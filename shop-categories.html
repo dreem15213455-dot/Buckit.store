@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Categories - Zatpat</title>
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f8f9fa;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .page-header {
+            background: #FF0000;
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            flex: 1;
+        }
+
+        .cart-icon {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #FFD700;
+            color: #000;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Search */
+        .search-section {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 40px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #FF0000;
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(255,0,0,0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #FF0000;
+            font-size: 18px;
+        }
+
+        /* Categories Container */
+        .categories-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Category Sections */
+        .category-section {
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1D3A57;
+        }
+
+        .section-title i {
+            color: #FF0000;
+            margin-right: 10px;
+        }
+
+        .view-all {
+            color: #FF0000;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .view-all:hover {
+            text-decoration: underline;
+        }
+
+        /* Categories Grid */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media (min-width: 576px) {
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .categories-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .categories-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        /* Category Card */
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid #eee;
+            text-align: center;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .category-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .category-content {
+            padding: 15px;
+        }
+
+        .category-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1D3A57;
+            margin-bottom: 5px;
+        }
+
+        .category-count {
+            font-size: 12px;
+            color: #FF0000;
+            font-weight: 600;
+        }
+
+        /* Featured Categories */
+        .featured-categories {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .featured-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1D3A57;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #FF0000;
+        }
+
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .featured-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .featured-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .featured-item:hover {
+            background: #FF0000;
+            color: white;
+        }
+
+        .featured-item:hover .featured-name {
+            color: white;
+        }
+
+        .featured-icon {
+            font-size: 30px;
+            color: #FF0000;
+            margin-bottom: 5px;
+        }
+
+        .featured-item:hover .featured-icon {
+            color: white;
+        }
+
+        .featured-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1D3A57;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            text-align: center;
+            padding: 50px;
+            color: #FF0000;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            background: white;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #eee;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            font-size: 11px;
+            transition: all 0.3s;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .nav-item.active {
+            color: #FF0000;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast-message {
+            background: white;
+            color: #333;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            border-left: 5px solid #28a745;
+        }
+
+        .toast-message.error {
+            border-left-color: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h1>All Categories</h1>
+            <div class="cart-icon" onclick="goToCart()">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge" id="cartCount">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-section">
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search categories...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+    </div>
+
+    <!-- Categories Container -->
+    <div class="categories-container" id="categoriesContainer">
+        <div class="loading-spinner">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading categories...</p>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="products.html" class="nav-item">
+            <i class="fas fa-boxes"></i>
+            <span>Products</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Cart</span>
+            <span class="cart-badge" id="navCartCount">0</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <i class="fas fa-shopping-bag"></i>
+            <span>Orders</span>
+        </a>
+    </nav>
+
+    <script>
+        // ========== SUPABASE INIT ==========
+        const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // ========== GLOBAL VARIABLES ==========
+        let allCategories = [];
+        let shopCountByCategory = {};
+        let cartItems = [];
+
+        // ========== TOAST SYSTEM ==========
+        const Toast = {
+            show: function(message, type = 'success', duration = 3000) {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast-message ${type}`;
+                toast.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.animation = 'slideIn 0.3s reverse';
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            }
+        };
+
+        // ========== LOAD CATEGORIES ==========
+        async function loadCategories() {
+            try {
+                const { data: categories, error } = await supabaseClient
+                    .from('categories')
+                    .select('*')
+                    .eq('active', true)
+                    .order('priority')
+                    .order('name');
+
+                if (error) throw error;
+
+                allCategories = categories || [];
+                
+                // Load shop counts for each category
+                await loadShopCounts();
+                
+                renderCategories();
+
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                document.getElementById('categoriesContainer').innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-circle mb-3" style="font-size: 48px; color: #dc3545;"></i>
+                        <h3>Error loading categories</h3>
+                        <p>Please try again later</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ========== LOAD SHOP COUNTS ==========
+        async function loadShopCounts() {
+            try {
+                const { data: shops, error } = await supabaseClient
+                    .from('shops')
+                    .select('category')
+                    .eq('status', 'approved');
+
+                if (error) throw error;
+
+                shopCountByCategory = {};
+                shops.forEach(shop => {
+                    if (shop.category) {
+                        shopCountByCategory[shop.category] = (shopCountByCategory[shop.category] || 0) + 1;
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading shop counts:', error);
+            }
+        }
+
+        // ========== GET CATEGORY ICON ==========
+        function getCategoryIcon(categoryName) {
+            const icons = {
+                'Groceries': 'fa-shopping-basket',
+                'Fruits': 'fa-apple-alt',
+                'Vegetables': 'fa-carrot',
+                'Dairy': 'fa-cheese',
+                'Bakery': 'fa-bread-slice',
+                'Meat': 'fa-drumstick-bite',
+                'Fish': 'fa-fish',
+                'Medical': 'fa-notes-medical',
+                'Pharmacy': 'fa-pills',
+                'Clothing': 'fa-tshirt',
+                'Electronics': 'fa-tv',
+                'Furniture': 'fa-couch',
+                'Hardware': 'fa-tools',
+                'Stationery': 'fa-pen',
+                'Pet Supplies': 'fa-dog',
+                'Baby Care': 'fa-baby',
+                'Beauty': 'fa-spa',
+                'Sports': 'fa-futbol',
+                'Books': 'fa-book',
+                'Toys': 'fa-gamepad',
+                'Jewelry': 'fa-gem',
+                'Flowers': 'fa-seedling',
+                'Gifts': 'fa-gift',
+                'Home Decor': 'fa-home',
+                'Kitchen': 'fa-utensils',
+                'Bath': 'fa-shower',
+                'Automotive': 'fa-car',
+                'Garden': 'fa-leaf',
+                'Farming': 'fa-tractor',
+                'Krishi Seva': 'fa-tractor',
+                'Restaurant': 'fa-utensils',
+                'Cafe': 'fa-coffee',
+                'Fast Food': 'fa-hamburger',
+                'Pizza': 'fa-pizza-slice',
+                'Beverages': 'fa-wine-bottle',
+                'Ice Cream': 'fa-ice-cream',
+                'Sweets': 'fa-candy-cane',
+                'Namkeen': 'fa-cookie'
+            };
+            
+            return icons[categoryName] || 'fa-store';
+        }
+
+        // ========== GET FEATURED CATEGORIES ==========
+        function getFeaturedCategories() {
+            // Categories with most shops
+            const categoriesWithCount = allCategories.map(cat => ({
+                ...cat,
+                shopCount: shopCountByCategory[cat.name] || 0
+            }));
+            
+            return categoriesWithCount
+                .sort((a, b) => b.shopCount - a.shopCount)
+                .slice(0, 8);
+        }
+
+        // ========== GROUP CATEGORIES BY PRIORITY ==========
+        function groupCategoriesByPriority() {
+            const groups = {
+                emergency: [],
+                popular: [],
+                other: []
+            };
+
+            allCategories.forEach(cat => {
+                if (cat.priority === 1) {
+                    groups.emergency.push(cat);
+                } else if (cat.priority === 2) {
+                    groups.popular.push(cat);
+                } else {
+                    groups.other.push(cat);
+                }
+            });
+
+            return groups;
+        }
+
+        // ========== RENDER CATEGORIES ==========
+        function renderCategories() {
+            const container = document.getElementById('categoriesContainer');
+            
+            const featured = getFeaturedCategories();
+            const grouped = groupCategoriesByPriority();
+
+            let html = '';
+
+            // Featured Categories Section
+            if (featured.length > 0) {
+                html += `
+                    <div class="featured-categories">
+                        <div class="featured-title">
+                            <i class="fas fa-star"></i> Featured Categories
+                        </div>
+                        <div class="featured-grid">
+                `;
+                
+                featured.forEach(cat => {
+                    const icon = getCategoryIcon(cat.name);
+                    html += `
+                        <div class="featured-item" onclick="openCategory('${cat.name}')">
+                            <div class="featured-icon"><i class="fas ${icon}"></i></div>
+                            <div class="featured-name">${cat.name}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Emergency Services Section
+            if (grouped.emergency.length > 0) {
+                html += `
+                    <div class="category-section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-first-aid"></i> Emergency Services
+                            </div>
+                        </div>
+                        <div class="categories-grid">
+                `;
+                
+                grouped.emergency.forEach(cat => {
+                    html += getCategoryCardHTML(cat);
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Popular Categories Section
+            if (grouped.popular.length > 0) {
+                html += `
+                    <div class="category-section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-fire"></i> Popular Categories
+                            </div>
+                        </div>
+                        <div class="categories-grid">
+                `;
+                
+                grouped.popular.forEach(cat => {
+                    html += getCategoryCardHTML(cat);
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Other Categories Section
+            if (grouped.other.length > 0) {
+                html += `
+                    <div class="category-section">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-tag"></i> More Categories
+                            </div>
+                        </div>
+                        <div class="categories-grid">
+                `;
+                
+                grouped.other.forEach(cat => {
+                    html += getCategoryCardHTML(cat);
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (html === '') {
+                html = `
+                    <div class="no-data">
+                        <i class="fas fa-folder-open mb-3" style="font-size: 48px; color: #ccc;"></i>
+                        <h3>No categories found</h3>
+                        <p>Check back later for new categories</p>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ========== GET CATEGORY CARD HTML ==========
+        function getCategoryCardHTML(category) {
+            const shopCount = shopCountByCategory[category.name] || 0;
+            const icon = getCategoryIcon(category.name);
+            
+            return `
+                <div class="category-card" onclick="openCategory('${category.name}')">
+                    <img src="${category.image_url || 'https://via.placeholder.com/200x120?text=' + category.name}" 
+                         class="category-image" 
+                         alt="${category.name}"
+                         onerror="this.src='https://via.placeholder.com/200x120?text=' + encodeURIComponent('${category.name}')">
+                    <div class="category-content">
+                        <div class="category-name">${category.name}</div>
+                        <div class="category-count">${shopCount} shops</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== SEARCH CATEGORIES ==========
+        function searchCategories(searchTerm) {
+            const container = document.getElementById('categoriesContainer');
+            
+            if (!searchTerm.trim()) {
+                renderCategories();
+                return;
+            }
+
+            const filtered = allCategories.filter(cat => 
+                cat.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-search mb-3" style="font-size: 48px; color: #ccc;"></i>
+                        <h3>No categories found</h3>
+                        <p>No results for "${searchTerm}"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="category-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fas fa-search"></i> Search Results
+                        </div>
+                        <div class="view-all" onclick="clearSearch()">Clear</div>
+                    </div>
+                    <div class="categories-grid">
+            `;
+            
+            filtered.forEach(cat => {
+                html += getCategoryCardHTML(cat);
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // ========== CLEAR SEARCH ==========
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            renderCategories();
+        }
+
+        // ========== OPEN CATEGORY ==========
+        function openCategory(categoryName) {
+            window.location.href = `category-shops.html?category=${encodeURIComponent(categoryName)}`;
+        }
+
+        // ========== UPDATE CART COUNT ==========
+        function updateCartCount() {
+            try {
+                cartItems = JSON.parse(localStorage.getItem('zatpat_cart')) || [];
+                const totalItems = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                document.getElementById('cartCount').innerText = totalItems;
+                document.getElementById('navCartCount').innerText = totalItems;
+            } catch (e) {
+                document.getElementById('cartCount').innerText = '0';
+                document.getElementById('navCartCount').innerText = '0';
+            }
+        }
+
+        // ========== GO TO CART ==========
+        function goToCart() {
+            window.location.href = 'cart.html';
+        }
+
+        // ========== GO BACK ==========
+        function goBack() {
+            window.history.back();
+        }
+
+        // ========== DEBOUNCE SEARCH ==========
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchCategories(this.value);
+            }, 500);
+        });
+
+        // ========== INITIALIZE ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            loadCategories();
+        });
+    </script>
+</body>
+</html>

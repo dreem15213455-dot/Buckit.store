@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Shops - BUCKiT</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #FF0000; /* Red */
+            --secondary: #FFD700; /* Yellow */
+            --success: #28a745; /* Green */
+            --dark: #1D3A57;
+            --light: #f8f9fa;
+        }
+        
+        body {
+            background: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            padding-bottom: 20px;
+        }
+        
+        .main-navbar {
+            background: #FF0000;
+            color: #FFFFFF;
+            padding: 12px 15px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            border-bottom: 6px solid #FFD700;
+        }
+        
+        .navbar-brand-custom {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #FFFFFF;
+            text-decoration: none;
+        }
+        
+        .brand-name-custom {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+        
+        .brand-name-custom .green-i {
+            color: #FFD700 !important;
+            font-weight: 800;
+            font-style: italic;
+        }
+        
+        .main-content {
+            padding-top: 70px;
+            padding-bottom: 20px;
+        }
+        
+        .page-header {
+            background: linear-gradient(45deg, #FF0000, #FF4500);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            font-size: 14px;
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .filters-bar {
+            background: white;
+            padding: 15px;
+            margin: 0 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .filter-btn {
+            background: #FF0000;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            background: #FF4500;
+            transform: translateY(-2px);
+        }
+        
+        .shops-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 0 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .shops-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .shops-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .shop-card { 
+            background: white; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            transition: all 0.3s; 
+            border: 1px solid #eee; 
+            cursor: pointer; 
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .shop-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.15);
+            border-color: #FF0000;
+        }
+        
+        .shop-image-container {
+            height: 150px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .shop-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        
+        .shop-card:hover .shop-image {
+            transform: scale(1.05);
+        }
+        
+        .shop-details {
+            padding: 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .shop-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: #1D3A57;
+            margin-bottom: 5px;
+            line-height: 1.2;
+            height: 34px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        .shop-category {
+            font-size: 11px;
+            color: #FF0000;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .shop-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+        
+        .shop-distance {
+            background: #FF0000;
+            color: white;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+        
+        .shop-rating {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .rating-star {
+            color: #FFD700;
+            font-size: 10px;
+        }
+        
+        .rating-value {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .shop-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            z-index: 2;
+        }
+        
+        .shop-status.closed {
+            background: rgba(220, 53, 69, 0.9);
+        }
+        
+        .sponsored-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 215, 0, 0.9);
+            color: #000;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            z-index: 2;
+            font-weight: 600;
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 50px 15px;
+            color: #FF0000;
+        }
+        
+        .no-shops {
+            text-align: center;
+            padding: 50px 20px;
+            color: #666;
+        }
+        
+        .no-shops i {
+            font-size: 60px;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .back-button {
+            background: white;
+            color: #FF0000;
+            border: 2px solid #FF0000;
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .back-button:hover {
+            background: #FF0000;
+            color: white;
+        }
+        
+        .shops-count {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .shops-count strong {
+            color: #FF0000;
+        }
+    </style>
+    
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAeW8X74-OFc_coEBrsps-vSSTnW9efkt0",
+            authDomain: "dreem15-b0610.firebaseapp.com",
+            projectId: "dreem15-b0610",
+            storageBucket: "dreem15-b0610.firebasestorage.app",
+            messagingSenderId: "655024502039",
+            appId: "1:655024502039:web:642dcd025e7ae2011c7352"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.FB = {
+            app: app,
+            db: db,
+            firestore: { collection, getDocs, query, where, orderBy }
+        };
+    </script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar main-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand-custom" href="index.html">
+                <div class="brand-logo"><i class="fas fa-store"></i></div>
+                <div class="brand-name-custom">BUCK<span class="green-i">i</span>T</div>
+            </a>
+            
+            <button class="back-button" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-store-alt"></i> All Shops</h1>
+            <p>Discover all shops in your area</p>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters-bar">
+            <select class="filter-select" id="filterCategory">
+                <option value="">All Categories</option>
+                <!-- Categories will be populated by JavaScript -->
+            </select>
+            
+            <select class="filter-select" id="filterSort">
+                <option value="distance">Sort by Distance</option>
+                <option value="rating">Sort by Rating</option>
+                <option value="name">Sort by Name</option>
+                <option value="newest">Newest First</option>
+            </select>
+            
+            <select class="filter-select" id="filterStatus">
+                <option value="all">All Status</option>
+                <option value="open">Open Now</option>
+                <option value="sponsored">Sponsored</option>
+            </select>
+            
+            <button class="filter-btn" onclick="applyFilters()">
+                <i class="fas fa-filter"></i> Apply
+            </button>
+            
+            <button class="filter-btn" style="background: #6c757d;" onclick="clearFilters()">
+                <i class="fas fa-times"></i> Clear
+            </button>
+        </div>
+        
+        <!-- Shops Count -->
+        <div class="shops-count">
+            Showing <strong id="shopsCount">0</strong> shops
+        </div>
+        
+        <!-- Shops Grid -->
+        <div class="shops-grid" id="shopsContainer">
+            <div class="loading-spinner" style="grid-column: 1 / -1;">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading shops...</p>
+            </div>
+        </div>
+        
+        <!-- No Shops Message -->
+        <div class="no-shops" id="noShopsMessage" style="display: none;">
+            <i class="fas fa-store-alt"></i>
+            <h5>No Shops Found</h5>
+            <p class="text-muted">Try changing filters or check back later</p>
+            <button class="btn btn-primary mt-3" onclick="clearFilters()">
+                <i class="fas fa-redo"></i> Reset Filters
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let allShops = [];
+        let allCategories = [];
+        let userLocation = { lat: 18.5204, lng: 73.8567 };
+        
+        // Get cached location
+        const cachedLocation = localStorage.getItem('buckit_user_location');
+        if (cachedLocation) {
+            try {
+                const locationData = JSON.parse(cachedLocation);
+                userLocation = locationData.coords;
+            } catch(e) {}
+        }
+        
+        // Load shops on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadShops();
+            loadCategories();
+        });
+        
+        async function loadShops() {
+            try {
+                const shopsRef = window.FB.firestore.collection(window.FB.db, 'shops');
+                const shopsQuery = window.FB.firestore.query(
+                    shopsRef,
+                    window.FB.firestore.where('status', '==', 'approved')
+                );
+                
+                const snapshot = await window.FB.firestore.getDocs(shopsQuery);
+                
+                if (snapshot.empty) {
+                    document.getElementById('noShopsMessage').style.display = 'block';
+                    document.getElementById('shopsContainer').style.display = 'none';
+                    return;
+                }
+                
+                allShops = [];
+                snapshot.forEach(doc => {
+                    allShops.push({ 
+                        id: doc.id, 
+                        ...doc.data(),
+                        // Calculate distance for each shop
+                        distance: calculateDistance(
+                            userLocation.lat, userLocation.lng,
+                            doc.data().latitude || userLocation.lat,
+                            doc.data().longitude || userLocation.lng
+                        )
+                    });
+                });
+                
+                // Sort by distance initially
+                allShops.sort((a, b) => a.distance - b.distance);
+                displayShops(allShops);
+                
+            } catch (error) {
+                console.error('Error loading shops:', error);
+                document.getElementById('shopsContainer').innerHTML = `
+                    <div class="text-center py-4" style="grid-column: 1 / -1;">
+                        <i class="fas fa-exclamation-triangle text-warning fa-2x mb-2"></i>
+                        <p>Error loading shops</p>
+                        <button class="btn btn-sm btn-primary" onclick="loadShops()">
+                            Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        async function loadCategories() {
+            try {
+                const categoriesRef = window.FB.firestore.collection(window.FB.db, 'categories');
+                const categoriesQuery = window.FB.firestore.query(
+                    categoriesRef,
+                    window.FB.firestore.where('active', '==', true)
+                );
+                
+                const snapshot = await window.FB.firestore.getDocs(categoriesQuery);
+                allCategories = [];
+                snapshot.forEach(doc => {
+                    allCategories.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Populate category filter
+                const categorySelect = document.getElementById('filterCategory');
+                allCategories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+        
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        function displayShops(shops) {
+            const container = document.getElementById('shopsContainer');
+            
+            if (shops.length === 0) {
+                document.getElementById('noShopsMessage').style.display = 'block';
+                container.style.display = 'none';
+                document.getElementById('shopsCount').textContent = '0';
+                return;
+            }
+            
+            container.style.display = 'grid';
+            document.getElementById('noShopsMessage').style.display = 'none';
+            document.getElementById('shopsCount').textContent = shops.length;
+            
+            let html = '';
+            
+            shops.forEach(shop => {
+                const defaultImage = 'https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?w=500';
+                const status = shop.isOpen !== false ? 'opened' : 'closed';
+                const statusText = shop.isOpen !== false ? 'Open' : 'Closed';
+                const statusClass = shop.isOpen !== false ? '' : 'closed';
+                
+                // Format distance
+                let distanceText = 'Nearby';
+                if (shop.distance !== undefined) {
+                    if (shop.distance < 1) {
+                        distanceText = `${(shop.distance * 1000).toFixed(0)} m`;
+                    } else {
+                        distanceText = `${shop.distance.toFixed(1)} km`;
+                    }
+                }
+                
+                html += `
+                    <div class="shop-card" onclick="window.location.href='shop-detail.html?id=${shop.id}'">
+                        <div class="shop-image-container">
+                            <img src="${shop.shopImage || shop.imageUrl || defaultImage}" 
+                                 class="shop-image" 
+                                 alt="${shop.shopName}"
+                                 onerror="this.src='${defaultImage}'">
+                            <div class="shop-status ${statusClass}">${statusText}</div>
+                            ${shop.isSponsored ? '<div class="sponsored-badge"><i class="fas fa-star"></i> Sponsored</div>' : ''}
+                        </div>
+                        <div class="shop-details">
+                            <div class="shop-name">${shop.shopName || 'Shop'}</div>
+                            <div class="shop-category">${shop.category || shop.shopCategory || 'General'}</div>
+                            <div class="shop-info-row">
+                                <div class="shop-distance">${distanceText}</div>
+                                <div class="shop-rating">
+                                    <i class="fas fa-star rating-star"></i>
+                                    <span class="rating-value">${shop.rating?.toFixed(1) || '4.2'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function applyFilters() {
+            const selectedCategory = document.getElementById('filterCategory').value;
+            const selectedSort = document.getElementById('filterSort').value;
+            const selectedStatus = document.getElementById('filterStatus').value;
+            
+            let filteredShops = [...allShops];
+            
+            // Filter by category
+            if (selectedCategory) {
+                const selectedCategoryData = allCategories.find(cat => cat.id === selectedCategory);
+                if (selectedCategoryData) {
+                    filteredShops = filteredShops.filter(shop => 
+                        shop.categoryId === selectedCategory ||
+                        shop.category === selectedCategoryData.name ||
+                        shop.shopCategory === selectedCategoryData.name
+                    );
+                }
+            }
+            
+            // Filter by status
+            if (selectedStatus === 'open') {
+                filteredShops = filteredShops.filter(shop => shop.isOpen !== false);
+            } else if (selectedStatus === 'sponsored') {
+                filteredShops = filteredShops.filter(shop => shop.isSponsored === true);
+            }
+            
+            // Sort shops
+            if (selectedSort === 'rating') {
+                filteredShops.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            } else if (selectedSort === 'name') {
+                filteredShops.sort((a, b) => (a.shopName || '').localeCompare(b.shopName || ''));
+            } else if (selectedSort === 'newest') {
+                // Assuming createdAt field exists
+                filteredShops.sort((a, b) => {
+                    const dateA = a.createdAt ? a.createdAt.toDate() : new Date(0);
+                    const dateB = b.createdAt ? b.createdAt.toDate() : new Date(0);
+                    return dateB - dateA;
+                });
+            } else {
+                // Default: sort by distance
+                filteredShops.sort((a, b) => a.distance - b.distance);
+            }
+            
+            displayShops(filteredShops);
+        }
+        
+        function clearFilters() {
+            document.getElementById('filterCategory').value = '';
+            document.getElementById('filterSort').value = 'distance';
+            document.getElementById('filterStatus').value = 'all';
+            
+            // Reset to all shops sorted by distance
+            allShops.sort((a, b) => a.distance - b.distance);
+            displayShops(allShops);
+        }
+        
+        // Make functions global
+        window.applyFilters = applyFilters;
+        window.clearFilters = clearFilters;
+    </script>
+</body>
+</html>
