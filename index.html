@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ZATPAT - Fast Local Deals ⚡</title>
+    <meta name="theme-color" content="#FF4D00">
+    <meta name="description" content="ZATPAT - Get groceries and essentials delivered in minutes. Fast local deals near you!">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Preconnect for faster fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+    
+    <style>
+        /* ========== ZEPTO-STYLE COLOR SYSTEM ========== */
+        :root {
+            --primary: #FF4D00;
+            --primary-dark: #E64500;
+            --accent-yellow: #FFD600;
+            --bg-light: #F0F2F5;
+            --card-white: #FFFFFF;
+            --text-primary: #0F172A;
+            --text-secondary: #6B7280;
+            --rating-star: #FACC15;
+            --border-light: #E5E7EB;
+            --gray-100: #F1F5F9;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+
+        /* Splash Screen */
+        #splashScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; transition: opacity 0.5s ease;
+        }
+        .splash-logo { text-align: center; animation: fadeInScale 0.5s ease; }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .splash-brand {
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .splash-brand span:first-child { font-weight: 700; opacity: 0.9; }
+        .splash-brand span:last-child { font-weight: 900; letter-spacing: -1px; }
+        .splash-tagline { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.9); margin-top: 12px; letter-spacing: 1px; }
+
+        /* Loader */
+        #loaderOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; z-index: 10000;
+        }
+        #loaderOverlay.active { display: flex; }
+        .loader-spinner { width: 44px; height: 44px; border: 3px solid var(--gray-200); border-radius: 50%; border-top-color: var(--primary); animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Offline Page */
+        #offlinePage {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10001; padding: 24px;
+        }
+        .offline-icon { font-size: 64px; color: white; margin-bottom: 20px; }
+        .offline-title { font-size: 24px; font-weight: 700; color: white; margin-bottom: 8px; }
+        .offline-sub { color: rgba(255,255,255,0.85); font-size: 14px; margin-bottom: 28px; text-align: center; }
+        .offline-retry { background: white; color: var(--primary); border: none; border-radius: var(--radius-full); padding: 12px 36px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+        /* Location Modal - WITH DEFAULT BUTTON */
+        .location-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+            display: flex; justify-content: center; align-items: center; z-index: 9998; padding: 20px;
+        }
+        .location-modal-content {
+            background: white; border-radius: var(--radius-2xl); padding: 32px 24px;
+            max-width: 340px; width: 90%; text-align: center;
+            animation: modalSlideUp 0.4s ease;
+        }
+        @keyframes modalSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .location-icon { font-size: 56px; margin-bottom: 12px; }
+        .location-modal-content h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
+        .location-modal-content p { color: var(--text-secondary); font-size: 14px; line-height: 1.5; margin-bottom: 24px; }
+        .location-btn { background: var(--primary); color: white; border: none; padding: 14px 20px; border-radius: var(--radius-full); font-weight: 600; width: 100%; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; }
+        .location-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .location-skip { background: transparent; border: 1px solid var(--gray-200); padding: 12px 20px; border-radius: var(--radius-full); font-weight: 500; width: 100%; cursor: pointer; color: var(--text-secondary); }
+        .location-error-msg { color: #FF4D00; font-size: 12px; margin-top: 12px; }
+
+        /* Header */
+        .top-bar {
+            background: white; position: fixed; top: 0; left: 0; width: 100%;
+            z-index: 1000; padding: 10px 16px; box-shadow: var(--shadow-sm); border-bottom: 1px solid var(--border-light);
+        }
+        .top-search-section { display: flex; align-items: center; gap: 8px; }
+        .menu-btn {
+            width: 38px; height: 38px; background: var(--gray-100); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+        }
+        .brand-name { font-size: 22px; font-weight: 800; flex-shrink: 0; }
+        .brand-name .normal { color: var(--primary); font-weight: 700; }
+        .brand-name .pat { color: black; font-weight: 900; letter-spacing: -0.5px; }
+        .search-box {
+            flex: 1; background: var(--gray-100); border-radius: var(--radius-full);
+            display: flex; align-items: center; padding: 0 12px; gap: 6px;
+            border: 1px solid transparent; min-width: 0;
+        }
+        .search-box:focus-within { border-color: var(--primary); background: white; }
+        .search-box i { color: var(--text-secondary); font-size: 13px; }
+        .search-box input { flex: 1; border: none; outline: none; padding: 8px 0; background: transparent; font-size: 13px; min-width: 0; }
+        .location-header {
+            display: flex; align-items: center; gap: 4px; padding: 6px 10px;
+            background: var(--gray-100); border-radius: var(--radius-full); cursor: pointer; flex-shrink: 0;
+        }
+        .location-header i { color: var(--primary); font-size: 11px; }
+        .location-header span { font-size: 11px; font-weight: 500; white-space: nowrap; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+        .notification-btn {
+            width: 38px; height: 38px; background: var(--gray-100); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; flex-shrink: 0;
+        }
+
+        /* Menu Dropdown */
+        #menuDropdown {
+            position: fixed; top: 68px; left: 16px; background: white; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg); z-index: 1001; min-width: 260px; display: none; overflow: hidden;
+        }
+        #menuDropdown ul { list-style: none; padding: 8px 0; margin: 0; }
+        #menuDropdown li { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--border-light); }
+        #menuDropdown li:last-child { border-bottom: none; }
+        #menuDropdown li:hover { background: var(--gray-50); color: var(--primary); }
+        #menuDropdown li i { width: 20px; color: var(--primary); }
+        .menu-divider { height: 1px; background: var(--border-light); margin: 8px 0; }
+
+        /* Main Content */
+        .main-content { padding-top: 76px; padding-bottom: 80px; }
+
+        /* Hero Slider */
+        .hero-section { padding: 0 16px 16px; }
+        .hero-slider { border-radius: var(--radius-lg); overflow: hidden; }
+        .hero-slide { position: relative; height: 150px; border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+        .hero-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 16px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+        }
+        .hero-title { font-size: 18px; font-weight: 800; color: white; margin-bottom: 4px; }
+        .hero-subtitle { font-size: 12px; color: rgba(255,255,255,0.9); }
+        .hero-badge { display: inline-block; background: var(--accent-yellow); color: var(--text-primary); font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: var(--radius-full); margin-top: 6px; }
+
+        /* Categories - 4 PER LINE */
+        .categories-section { background: white; padding: 16px 0; margin-bottom: 12px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px 12px 16px; }
+        .section-header h2 { font-size: 18px; font-weight: 700; margin: 0; }
+        .view-all { color: var(--primary); font-size: 12px; font-weight: 600; text-decoration: none; }
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 0 12px;
+        }
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        .category-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: var(--radius-md);
+            background-size: cover;
+            background-position: center;
+            background-color: var(--gray-100);
+            margin-bottom: 6px;
+            border: 1px solid var(--border-light);
+            transition: transform 0.2s;
+        }
+        .category-item:hover .category-icon { transform: scale(1.05); }
+        .category-name {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70px;
+        }
+
+        /* Hot Offers - 2 CARDS + AUTO SLIDE */
+        .offers-section {
+            background: white;
+            padding: 16px 0;
+            margin-bottom: 12px;
+        }
+        .offers-slider-container {
+            padding: 0 16px;
+            position: relative;
+        }
+        .offers-slider {
+            overflow: hidden;
+            border-radius: var(--radius-lg);
+        }
+        .offers-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        .offers-track-group {
+            display: flex;
+            min-width: 100%;
+            gap: 12px;
+        }
+        .offer-card {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius-lg);
+            padding: 14px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .offer-content h4 { font-size: 13px; font-weight: 800; color: white; margin-bottom: 4px; }
+        .offer-content p { font-size: 10px; color: rgba(255,255,255,0.9); }
+        .offer-btn { background: var(--accent-yellow); color: var(--text-primary); border: none; padding: 5px 12px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .slider-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gray-300);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .slider-dot.active {
+            width: 20px;
+            border-radius: 4px;
+            background: var(--primary);
+        }
+
+        /* Featured Products - 3 PER LINE */
+        .featured-section { background: white; padding: 16px 0; margin: 12px 0; }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 12px;
+        }
+        .product-card {
+            background: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .product-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .product-img { width: 100%; height: 90px; object-fit: cover; background: var(--gray-100); position: relative; }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; }
+        .discount-tag { position: absolute; top: 4px; left: 4px; background: var(--accent-yellow); color: var(--text-primary); font-size: 8px; font-weight: 700; padding: 2px 5px; border-radius: var(--radius-full); }
+        .product-info { padding: 6px; }
+        .product-name { font-size: 10px; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-rating { display: flex; align-items: center; gap: 2px; margin-bottom: 3px; }
+        .product-rating i { color: var(--rating-star); font-size: 8px; }
+        .product-rating span { font-size: 9px; }
+        .product-price { font-size: 11px; font-weight: 700; color: var(--primary); }
+        .add-cart {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 0;
+            font-size: 9px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        .add-cart:hover { background: var(--primary-dark); }
+
+        /* Sponsored Shops */
+        .sponsored-section { background: white; padding: 16px 0; margin: 12px 0; }
+        .sponsored-scroll { padding: 0 16px; display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
+        .sponsored-scroll::-webkit-scrollbar { display: none; }
+        .sponsored-card {
+            background: white; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light); cursor: pointer; min-width: 130px; position: relative;
+        }
+        .sponsored-img { width: 100%; height: 75px; object-fit: cover; }
+        .sponsored-badge { position: absolute; top: 6px; left: 6px; background: var(--accent-yellow); color: var(--text-primary); font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: var(--radius-full); }
+        .sponsored-info { padding: 6px; }
+        .sponsored-name { font-size: 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sponsored-rating { display: flex; align-items: center; gap: 2px; margin-top: 3px; }
+        .sponsored-rating i { color: var(--rating-star); font-size: 8px; }
+
+        /* Local Shops */
+        .local-title { font-size: 18px; font-weight: 700; margin: 12px 0 12px; padding: 0 16px; }
+        .shops-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px; }
+        .shop-item {
+            background: white; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light); cursor: pointer;
+        }
+        .shop-img { width: 100%; height: 100px; object-fit: cover; position: relative; background: var(--gray-100); }
+        .shop-img img { width: 100%; height: 100%; object-fit: cover; }
+        .shop-status { position: absolute; top: 6px; right: 6px; background: var(--primary); color: white; font-size: 8px; font-weight: 600; padding: 2px 6px; border-radius: var(--radius-full); }
+        .shop-status.closed { background: var(--gray-400); }
+        .shop-details { padding: 8px; }
+        .shop-name { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+        .shop-category { font-size: 9px; color: var(--primary); font-weight: 500; margin-bottom: 4px; }
+        .shop-footer { display: flex; justify-content: space-between; align-items: center; }
+        .shop-distance { background: rgba(255,77,0,0.1); color: var(--primary); font-size: 8px; padding: 2px 6px; border-radius: var(--radius-full); }
+        .shop-rating { display: flex; align-items: center; gap: 2px; }
+        .shop-rating i { color: var(--rating-star); font-size: 8px; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            background: white; position: fixed; bottom: 0; left: 0; width: 100%;
+            display: flex; justify-content: space-around; padding: 8px 16px 16px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 1000; border-top: 1px solid var(--border-light);
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; font-size: 10px; font-weight: 500; color: var(--gray-400); transition: all 0.2s; position: relative; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 20px; margin-bottom: 3px; }
+        .cart-count { position: absolute; top: -5px; right: -8px; background: var(--primary); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 9px; display: flex; align-items: center; justify-content: center; }
+
+        /* Auth Modal */
+        .auth-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center; z-index: 9990;
+        }
+        .auth-content {
+            background: white; border-radius: var(--radius-2xl); padding: 28px;
+            max-width: 90%; width: 360px; text-align: center;
+        }
+        .auth-input { margin-bottom: 14px; border-radius: var(--radius-md); padding: 12px 14px; border: 1px solid var(--border-light); font-size: 14px; width: 100%; }
+        .auth-input:focus { border-color: var(--primary); outline: none; }
+        .auth-btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: var(--radius-md); font-weight: 600; width: 100%; margin-bottom: 12px; cursor: pointer; }
+        .text-error { color: #EF4444; font-size: 12px; margin: 8px 0; display: none; }
+
+        /* Toast */
+        .toast-notification {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background: #1F2937; color: white; padding: 10px 20px;
+            border-radius: var(--radius-full); font-size: 13px; font-weight: 500;
+            z-index: 10050; display: none; align-items: center; gap: 8px;
+            box-shadow: var(--shadow-lg); white-space: nowrap;
+        }
+        .toast-notification.show { display: flex; animation: toastUp 0.3s ease; }
+        @keyframes toastUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+        /* Delivery Timer Bar */
+        .delivery-timer-bar {
+            position: fixed; top: 65px; left: 0; width: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white; padding: 8px 16px; z-index: 999;
+            display: none; justify-content: space-between; align-items: center;
+            font-size: 12px; font-weight: 500;
+        }
+        .timer-display { font-weight: 800; font-size: 15px; margin-left: 6px; }
+        .track-btn { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: var(--radius-full); cursor: pointer; font-size: 11px; }
+
+        .loading-spinner { text-align: center; padding: 40px; color: var(--primary); }
+        .no-data { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
+
+        @media (max-width: 480px) {
+            .brand-name { font-size: 20px; }
+            .hero-slide { height: 130px; }
+            .category-icon { width: 60px; height: 60px; }
+            .category-name { font-size: 10px; max-width: 65px; }
+            .offer-card { padding: 10px 12px; }
+            .offer-content h4 { font-size: 11px; }
+            .offer-content p { font-size: 9px; }
+            .offer-btn { font-size: 9px; padding: 4px 8px; }
+            .product-img { height: 80px; }
+            .shop-img { height: 90px; }
+            .sponsored-card { min-width: 115px; }
+        }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+</head>
+<body>
+
+<!-- Splash Screen -->
+<div id="splashScreen">
+    <div class="splash-logo">
+        <div class="splash-brand"><span>ZAT</span><span>PAT</span></div>
+        <div class="splash-tagline">10 MINUTE DELIVERY ⚡</div>
+    </div>
+</div>
+
+<!-- Loader -->
+<div id="loaderOverlay"><div class="loader-spinner"></div></div>
+
+<!-- Toast -->
+<div id="toastMsg" class="toast-notification"><i class="fas fa-check-circle"></i> <span id="toastText"></span></div>
+
+<!-- Location Modal - WITH DEFAULT BUTTON -->
+<div class="location-modal" id="locationModal" style="display: flex;">
+    <div class="location-modal-content">
+        <div class="location-icon"><i class="fas fa-map-marker-alt"></i></div>
+        <h2>📍 Enable Location</h2>
+        <p>ZATPAT needs your location to show shops near you and provide the best experience.</p>
+        <button class="location-btn" id="allowLocationBtn"><i class="fas fa-location-crosshairs"></i> Allow & Detect Location</button>
+        <button class="location-skip" id="skipLocationBtn">Use Default Location (Pune)</button>
+        <p style="font-size: 11px; margin-top: 16px; color: var(--text-secondary);"><i class="fas fa-shield-alt"></i> Your location is private & secure</p>
+        <div id="locationErrorMsg" class="location-error-msg"></div>
+    </div>
+</div>
+
+<div id="mainApp" style="display: none;">
+    <!-- Header -->
+    <div class="top-bar">
+        <div class="top-search-section">
+            <div class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+            <div class="brand-name"><span class="normal">ZAT</span><span class="pat">PAT</span></div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search products or shops..." autocomplete="off">
+            </div>
+            <div class="location-header" id="locationHeaderBtn">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="currentLocation">📍 Select</span>
+            </div>
+            <div class="notification-btn" id="notificationBtn">
+                <i class="fas fa-bell"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Timer Bar -->
+    <div id="deliveryTimerBar" class="delivery-timer-bar" style="display: none;">
+        <div><i class="fas fa-clock"></i> Delivery in <span id="timerDisplay" class="timer-display">00:00</span></div>
+        <div id="trackOrderBtn" class="track-btn"><i class="fas fa-location-dot"></i> Track</div>
+    </div>
+
+    <!-- Menu Dropdown -->
+    <div id="menuDropdown">
+        <ul>
+            <li id="authMenuItem" onclick="showAuthModal()"><i class="fas fa-user-circle"></i> Login / Register</li>
+            <li id="logoutMenuItem" style="display:none;" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+            <li onclick="window.location.href='shop-register.html'"><i class="fas fa-store-alt"></i> Register Shop</li>
+            <li onclick="window.location.href='products.html'"><i class="fas fa-boxes"></i> All Products</li>
+            <li onclick="openTrackOrder()"><i class="fas fa-truck"></i> Track Order</li>
+            <li onclick="openOrderHistory()"><i class="fas fa-clipboard-list"></i> My Orders</li>
+            <li onclick="window.open('https://wa.me/918600252238', '_blank')"><i class="fab fa-whatsapp"></i> WhatsApp Support</li>
+            <li onclick="showHelpModal()"><i class="fas fa-headset"></i> Help & Support</li>
+            <div class="menu-divider"></div>
+            <li onclick="window.location.href='refund-policy.html'"><i class="fas fa-money-bill-wave"></i> Refund Policy</li>
+            <li onclick="window.location.href='privacy-policy.html'"><i class="fas fa-shield-alt"></i> Privacy Policy</li>
+            <li onclick="window.location.href='terms.html'"><i class="fas fa-file-contract"></i> Terms & Conditions</li>
+            <li onclick="window.location.href='delete-account.html'"><i class="fas fa-trash-alt"></i> Delete Account</li>
+            <li onclick="showAboutUs()"><i class="fas fa-info-circle"></i> About Us</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <!-- Hero Slider -->
+        <div class="hero-section">
+            <div class="swiper hero-slider" id="heroSwiper">
+                <div class="swiper-wrapper" id="heroContainer">
+                    <div class="swiper-slide"><div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div></div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+
+        <!-- Categories - GRID 4 PER LINE -->
+        <div class="categories-section">
+            <div class="section-header">
+                <h2>Shop by Category</h2>
+                <a href="shop-categories.html" class="view-all">View All →</a>
+            </div>
+            <div class="categories-grid" id="categoriesContainer">
+                <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+            </div>
+        </div>
+
+        <!-- Hot Offers - 2 CARDS + AUTO SLIDE -->
+        <div class="offers-section">
+            <div class="section-header">
+                <h2>🔥 Hot Offers</h2>
+                <a href="offers.html" class="view-all">View All →</a>
+            </div>
+            <div class="offers-slider-container">
+                <div class="offers-slider" id="offersSlider">
+                    <div class="offers-track" id="offersTrack"></div>
+                </div>
+                <div class="slider-dots" id="offersDots"></div>
+            </div>
+        </div>
+
+        <!-- Featured Products - GRID 3 PER LINE -->
+        <div class="featured-section">
+            <div class="section-header">
+                <h3><i class="fas fa-fire" style="color: var(--primary);"></i> Featured Products</h3>
+                <a href="products.html" class="view-all">View All →</a>
+            </div>
+            <div class="products-grid" id="featuredContainer">
+                <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+            </div>
+        </div>
+
+        <!-- Sponsored Shops -->
+        <div class="sponsored-section">
+            <div class="section-header">
+                <span><i class="fas fa-star" style="color: var(--accent-yellow);"></i> Sponsored Shops</span>
+                <a href="sponsored-shops.html" class="view-all">View All →</a>
+            </div>
+            <div class="sponsored-scroll" id="sponsoredContainer">
+                <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+            </div>
+        </div>
+
+        <!-- Local Shops -->
+        <h3 class="local-title" id="localAreaTitle">📍 Local Shops Near You</h3>
+        <div class="shops-grid" id="shopsContainer">
+            <div class="loading-spinner"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Loading shops...</div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="products.html" class="nav-item"><i class="fas fa-compass"></i><span>Explore</span></a>
+        <a href="cart.html" class="nav-item"><i class="fas fa-shopping-cart"></i><span>Cart</span><span class="cart-count" id="cartCount">0</span></a>
+        <a href="#" class="nav-item" onclick="openProfile()"><i class="fas fa-user"></i><span>Profile</span></a>
+        <a href="#" class="nav-item" onclick="openOrdersPage()"><i class="fas fa-receipt"></i><span>Orders</span></a>
+    </nav>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="auth-modal" style="display:none;">
+        <div class="auth-content">
+            <h3>Welcome to ZATPAT</h3>
+            <div id="loginForm">
+                <input type="email" id="loginEmail" class="auth-input" placeholder="Email Address">
+                <input type="password" id="loginPassword" class="auth-input" placeholder="Password">
+                <button class="auth-btn" onclick="handleLogin()">Login</button>
+                <p id="loginError" class="text-error"></p>
+                <p class="small">New here? <a href="#" onclick="showRegisterForm()">Create Account</a></p>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <input type="text" id="registerName" class="auth-input" placeholder="Full Name">
+                <input type="email" id="registerEmail" class="auth-input" placeholder="Email Address">
+                <input type="password" id="registerPassword" class="auth-input" placeholder="Password (min 6 characters)">
+                <input type="tel" id="registerPhone" class="auth-input" placeholder="Mobile Number">
+                <button class="auth-btn" onclick="handleRegister()">Register</button>
+                <p id="registerError" class="text-error"></p>
+                <p class="small">Already have account? <a href="#" onclick="showLoginForm()">Login</a></p>
+            </div>
+            <button class="location-skip" style="margin-top: 12px;" onclick="hideAuthModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="auth-modal" style="display:none;">
+        <div class="auth-content">
+            <h3><i class="fas fa-headset"></i> Help & Support</h3>
+            <div style="text-align: left; margin: 20px 0;">
+                <p><strong><i class="fas fa-phone" style="color: var(--primary);"></i> Helpline:</strong> 8600252238</p>
+                <p><strong><i class="fas fa-envelope" style="color: var(--primary);"></i> Email:</strong> solutionssk060@gmail.com</p>
+                <p><strong><i class="fab fa-whatsapp" style="color: var(--primary);"></i> WhatsApp:</strong> +91 86002 52238</p>
+            </div>
+            <button class="auth-btn" style="background:#25D366;" onclick="window.open('https://wa.me/918600252238', '_blank')"><i class="fab fa-whatsapp"></i> WhatsApp Chat</button>
+            <button class="location-skip" style="margin-top: 12px;" onclick="hideHelpModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- About Us Modal -->
+    <div id="aboutUsModal" class="auth-modal" style="display:none;">
+        <div class="auth-content">
+            <h3><i class="fas fa-info-circle" style="color: var(--primary);"></i> About ZATPAT</h3>
+            <div style="text-align: left; margin: 20px 0;">
+                <p><strong>Version:</strong> 2.0.0</p>
+                <p><strong>Developer:</strong> Solutions SK</p>
+                <p><strong>Contact:</strong> solutionssk060@gmail.com</p>
+                <p><strong>Phone:</strong> 8600252238</p>
+                <p>ZATPAT is your local shopping companion, delivering groceries and essentials in minutes. We connect you with nearby shops for instant delivery.</p>
+            </div>
+            <button class="auth-btn" onclick="hideAboutUs()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========== SUPABASE CONFIGURATION ==========
+    const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // ========== GLOBAL VARIABLES ==========
+    let currentUser = null;
+    let userLocation = { lat: 18.5204, lng: 73.8567 };
+    let allShopsData = [];
+    let heroSwiper = null;
+    let searchTimeout = null;
+    let offersSliderIndex = 0;
+    let offersInterval = null;
+    let activeOrder = null;
+    let deliveryInterval = null;
+
+    // DOM Elements
+    const splashScreen = document.getElementById('splashScreen');
+    const locationModal = document.getElementById('locationModal');
+    const mainApp = document.getElementById('mainApp');
+    const loader = document.getElementById('loaderOverlay');
+    
+    function showLoader() { loader.classList.add('active'); }
+    function hideLoader() { loader.classList.remove('active'); }
+    
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toastMsg');
+        const toastText = document.getElementById('toastText');
+        toastText.innerHTML = message;
+        toast.style.background = isError ? '#EF4444' : '#1F2937';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ========== GET CITY NAME ==========
+    async function getCityName(lat, lng) {
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`);
+            const data = await response.json();
+            const city = data.address?.city || data.address?.town || data.address?.village || 'Your Area';
+            return city.split(' ')[0];
+        } catch (error) {
+            return `${lat.toFixed(2)}`;
+        }
+    }
+
+    // ========== LOCATION WITH RETRY AND DEFAULT ==========
+    function getUserLocationWithRetry(retryCount = 0) {
+        showLoader();
+        const errorDiv = document.getElementById('locationErrorMsg');
+        if (errorDiv) errorDiv.innerHTML = '';
+        
+        if (!navigator.geolocation) {
+            useDefaultLocation();
+            return;
+        }
+        
+        const timeoutId = setTimeout(() => {
+            if (retryCount < 2) {
+                if (errorDiv) {
+                    errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Taking too long. <a href="#" onclick="getUserLocationWithRetry(' + (retryCount+1) + ')">Retry</a>';
+                }
+            } else {
+                if (errorDiv) errorDiv.innerHTML = '<i class="fas fa-clock"></i> Timeout. Using default location.';
+                useDefaultLocation();
+            }
+            hideLoader();
+        }, 10000);
+        
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                clearTimeout(timeoutId);
+                userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
+                localStorage.setItem('user_lat', userLocation.lat);
+                localStorage.setItem('user_lng', userLocation.lng);
+                localStorage.setItem('location_permitted', 'true');
+                
+                const city = await getCityName(userLocation.lat, userLocation.lng);
+                document.getElementById('currentLocation').innerHTML = `📍 ${city}`;
+                
+                locationModal.style.display = 'none';
+                mainApp.style.display = 'block';
+                loadAllData();
+                loadNearbyShops(userLocation.lat, userLocation.lng);
+                hideLoader();
+                showToast(`📍 Location: ${city}`);
+            },
+            (error) => {
+                clearTimeout(timeoutId);
+                let errorMsg = '';
+                switch(error.code) {
+                    case error.PERMISSION_DENIED: errorMsg = 'Permission denied. Allow location in settings.'; break;
+                    case error.POSITION_UNAVAILABLE: errorMsg = 'Location unavailable.'; break;
+                    case error.TIMEOUT: errorMsg = 'Timeout.'; break;
+                    default: errorMsg = 'Location failed.';
+                }
+                if (retryCount < 2) {
+                    if (errorDiv) errorDiv.innerHTML = errorMsg + ' <a href="#" onclick="getUserLocationWithRetry(' + (retryCount+1) + ')">Retry</a>';
+                    hideLoader();
+                } else {
+                    if (errorDiv) errorDiv.innerHTML = errorMsg + ' Using default location.';
+                    useDefaultLocation();
+                }
+            },
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+        );
+    }
+
+    function useDefaultLocation() {
+        localStorage.setItem('location_permitted', 'true');
+        userLocation = { lat: 18.5204, lng: 73.8567 };
+        document.getElementById('currentLocation').innerHTML = '📍 Pune';
+        locationModal.style.display = 'none';
+        mainApp.style.display = 'block';
+        loadAllData();
+        loadNearbyShops(18.5204, 73.8567);
+        showToast('📍 Using default location (Pune)');
+    }
+
+    function openLocationModal() { locationModal.style.display = 'flex'; }
+
+    // ========== LOAD ALL DATA ==========
+    async function loadAllData() {
+        await Promise.allSettled([
+            loadHeroSlider(),
+            loadCategories(),
+            loadOffers(),
+            loadFeaturedProducts(),
+            loadSponsoredShops()
+        ]);
+        updateCartCount();
+        checkActiveOrder();
+    }
+
+    // ========== LOAD HERO SLIDER ==========
+    async function loadHeroSlider() {
+        try {
+            const { data: sliders, error } = await supabaseClient
+                .from('sliders')
+                .select('*')
+                .eq('is_active', true)
+                .order('display_order', { ascending: true });
+            
+            const container = document.getElementById('heroContainer');
+            if (!container) return;
+            
+            if (sliders && sliders.length > 0) {
+                let html = '';
+                sliders.forEach(slider => {
+                    html += `
+                        <div class="swiper-slide hero-slide" onclick="window.location.href='${slider.link || '#'}'">
+                            <img loading="lazy" src="${slider.image_url}" alt="${slider.title}" onerror="this.style.display='none'">
+                            <div class="hero-overlay">
+                                <div class="hero-title">${slider.title || 'Special Offer'}</div>
+                                <div class="hero-subtitle">${slider.description || ''}</div>
+                                <div class="hero-badge">${slider.badge_text || 'LIMITED'}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `<div class="swiper-slide hero-slide"><div class="hero-overlay"><div class="hero-title">Welcome to ZATPAT</div><div class="hero-subtitle">Fast Local Deals</div><div class="hero-badge">⚡</div></div></div>`;
+            }
+            
+            if (heroSwiper) heroSwiper.update();
+            else {
+                heroSwiper = new Swiper('#heroSwiper', { loop: true, autoplay: { delay: 4000 }, pagination: { el: '.swiper-pagination', clickable: true } });
+            }
+        } catch (error) { console.error('Error loading sliders:', error); }
+    }
+
+    // ========== LOAD CATEGORIES - GRID 4 ==========
+    async function loadCategories() {
+        try {
+            const { data: categories, error } = await supabaseClient
+                .from('categories')
+                .select('*')
+                .eq('is_active', true)
+                .limit(8);
+            
+            const container = document.getElementById('categoriesContainer');
+            if (!container) return;
+            
+            if (categories && categories.length > 0) {
+                let html = '';
+                categories.forEach(cat => {
+                    const imageUrl = cat.image_url || `https://placehold.co/60x60/FF4D00/white?text=${cat.name.charAt(0)}`;
+                    html += `
+                        <div class="category-item" onclick="filterByCategory('${cat.name}')">
+                            <div class="category-icon" style="background-image: url('${imageUrl}'); background-size: cover;"></div>
+                            <div class="category-name">${cat.name}</div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="no-data">No categories</div>';
+            }
+        } catch (error) { console.error('Error loading categories:', error); }
+    }
+
+    // ========== LOAD OFFERS - 2 CARDS + AUTO SLIDE ==========
+    async function loadOffers() {
+        try {
+            const { data: offers, error } = await supabaseClient
+                .from('offers')
+                .select('*')
+                .eq('is_active', true)
+                .order('priority', { ascending: true })
+                .limit(4);
+            
+            const track = document.getElementById('offersTrack');
+            const dotsContainer = document.getElementById('offersDots');
+            if (!track) return;
+            
+            if (offers && offers.length > 0) {
+                let html = '';
+                for (let i = 0; i < offers.length; i += 2) {
+                    html += `<div class="offers-track-group">`;
+                    html += `
+                        <div class="offer-card" onclick="window.location.href='${offers[i].link || 'offers.html'}'">
+                            <div class="offer-content">
+                                <h4>${offers[i].title}</h4>
+                                <p>${offers[i].subtitle || ''}</p>
+                            </div>
+                            <button class="offer-btn">Shop</button>
+                        </div>
+                    `;
+                    if (offers[i+1]) {
+                        html += `
+                            <div class="offer-card" onclick="window.location.href='${offers[i+1].link || 'offers.html'}'">
+                                <div class="offer-content">
+                                    <h4>${offers[i+1].title}</h4>
+                                    <p>${offers[i+1].subtitle || ''}</p>
+                                </div>
+                                <button class="offer-btn">Shop</button>
+                            </div>
+                        `;
+                    }
+                    html += `</div>`;
+                }
+                track.innerHTML = html;
+                
+                const slideCount = Math.ceil(offers.length / 2);
+                let dotsHtml = '';
+                for (let i = 0; i < slideCount; i++) {
+                    dotsHtml += `<div class="slider-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></div>`;
+                }
+                dotsContainer.innerHTML = dotsHtml;
+                
+                if (offersInterval) clearInterval(offersInterval);
+                offersInterval = setInterval(() => {
+                    const slides = document.querySelectorAll('.offers-track-group');
+                    const dots = document.querySelectorAll('.slider-dot');
+                    if (slides.length === 0) return;
+                    offersSliderIndex = (offersSliderIndex + 1) % slides.length;
+                    track.style.transform = `translateX(-${offersSliderIndex * 100}%)`;
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === offersSliderIndex);
+                    });
+                }, 4000);
+                
+                document.querySelectorAll('.slider-dot').forEach(dot => {
+                    dot.addEventListener('click', () => {
+                        const index = parseInt(dot.dataset.index);
+                        offersSliderIndex = index;
+                        track.style.transform = `translateX(-${offersSliderIndex * 100}%)`;
+                        document.querySelectorAll('.slider-dot').forEach((d, i) => {
+                            d.classList.toggle('active', i === offersSliderIndex);
+                        });
+                        if (offersInterval) {
+                            clearInterval(offersInterval);
+                            offersInterval = setInterval(() => {
+                                const slides = document.querySelectorAll('.offers-track-group');
+                                if (slides.length === 0) return;
+                                offersSliderIndex = (offersSliderIndex + 1) % slides.length;
+                                track.style.transform = `translateX(-${offersSliderIndex * 100}%)`;
+                                document.querySelectorAll('.slider-dot').forEach((d, i) => {
+                                    d.classList.toggle('active', i === offersSliderIndex);
+                                });
+                            }, 4000);
+                        }
+                    });
+                });
+            } else {
+                track.innerHTML = '<div class="offers-track-group"><div class="offer-card" style="min-width:100%">No offers available</div></div>';
+            }
+        } catch (error) { console.error('Error loading offers:', error); }
+    }
+
+    // ========== LOAD FEATURED PRODUCTS - GRID 3 ==========
+    async function loadFeaturedProducts() {
+        try {
+            const { data: products, error } = await supabaseClient
+                .from('products')
+                .select('*, shops(name)')
+                .eq('is_featured', true)
+                .eq('is_active', true)
+                .limit(6);
+            
+            const container = document.getElementById('featuredContainer');
+            if (!container) return;
+            
+            if (products && products.length > 0) {
+                let html = '';
+                products.forEach(product => {
+                    const imageUrl = product.images?.[0] || product.image_url || 'https://placehold.co/150x100/FF4D00/white?text=Product';
+                    const discount = product.offer_price ? Math.round((1 - product.offer_price/product.price) * 100) : 0;
+                    const rating = product.rating || 4.5;
+                    html += `
+                        <div class="product-card" onclick="openProductDetails('${product.id}')">
+                            <div class="product-img">
+                                ${discount > 0 ? `<div class="discount-tag">${discount}%</div>` : ''}
+                                <img loading="lazy" src="${imageUrl}" onerror="this.src='https://placehold.co/150x100/FF4D00/white?text=Product'">
+                            </div>
+                            <div class="product-info">
+                                <div class="product-name">${product.name}</div>
+                                <div class="product-rating"><i class="fas fa-star"></i> <span>${rating}</span></div>
+                                <div class="product-price">₹${product.offer_price || product.price}</div>
+                                <button class="add-cart" onclick="event.stopPropagation(); addToCart('${product.id}', '${product.name}', ${product.offer_price || product.price})">Add</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="no-data">No featured products</div>';
+            }
+        } catch (error) { console.error('Error loading featured products:', error); }
+    }
+
+    // ========== LOAD SPONSORED SHOPS ==========
+    async function loadSponsoredShops() {
+        try {
+            const { data: featured, error } = await supabaseClient
+                .from('featured_shops')
+                .select('*, shops(id, name, image_url, rating)')
+                .eq('active', true)
+                .order('priority', { ascending: false })
+                .limit(6);
+            
+            const container = document.getElementById('sponsoredContainer');
+            if (!container) return;
+            
+            if (featured && featured.length > 0) {
+                let html = '';
+                featured.forEach(f => {
+                    const shop = f.shops;
+                    if (shop) {
+                        const imageUrl = shop.image_url || 'https://placehold.co/130x75/FF4D00/white?text=Shop';
+                        html += `
+                            <div class="sponsored-card" onclick="openShopDetails('${shop.id}')">
+                                <img loading="lazy" src="${imageUrl}" class="sponsored-img" onerror="this.src='https://placehold.co/130x75/FF4D00/white?text=Shop'">
+                                <div class="sponsored-badge"><i class="fas fa-crown"></i> Sponsored</div>
+                                <div class="sponsored-info">
+                                    <div class="sponsored-name">${shop.name}</div>
+                                    <div class="sponsored-rating"><i class="fas fa-star"></i> ${shop.rating || '4.0'}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="no-data">No sponsored shops</div>';
+            }
+        } catch (error) { console.error('Error loading sponsored shops:', error); }
+    }
+
+    // ========== LOAD NEARBY SHOPS ==========
+    async function loadNearbyShops(lat, lng) {
+        try {
+            showLoader();
+            const { data: shops, error } = await supabaseClient
+                .from('shops')
+                .select('*')
+                .eq('status', 'approved');
+            
+            if (error) throw error;
+            
+            const container = document.getElementById('shopsContainer');
+            if (!shops || shops.length === 0) {
+                container.innerHTML = '<div class="no-data"><i class="fas fa-store-slash"></i><h3>No shops found</h3><p>Be the first to register your shop!</p></div>';
+                hideLoader();
+                return;
+            }
+            
+            allShopsData = shops.map(shop => {
+                if (shop.latitude && shop.longitude) {
+                    const distance = calculateDistance(lat, lng, shop.latitude, shop.longitude);
+                    return { ...shop, distance: distance.toFixed(1) };
+                }
+                return { ...shop, distance: (Math.random() * 5 + 1).toFixed(1) };
+            });
+            
+            allShopsData.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+            displayShops();
+            hideLoader();
+        } catch (error) { console.error('Error loading shops:', error); hideLoader(); }
+    }
+
+    function displayShops() {
+        const container = document.getElementById('shopsContainer');
+        if (!container) return;
+        if (!allShopsData || allShopsData.length === 0) {
+            container.innerHTML = '<div class="no-data"><i class="fas fa-store-slash"></i><h3>No shops available</h3></div>';
+            return;
+        }
+        let html = '';
+        allShopsData.slice(0, 6).forEach(shop => {
+            const imageUrl = shop.image_url || 'https://placehold.co/150x100/FF4D00/white?text=Shop';
+            html += `
+                <div class="shop-item" onclick="openShopDetails('${shop.id}')">
+                    <div class="shop-img">
+                        <img loading="lazy" src="${imageUrl}" onerror="this.src='https://placehold.co/150x100/FF4D00/white?text=Shop'">
+                        <span class="shop-status ${!shop.is_open ? 'closed' : ''}">${shop.is_open ? 'Open' : 'Closed'}</span>
+                    </div>
+                    <div class="shop-details">
+                        <div class="shop-name">${shop.name}</div>
+                        <div class="shop-category">${shop.category || 'Store'}</div>
+                        <div class="shop-footer">
+                            <span class="shop-distance"><i class="fas fa-location-dot"></i> ${shop.distance} km</span>
+                            <div class="shop-rating"><i class="fas fa-star"></i> ${shop.rating || '4.0'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    // ========== SEARCH ==========
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        if (searchTimeout) clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const query = e.target.value.trim();
+            if (query.length > 1) {
+                window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+            }
+        }, 300);
+    });
+
+    // ========== CART FUNCTIONS ==========
+    function addToCart(id, name, price) {
+        let cart = JSON.parse(localStorage.getItem('zatpat_cart')) || [];
+        const existing = cart.find(item => item.id === id);
+        if (existing) existing.quantity += 1;
+        else cart.push({ id, name, price, quantity: 1 });
+        localStorage.setItem('zatpat_cart', JSON.stringify(cart));
+        updateCartCount();
+        showToast(`🛒 ${name} added`);
+        
+        if (cart.length > 0 && !activeOrder) {
+            setTimeout(() => {
+                if (confirm('🛒 Start 10-minute delivery for your items?')) {
+                    startDeliveryTimer();
+                }
+            }, 500);
+        }
+    }
+
+    function updateCartCount() {
+        const cart = JSON.parse(localStorage.getItem('zatpat_cart')) || [];
+        const count = cart.reduce((s, i) => s + (i.quantity || 1), 0);
+        const cartCountElem = document.getElementById('cartCount');
+        if (cartCountElem) cartCountElem.innerText = count;
+    }
+
+    // ========== DELIVERY TIMER ==========
+    function startDeliveryTimer() {
+        if (deliveryInterval) clearInterval(deliveryInterval);
+        
+        activeOrder = {
+            id: 'ORD' + Date.now(),
+            startTime: new Date(),
+            status: 'preparing'
+        };
+        localStorage.setItem('activeOrder', JSON.stringify(activeOrder));
+        
+        const timerBar = document.getElementById('deliveryTimerBar');
+        timerBar.style.display = 'flex';
+        
+        function updateTimer() {
+            const now = new Date();
+            const elapsed = (now - new Date(activeOrder.startTime)) / 1000;
+            const remaining = Math.max(0, 600 - elapsed);
+            
+            if (remaining <= 0) {
+                clearInterval(deliveryInterval);
+                document.getElementById('timerDisplay').innerHTML = '00:00';
+                showToast('🎉 Your order has arrived!');
+                timerBar.style.background = 'linear-gradient(90deg,#22C55E,#16A34A)';
+                return;
+            }
+            
+            const minutes = Math.floor(remaining / 60);
+            const seconds = Math.floor(remaining % 60);
+            document.getElementById('timerDisplay').innerHTML = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+            
+            if (remaining < 120) {
+                timerBar.style.background = 'linear-gradient(90deg,#EF4444,#DC2626)';
+            }
+        }
+        updateTimer();
+        deliveryInterval = setInterval(updateTimer, 1000);
+    }
+
+    function checkActiveOrder() {
+        const saved = localStorage.getItem('activeOrder');
+        if (saved) {
+            activeOrder = JSON.parse(saved);
+            const now = new Date();
+            const elapsed = (now - new Date(activeOrder.startTime)) / 1000;
+            if (elapsed < 600) {
+                startDeliveryTimer();
+            } else {
+                localStorage.removeItem('activeOrder');
+            }
+        }
+    }
+
+    function trackOrder() {
+        if (activeOrder) {
+            window.location.href = `order-tracking.html?order=${activeOrder.id}`;
+        } else {
+            showToast('No active order', true);
+        }
+    }
+
+    // ========== NAVIGATION ==========
+    function openProductDetails(id) { window.location.href = `product-detail.html?id=${id}`; }
+    function openShopDetails(id) { window.location.href = `shop-details.html?id=${id}`; }
+    function filterByCategory(cat) { window.location.href = `products.html?category=${encodeURIComponent(cat)}`; }
+    function openProfile() { if(!currentUser) { showAuthModal(); return; } window.location.href = 'profile.html'; }
+    function openOrdersPage() { if(!currentUser) { showAuthModal(); return; } window.location.href = 'orders.html'; }
+    function openTrackOrder() { if(!currentUser) { showAuthModal(); return; } window.location.href = 'order-tracking.html'; }
+    function openOrderHistory() { if(!currentUser) { showAuthModal(); return; } window.location.href = 'orders.html'; }
+
+    // ========== UI FUNCTIONS ==========
+    function toggleMenu() {
+        const menu = document.getElementById('menuDropdown');
+        if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function showAuthModal() { document.getElementById('authModal').style.display = 'flex'; toggleMenu(); }
+    function hideAuthModal() { document.getElementById('authModal').style.display = 'none'; }
+    function showRegisterForm() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; }
+    function showLoginForm() { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; }
+    function showHelpModal() { document.getElementById('helpModal').style.display = 'flex'; toggleMenu(); }
+    function hideHelpModal() { document.getElementById('helpModal').style.display = 'none'; }
+    function showAboutUs() { document.getElementById('aboutUsModal').style.display = 'flex'; toggleMenu(); }
+    function hideAboutUs() { document.getElementById('aboutUsModal').style.display = 'none'; }
+
+    // ========== AUTH ==========
+    async function handleLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!email || !password) {
+            document.getElementById('loginError').innerText = 'Fill all fields';
+            document.getElementById('loginError').style.display = 'block';
+            return;
+        }
+        
+        showLoader();
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                document.getElementById('loginError').innerText = error.message;
+                document.getElementById('loginError').style.display = 'block';
+                hideLoader();
+                return;
+            }
+            
+            if (data.user) {
+                const { data: profile } = await supabaseClient
+                    .from('users')
+                    .select('role')
+                    .eq('id', data.user.id)
+                    .maybeSingle();
+                
+                const role = profile?.role || 'user';
+                
+                hideLoader();
+                hideAuthModal();
+                showToast('✅ Login successful!');
+                
+                if (role === 'admin') {
+                    window.location.href = 'admin-panel.html';
+                } else if (role === 'shop_owner') {
+                    window.location.href = 'shop-dashboard.html';
+                } else {
+                    currentUser = data.user;
+                    document.getElementById('authMenuItem').style.display = 'none';
+                    document.getElementById('logoutMenuItem').style.display = 'block';
+                    location.reload();
+                }
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            hideLoader();
+            document.getElementById('loginError').innerText = 'Login failed. Try again.';
+            document.getElementById('loginError').style.display = 'block';
+        }
+    }
+
+    async function handleRegister() {
+        const name = document.getElementById('registerName').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+        const phone = document.getElementById('registerPhone').value;
+        
+        if (!name || !email || !password || !phone) {
+            document.getElementById('registerError').innerText = 'Fill all fields';
+            document.getElementById('registerError').style.display = 'block';
+            return;
+        }
+        if (password.length < 6) {
+            document.getElementById('registerError').innerText = 'Password min 6 chars';
+            document.getElementById('registerError').style.display = 'block';
+            return;
+        }
+        
+        showLoader();
+        try {
+            const { data, error } = await supabaseClient.auth.signUp({
+                email, password,
+                options: { data: { name, phone, role: 'user' } }
+            });
+            
+            if (error) {
+                document.getElementById('registerError').innerText = error.message;
+                document.getElementById('registerError').style.display = 'block';
+                hideLoader();
+                return;
+            }
+            
+            if (data.user) {
+                await supabaseClient
+                    .from('users')
+                    .insert([{
+                        id: data.user.id,
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        role: 'user',
+                        is_active: true,
+                        created_at: new Date().toISOString()
+                    }]);
+                
+                hideLoader();
+                hideAuthModal();
+                showToast('✅ Registration successful! Please login.');
+                showLoginForm();
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            hideLoader();
+            document.getElementById('registerError').innerText = 'Registration failed. Try again.';
+            document.getElementById('registerError').style.display = 'block';
+        }
+    }
+
+    async function handleLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            try {
+                localStorage.clear();
+                await supabaseClient.auth.signOut();
+                currentUser = null;
+                document.getElementById('authMenuItem').style.display = 'block';
+                document.getElementById('logoutMenuItem').style.display = 'none';
+                showToast('👋 Logged out successfully');
+                setTimeout(() => window.location.href = 'index.html', 500);
+            } catch (error) {
+                console.error('Logout error:', error);
+                window.location.href = 'index.html';
+            }
+        }
+    }
+
+    function checkConnectionAndReload() { 
+        if (navigator.onLine) location.reload(); 
+        else alert('Still offline. Please check your connection.'); 
+    }
+
+    // ========== CHECK LOGGED IN USER ==========
+    async function checkLoggedInUser() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) return false;
+            
+            const { data: { user }, error } = await supabaseClient.auth.getUser();
+            if (error || !user) return false;
+            
+            const { data: profile } = await supabaseClient
+                .from('users')
+                .select('role')
+                .eq('id', user.id)
+                .maybeSingle();
+            
+            const role = profile?.role || 'user';
+            
+            if (role === 'admin') {
+                window.location.href = 'admin-panel.html';
+                return true;
+            } else if (role === 'shop_owner') {
+                window.location.href = 'shop-dashboard.html';
+                return true;
+            } else {
+                currentUser = user;
+                document.getElementById('authMenuItem').style.display = 'none';
+                document.getElementById('logoutMenuItem').style.display = 'block';
+                return false;
+            }
+        } catch (error) {
+            console.error('Error checking logged in user:', error);
+            return false;
+        }
+    }
+
+    // ========== SERVICE WORKER ==========
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
+    }
+
+    // ========== APP START ==========
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (!navigator.onLine) { document.getElementById('offlinePage').style.display = 'flex'; return; }
+        
+        const redirected = await checkLoggedInUser();
+        if (redirected) return;
+        
+        checkActiveOrder();
+        
+        setTimeout(() => {
+            splashScreen.style.opacity = '0';
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+            }, 500);
+        }, 1500);
+    });
+
+    // Event Listeners
+    document.getElementById('allowLocationBtn').addEventListener('click', () => getUserLocationWithRetry(0));
+    document.getElementById('skipLocationBtn').addEventListener('click', useDefaultLocation);
+    document.getElementById('locationHeaderBtn').addEventListener('click', openLocationModal);
+    document.getElementById('notificationBtn').addEventListener('click', () => {
+        showToast('🔔 New features coming soon!');
+    });
+    document.getElementById('trackOrderBtn').addEventListener('click', trackOrder);
+
+    document.addEventListener('click', (e) => {
+        const menu = document.getElementById('menuDropdown');
+        if (menu && !menu.contains(e.target) && !e.target.closest('.menu-btn')) menu.style.display = 'none';
+    });
+
+    // Make functions global
+    window.toggleMenu = toggleMenu;
+    window.showAuthModal = showAuthModal;
+    window.hideAuthModal = hideAuthModal;
+    window.showRegisterForm = showRegisterForm;
+    window.showLoginForm = showLoginForm;
+    window.showHelpModal = showHelpModal;
+    window.hideHelpModal = hideHelpModal;
+    window.showAboutUs = showAboutUs;
+    window.hideAboutUs = hideAboutUs;
+    window.handleLogin = handleLogin;
+    window.handleRegister = handleRegister;
+    window.handleLogout = handleLogout;
+    window.openProfile = openProfile;
+    window.openOrdersPage = openOrdersPage;
+    window.openTrackOrder = openTrackOrder;
+    window.openOrderHistory = openOrderHistory;
+    window.addToCart = addToCart;
+    window.openProductDetails = openProductDetails;
+    window.openShopDetails = openShopDetails;
+    window.filterByCategory = filterByCategory;
+    window.checkConnectionAndReload = checkConnectionAndReload;
+    window.getUserLocationWithRetry = getUserLocationWithRetry;
+    window.useDefaultLocation = useDefaultLocation;
+    window.openLocationModal = openLocationModal;
+    window.trackOrder = trackOrder;
+</script>
+</body>
+</html>
