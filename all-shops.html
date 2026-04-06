@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>All Shops - Zatpat</title>
+    <meta name="theme-color" content="#FFD600">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #FFD600;
+            --accent-green: #16A34A;
+            --bg-light: #F5F5F5;
+            --card-white: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-light: #E5E7EB;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-light); }
+        .top-bar {
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .brand-name { font-size: 22px; font-weight: 800; }
+        .brand-name .normal { color: #000000; }
+        .brand-name .pat { color: var(--accent-green); }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 16px; }
+        .main-content { padding-top: 80px; padding-bottom: 100px; max-width: 600px; margin: 0 auto; }
+        .search-box { margin: 16px; }
+        .search-box input { width: 100%; padding: 14px; border: 1px solid var(--border-light); border-radius: var(--radius-full); font-size: 14px; }
+        .shops-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px; }
+        .shop-card {
+            background: white;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .shop-card:hover { transform: translateY(-4px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .shop-img { width: 100%; height: 100px; object-fit: cover; }
+        .shop-info { padding: 12px; }
+        .shop-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+        .shop-category { font-size: 11px; color: var(--primary); }
+        .shop-rating { display: flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 11px; }
+        .shop-rating i { color: #FACC15; }
+        .empty-state { text-align: center; padding: 60px; }
+        .loading-spinner { text-align: center; padding: 60px; color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+        <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+        <div class="page-title">All Shops</div>
+    </div>
+    <div class="main-content">
+        <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 Search shops..." onkeyup="filterShops()"></div>
+        <div id="shopsContainer" class="shops-grid"><div class="loading-spinner"><i class="fas fa-spinner fa-spin fa-2x"></i></div></div>
+    </div>
+    <script>
+        const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        let allShops = [];
+        async function loadShops() {
+            const { data } = await supabaseClient.from('shops').select('*').eq('status', 'approved');
+            if (data) { allShops = data; renderShops(); }
+        }
+        function renderShops() {
+            const term = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const filtered = allShops.filter(s => s.name?.toLowerCase().includes(term) || s.category?.toLowerCase().includes(term) || s.city?.toLowerCase().includes(term));
+            if (filtered.length === 0) { document.getElementById('shopsContainer').innerHTML = '<div class="empty-state">No shops found</div>'; return; }
+            document.getElementById('shopsContainer').innerHTML = filtered.map(shop => `
+                <div class="shop-card" onclick="viewShop('${shop.id}')">
+                    <img src="${shop.image_url || 'https://placehold.co/300x100/FFD600/000?text=Shop'}" class="shop-img" onerror="this.src='https://placehold.co/300x100/FFD600/000?text=Shop'">
+                    <div class="shop-info">
+                        <div class="shop-name">${escapeHtml(shop.name)}</div>
+                        <div class="shop-category">${shop.category || 'Store'}</div>
+                        <div class="shop-rating"><i class="fas fa-star"></i> ${shop.rating || '4.0'} • ${shop.city || ''}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        function filterShops() { renderShops(); }
+        function viewShop(id) { window.location.href = `shop-details.html?id=${id}`; }
+        function goBack() { window.location.href = 'index.html'; }
+        function escapeHtml(t) { if(!t) return ''; return t.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+        loadShops();
+        window.filterShops = filterShops; window.viewShop = viewShop; window.goBack = goBack;
+    </script>
+</body>
+</html>
