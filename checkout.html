@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Checkout - Zatpat</title>
+    <meta name="theme-color" content="#FFD600">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #FFD600;
+            --primary-dark: #E5C200;
+            --accent-green: #16A34A;
+            --bg-light: #F5F5F5;
+            --card-white: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-light: #E5E7EB;
+            --danger: #EF4444;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+
+        .top-bar {
+            background: var(--card-white);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .brand-name { font-size: 22px; font-weight: 800; }
+        .brand-name .normal { color: #000000; }
+        .brand-name .pat { color: var(--accent-green); }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 16px; }
+
+        .main-content {
+            padding-top: 80px;
+            padding-bottom: 100px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section-card {
+            background: white;
+            margin: 16px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+        .section-title {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-light);
+            font-weight: 700;
+            background: var(--bg-light);
+        }
+        .section-body {
+            padding: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .payment-option {
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .payment-option.selected {
+            border-color: var(--primary);
+            background: rgba(255, 214, 0, 0.05);
+        }
+        .payment-option-icon {
+            width: 40px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .payment-option-info {
+            flex: 1;
+        }
+        .payment-option-title {
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .payment-option-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .upi-details {
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+            text-align: center;
+        }
+        .upi-details.show {
+            display: block;
+        }
+        .qr-code-img {
+            max-width: 150px;
+            max-height: 150px;
+            margin: 10px auto;
+            display: block;
+            border-radius: var(--radius-md);
+        }
+        .upi-intent-btn {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            margin-top: 12px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .order-items {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 13px;
+        }
+        .order-total {
+            padding-top: 12px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 8px;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .total-row.grand {
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--accent-green);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .place-order-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+            border: none;
+            width: calc(100% - 32px);
+            margin: 16px;
+            padding: 16px;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .place-order-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Payment Modal */
+        .payment-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+        }
+        .payment-modal-content {
+            background: white;
+            border-radius: var(--radius-2xl);
+            padding: 28px;
+            max-width: 340px;
+            width: 90%;
+            text-align: center;
+        }
+        .payment-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 60px;
+            color: var(--primary);
+        }
+        .text-success { color: var(--success); }
+        .text-muted { color: var(--text-secondary); font-size: 12px; }
+
+        @media (max-width: 480px) {
+            .payment-option { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+        <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+        <div class="page-title">Checkout</div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Loading checkout...</p></div>
+    </div>
+
+    <div id="toastMsg" class="toast-notification" style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #1F2937; color: white; padding: 10px 20px; border-radius: 50px; font-size: 13px; z-index: 10050; display: none;">
+        <i class="fas fa-check-circle"></i> <span id="toastText"></span>
+    </div>
+
+    <div class="payment-modal-overlay" id="paymentModal">
+        <div class="payment-modal-content">
+            <i class="fas fa-spinner fa-spin" style="font-size: 48px; color: var(--primary);"></i>
+            <h3 style="margin: 16px 0;">Processing Payment</h3>
+            <p id="paymentModalText">Please wait...</p>
+            <div class="payment-spinner"></div>
+            <button onclick="closePaymentModal()" style="background: none; border: none; margin-top: 16px; color: var(--danger); cursor: pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let cart = [];
+        let cartItems = [];
+        let subtotal = 0;
+        let deliveryFee = 40;
+        let freeThreshold = 299;
+        let total = 0;
+        
+        let selectedPaymentMethod = 'upi';
+        let selectedShop = null;
+        let selectedShopUpi = null;
+        let selectedShopQr = null;
+        
+        let currentUser = null;
+        let isProcessing = false;
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastMsg');
+            const toastText = document.getElementById('toastText');
+            toastText.innerHTML = message;
+            toast.style.background = isError ? '#EF4444' : '#1F2937';
+            toast.style.display = 'flex';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        async function loadDeliverySettings() {
+            try {
+                const { data: feeData } = await supabaseClient
+                    .from('app_settings')
+                    .select('value')
+                    .eq('key', 'delivery_fee')
+                    .maybeSingle();
+                if (feeData) deliveryFee = parseInt(feeData.value);
+                
+                const { data: thresholdData } = await supabaseClient
+                    .from('app_settings')
+                    .select('value')
+                    .eq('key', 'free_delivery_threshold')
+                    .maybeSingle();
+                if (thresholdData) freeThreshold = parseInt(thresholdData.value);
+            } catch (error) {
+                console.error('Error loading delivery settings:', error);
+            }
+        }
+
+        async function loadCart() {
+            const savedCart = localStorage.getItem('checkout_cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+            } else {
+                const mainCart = localStorage.getItem('zatpat_cart');
+                if (mainCart) {
+                    cart = JSON.parse(mainCart);
+                }
+            }
+            
+            if (cart.length === 0) {
+                window.location.href = 'cart.html';
+                return;
+            }
+            
+            await loadCartProducts();
+        }
+
+        async function loadCartProducts() {
+            cartItems = [];
+            subtotal = 0;
+            let shopId = null;
+            
+            for (let item of cart) {
+                const { data: product, error } = await supabaseClient
+                    .from('products')
+                    .select('*, shops(id, name, upi_id, upi_name, qr_code_url, phone, address, city)')
+                    .eq('id', item.id)
+                    .single();
+                
+                if (!error && product) {
+                    cartItems.push({
+                        ...product,
+                        quantity: item.quantity || 1,
+                        itemTotal: (product.offer_price || product.price) * (item.quantity || 1)
+                    });
+                    
+                    if (!shopId && product.shops) {
+                        shopId = product.shop_id;
+                        selectedShop = product.shops;
+                        selectedShopUpi = selectedShop.upi_id;
+                        selectedShopQr = selectedShop.qr_code_url;
+                    }
+                    subtotal += (product.offer_price || product.price) * (item.quantity || 1);
+                }
+            }
+            
+            const delivery = subtotal > freeThreshold ? 0 : deliveryFee;
+            total = subtotal + delivery;
+            
+            renderCheckout();
+        }
+
+        async function checkUser() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                showLoginPrompt();
+                return false;
+            }
+            currentUser = user;
+            
+            const { data: profile } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('id', user.id)
+                .maybeSingle();
+            
+            if (profile) {
+                setTimeout(() => {
+                    const nameField = document.getElementById('fullName');
+                    const emailField = document.getElementById('email');
+                    const phoneField = document.getElementById('phone');
+                    if (nameField) nameField.value = profile.name || '';
+                    if (emailField) emailField.value = user.email || '';
+                    if (phoneField) phoneField.value = profile.phone || '';
+                }, 500);
+            }
+            
+            return true;
+        }
+
+        function showLoginPrompt() {
+            document.getElementById('mainContent').innerHTML = `
+                <div class="section-card" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-lock" style="font-size: 64px; color: var(--warning);"></i>
+                    <h3 style="margin: 16px 0;">Please Login to Continue</h3>
+                    <p>You need to login before placing order</p>
+                    <button class="place-order-btn" onclick="goToLogin()" style="margin-top: 20px;">Login Now</button>
+                </div>
+            `;
+        }
+
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById(`payment-${method}`).classList.add('selected');
+            
+            const upiDetails = document.getElementById('upiDetails');
+            if (method === 'upi') {
+                upiDetails.classList.add('show');
+            } else {
+                upiDetails.classList.remove('show');
+            }
+        }
+
+        function generateOrderId() {
+            return 'ORD' + Date.now() + Math.random().toString(36).substring(2, 6).toUpperCase();
+        }
+
+        // Save order to database
+        async function saveOrder(orderId, paymentStatus = 'pending') {
+            const delivery = subtotal > freeThreshold ? 0 : deliveryFee;
+            
+            const orderData = {
+                order_id: orderId,
+                user_id: currentUser.id,
+                shop_id: selectedShop?.id,
+                items: cartItems.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.offer_price || item.price,
+                    quantity: item.quantity,
+                    total: item.itemTotal
+                })),
+                subtotal: subtotal,
+                delivery_fee: delivery,
+                total: total,
+                payment_method: selectedPaymentMethod,
+                payment_status: paymentStatus,
+                order_status: selectedPaymentMethod === 'cod' ? 'confirmed' : 'pending_payment',
+                shipping_address: {
+                    full_name: document.getElementById('fullName')?.value,
+                    phone: document.getElementById('phone')?.value,
+                    address: document.getElementById('address')?.value,
+                    city: document.getElementById('city')?.value,
+                    pincode: document.getElementById('pincode')?.value
+                },
+                created_at: new Date().toISOString()
+            };
+            
+            const { error } = await supabaseClient.from('orders').insert([orderData]);
+            if (error) throw error;
+            return true;
+        }
+
+        // Show payment modal
+        function showPaymentModal(message) {
+            document.getElementById('paymentModalText').innerText = message;
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        // Direct UPI Intent Payment
+        function payWithUPIIntent(orderId) {
+            const upiId = selectedShopUpi;
+            const amount = total;
+            const shopName = selectedShop?.name || 'Zatpat Shop';
+            const orderIdShort = orderId.slice(-6);
+            
+            // Create UPI Intent URL
+            const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(shopName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('Order ' + orderIdShort)}`;
+            
+            // Try to open UPI app
+            window.location.href = upiUrl;
+            
+            // Show instruction modal
+            showPaymentModal(`Please complete payment of ₹${amount} in the UPI app.\n\nUPI ID: ${upiId}`);
+            
+            // After 10 seconds, check if user has completed payment
+            setTimeout(() => {
+                if (confirm('Have you completed the payment? Click OK to confirm order.')) {
+                    confirmPayment(orderId);
+                } else {
+                    closePaymentModal();
+                    showToast('Payment pending. You can complete payment from UPI app and then confirm.', true);
+                }
+            }, 10000);
+        }
+        
+        async function confirmPayment(orderId) {
+            closePaymentModal();
+            showToast('Verifying payment...');
+            
+            await supabaseClient
+                .from('orders')
+                .update({ payment_status: 'paid', order_status: 'confirmed' })
+                .eq('order_id', orderId);
+            
+            localStorage.removeItem('zatpat_cart');
+            localStorage.removeItem('checkout_cart');
+            window.location.href = `order-confirmation.html?order=${orderId}&status=success`;
+        }
+
+        // Place Order Main Function
+        async function placeOrder() {
+            if (isProcessing) return;
+            
+            const fullName = document.getElementById('fullName')?.value;
+            const phone = document.getElementById('phone')?.value;
+            const address = document.getElementById('address')?.value;
+            const city = document.getElementById('city')?.value;
+            const pincode = document.getElementById('pincode')?.value;
+            
+            if (!fullName || !phone || !address || !city || !pincode) {
+                showToast('Please fill all address fields', true);
+                return;
+            }
+            if (pincode.length !== 6) {
+                showToast('Please enter valid 6-digit pincode', true);
+                return;
+            }
+            if (phone.length < 10) {
+                showToast('Please enter valid phone number', true);
+                return;
+            }
+            
+            if (selectedPaymentMethod === 'upi' && !selectedShopUpi) {
+                showToast('Shop owner has not set up UPI payment. Please select COD.', true);
+                return;
+            }
+            
+            isProcessing = true;
+            const btn = document.querySelector('.place-order-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+            
+            const orderId = generateOrderId();
+            
+            try {
+                if (selectedPaymentMethod === 'cod') {
+                    await saveOrder(orderId, 'pending');
+                    localStorage.removeItem('zatpat_cart');
+                    localStorage.removeItem('checkout_cart');
+                    window.location.href = `order-confirmation.html?order=${orderId}&status=success`;
+                } else {
+                    await saveOrder(orderId, 'pending');
+                    payWithUPIIntent(orderId);
+                }
+            } catch (error) {
+                showToast('Order failed: ' + error.message, true);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                isProcessing = false;
+            }
+        }
+
+        function renderCheckout() {
+            const delivery = subtotal > freeThreshold ? 0 : deliveryFee;
+            const savedAmount = subtotal > freeThreshold ? deliveryFee : 0;
+            
+            let itemsHtml = '';
+            cartItems.forEach(item => {
+                itemsHtml += `
+                    <div class="order-item">
+                        <span>${escapeHtml(item.name)} x ${item.quantity}</span>
+                        <span>₹${item.itemTotal}</span>
+                    </div>
+                `;
+            });
+            
+            const upiDetailsHtml = selectedShopUpi ? `
+                <div class="upi-details" id="upiDetails">
+                    <i class="fas fa-university" style="font-size: 32px; color: var(--primary);"></i>
+                    <p style="margin: 10px 0;"><strong>UPI ID:</strong> ${selectedShopUpi}</p>
+                    ${selectedShop?.upi_name ? `<p><strong>Account:</strong> ${escapeHtml(selectedShop.upi_name)}</p>` : ''}
+                    ${selectedShopQr ? `<img src="${selectedShopQr}" class="qr-code-img" onclick="window.open(this.src)">` : ''}
+                    <button class="upi-intent-btn" onclick="document.getElementById('continueToPayBtn').click()">
+                        <i class="fas fa-google-pay"></i> Pay with UPI App
+                    </button>
+                    <p class="text-muted" style="margin-top: 10px;">
+                        <i class="fas fa-shield-alt"></i> Payment goes directly to shop owner
+                    </p>
+                </div>
+            ` : '<div class="upi-details" id="upiDetails"><div style="background: #FEE2E2; padding: 12px; border-radius: var(--radius-md); color: var(--danger);">Shop owner has not set up UPI. Please select COD.</div></div>';
+            
+            document.getElementById('mainContent').innerHTML = `
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-map-marker-alt"></i> Delivery Address</div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" id="fullName" class="form-control" placeholder="Enter full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="10-digit mobile number">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="email" class="form-control" placeholder="Email (optional)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Address *</label>
+                            <textarea id="address" class="form-control" rows="2" placeholder="House number, street, landmark"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="form-group">
+                                    <label class="form-label">City *</label>
+                                    <input type="text" id="city" class="form-control" placeholder="City">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label class="form-label">Pincode *</label>
+                                    <input type="text" id="pincode" class="form-control" placeholder="Pincode" maxlength="6">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-store"></i> Shop Details</div>
+                    <div class="section-body">
+                        <p><strong>${escapeHtml(selectedShop?.name || 'Shop')}</strong></p>
+                        <p class="text-muted">${selectedShop?.city || ''} • ${selectedShop?.phone || ''}</p>
+                    </div>
+                </div>
+                
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-credit-card"></i> Payment Method</div>
+                    <div class="section-body">
+                        <div class="payment-option selected" id="payment-upi" onclick="selectPaymentMethod('upi')">
+                            <div class="payment-option-icon"><i class="fab fa-google-pay" style="font-size: 28px;"></i></div>
+                            <div class="payment-option-info">
+                                <div class="payment-option-title">UPI / Google Pay / PhonePe</div>
+                                <div class="payment-option-desc">Pay directly to shop owner</div>
+                            </div>
+                        </div>
+                        <div class="payment-option" id="payment-cod" onclick="selectPaymentMethod('cod')">
+                            <div class="payment-option-icon"><i class="fas fa-money-bill-wave" style="font-size: 28px;"></i></div>
+                            <div class="payment-option-info">
+                                <div class="payment-option-title">Cash on Delivery</div>
+                                <div class="payment-option-desc">Pay when order arrives</div>
+                            </div>
+                        </div>
+                        ${upiDetailsHtml}
+                    </div>
+                </div>
+                
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-receipt"></i> Order Summary</div>
+                    <div class="section-body">
+                        <div class="order-items">${itemsHtml}</div>
+                        <div class="order-total">
+                            <div class="total-row"><span>Subtotal</span><span>₹${subtotal}</span></div>
+                            <div class="total-row"><span>Delivery Fee</span><span>${delivery === 0 ? '<span class="text-success">FREE</span>' : `₹${delivery}`}</span></div>
+                            ${savedAmount > 0 ? `<div class="total-row" style="color: var(--success);"><span>You Saved</span><span>₹${savedAmount}</span></div>` : ''}
+                            <div class="total-row grand"><span>Total Amount</span><span>₹${total}</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="place-order-btn" id="continueToPayBtn" onclick="placeOrder()">
+                    ${selectedPaymentMethod === 'cod' ? 'Place Order • ₹' + total : 'Continue to Payment • ₹' + total}
+                </button>
+            `;
+        }
+
+        function goBack() { window.location.href = 'cart.html'; }
+        function goToLogin() { window.location.href = 'index.html'; }
+        function escapeHtml(text) { if(!text) return ''; return String(text).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadDeliverySettings();
+            const isLoggedIn = await checkUser();
+            if (isLoggedIn) {
+                await loadCart();
+            }
+        });
+
+        window.selectPaymentMethod = selectPaymentMethod;
+        window.placeOrder = placeOrder;
+        window.confirmPayment = confirmPayment;
+        window.closePaymentModal = closePaymentModal;
+        window.goBack = goBack;
+        window.goToLogin = goToLogin;
+    </script>
+</body>
+</html>

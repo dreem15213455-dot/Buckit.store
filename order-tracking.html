@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Track Order - Zatpat</title>
+    <meta name="theme-color" content="#FFD600">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #FFD600;
+            --primary-dark: #E5C200;
+            --accent-green: #16A34A;
+            --bg-light: #F5F5F5;
+            --card-white: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-light: #E5E7EB;
+            --danger: #EF4444;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+
+        .top-bar {
+            background: var(--card-white);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .brand-name { font-size: 22px; font-weight: 800; }
+        .brand-name .normal { color: #000000; }
+        .brand-name .pat { color: var(--accent-green); }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 16px; }
+
+        .main-content {
+            padding-top: 80px;
+            padding-bottom: 100px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Search Box */
+        .search-card {
+            background: white;
+            margin: 16px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            padding: 20px;
+        }
+        .search-input-group {
+            display: flex;
+            gap: 12px;
+        }
+        .search-input-group input {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-full);
+            font-size: 14px;
+        }
+        .search-input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .search-btn {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 0 24px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Order Details Card */
+        .order-card {
+            background: white;
+            margin: 16px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+        .order-header {
+            padding: 16px;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .order-id {
+            font-weight: 700;
+        }
+        .order-status {
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pending { background: #FEF3C7; color: #D97706; }
+        .status-confirmed { background: #DBEAFE; color: #2563EB; }
+        .status-preparing { background: #FEF3C7; color: #D97706; }
+        .status-out_for_delivery { background: #E0E7FF; color: #4F46E5; }
+        .status-delivered { background: #D1FAE5; color: #059669; }
+        .status-cancelled { background: #FEE2E2; color: #DC2626; }
+
+        /* Progress Tracker */
+        .progress-tracker {
+            padding: 24px 16px;
+            position: relative;
+        }
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+        .step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-light);
+            border: 2px solid var(--border-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            position: relative;
+            z-index: 2;
+            background: white;
+        }
+        .step-circle.completed {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+        .step-circle.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: #000;
+        }
+        .step-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .step-label.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        .step-label.completed {
+            color: var(--success);
+        }
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-light);
+            z-index: 0;
+        }
+        .progress-line-fill {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 2px;
+            background: var(--success);
+            z-index: 0;
+            transition: width 0.3s ease;
+        }
+
+        /* Info Rows */
+        .info-section {
+            padding: 16px;
+            border-top: 1px solid var(--border-light);
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .info-label {
+            color: var(--text-secondary);
+        }
+        .info-value {
+            font-weight: 600;
+        }
+
+        /* Items List */
+        .items-list {
+            padding: 16px;
+            border-top: 1px solid var(--border-light);
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 13px;
+        }
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-top: 1px solid var(--border-light);
+        }
+        .support-btn {
+            flex: 1;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+        .reorder-btn {
+            flex: 1;
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .not-found {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 60px;
+            color: var(--primary);
+        }
+
+        @media (max-width: 480px) {
+            .step-circle { width: 32px; height: 32px; font-size: 12px; }
+            .step-label { font-size: 9px; }
+            .progress-line, .progress-line-fill { top: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+        <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+        <div class="page-title">Track Order</div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="search-card">
+            <div class="search-input-group">
+                <input type="text" id="orderSearchInput" placeholder="Enter Order ID (e.g., ORD123456)" autocomplete="off">
+                <button class="search-btn" onclick="searchOrder()"><i class="fas fa-search"></i> Track</button>
+            </div>
+        </div>
+        <div id="orderResult"></div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentOrder = null;
+
+        // Get order ID from URL
+        function getOrderIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('order');
+        }
+
+        // Search order
+        async function searchOrder() {
+            const input = document.getElementById('orderSearchInput');
+            const orderId = input?.value.trim();
+            
+            if (!orderId) {
+                showNotFound('Please enter an Order ID');
+                return;
+            }
+            
+            await loadOrder(orderId);
+        }
+
+        // Load order from database
+        async function loadOrder(orderId) {
+            showLoading();
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('orders')
+                    .select('*')
+                    .eq('order_id', orderId)
+                    .maybeSingle();
+
+                if (error || !data) {
+                    showNotFound('Order not found. Please check your Order ID.');
+                    return;
+                }
+
+                currentOrder = data;
+                renderOrderTracking();
+            } catch (error) {
+                console.error('Error loading order:', error);
+                showNotFound('Failed to load order details');
+            }
+        }
+
+        // Get status display text and class
+        function getStatusInfo(status) {
+            const statusMap = {
+                'pending': { text: 'Pending', class: 'status-pending', step: 1 },
+                'confirmed': { text: 'Confirmed', class: 'status-confirmed', step: 2 },
+                'preparing': { text: 'Preparing', class: 'status-preparing', step: 3 },
+                'out_for_delivery': { text: 'Out for Delivery', class: 'status-out_for_delivery', step: 4 },
+                'delivered': { text: 'Delivered', class: 'status-delivered', step: 5 },
+                'cancelled': { text: 'Cancelled', class: 'status-cancelled', step: 0 }
+            };
+            return statusMap[status] || { text: status, class: 'status-pending', step: 1 };
+        }
+
+        // Render order tracking
+        function renderOrderTracking() {
+            if (!currentOrder) return;
+
+            const statusInfo = getStatusInfo(currentOrder.order_status);
+            const items = currentOrder.items || [];
+            const address = currentOrder.shipping_address || {};
+            const isDelivered = currentOrder.order_status === 'delivered';
+            const isCancelled = currentOrder.order_status === 'cancelled';
+            
+            // Steps for progress bar
+            const steps = [
+                { key: 'pending', label: 'Order Placed', icon: 'fa-receipt' },
+                { key: 'confirmed', label: 'Confirmed', icon: 'fa-check-circle' },
+                { key: 'preparing', label: 'Preparing', icon: 'fa-box' },
+                { key: 'out_for_delivery', label: 'Out for Delivery', icon: 'fa-truck' },
+                { key: 'delivered', label: 'Delivered', icon: 'fa-home' }
+            ];
+            
+            let currentStep = statusInfo.step;
+            if (isCancelled) currentStep = 0;
+            
+            let stepsHtml = '';
+            steps.forEach((step, index) => {
+                const stepNumber = index + 1;
+                let circleClass = '';
+                let labelClass = '';
+                
+                if (isCancelled) {
+                    circleClass = '';
+                    labelClass = '';
+                } else if (stepNumber <= currentStep) {
+                    circleClass = 'completed';
+                    labelClass = 'completed';
+                } else if (stepNumber === currentStep + 1) {
+                    circleClass = 'active';
+                    labelClass = 'active';
+                }
+                
+                stepsHtml += `
+                    <div class="step">
+                        <div class="step-circle ${circleClass}">
+                            <i class="fas ${step.icon}"></i>
+                        </div>
+                        <div class="step-label ${labelClass}">${step.label}</div>
+                    </div>
+                `;
+            });
+            
+            const progressPercent = isCancelled ? 0 : ((currentStep - 1) / 4) * 100;
+            
+            let itemsHtml = '';
+            items.forEach(item => {
+                itemsHtml += `
+                    <div class="item-row">
+                        <span>${escapeHtml(item.name)} x ${item.quantity}</span>
+                        <span>₹${item.total}</span>
+                    </div>
+                `;
+            });
+
+            const container = document.getElementById('orderResult');
+            container.innerHTML = `
+                <div class="order-card">
+                    <div class="order-header">
+                        <span class="order-id"><i class="fas fa-hashtag"></i> ${currentOrder.order_id}</span>
+                        <span class="order-status ${statusInfo.class}">${statusInfo.text}</span>
+                    </div>
+                    
+                    ${!isCancelled ? `
+                    <div class="progress-tracker">
+                        <div class="progress-steps">
+                            ${stepsHtml}
+                        </div>
+                        <div class="progress-line"></div>
+                        <div class="progress-line-fill" style="width: ${progressPercent}%;"></div>
+                    </div>
+                    ` : `
+                    <div style="padding: 20px; text-align: center; background: #FEE2E2; margin: 16px; border-radius: var(--radius-md);">
+                        <i class="fas fa-times-circle" style="font-size: 32px; color: var(--danger);"></i>
+                        <p style="margin-top: 8px;">This order has been cancelled.</p>
+                    </div>
+                    `}
+                    
+                    <div class="info-section">
+                        <div class="info-row">
+                            <span class="info-label">Order Date</span>
+                            <span class="info-value">${new Date(currentOrder.created_at).toLocaleString()}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Payment Method</span>
+                            <span class="info-value">${currentOrder.payment_method === 'upi' ? 'UPI / Google Pay' : 'Cash on Delivery'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Payment Status</span>
+                            <span class="info-value" style="color: ${currentOrder.payment_status === 'paid' ? 'var(--success)' : 'var(--warning)'}">
+                                ${currentOrder.payment_status === 'paid' ? '✅ Paid' : '⏳ Pending'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="items-list">
+                        <div style="font-weight: 700; margin-bottom: 12px;">Items Ordered</div>
+                        ${itemsHtml}
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light);">
+                            <div class="info-row">
+                                <span>Subtotal</span>
+                                <span>₹${currentOrder.subtotal || 0}</span>
+                            </div>
+                            <div class="info-row">
+                                <span>Delivery Fee</span>
+                                <span>${currentOrder.delivery_fee === 0 ? 'FREE' : `₹${currentOrder.delivery_fee}`}</span>
+                            </div>
+                            <div class="info-row" style="font-weight: 800; font-size: 16px;">
+                                <span>Total</span>
+                                <span style="color: var(--accent-green);">₹${currentOrder.total || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div style="font-weight: 700; margin-bottom: 12px;">Delivery Address</div>
+                        <p><strong>${escapeHtml(address.full_name || '')}</strong></p>
+                        <p>${escapeHtml(address.address || '')}</p>
+                        <p>${escapeHtml(address.city || '')} - ${escapeHtml(address.pincode || '')}</p>
+                        <p>Phone: ${escapeHtml(address.phone || '')}</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <a href="https://wa.me/918600252238?text=Hello%2C%20I%20have%20a%20query%20about%20order%20${currentOrder.order_id}" target="_blank" class="support-btn">
+                            <i class="fab fa-whatsapp"></i> Support
+                        </a>
+                        <button class="reorder-btn" onclick="reorderItems()">
+                            <i class="fas fa-redo-alt"></i> Reorder
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Reorder items (add to cart)
+        async function reorderItems() {
+            if (!currentOrder || !currentOrder.items) return;
+            
+            let cart = JSON.parse(localStorage.getItem('zatpat_cart')) || [];
+            
+            for (let item of currentOrder.items) {
+                const existing = cart.find(c => c.id === item.id);
+                if (existing) {
+                    existing.quantity = (existing.quantity || 1) + (item.quantity || 1);
+                } else {
+                    cart.push({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity || 1
+                    });
+                }
+            }
+            
+            localStorage.setItem('zatpat_cart', JSON.stringify(cart));
+            alert('Items added to cart!');
+            window.location.href = 'cart.html';
+        }
+
+        function showLoading() {
+            document.getElementById('orderResult').innerHTML = `
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Loading order details...</p>
+                </div>
+            `;
+        }
+
+        function showNotFound(message) {
+            document.getElementById('orderResult').innerHTML = `
+                <div class="order-card">
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <i class="fas fa-search" style="font-size: 64px; color: var(--text-secondary); opacity: 0.5;"></i>
+                        <h3 style="margin: 16px 0;">Order Not Found</h3>
+                        <p>${message}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Check URL for order ID on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlOrderId = getOrderIdFromUrl();
+            if (urlOrderId) {
+                document.getElementById('orderSearchInput').value = urlOrderId;
+                loadOrder(urlOrderId);
+            }
+        });
+
+        // Enter key search
+        document.getElementById('orderSearchInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchOrder();
+        });
+
+        window.searchOrder = searchOrder;
+        window.goBack = goBack;
+        window.reorderItems = reorderItems;
+    </script>
+</body>
+</html>

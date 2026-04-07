@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Zatpat - Shop Details</title>
+    <meta name="theme-color" content="#FFD600">
+    <meta name="description" content="Zatpat - स्थानिक दुकान, झटपट डिलिव्हरी | Local shops, fast delivery">
+    
+    <!-- Preconnect for faster fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase Connection -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* ========== HOME PAGE JESA COLOR SYSTEM ========== */
+        :root {
+            --primary: #FFD600;
+            --primary-dark: #E5C200;
+            --accent-yellow: #FFD600;
+            --accent-green: #16A34A;
+            --bg-light: #F5F5F5;
+            --card-white: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --rating-star: #FFD600;
+            --border-light: #E5E7EB;
+            --gray-100: #F5F5F5;
+            --danger: #EF4444;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Poppins', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Header */
+        .top-bar {
+            background: var(--card-white);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--gray-100);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #E5E7EB;
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 800;
+        }
+        .brand-name .normal { color: #000000; }
+        .brand-name .pat { color: var(--accent-green); }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 80px;
+            padding-bottom: 85px;
+        }
+
+        /* Shop Banner */
+        .shop-banner {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 32px 20px;
+            margin-bottom: 16px;
+            text-align: center;
+            color: #000000;
+        }
+        .shop-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 36px;
+            overflow: hidden;
+        }
+        .shop-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .shop-name {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #000000;
+        }
+        .shop-meta {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 12px;
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+        .shop-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,0,0,0.1);
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            color: #000000;
+        }
+        .shop-meta-item i {
+            color: #000000;
+        }
+
+        /* Info Cards */
+        .info-card {
+            background: var(--card-white);
+            margin: 16px;
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+        .info-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+        .info-title i {
+            color: var(--primary);
+        }
+        .info-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .timing-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .timing-day {
+            font-weight: 500;
+        }
+        .timing-time {
+            color: var(--text-secondary);
+        }
+        .timing-closed {
+            color: var(--danger);
+        }
+
+        /* Products Section */
+        .products-section {
+            background: var(--card-white);
+            margin: 16px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .section-title {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .products-grid {
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .product-card {
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border-light);
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .product-image {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            background: var(--gray-100);
+        }
+        .product-info {
+            padding: 10px;
+        }
+        .product-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+        .add-btn {
+            background: var(--primary);
+            color: #000000;
+            border: none;
+            border-radius: var(--radius-full);
+            padding: 6px 0;
+            font-size: 11px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .add-btn:hover {
+            background: var(--primary-dark);
+        }
+        .view-all-btn {
+            background: transparent;
+            color: var(--accent-green);
+            width: auto;
+            padding: 0;
+            font-weight: 600;
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+            background: var(--card-white);
+            margin: 16px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .review-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .reviewer-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .review-stars {
+            color: var(--rating-star);
+            font-size: 12px;
+        }
+        .review-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        .review-date {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* Loading & Empty States */
+        .loading-spinner {
+            text-align: center;
+            padding: 60px;
+            color: var(--primary);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .error-icon {
+            font-size: 64px;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+        .error-btn {
+            background: var(--primary);
+            color: #000000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        /* Bottom Nav - HOME PAGE JESA */
+        .bottom-nav {
+            background: var(--card-white);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            z-index: 1000;
+            border-top: 1px solid var(--border-light);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1F2937;
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 10050;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-md);
+            white-space: nowrap;
+        }
+        .toast-notification.show {
+            display: flex;
+            animation: toastUp 0.3s ease;
+        }
+        @keyframes toastUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .products-grid { gap: 10px; }
+            .product-image { height: 90px; }
+            .shop-name { font-size: 20px; }
+            .shop-meta { gap: 10px; }
+            .shop-meta-item { font-size: 11px; padding: 3px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="top-bar">
+        <div class="d-flex align-items-center gap-3">
+            <div class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <div class="brand-name">
+                <span class="normal">Zat</span><span class="pat">pat</span>
+            </div>
+            <div style="flex:1;"></div>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p class="mt-2">Loading shop details...</p>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="products.html" class="nav-item">
+            <i class="fas fa-compass"></i>
+            <span>Explore</span>
+        </a>
+        <a href="cart.html" class="nav-item">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Cart</span>
+        </a>
+        <a href="#" class="nav-item" onclick="openProfile()">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+        <a href="#" class="nav-item" onclick="openOrders()">
+            <i class="fas fa-receipt"></i>
+            <span>Orders</span>
+        </a>
+    </nav>
+
+    <!-- Toast -->
+    <div id="toastMsg" class="toast-notification">
+        <i class="fas fa-check-circle"></i> 
+        <span id="toastText"></span>
+    </div>
+
+    <script>
+        // ========== SUPABASE CONFIG ==========
+        const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Get shop ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const shopId = urlParams.get('id');
+
+        let shop = null;
+        let products = [];
+        let currentUser = null;
+
+        // ========== TOAST FUNCTION ==========
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastMsg');
+            const toastText = document.getElementById('toastText');
+            toastText.innerHTML = message;
+            toast.style.background = isError ? '#EF4444' : '#1F2937';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // ========== CHECK LOGGED IN USER ==========
+        async function checkLoggedInUser() {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    const { data: { user } } = await supabaseClient.auth.getUser();
+                    currentUser = user;
+                }
+            } catch (error) {
+                console.error('Error checking user:', error);
+            }
+        }
+
+        // ========== LOAD SHOP DATA ==========
+        async function loadShop() {
+            if (!shopId) {
+                showError('No shop ID provided');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('shops')
+                    .select('*')
+                    .eq('id', shopId)
+                    .single();
+
+                if (error) throw error;
+                if (!data) {
+                    showError('Shop not found');
+                    return;
+                }
+
+                shop = data;
+                await Promise.all([
+                    loadProducts(),
+                    loadReviews()
+                ]);
+                renderShop();
+
+            } catch (error) {
+                console.error('Error loading shop:', error);
+                showError('Failed to load shop details');
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select('*')
+                    .eq('shop_id', shopId)
+                    .eq('is_active', true)
+                    .limit(8);
+
+                if (!error && data) {
+                    products = data;
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        async function loadReviews() {
+            try {
+                // Try to fetch real reviews from database
+                const { data, error } = await supabaseClient
+                    .from('reviews')
+                    .select('*, users(name)')
+                    .eq('shop_id', shopId)
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (!error && data && data.length > 0) {
+                    window.reviewsData = data.map(r => ({
+                        name: r.users?.name || 'Customer',
+                        rating: r.rating,
+                        text: r.comment,
+                        date: new Date(r.created_at).toLocaleDateString()
+                    }));
+                } else {
+                    // Sample reviews as fallback
+                    window.reviewsData = [
+                        { name: 'Rahul Sharma', rating: 5, text: 'Great shop! Fresh products and quick delivery.', date: '2 days ago' },
+                        { name: 'Priya Patel', rating: 4, text: 'Good quality items. Slightly delayed delivery.', date: '5 days ago' },
+                        { name: 'Amit Kumar', rating: 5, text: 'Excellent service! Will order again.', date: '1 week ago' }
+                    ];
+                }
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+                window.reviewsData = [];
+            }
+        }
+
+        function renderShop() {
+            const isOpen = shop.is_open;
+            const rating = shop.rating || 4.5;
+            const reviewCount = window.reviewsData?.length || 0;
+            const shopImage = shop.image_url || null;
+            
+            // Products HTML
+            let productsHtml = '';
+            if (products.length === 0) {
+                productsHtml = '<div class="empty-state"><i class="fas fa-box-open fa-2x" style="margin-bottom: 10px;"></i><p>No products available</p></div>';
+            } else {
+                productsHtml = '<div class="products-grid">';
+                products.forEach(product => {
+                    const imageUrl = product.images?.[0] || product.image_url || 'https://placehold.co/150x100/FFD600/000000?text=Product';
+                    productsHtml += `
+                        <div class="product-card" onclick="viewProduct('${product.id}')">
+                            <img src="${imageUrl}" class="product-image" onerror="this.src='https://placehold.co/150x100/FFD600/000000?text=Product'">
+                            <div class="product-info">
+                                <div class="product-name">${escapeHtml(product.name)}</div>
+                                <div class="product-price">₹${product.offer_price || product.price}</div>
+                                <button class="add-btn" onclick="event.stopPropagation(); addToCart('${product.id}', '${escapeHtml(product.name)}', ${product.offer_price || product.price})">
+                                    <i class="fas fa-cart-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                productsHtml += '</div>';
+            }
+            
+            // Reviews HTML
+            let reviewsHtml = '';
+            if (!window.reviewsData || window.reviewsData.length === 0) {
+                reviewsHtml = '<div class="empty-state"><i class="fas fa-comment-slash fa-2x" style="margin-bottom: 10px;"></i><p>No reviews yet</p></div>';
+            } else {
+                window.reviewsData.forEach(review => {
+                    reviewsHtml += `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span class="reviewer-name">${escapeHtml(review.name)}</span>
+                                <span class="review-stars">${renderStars(review.rating)}</span>
+                            </div>
+                            <div class="review-text">${escapeHtml(review.text)}</div>
+                            <div class="review-date">${review.date}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            const container = document.getElementById('mainContent');
+            container.innerHTML = `
+                <!-- Shop Banner -->
+                <div class="shop-banner">
+                    <div class="shop-avatar">
+                        ${shopImage ? 
+                            `<img src="${shopImage}" alt="${escapeHtml(shop.name)}" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-store\'></i>'">` : 
+                            '<i class="fas fa-store"></i>'
+                        }
+                    </div>
+                    <div class="shop-name">${escapeHtml(shop.name)}</div>
+                    <div class="shop-meta">
+                        <div class="shop-meta-item">
+                            <i class="fas fa-star"></i> ${rating}
+                        </div>
+                        <div class="shop-meta-item">
+                            <i class="fas fa-comment"></i> ${reviewCount} reviews
+                        </div>
+                        <div class="shop-meta-item">
+                            <i class="fas ${isOpen ? 'fa-circle' : 'fa-circle'}"></i> ${isOpen ? 'Open Now' : 'Closed'}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Shop Info -->
+                <div class="info-card">
+                    <div class="info-title">
+                        <i class="fas fa-info-circle"></i> About Shop
+                    </div>
+                    <div class="info-text">
+                        ${escapeHtml(shop.description || 'A trusted local shop offering quality products at affordable prices. We take pride in serving our community with fresh and authentic items.')}
+                    </div>
+                </div>
+                
+                <!-- Shop Timing -->
+                <div class="info-card">
+                    <div class="info-title">
+                        <i class="fas fa-clock"></i> Opening Hours
+                    </div>
+                    <div class="timing-item">
+                        <span class="timing-day">Monday - Saturday</span>
+                        <span class="timing-time">9:00 AM - 10:00 PM</span>
+                    </div>
+                    <div class="timing-item">
+                        <span class="timing-day">Sunday</span>
+                        <span class="timing-time ${!isOpen ? 'timing-closed' : ''}">${isOpen ? '10:00 AM - 6:00 PM' : 'Closed'}</span>
+                    </div>
+                    ${shop.address ? `
+                    <div class="timing-item">
+                        <span class="timing-day"><i class="fas fa-map-marker-alt"></i> Address</span>
+                        <span class="timing-time">${escapeHtml(shop.address)}</span>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <!-- Products -->
+                <div class="products-section">
+                    <div class="section-header">
+                        <span class="section-title"><i class="fas fa-box" style="color: var(--primary);"></i> Products from this shop</span>
+                        ${products.length > 4 ? `<a href="#" class="add-btn view-all-btn" onclick="viewAllProducts()">View All →</a>` : ''}
+                    </div>
+                    ${productsHtml}
+                </div>
+                
+                <!-- Reviews -->
+                <div class="reviews-section">
+                    <div class="section-header">
+                        <span class="section-title"><i class="fas fa-star" style="color: var(--primary);"></i> Customer Reviews</span>
+                        <span style="font-size: 13px; color: var(--text-secondary);">${reviewCount} reviews</span>
+                    </div>
+                    ${reviewsHtml}
+                </div>
+            `;
+        }
+
+        function renderStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else if (i - 0.5 <= rating) {
+                    stars += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function addToCart(productId, productName, productPrice) {
+            let cart = JSON.parse(localStorage.getItem('zatpat_cart')) || [];
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ id: productId, name: productName, price: productPrice, quantity: 1 });
+            }
+            localStorage.setItem('zatpat_cart', JSON.stringify(cart));
+            
+            showToast(`🛒 ${productName} added to cart`);
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('zatpat_cart')) || [];
+            const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            // Optional: update cart badge if exists
+        }
+
+        function viewProduct(productId) {
+            window.location.href = `product-detail.html?id=${productId}`;
+        }
+
+        function viewAllProducts() {
+            window.location.href = `products.html?shop=${shopId}`;
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        function openProfile() {
+            if (!currentUser) {
+                showToast('Please login first', true);
+                return;
+            }
+            window.location.href = 'profile.html';
+        }
+
+        function openOrders() {
+            if (!currentUser) {
+                showToast('Please login first', true);
+                return;
+            }
+            window.location.href = 'orders.html';
+        }
+
+        function showError(message) {
+            document.getElementById('mainContent').innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>${message}</h3>
+                    <button class="error-btn" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i> Go Back Home
+                    </button>
+                </div>
+            `;
+        }
+
+        // ========== PAGE LOAD ==========
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkLoggedInUser();
+            await loadShop();
+        });
+    </script>
+</body>
+</html>

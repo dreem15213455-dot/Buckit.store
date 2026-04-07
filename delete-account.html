@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Delete Account - Zatpat</title>
+    <meta name="theme-color" content="#FFD600">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --primary: #FFD600; --danger: #EF4444; --bg-light: #F5F5F5; --border-light: #E5E7EB; --radius-md: 12px; --radius-lg: 16px; --radius-2xl: 24px; --radius-full: 9999px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-light); }
+        .top-bar { background: white; position: fixed; top: 0; width: 100%; padding: 12px 16px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--border-light); z-index: 1000; }
+        .back-btn { width: 40px; height: 40px; background: var(--bg-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .brand-name { font-size: 22px; font-weight: 800; }
+        .brand-name .normal { color: #000000; }
+        .brand-name .pat { color: #16A34A; }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 16px; }
+        .main-content { padding-top: 80px; padding-bottom: 100px; max-width: 600px; margin: 0 auto; }
+        .warning-card { background: white; margin: 16px; border-radius: var(--radius-2xl); border: 1px solid var(--border-light); padding: 24px; text-align: center; }
+        .warning-icon { font-size: 64px; color: var(--danger); margin-bottom: 16px; }
+        .warning-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+        .warning-text { color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
+        .form-group { margin-bottom: 16px; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); }
+        .delete-btn { background: var(--danger); color: white; border: none; padding: 14px; border-radius: var(--radius-full); font-weight: 600; width: 100%; cursor: pointer; }
+        .cancel-btn { background: transparent; border: 1px solid var(--border-light); padding: 12px; border-radius: var(--radius-full); font-weight: 600; width: 100%; margin-top: 12px; cursor: pointer; }
+        .toast-notification { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #1F2937; color: white; padding: 10px 20px; border-radius: 50px; font-size: 13px; z-index: 10050; display: none; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+        <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+        <div class="page-title">Delete Account</div>
+    </div>
+    <div class="main-content">
+        <div class="warning-card">
+            <div class="warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="warning-title">Delete Your Account</div>
+            <div class="warning-text">This action is <strong>permanent</strong> and cannot be undone. All your data including orders, profile information will be permanently deleted.</div>
+            <div class="form-group"><input type="text" id="confirmText" class="form-control" placeholder='Type "DELETE" to confirm'></div>
+            <button class="delete-btn" onclick="requestDeletion()"><i class="fas fa-trash-alt"></i> Permanently Delete Account</button>
+            <button class="cancel-btn" onclick="goBack()">Cancel</button>
+        </div>
+    </div>
+    <div id="toastMsg" class="toast-notification"><i class="fas fa-check-circle"></i> <span id="toastText"></span></div>
+    <script>
+        const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        function showToast(msg, isErr) { const t = document.getElementById('toastMsg'); document.getElementById('toastText').innerHTML = msg; t.style.background = isErr ? '#EF4444' : '#1F2937'; t.style.display = 'flex'; setTimeout(() => t.style.display = 'none', 3000); }
+        async function requestDeletion() {
+            const confirmText = document.getElementById('confirmText').value;
+            if (confirmText !== 'DELETE') { showToast('Please type "DELETE" to confirm', true); return; }
+            if (!confirm('Are you absolutely sure? This cannot be undone.')) return;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { showToast('Please login first', true); window.location.href = 'index.html'; return; }
+            await supabaseClient.from('users').update({ is_active: false, deleted_at: new Date() }).eq('id', user.id);
+            await supabaseClient.auth.signOut();
+            localStorage.clear();
+            showToast('Account deletion request submitted. You will be redirected.');
+            setTimeout(() => window.location.href = 'index.html', 2000);
+        }
+        function goBack() { window.location.href = 'profile.html'; }
+        window.requestDeletion = requestDeletion; window.goBack = goBack;
+    </script>
+</body>
+</html>
