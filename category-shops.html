@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Category Shops - Zatpat</title>
+    <meta name="theme-color" content="#FFD600">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #FFD600;
+            --primary-dark: #E5C200;
+            --accent-green: #16A34A;
+            --bg-light: #F5F5F5;
+            --card-white: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-light: #E5E7EB;
+            --rating-star: #FFD600;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+        h1, h2, h3 { font-family: 'Poppins', sans-serif; }
+        
+        .top-bar {
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .brand-name {
+            font-size: 22px;
+            font-weight: 800;
+        }
+        .brand-name .normal { color: #000000; }
+        .brand-name .pat { color: var(--accent-green); }
+        
+        .main-content { padding-top: 80px; padding-bottom: 80px; }
+        
+        /* Category Header */
+        .category-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 32px 20px;
+            text-align: center;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+        .category-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .category-header p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Shops Grid */
+        .shops-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 0 16px;
+        }
+        .shop-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border-light);
+        }
+        .shop-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .shop-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            background: var(--bg-light);
+        }
+        .shop-info {
+            padding: 12px;
+        }
+        .shop-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .shop-category {
+            font-size: 11px;
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .shop-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .shop-rating {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .shop-rating i { color: #FACC15; font-size: 10px; }
+        .shop-status {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            background: var(--primary);
+            color: #000;
+        }
+        .shop-status.closed { background: var(--text-secondary); color: white; }
+        
+        .loading-spinner { text-align: center; padding: 60px; color: var(--primary); }
+        .no-data { text-align: center; padding: 60px; color: var(--text-secondary); }
+        
+        .bottom-nav {
+            background: white;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            z-index: 1000;
+            border-top: 1px solid var(--border-light);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .nav-item i { font-size: 20px; margin-bottom: 3px; }
+        
+        @media (min-width: 768px) {
+            .shops-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .shops-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+        <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+        <div style="flex:1; text-align: center; font-weight: 600;" id="pageTitle">Category Shops</div>
+    </div>
+    
+    <div class="main-content">
+        <div class="category-header" id="categoryHeader">
+            <h1 id="categoryName">Loading...</h1>
+            <p id="categoryDesc">Browse all shops in this category</p>
+        </div>
+        <div class="loading-spinner" id="loadingSpinner"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Loading shops...</div>
+        <div class="shops-grid" id="shopsGrid"></div>
+    </div>
+    
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="products.html" class="nav-item"><i class="fas fa-compass"></i><span>Explore</span></a>
+        <a href="cart.html" class="nav-item"><i class="fas fa-shopping-cart"></i><span>Cart</span></a>
+        <a href="shop-categories.html" class="nav-item"><i class="fas fa-tags"></i><span>Categories</span></a>
+        <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+    </nav>
+
+    <script>
+        const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryName = decodeURIComponent(urlParams.get('category') || '');
+        
+        async function loadShops() {
+            if (!categoryName) {
+                document.getElementById('loadingSpinner').innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i><h3>No category selected</h3></div>';
+                return;
+            }
+            
+            document.getElementById('categoryName').innerText = categoryName;
+            document.getElementById('pageTitle').innerText = categoryName + ' Shops';
+            
+            try {
+                const { data: shops, error } = await supabaseClient
+                    .from('shops')
+                    .select('*')
+                    .eq('category', categoryName)
+                    .eq('status', 'approved')
+                    .order('rating', { ascending: false });
+                
+                const container = document.getElementById('shopsGrid');
+                const spinner = document.getElementById('loadingSpinner');
+                
+                if (error) throw error;
+                
+                if (!shops || shops.length === 0) {
+                    spinner.innerHTML = '<div class="no-data"><i class="fas fa-store-slash"></i><h3>No shops found in this category</h3><p>Be the first to register!</p></div>';
+                    return;
+                }
+                
+                spinner.style.display = 'none';
+                
+                let html = '';
+                shops.forEach(shop => {
+                    const imageUrl = shop.image_url || 'https://placehold.co/300x200/FFD600/000?text=Shop';
+                    html += `
+                        <div class="shop-card" onclick="openShopDetails('${shop.id}')">
+                            <img src="${imageUrl}" class="shop-img" onerror="this.src='https://placehold.co/300x200/FFD600/000?text=Shop'">
+                            <div class="shop-info">
+                                <div class="shop-name">${escapeHtml(shop.name)}</div>
+                                <div class="shop-category">${shop.category || 'General Store'}</div>
+                                <div class="shop-footer">
+                                    <div class="shop-rating"><i class="fas fa-star"></i> ${shop.rating || '4.0'}</div>
+                                    <div class="shop-status ${!shop.is_open ? 'closed' : ''}">${shop.is_open ? 'Open' : 'Closed'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading shops:', error);
+                document.getElementById('loadingSpinner').innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i><h3>Error loading shops</h3></div>';
+            }
+        }
+        
+        function openShopDetails(shopId) {
+            window.location.href = `shop-details.html?id=${shopId}`;
+        }
+        
+        function goBack() {
+            window.location.href = 'shop-categories.html';
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadShops);
+        window.openShopDetails = openShopDetails;
+        window.goBack = goBack;
+    </script>
+</body>
+</html>

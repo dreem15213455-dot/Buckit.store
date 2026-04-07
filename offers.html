@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Offers - Zatpat</title>
+    <meta name="theme-color" content="#FFD600">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #FFD600;
+            --primary-dark: #E5C200;
+            --accent-green: #16A34A;
+            --bg-light: #F5F5F5;
+            --card-white: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-light: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+
+        /* Header */
+        .top-bar {
+            background: var(--card-white);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+        }
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: #E5E7EB; }
+        .brand-name { font-size: 22px; font-weight: 800; }
+        .brand-name .normal { color: #000000; }
+        .brand-name .pat { color: var(--accent-green); }
+
+        .main-content { padding-top: 80px; padding-bottom: 30px; }
+
+        /* Hero Banner */
+        .offers-hero {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .offers-hero h1 { font-size: 32px; font-weight: 800; color: #000000; margin-bottom: 8px; }
+        .offers-hero p { color: rgba(0,0,0,0.7); font-size: 14px; }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 12px;
+            padding: 0 16px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex-wrap: wrap;
+        }
+        .category-tabs::-webkit-scrollbar { display: none; }
+        .category-chip {
+            background: var(--card-white);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-full);
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .category-chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #000000;
+        }
+        .category-chip:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Offers Grid */
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            padding: 0 16px;
+        }
+        .offer-card {
+            background: var(--card-white);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .offer-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .offer-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        .offer-content {
+            padding: 20px;
+        }
+        .offer-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .offer-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        .offer-discount {
+            display: inline-block;
+            background: var(--primary);
+            color: #000000;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .offer-shop-btn {
+            background: #000000;
+            color: var(--primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .offer-shop-btn:hover {
+            background: #1a1a1a;
+            transform: translateY(-1px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state i { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
+
+        /* Loading */
+        .loading-spinner { text-align: center; padding: 60px; color: var(--primary); }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            background: var(--card-white);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 16px 16px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            z-index: 1000;
+            border-top: 1px solid var(--border-light);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 20px; margin-bottom: 3px; }
+
+        @media (max-width: 480px) {
+            .offers-grid { grid-template-columns: 1fr; }
+            .offers-hero h1 { font-size: 24px; }
+            .offer-image { height: 150px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="top-bar">
+    <div class="d-flex align-items-center gap-3">
+        <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+        <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+        <div style="flex:1;"></div>
+    </div>
+</div>
+
+<div class="main-content">
+    <!-- Hero Banner -->
+    <div class="offers-hero">
+        <h1>🔥 Hot Offers</h1>
+        <p>Grab the best deals & discounts from your favorite shops</p>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="category-tabs" id="categoryTabs">
+        <div class="category-chip active" data-category="all">All Offers</div>
+    </div>
+
+    <!-- Offers Grid -->
+    <div id="offersContainer" class="offers-grid">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Loading offers...</p></div>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="products.html" class="nav-item"><i class="fas fa-compass"></i><span>Explore</span></a>
+    <a href="cart.html" class="nav-item"><i class="fas fa-shopping-cart"></i><span>Cart</span></a>
+    <a href="#" class="nav-item" onclick="openProfile()"><i class="fas fa-user"></i><span>Profile</span></a>
+    <a href="#" class="nav-item" onclick="openOrders()"><i class="fas fa-receipt"></i><span>Orders</span></a>
+</nav>
+
+<script>
+    const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    let allOffers = [];
+    let currentCategory = 'all';
+    let currentUser = null;
+
+    // Load all active offers
+    async function loadOffers() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('offers')
+                .select('*')
+                .eq('is_active', true)
+                .order('priority', { ascending: true });
+            
+            if (error) throw error;
+            
+            allOffers = data || [];
+            renderCategoryTabs();
+            renderOffers();
+        } catch (error) {
+            console.error('Error loading offers:', error);
+            document.getElementById('offersContainer').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Failed to load offers</h3>
+                    <p>Please try again later</p>
+                </div>
+            `;
+        }
+    }
+
+    // Render category tabs (extract unique categories from link or create based on offer type)
+    function renderCategoryTabs() {
+        const categories = ['All Offers'];
+        // You can add more categories based on your needs
+        const extraCategories = ['Grocery', 'Fashion', 'Electronics', 'Dairy', 'Hardware'];
+        
+        const container = document.getElementById('categoryTabs');
+        if (container) {
+            let html = '';
+            categories.forEach(cat => {
+                html += `<div class="category-chip ${currentCategory === cat.toLowerCase() ? 'active' : ''}" data-category="${cat.toLowerCase()}" onclick="filterOffers('${cat.toLowerCase()}')">${cat}</div>`;
+            });
+            extraCategories.forEach(cat => {
+                html += `<div class="category-chip" data-category="${cat.toLowerCase()}" onclick="filterOffers('${cat.toLowerCase()}')">${cat}</div>`;
+            });
+            container.innerHTML = html;
+        }
+    }
+
+    // Filter offers by category
+    function filterOffers(category) {
+        currentCategory = category;
+        renderCategoryTabs();
+        renderOffers();
+    }
+
+    // Render offers grid
+    function renderOffers() {
+        const container = document.getElementById('offersContainer');
+        if (!container) return;
+
+        let filteredOffers = allOffers;
+        
+        // Filter by category if not 'all'
+        if (currentCategory !== 'all') {
+            filteredOffers = allOffers.filter(offer => {
+                const link = offer.link || '';
+                return link.toLowerCase().includes(currentCategory);
+            });
+        }
+
+        if (filteredOffers.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <i class="fas fa-tag"></i>
+                    <h3>No offers found</h3>
+                    <p>Check back later for amazing deals!</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = filteredOffers.map(offer => `
+            <div class="offer-card" onclick="shopNow('${offer.link || 'products.html'}', '${offer.category || ''}')">
+                ${offer.image_url ? 
+                    `<img src="${offer.image_url}" class="offer-image" onerror="this.src='https://placehold.co/400x180/FFD600/000?text=Offer'">` : 
+                    `<div class="offer-image" style="display: flex; align-items: center; justify-content: center;"><i class="fas fa-tag" style="font-size: 48px; color: #000;"></i></div>`
+                }
+                <div class="offer-content">
+                    <h3 class="offer-title">${offer.title || 'Special Offer'}</h3>
+                    <p class="offer-subtitle">${offer.subtitle || ''}</p>
+                    <span class="offer-discount">${offer.discount_value}${offer.discount_type === 'percentage' ? '% OFF' : '₹ OFF'}</span>
+                    <button class="offer-shop-btn" onclick="event.stopPropagation(); shopNow('${offer.link || 'products.html'}', '${offer.category || ''}')">
+                        Shop Now <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Shop Now action - redirect to products page with category filter
+    function shopNow(link, category) {
+        if (link && link !== '#' && link !== '') {
+            window.location.href = link;
+        } else if (category) {
+            window.location.href = `products.html?category=${encodeURIComponent(category)}`;
+        } else {
+            window.location.href = 'products.html';
+        }
+    }
+
+    function goBack() {
+        window.location.href = 'index.html';
+    }
+
+    function openProfile() {
+        if (!currentUser) {
+            alert('Please login first');
+            return;
+        }
+        window.location.href = 'profile.html';
+    }
+
+    function openOrders() {
+        if (!currentUser) {
+            alert('Please login first');
+            return;
+        }
+        window.location.href = 'orders.html';
+    }
+
+    // Check logged in user
+    async function checkUser() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            currentUser = user;
+        }
+    }
+
+    // Page load
+    document.addEventListener('DOMContentLoaded', async () => {
+        await checkUser();
+        await loadOffers();
+    });
+
+    // Make functions global
+    window.filterOffers = filterOffers;
+    window.shopNow = shopNow;
+    window.goBack = goBack;
+    window.openProfile = openProfile;
+    window.openOrders = openOrders;
+</script>
+</body>
+</html>

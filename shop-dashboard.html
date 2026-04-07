@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Shop Dashboard - Zatpat</title>
+    <meta name="theme-color" content="#FFD600">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #FFD600;
+            --primary-dark: #E5C200;
+            --accent-green: #16A34A;
+            --bg-light: #F5F5F5;
+            --card-white: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-light: #E5E7EB;
+            --danger: #EF4444;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+
+        .top-bar {
+            background: var(--card-white);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .brand-name { font-size: 22px; font-weight: 800; }
+        .brand-name .normal { color: #000000; }
+        .brand-name .pat { color: var(--accent-green); }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 16px; }
+        .logout-header-btn {
+            background: rgba(239,68,68,0.1);
+            color: var(--danger);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .main-content {
+            padding-top: 80px;
+            padding-bottom: 85px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        /* New Order Highlight */
+        @keyframes blink {
+            0%, 100% { background-color: white; }
+            50% { background-color: #FEF3C7; }
+        }
+        .order-card.new-order {
+            animation: blink 1s ease-in-out 3;
+            border-left: 4px solid var(--primary);
+        }
+        .new-order-badge {
+            background: var(--primary);
+            color: #000;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            margin-left: 8px;
+        }
+
+        .shop-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            margin: 16px 0;
+            padding: 24px;
+            border-radius: var(--radius-xl);
+            color: #000000;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .shop-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+        .shop-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .shop-info h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: #000; }
+        .shop-info p { font-size: 12px; opacity: 0.8; margin: 2px 0; color: #000; }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+            background: rgba(0,0,0,0.1);
+            color: #000;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .stat-card {
+            background: var(--card-white);
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            border: 1px solid var(--border-light);
+        }
+        .stat-value { font-size: 24px; font-weight: 800; color: var(--accent-green); }
+        .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+        .tabs {
+            display: flex;
+            margin: 16px 0;
+            background: var(--card-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        .tab.active { background: var(--primary); color: #000000; }
+
+        .orders-section { margin: 16px 0; }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .section-header h3 { font-size: 18px; font-weight: 700; margin: 0; }
+
+        .orders-table {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+        .order-row:last-child { border-bottom: none; }
+        .order-row:hover { background: var(--bg-light); }
+        .order-info { flex: 2; }
+        .order-id { font-weight: 700; font-size: 14px; }
+        .order-customer { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+        .order-amount { font-weight: 700; color: var(--accent-green); }
+        .order-status-select {
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-light);
+            font-size: 12px;
+            font-weight: 500;
+            background: white;
+            cursor: pointer;
+        }
+        .order-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .order-btn {
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+        .order-btn-primary { background: var(--primary); color: #000; }
+        .order-btn-danger { background: rgba(239,68,68,0.1); color: var(--danger); }
+        .order-btn-success { background: var(--success); color: white; }
+
+        .new-order-alert {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+            padding: 12px 20px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .new-order-alert.show { display: flex; }
+        .new-order-alert i { font-size: 20px; margin-right: 10px; }
+
+        .loading-spinner { text-align: center; padding: 60px; color: var(--primary); }
+        .text-muted { color: var(--text-secondary); font-size: 12px; }
+
+        @media (max-width: 768px) {
+            .order-row { flex-direction: column; gap: 10px; align-items: flex-start; }
+            .order-actions { width: 100%; justify-content: flex-end; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="d-flex align-items-center gap-3">
+            <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+            <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+            <div class="page-title">Shop Dashboard</div>
+        </div>
+        <button class="logout-header-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Loading dashboard...</p></div>
+    </div>
+
+    <div id="toastMsg" class="toast-notification" style="position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #1F2937; color: white; padding: 10px 20px; border-radius: 50px; font-size: 13px; z-index: 10050; display: none;">
+        <i class="fas fa-check-circle"></i> <span id="toastText"></span>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+        let shop = null;
+        let orders = [];
+        let lastOrderCount = 0;
+        let autoRefreshInterval = null;
+        let audio = null;
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastMsg');
+            const toastText = document.getElementById('toastText');
+            toastText.innerHTML = message;
+            toast.style.background = isError ? '#EF4444' : '#1F2937';
+            toast.style.display = 'flex';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        // Play sound on new order
+        function playNewOrderSound() {
+            try {
+                audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+                audio.volume = 0.5;
+                audio.play().catch(e => console.log('Sound play error:', e));
+            } catch(e) { console.log('Sound error:', e); }
+        }
+
+        // Request notification permission
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        // Show browser notification
+        function showBrowserNotification(orderId) {
+            if (Notification.permission === 'granted') {
+                new Notification('🆕 New Order Received!', {
+                    body: `Order #${orderId} has been placed. Click to view.`,
+                    icon: '/favicon.ico',
+                    silent: false
+                });
+            }
+        }
+
+        // Check for new orders
+        function checkForNewOrders(newOrders) {
+            const currentCount = newOrders.length;
+            if (currentCount > lastOrderCount && lastOrderCount > 0) {
+                const newCount = currentCount - lastOrderCount;
+                playNewOrderSound();
+                showBrowserNotification(`New order received`);
+                showToast(`🔔 ${newCount} new order${newCount > 1 ? 's' : ''} received!`);
+                
+                // Show alert banner
+                const alertBanner = document.getElementById('newOrderAlert');
+                if (alertBanner) {
+                    alertBanner.classList.add('show');
+                    setTimeout(() => alertBanner.classList.remove('show'), 5000);
+                }
+            }
+            lastOrderCount = currentCount;
+        }
+
+        // Update order status
+        async function updateOrderStatus(orderId, newStatus) {
+            const { error } = await supabaseClient
+                .from('orders')
+                .update({ order_status: newStatus })
+                .eq('order_id', orderId);
+            
+            if (error) {
+                showToast('Error: ' + error.message, true);
+            } else {
+                showToast(`✅ Order status updated to: ${newStatus}`);
+                await loadOrders();
+                renderDashboard();
+            }
+        }
+
+        // Load orders for this shop
+        async function loadOrders() {
+            if (!shop) return [];
+            const { data, error } = await supabaseClient
+                .from('orders')
+                .select('*')
+                .eq('shop_id', shop.id)
+                .order('created_at', { ascending: false });
+            
+            if (!error && data) {
+                checkForNewOrders(data);
+                orders = data;
+            }
+            return orders;
+        }
+
+        async function loadProducts() {
+            const { data } = await supabaseClient
+                .from('products')
+                .select('*')
+                .eq('shop_id', shop.id);
+            return data || [];
+        }
+
+        async function checkUser() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { showLoginPrompt(); return false; }
+            currentUser = user;
+            const { data: shopData, error } = await supabaseClient
+                .from('shops')
+                .select('*')
+                .eq('owner_id', user.id)
+                .single();
+            if (error || !shopData) { showNoShopPrompt(); return false; }
+            shop = shopData;
+            if (shop.status !== 'approved') { showPendingApproval(); return false; }
+            return true;
+        }
+
+        async function renderDashboard() {
+            await loadOrders();
+            const products = await loadProducts();
+            
+            const totalProducts = products.length;
+            const totalOrders = orders.length;
+            const totalEarnings = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+            const pendingOrders = orders.filter(o => o.order_status === 'pending').length;
+            
+            let ordersHtml = '';
+            if (orders.length === 0) {
+                ordersHtml = '<div style="text-align:center; padding:40px;">No orders yet</div>';
+            } else {
+                orders.forEach(order => {
+                    const isNew = new Date(order.created_at) > new Date(Date.now() - 60000); // Last 1 minute
+                    const address = order.shipping_address || {};
+                    ordersHtml += `
+                        <div class="order-row ${isNew ? 'new-order' : ''}">
+                            <div class="order-info">
+                                <div class="order-id">
+                                    ${order.order_id}
+                                    ${isNew ? '<span class="new-order-badge">🆕 NEW</span>' : ''}
+                                </div>
+                                <div class="order-customer">
+                                    ${address.full_name || 'Customer'} • ${address.city || ''} • ${new Date(order.created_at).toLocaleString()}
+                                </div>
+                            </div>
+                            <div class="order-amount">₹${Math.round(order.total || 0)}</div>
+                            <select class="order-status-select" onchange="updateOrderStatus('${order.order_id}', this.value)">
+                                <option value="pending" ${order.order_status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
+                                <option value="confirmed" ${order.order_status === 'confirmed' ? 'selected' : ''}>✅ Confirmed</option>
+                                <option value="preparing" ${order.order_status === 'preparing' ? 'selected' : ''}>👨‍🍳 Preparing</option>
+                                <option value="out_for_delivery" ${order.order_status === 'out_for_delivery' ? 'selected' : ''}>🚚 Out for Delivery</option>
+                                <option value="delivered" ${order.order_status === 'delivered' ? 'selected' : ''}>🏠 Delivered</option>
+                                <option value="cancelled" ${order.order_status === 'cancelled' ? 'selected' : ''}>❌ Cancelled</option>
+                            </select>
+                            <div class="order-actions">
+                                <button class="order-btn order-btn-primary" onclick="window.location.href='order-tracking.html?order=${order.order_id}'">Track</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            const container = document.getElementById('mainContent');
+            container.innerHTML = `
+                <div class="shop-header">
+                    <div class="shop-avatar" onclick="document.getElementById('shopPhotoInput').click()">
+                        ${shop.image_url ? `<img src="${shop.image_url}">` : `<i class="fas fa-store"></i>`}
+                        <input type="file" id="shopPhotoInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="shop-info">
+                        <h2>${escapeHtml(shop.name)}</h2>
+                        <p>${shop.city || 'Location not set'} • ${shop.phone}</p>
+                        <span class="status-badge">${shop.status}</span>
+                    </div>
+                </div>
+                
+                <div class="new-order-alert" id="newOrderAlert">
+                    <div><i class="fas fa-bell"></i> 🆕 New order received! Check below.</div>
+                    <i class="fas fa-times" onclick="this.parentElement.classList.remove('show')" style="cursor:pointer;"></i>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value">${totalProducts}</div><div class="stat-label">Products</div></div>
+                    <div class="stat-card"><div class="stat-value">${totalOrders}</div><div class="stat-label">Total Orders</div></div>
+                    <div class="stat-card"><div class="stat-value">${pendingOrders}</div><div class="stat-label">Pending</div></div>
+                </div>
+                
+                <div class="orders-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-receipt"></i> Orders (${totalOrders})</h3>
+                        <button class="order-btn order-btn-primary" onclick="location.reload()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="orders-table">${ordersHtml}</div>
+                </div>
+            `;
+            
+            document.getElementById('shopPhotoInput').onchange = (e) => { if(e.target.files[0]) uploadShopPhoto(e.target.files[0]); };
+        }
+
+        async function uploadShopPhoto(file) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `shops/${shop.id}_${Date.now()}.${fileExt}`;
+            const { error } = await supabaseClient.storage.from('shop-images').upload(fileName, file);
+            if (error) { showToast('Upload failed', true); return; }
+            const { data: publicUrl } = supabaseClient.storage.from('shop-images').getPublicUrl(fileName);
+            await supabaseClient.from('shops').update({ image_url: publicUrl.publicUrl }).eq('id', shop.id);
+            shop.image_url = publicUrl.publicUrl;
+            renderDashboard();
+            showToast('Photo updated!');
+        }
+
+        function startAutoRefresh() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            autoRefreshInterval = setInterval(async () => {
+                await loadOrders();
+                renderDashboard();
+            }, 10000);
+        }
+
+        function showLoginPrompt() { document.getElementById('mainContent').innerHTML = `<div style="text-align:center; padding:60px;"><i class="fas fa-lock" style="font-size:64px;"></i><h3>Please Login</h3><button class="order-btn order-btn-primary" onclick="window.location.href='index.html'">Login</button></div>`; }
+        function showNoShopPrompt() { document.getElementById('mainContent').innerHTML = `<div style="text-align:center; padding:60px;"><i class="fas fa-store" style="font-size:64px;"></i><h3>No Shop Found</h3><button class="order-btn order-btn-primary" onclick="window.location.href='shop-register.html'">Register Shop</button></div>`; }
+        function showPendingApproval() { document.getElementById('mainContent').innerHTML = `<div style="text-align:center; padding:60px;"><i class="fas fa-clock" style="font-size:64px; color:var(--warning);"></i><h3>Shop Pending Approval</h3></div>`; }
+
+        async function handleLogout() { if(confirm('Logout?')) { await supabaseClient.auth.signOut(); localStorage.clear(); window.location.href = 'index.html'; } }
+        function goBack() { window.location.href = 'index.html'; }
+        function escapeHtml(text) { if(!text) return ''; return text.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            requestNotificationPermission();
+            const isLoggedIn = await checkUser();
+            if (isLoggedIn && shop && shop.status === 'approved') {
+                await renderDashboard();
+                startAutoRefresh();
+            }
+        });
+
+        window.updateOrderStatus = updateOrderStatus;
+        window.goBack = goBack;
+        window.handleLogout = handleLogout;
+    </script>
+</body>
+</html>
