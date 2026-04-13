@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Zatpat - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/compressorjs@1.2.1/dist/compressor.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #FFD600;
+            --primary-dark: #E5C200;
+            --accent-green: #16A34A;
+            --bg-light: #F5F5F5;
+            --card-white: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border-light: #E5E7EB;
+            --gray-100: #F5F5F5;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--card-white);
+            border-right: 1px solid var(--border-light);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .sidebar-header h2 { font-size: 28px; font-weight: 800; }
+        .sidebar-header h2 .normal { color: #000000; }
+        .sidebar-header h2 .pat { color: var(--accent-green); }
+        .sidebar-header p { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+        
+        .sidebar-menu { padding: 16px 12px; }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .menu-item i { width: 22px; font-size: 18px; }
+        .menu-item:hover { background: var(--gray-100); color: var(--primary); }
+        .menu-item.active { background: var(--primary); color: #000000; }
+        .menu-divider { height: 1px; background: var(--border-light); margin: 12px 0; }
+        
+        .main-content { margin-left: 260px; padding: 24px 32px; min-height: 100vh; }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .page-title { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+        
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--card-white);
+            padding: 8px 20px;
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+        
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000000;
+            font-weight: 700;
+        }
+        
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: var(--card-white);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+        
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .stat-icon.users { background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
+        .stat-icon.shops { background: linear-gradient(135deg, var(--primary), #E5C200); color: #000; }
+        .stat-icon.products { background: linear-gradient(135deg, var(--success), #059669); }
+        .stat-icon.orders { background: linear-gradient(135deg, #8B5CF6, #6D28D9); }
+        
+        .stat-info h3 { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+        .stat-info p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+        
+        .content-card {
+            background: var(--card-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: var(--card-white);
+        }
+        
+        .card-header h2 { font-size: 20px; font-weight: 700; margin: 0; }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: #000000;
+            border: none;
+            padding: 8px 20px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-sm { padding: 4px 10px; font-size: 11px; }
+        .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        
+        .table-wrapper { overflow-x: auto; width: 100%; }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .data-table th { text-align: left; padding: 14px 16px; background: var(--gray-100); font-weight: 600; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-light); white-space: nowrap; }
+        .data-table td { padding: 14px 16px; border-bottom: 1px solid var(--border-light); font-size: 13px; vertical-align: middle; }
+        .data-table tr:hover { background: var(--gray-100); }
+        
+        .badge-pending, .badge-approved, .badge-rejected, .badge-active, .badge-blocked {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-pending { background: #FEF3C7; color: #D97706; }
+        .badge-approved { background: #D1FAE5; color: #059669; }
+        .badge-rejected { background: #FEE2E2; color: #DC2626; }
+        .badge-active { background: #D1FAE5; color: #059669; }
+        .badge-blocked { background: #FEE2E2; color: #DC2626; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-label { font-weight: 600; font-size: 13px; margin-bottom: 6px; display: block; }
+        .form-control { width: 100%; padding: 12px 14px; border: 1px solid var(--border-light); border-radius: var(--radius-md); font-size: 14px; }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.1); }
+        
+        .image-upload-area {
+            border: 2px dashed var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .image-upload-area:hover { border-color: var(--primary); background: var(--gray-100); }
+        .image-preview { max-width: 100%; max-height: 150px; margin-top: 12px; border-radius: var(--radius-md); display: none; }
+        
+        .search-box { display: flex; gap: 12px; margin-bottom: 20px; padding: 0 20px; }
+        .search-box input { flex: 1; padding: 10px 16px; border: 1px solid var(--border-light); border-radius: var(--radius-full); font-size: 14px; }
+        
+        .nav-tabs { display: flex; gap: 10px; padding: 0 20px; border-bottom: 1px solid var(--border-light); margin-bottom: 16px; flex-wrap: wrap; }
+        .nav-tabs .btn { padding: 8px 20px; border-radius: var(--radius-full); font-size: 13px; font-weight: 500; cursor: pointer; border: none; background: var(--gray-100); color: var(--text-secondary); }
+        .nav-tabs .btn.active { background: var(--primary); color: #000000; }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .modal-container {
+            background: var(--card-white);
+            border-radius: var(--radius-2xl);
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px;
+        }
+        
+        .modal-container h3 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 24px; }
+        .modal-buttons button:first-child { flex: 1; background: var(--primary); color: #000; border: none; padding: 12px; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; }
+        .modal-buttons button:last-child { flex: 1; background: transparent; border: 1px solid var(--border-light); padding: 12px; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+        .category-card {
+            background: var(--gray-100);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+        }
+        .category-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+        
+        .offers-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+        .offer-card-item {
+            background: var(--card-white);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .offer-card-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .offer-card-img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        .offer-card-content { padding: 12px; }
+        .offer-card-title { font-weight: 700; font-size: 14px; }
+        .offer-card-subtitle { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+        .offer-card-badge { background: var(--primary); color: #000; padding: 2px 8px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; display: inline-block; margin-top: 8px; }
+        
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; }
+        .toast-message { background: white; padding: 14px 20px; border-radius: var(--radius-md); margin-bottom: 10px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; border-left: 4px solid; animation: slideIn 0.3s ease; }
+        .toast-message.success { border-left-color: var(--success); }
+        .toast-message.error { border-left-color: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        .loading-spinner { text-align: center; padding: 60px; color: var(--primary); }
+        .mt-4 { margin-top: 24px; }
+        .shop-image { width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-md); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { width: 80px; }
+            .sidebar-header h2, .sidebar-header p, .menu-item span { display: none; }
+            .main-content { margin-left: 80px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .main-content { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><span class="normal">Zat</span><span class="pat">pat</span></h2>
+            <p>Admin Panel</p>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" data-section="shops"><i class="fas fa-store"></i><span>Shop Management</span></div>
+            <div class="menu-item" data-section="users"><i class="fas fa-users"></i><span>User Management</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" data-section="categories"><i class="fas fa-tags"></i><span>Categories</span></div>
+            <div class="menu-item" data-section="products"><i class="fas fa-box"></i><span>Products</span></div>
+            <div class="menu-item" data-section="hotoffers"><i class="fas fa-fire"></i><span>🔥 Hot Offers</span></div>
+            <div class="menu-item" data-section="sliders"><i class="fas fa-images"></i><span>Sliders</span></div>
+            <div class="menu-item" data-section="sponsored"><i class="fas fa-crown"></i><span>Sponsored Shops</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" data-section="orders"><i class="fas fa-receipt"></i><span>Orders</span></div>
+            <div class="menu-item" data-section="settings"><i class="fas fa-cog"></i><span>Settings</span></div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>View Website</span></div>
+            <div class="menu-item" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></div>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="admin-header">
+            <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            <div class="admin-user">
+                <div class="admin-avatar" id="adminAvatar">A</div>
+                <span id="adminEmail">admin@zatpat.com</span>
+                <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+        <div id="contentArea"><div class="loading-spinner"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Loading...</p></div></div>
+    </div>
+    
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-container" id="modalContent"></div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        let currentAdmin = null;
+        let allUsers = [], allShops = [], allProducts = [], allCategories = [], allOffers = [], allSliders = [], allFeaturedShops = [], allOrders = [];
+        let appSettings = { registrationFee: 499, deliveryFee: 40, freeDeliveryThreshold: 299 };
+        let currentSection = 'dashboard';
+        let currentShopFilter = 'all';
+        
+        let offerImageFile = null;
+        let sliderImageFile = null;
+        let categoryImageFile = null;
+        let editItemId = null;
+        
+        const Toast = {
+            show: (message, type = 'success') => {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast-message ${type}`;
+                toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i><span>${message}</span>`;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+        };
+        
+        async function compressImage(file, maxSizeKB = 400) {
+            return new Promise((resolve, reject) => {
+                new Compressor(file, {
+                    quality: 0.7,
+                    maxWidth: 800,
+                    maxHeight: 800,
+                    success(result) { resolve(result); },
+                    error(err) { reject(err); }
+                });
+            });
+        }
+        
+        async function checkAdmin() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { window.location.href = 'index.html'; return; }
+            const { data: profile } = await supabaseClient.from('users').select('role, name').eq('id', user.id).maybeSingle();
+            if (profile?.role !== 'admin') {
+                Toast.show('Access Denied', 'error');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+                return;
+            }
+            currentAdmin = { ...user, ...profile };
+            document.getElementById('adminEmail').innerText = user.email;
+            document.getElementById('adminAvatar').innerText = (profile?.name || 'A').charAt(0).toUpperCase();
+            await loadAllData();
+            loadSection('dashboard');
+        }
+        
+        async function loadAllData() {
+            const [users, shops, products, categories, offers, sliders, featured, orders, settings] = await Promise.all([
+                supabaseClient.from('users').select('*').order('created_at', { ascending: false }),
+                supabaseClient.from('shops').select('*').order('created_at', { ascending: false }),
+                supabaseClient.from('products').select('*, shops(name, image_url)').order('created_at', { ascending: false }),
+                supabaseClient.from('categories').select('*').order('priority'),
+                supabaseClient.from('offers').select('*').order('priority'),
+                supabaseClient.from('sliders').select('*').order('display_order'),
+                supabaseClient.from('featured_shops').select('*, shops(id, name, image_url, rating)'),
+                supabaseClient.from('orders').select('*').order('created_at', { ascending: false }),
+                supabaseClient.from('app_settings').select('*')
+            ]);
+            allUsers = users.data || [];
+            allShops = shops.data || [];
+            allProducts = products.data || [];
+            allCategories = categories.data || [];
+            allOffers = offers.data || [];
+            allSliders = sliders.data || [];
+            allFeaturedShops = featured.data || [];
+            allOrders = orders.data || [];
+            
+            if (settings.data) {
+                const regFee = settings.data.find(s => s.key === 'registration_fee');
+                if (regFee) appSettings.registrationFee = parseFloat(regFee.value);
+                const delFee = settings.data.find(s => s.key === 'delivery_fee');
+                if (delFee) appSettings.deliveryFee = parseFloat(delFee.value);
+                const freeThreshold = settings.data.find(s => s.key === 'free_delivery_threshold');
+                if (freeThreshold) appSettings.freeDeliveryThreshold = parseFloat(freeThreshold.value);
+            }
+        }
+        
+        function loadSection(section) {
+            currentSection = section;
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            const menuItem = document.querySelector(`[data-section="${section}"]`);
+            if (menuItem) menuItem.classList.add('active');
+            
+            const titles = {
+                dashboard: 'Dashboard', shops: 'Shop Management', users: 'User Management',
+                categories: 'Categories', products: 'Products',
+                hotoffers: '🔥 Hot Offers', sliders: 'Sliders', sponsored: 'Sponsored Shops',
+                orders: 'Orders', settings: 'Settings'
+            };
+            document.getElementById('pageTitle').innerText = titles[section] || section;
+            
+            if (section === 'dashboard') renderDashboard();
+            else if (section === 'shops') renderShops();
+            else if (section === 'users') renderUsers();
+            else if (section === 'categories') renderCategories();
+            else if (section === 'products') renderProducts();
+            else if (section === 'hotoffers') renderHotOffers();
+            else if (section === 'sliders') renderSliders();
+            else if (section === 'sponsored') renderSponsored();
+            else if (section === 'orders') renderOrders();
+            else if (section === 'settings') renderSettings();
+        }
+        
+        function renderDashboard() {
+            const pendingShops = allShops.filter(s => s.status === 'pending').length;
+            const totalRevenue = allOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+            document.getElementById('contentArea').innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-icon users"><i class="fas fa-users"></i></div><div class="stat-info"><h3>${allUsers.length}</h3><p>Total Users</p></div></div>
+                    <div class="stat-card"><div class="stat-icon shops"><i class="fas fa-store"></i></div><div class="stat-info"><h3>${allShops.length}</h3><p>Total Shops</p><small class="text-muted">${pendingShops} pending</small></div></div>
+                    <div class="stat-card"><div class="stat-icon products"><i class="fas fa-box"></i></div><div class="stat-info"><h3>${allProducts.length}</h3><p>Total Products</p></div></div>
+                    <div class="stat-card"><div class="stat-icon orders"><i class="fas fa-rupee-sign"></i></div><div class="stat-info"><h3>₹${totalRevenue.toLocaleString()}</h3><p>Total Revenue</p></div></div>
+                </div>
+                <div class="content-card"><div class="card-header"><h2>Quick Actions</h2></div><div style="padding: 20px; display: flex; gap: 12px; flex-wrap: wrap;"><button class="btn-primary" onclick="loadSection('shops')">Manage Shops</button><button class="btn-primary" onclick="loadSection('hotoffers')">Hot Offers</button><button class="btn-primary" onclick="loadSection('settings')">Settings</button></div></div>
+            `;
+        }
+        
+        // ========== SHOPS ==========
+        function renderShops() {
+            document.getElementById('contentArea').innerHTML = `
+                <div class="content-card"><div class="card-header"><h2>Shop Management</h2></div>
+                <div class="search-box"><input type="text" id="shopSearch" placeholder="🔍 Search shops..." onkeyup="filterShopsList()"></div>
+                <div class="nav-tabs">
+                    <button class="btn ${currentShopFilter === 'all' ? 'active' : ''}" onclick="filterShopStatus('all')">All (${allShops.length})</button>
+                    <button class="btn ${currentShopFilter === 'pending' ? 'active' : ''}" onclick="filterShopStatus('pending')">Pending (${allShops.filter(s=>s.status==='pending').length})</button>
+                    <button class="btn ${currentShopFilter === 'approved' ? 'active' : ''}" onclick="filterShopStatus('approved')">Approved (${allShops.filter(s=>s.status==='approved').length})</button>
+                </div>
+                <div id="shopsList"></div></div>
+            `;
+            filterShopsList();
+        }
+        
+        function filterShopStatus(status) { currentShopFilter = status; filterShopsList(); }
+        function filterShopsList() {
+            const term = document.getElementById('shopSearch')?.value.toLowerCase() || '';
+            let filtered = allShops;
+            if (currentShopFilter !== 'all') filtered = allShops.filter(s => s.status === currentShopFilter);
+            filtered = filtered.filter(s => (s.name?.toLowerCase().includes(term) || s.owner_name?.toLowerCase().includes(term)));
+            document.getElementById('shopsList').innerHTML = renderShopsTable(filtered);
+        }
+        
+        function renderShopsTable(shops) {
+            if (!shops.length) return '<div style="padding: 40px; text-align: center;">No shops found</div>';
+            let html = '<div class="table-wrapper"><table class="data-table"><thead><tr><th>Image</th><th>Shop Name</th><th>Owner</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+            shops.forEach(shop => {
+                html += `<tr>
+                    <td><img src="${shop.image_url || 'https://placehold.co/50x50/FFD600/000?text=Shop'}" class="shop-image" onerror="this.src='https://placehold.co/50x50/FFD600/000?text=Shop'"></td>
+                    <td><strong>${shop.name || '-'}</strong><br><small>${shop.city || ''}</small></td>
+                    <td>${shop.owner_name || '-'}</td>
+                    <td>${shop.phone || '-'}</td>
+                    <td><span class="badge-${shop.status}">${shop.status}</span></td>
+                    <td><div class="btn-group">
+                        ${shop.status === 'pending' ? `<button class="btn-success btn-sm" onclick="approveShop('${shop.id}')">Approve</button>` : ''}
+                        <button class="btn-danger btn-sm" onclick="deleteShop('${shop.id}')">Delete</button>
+                    </div></td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            return html;
+        }
+        
+        async function approveShop(id) { await supabaseClient.from('shops').update({ status: 'approved' }).eq('id', id); Toast.show('Shop approved'); await loadAllData(); renderShops(); }
+        async function deleteShop(id) { if(!confirm('Delete shop?')) return; await supabaseClient.from('shops').delete().eq('id', id); Toast.show('Shop deleted'); await loadAllData(); renderShops(); }
+        
+        // ========== USERS ==========
+        function renderUsers() {
+            document.getElementById('contentArea').innerHTML = `
+                <div class="content-card"><div class="card-header"><h2>User Management</h2></div>
+                <div class="search-box"><input type="text" id="userSearch" placeholder="🔍 Search users..." onkeyup="filterUsersList()"></div>
+                <div id="usersList"></div></div>
+            `;
+            filterUsersList();
+        }
+        
+        function filterUsersList() {
+            const term = document.getElementById('userSearch')?.value.toLowerCase() || '';
+            const filtered = allUsers.filter(u => u.name?.toLowerCase().includes(term) || u.email?.toLowerCase().includes(term));
+            document.getElementById('usersList').innerHTML = renderUsersTable(filtered);
+        }
+        
+        function renderUsersTable(users) {
+            if (!users.length) return '<div style="padding: 40px; text-align: center;">No users found</div>';
+            let html = '<div class="table-wrapper"><table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+            users.forEach(user => {
+                html += `<tr>
+                    <td><strong>${user.name || '-'}</strong></td>
+                    <td>${user.email}</td>
+                    <td>${user.phone || '-'}</td>
+                    <td><span class="badge-${user.role === 'admin' ? 'approved' : 'pending'}">${user.role}</span></td>
+                    <td><span class="${user.is_active ? 'badge-active' : 'badge-blocked'}">${user.is_active ? 'Active' : 'Blocked'}</span></td>
+                    <td><div class="btn-group">
+                        ${user.role !== 'admin' ? `<button class="btn-${user.is_active ? 'danger' : 'success'} btn-sm" onclick="toggleUserStatus('${user.id}', ${!user.is_active})">${user.is_active ? 'Block' : 'Activate'}</button>` : ''}
+                        <button class="btn-danger btn-sm" onclick="deleteUser('${user.id}')">Delete</button>
+                    </div></td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            return html;
+        }
+        
+        async function toggleUserStatus(id, active) { await supabaseClient.from('users').update({ is_active: active }).eq('id', id); Toast.show(active ? 'User activated' : 'User blocked'); await loadAllData(); renderUsers(); }
+        async function deleteUser(id) { if(!confirm('Delete user?')) return; await supabaseClient.from('users').delete().eq('id', id); Toast.show('User deleted'); await loadAllData(); renderUsers(); }
+        
+        // ========== CATEGORIES (FIXED - Edit/Delete Working) ==========
+        function renderCategories() {
+            document.getElementById('contentArea').innerHTML = `
+                <div class="content-card"><div class="card-header"><h2>Categories</h2><button class="btn-primary" onclick="showAddCategoryModal()">+ Add Category</button></div>
+                <div class="categories-grid" id="categoriesGrid"></div></div>
+            `;
+            const container = document.getElementById('categoriesGrid');
+            if (container) {
+                container.innerHTML = allCategories.map(cat => `
+                    <div class="category-card">
+                        <img src="${cat.image_url || 'https://placehold.co/80x80/FFD600/000?text='+cat.name.charAt(0)}" onerror="this.src='https://placehold.co/80x80/FFD600/000?text=${cat.name.charAt(0)}'">
+                        <div><strong>${cat.name}</strong></div>
+                        <div class="btn-group" style="margin-top: 8px;">
+                            <button class="btn-warning btn-sm" onclick="showEditCategoryModal('${cat.id}')">Edit</button>
+                            <button class="btn-danger btn-sm" onclick="deleteCategory('${cat.id}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function showAddCategoryModal() { editItemId = null; categoryImageFile = null; showCategoryModal(); }
+        function showEditCategoryModal(id) { 
+            editItemId = id; 
+            const category = allCategories.find(c => c.id == id);
+            if(category) showCategoryModal(category); 
+        }
+        
+        function showCategoryModal(category = null) {
+            const modalHtml = `<h3>${category ? 'Edit' : 'Add'} Category</h3>
+                <div class="form-group"><label class="form-label">Category Name</label><input type="text" id="catName" class="form-control" value="${category?.name || ''}"></div>
+                <div class="form-group"><label class="form-label">Category Image</label>
+                    <div class="image-upload-area" onclick="document.getElementById('catImageInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i><p>Click to upload image</p>
+                        <img id="catImagePreview" class="image-preview" src="${category?.image_url || ''}">
+                    </div>
+                    <input type="file" id="catImageInput" accept="image/*" style="display:none" onchange="handleCategoryImage(this)">
+                </div>
+                <div class="modal-buttons"><button onclick="saveCategory()">Save</button><button onclick="hideModal()">Cancel</button></div>`;
+            showModal(modalHtml);
+            if(category?.image_url) {
+                document.getElementById('catImagePreview').style.display = 'block';
+            }
+        }
+        
+        function handleCategoryImage(input) { 
+            const f = input.files[0]; 
+            if(f){ 
+                categoryImageFile = f; 
+                const r = new FileReader(); 
+                r.onload = e => { 
+                    const p = document.getElementById('catImagePreview'); 
+                    if(p){ 
+                        p.src = e.target.result; 
+                        p.style.display = 'block'; 
+                    } 
+                }; 
+                r.readAsDataURL(f); 
+            } 
+        }
+        
+        async function saveCategory() {
+            const name = document.getElementById('catName').value;
+            if(!name) { Toast.show('Enter category name', 'error'); return; }
+            
+            let imageUrl = document.getElementById('catImagePreview')?.src;
+            
+            if(categoryImageFile) {
+                const compressed = await compressImage(categoryImageFile);
+                const fileName = `categories/${Date.now()}.jpg`;
+                const { error: uploadError } = await supabaseClient.storage.from('category-images').upload(fileName, compressed);
+                if(uploadError) {
+                    Toast.show('Image upload failed', 'error');
+                    return;
+                }
+                const { data: { publicUrl } } = supabaseClient.storage.from('category-images').getPublicUrl(fileName);
+                imageUrl = publicUrl;
+            }
+            
+            const categoryData = { name, image_url: imageUrl, priority: 5, is_active: true };
+            
+            if (editItemId) {
+                await supabaseClient.from('categories').update(categoryData).eq('id', editItemId);
+                Toast.show('Category updated');
+            } else {
+                await supabaseClient.from('categories').insert([categoryData]);
+                Toast.show('Category added');
+            }
+            hideModal(); 
+            categoryImageFile = null;
+            await loadAllData(); 
+            renderCategories();
+        }
+        
+        async function deleteCategory(id) { 
+            if(!confirm('Delete category?')) return; 
+            await supabaseClient.from('categories').delete().eq('id', id); 
+            Toast.show('Category deleted'); 
+            await loadAllData(); 
+            renderCategories(); 
+        }
+        
+        // ========== PRODUCTS (Fixed - Images working) ==========
+        function renderProducts() {
+            document.getElementById('contentArea').innerHTML = `
+                <div class="content-card"><div class="card-header"><h2>Products</h2><button class="btn-primary" onclick="showAddProductModal()">+ Add Product</button></div>
+                <div class="search-box"><input type="text" id="productSearch" placeholder="🔍 Search products..." onkeyup="filterProductsList()"></div>
+                <div id="productsList"></div></div>
+            `;
+            filterProductsList();
+        }
+        
+        function filterProductsList() {
+            const term = document.getElementById('productSearch')?.value.toLowerCase() || '';
+            const filtered = allProducts.filter(p => p.name?.toLowerCase().includes(term));
+            document.getElementById('productsList').innerHTML = renderProductsTable(filtered);
+        }
+        
+        function renderProductsTable(products) {
+            if (!products.length) return '<div style="padding: 40px; text-align: center;">No products found</div>';
+            let html = '<div class="table-wrapper"><table class="data-table"><thead><tr><th>Image</th><th>Product</th><th>Shop</th><th>Price</th><th>Featured</th><th>Actions</th></tr></thead><tbody>';
+            products.forEach(p => {
+                const imgUrl = p.images?.[0] || p.image_url || 'https://placehold.co/50x50/FFD600/000?text=Product';
+                html += `<tr>
+                    <td><img src="${imgUrl}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;" onerror="this.src='https://placehold.co/50x50/FFD600/000?text=Product'"></td
+                    <td><strong>${p.name}</strong><br><small>${p.category || ''}</small></td>
+                    <td>${p.shops?.name || '-'}</td>
+                    <td>₹${p.price}${p.offer_price ? `<br><span style="color:green;">${p.offer_price}</span>` : ''}</td>
+                    <td><input type="checkbox" ${p.is_featured ? 'checked' : ''} onchange="toggleFeatured('${p.id}', this.checked)"></td>
+                    <td><div class="btn-group">
+                        <button class="btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Delete</button>
+                    </div></td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            return html;
+        }
+        
+        function showAddProductModal() { Toast.show('Add product feature - use shop dashboard', 'info'); }
+        async function deleteProduct(id) { if(!confirm('Delete product?')) return; await supabaseClient.from('products').delete().eq('id', id); Toast.show('Product deleted'); await loadAllData(); renderProducts(); }
+        async function toggleFeatured(id, featured) { await supabaseClient.from('products').update({ is_featured: featured }).eq('id', id); Toast.show(featured ? 'Featured' : 'Unfeatured'); await loadAllData(); renderProducts(); }
+        
+        // ========== HOT OFFERS ==========
+        function renderHotOffers() {
+            document.getElementById('contentArea').innerHTML = `
+                <div class="content-card"><div class="card-header"><h2>🔥 Hot Offers Cards</h2><button class="btn-primary" onclick="showAddOfferModal()">+ Add Offer Card</button></div>
+                <div class="offers-cards-grid" id="offersCardsGrid"></div></div>
+            `;
+            const container = document.getElementById('offersCardsGrid');
+            if(container) {
+                if (allOffers.length === 0) {
+                    container.innerHTML = '<div style="padding: 40px; text-align: center; grid-column: 1/-1;">No offers yet. Click "Add Offer Card" to create.</div>';
+                } else {
+                    container.innerHTML = allOffers.map(offer => `
+                        <div class="offer-card-item">
+                            ${offer.image_url ? `<img src="${offer.image_url}" class="offer-card-img" onerror="this.src='https://placehold.co/400x140/FFD600/000?text=Offer'">` : `<div class="offer-card-img" style="display: flex; align-items: center; justify-content: center;"><i class="fas fa-tag" style="font-size: 48px; color: #000;"></i></div>`}
+                            <div class="offer-card-content">
+                                <div class="offer-card-title">${offer.title || 'Special Offer'}</div>
+                                <div class="offer-card-subtitle">${offer.subtitle || ''}</div>
+                                <div class="offer-card-badge">${offer.discount_value}${offer.discount_type === 'percentage' ? '% OFF' : '₹ OFF'}</div>
+                                <div class="btn-group" style="margin-top: 12px;">
+                                    <button class="btn-warning btn-sm" onclick="editOffer('${offer.id}')">Edit</button>
+                                    <button class="btn-danger btn-sm" onclick="deleteOffer('${offer.id}')">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+        
+        function showAddOfferModal() { editItemId = null; offerImageFile = null; showOfferModal(); }
+        function editOffer(id) { editItemId = id; const offer = allOffers.find(o => o.id == id); if(offer) showOfferModal(offer); }
+        
+        function showOfferModal(offer = null) {
+            const modalHtml = `<h3>${offer ? 'Edit' : 'Add'} Hot Offer Card</h3>
+                <div class="form-group"><label class="form-label">Title *</label><input type="text" id="offerTitle" class="form-control" value="${offer?.title || ''}"></div>
+                <div class="form-group"><label class="form-label">Subtitle</label><input type="text" id="offerSubtitle" class="form-control" value="${offer?.subtitle || ''}"></div>
+                <div class="form-group"><label class="form-label">Discount Value *</label><input type="number" id="offerValue" class="form-control" value="${offer?.discount_value || ''}"></div>
+                <div class="form-group"><label class="form-label">Discount Type</label><select id="offerType" class="form-control"><option value="percentage" ${offer?.discount_type === 'percentage' ? 'selected' : ''}>Percentage (%)</option><option value="fixed" ${offer?.discount_type === 'fixed' ? 'selected' : ''}>Fixed Amount (₹)</option></select></div>
+                <div class="form-group"><label class="form-label">🔗 Destination Link</label><input type="text" id="offerLink" class="form-control" value="${offer?.link || ''}" placeholder="products.html?category=Grocery"></div>
+                <div class="form-group"><label class="form-label">Offer Image (Optional)</label>
+                    <div class="image-upload-area" onclick="document.getElementById('offerImage').click()"><i class="fas fa-cloud-upload-alt"></i><p>Click to upload</p><img id="offerImagePreview" class="image-preview" src="${offer?.image_url || ''}"></div>
+                    <input type="file" id="offerImage" accept="image/*" style="display:none" onchange="handleOfferImage(this)">
+                </div>
+                <div class="modal-buttons"><button onclick="saveOfferCard()">Save</button><button onclick="hideModal()">Cancel</button></div>`;
+            showModal(modalHtml);
+            if(offer?.image_url) document.getElementById('offerImagePreview').style.display = 'block';
+        }
+        
+        function handleOfferImage(input) { const f = input.files[0]; if(f){ offerImageFile = f; const r = new FileReader(); r.onload = e => { const p = document.getElementById('offerImagePreview'); if(p){ p.src = e.target.result; p.style.display = 'block'; } }; r.readAsDataURL(f); } }
+        
+        async function saveOfferCard() {
+            const title = document.getElementById('offerTitle').value;
+            const value = parseFloat(document.getElementById('offerValue').value);
+            if(!title || !value) { Toast.show('Title and discount value required', 'error'); return; }
+            let imageUrl = document.getElementById('offerImagePreview')?.src;
+            if(offerImageFile) {
+                const compressed = await compressImage(offerImageFile);
+                const fileName = `offers/${Date.now()}.jpg`;
+                await supabaseClient.storage.from('offer-images').upload(fileName, compressed);
+                const { data: { publicUrl } } = supabaseClient.storage.from('offer-images').getPublicUrl(fileName);
+                imageUrl = publicUrl;
+            }
+            const offerData = {
+                title, subtitle: document.getElementById('offerSubtitle').value,
+                discount_value: value, discount_type: document.getElementById('offerType').value,
+                image_url: imageUrl, link: document.getElementById('offerLink').value,
+                position: 'hot_offer', is_active: true, priority: 1
+            };
+            if (editItemId) {
+                await supabaseClient.from('offers').update(offerData).eq('id', editItemId);
+                Toast.show('Offer card updated');
+            } else {
+                await supabaseClient.from('offers').insert([offerData]);
+                Toast.show('Offer card added');
+            }
+            hideModal(); await loadAllData(); renderHotOffers();
+        }
+        
+        async function deleteOffer(id) { if(!confirm('Delete offer?')) return; await supabaseClient.from('offers').delete().eq('id', id); Toast.show('Offer deleted'); await loadAllData(); renderHotOffers(); }
+        
+        // ========== SLIDERS (FIXED - Add working) ==========
+        function renderSliders() {
+            document.getElementById('contentArea').innerHTML = `
+                <div class="content-card"><div class="card-header"><h2>Hero Slider</h2><button class="btn-primary" onclick="showAddSliderModal()">+ Add Slide</button></div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding: 20px;">
+                    ${allSliders.map(s => `
+                        <div style="border: 1px solid var(--border-light); border-radius: var(--radius-md); overflow: hidden;">
+                            <img src="${s.image_url}" style="width: 100%; height: 120px; object-fit: cover;">
+                            <div style="padding: 12px;"><strong>${s.title || 'Slide'}</strong></div>
+                            <div style="padding: 12px;" class="btn-group">
+                                <button class="btn-warning btn-sm" onclick="editSlider('${s.id}')">Edit</button>
+                                <button class="btn-danger btn-sm" onclick="deleteSlider('${s.id}')">Delete</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div></div>
+            `;
+        }
+        
+        function showAddSliderModal() { editItemId = null; sliderImageFile = null; showSliderModal(); }
+        function editSlider(id) { editItemId = id; const slider = allSliders.find(s => s.id == id); if(slider) showSliderModal(slider); }
+        
+        function showSliderModal(slider = null) {
+            const modalHtml = `<h3>${slider ? 'Edit' : 'Add'} Slider</h3>
+                <div class="form-group"><div class="image-upload-area" onclick="document.getElementById('sliderImg').click()"><i class="fas fa-cloud-upload-alt"></i><p>Click to upload</p><img id="sliderImgPreview" class="image-preview" src="${slider?.image_url || ''}"></div><input type="file" id="sliderImg" accept="image/*" style="display:none" onchange="handleSliderImage(this)"></div>
+                <div class="form-group"><label class="form-label">Title</label><input type="text" id="sliderTitle" class="form-control" value="${slider?.title || ''}"></div>
+                <div class="modal-buttons"><button onclick="saveSlider()">Save</button><button onclick="hideModal()">Cancel</button></div>`;
+            showModal(modalHtml);
+            if(slider?.image_url) document.getElementById('sliderImgPreview').style.display = 'block';
+        }
+        
+        function handleSliderImage(input) { const f = input.files[0]; if(f){ sliderImageFile = f; const r = new FileReader(); r.onload = e => { const p = document.getElementById('sliderImgPreview'); if(p){ p.src = e.target.result; p.style.display = 'block'; } }; r.readAsDataURL(f); } }
+        
+        async function saveSlider() {
+            let imageUrl = document.getElementById('sliderImgPreview')?.src;
+            if(sliderImageFile) {
+                const compressed = await compressImage(sliderImageFile);
+                const fileName = `sliders/${Date.now()}.jpg`;
+                await supabaseClient.storage.from('slider-images').upload(fileName, compressed);
+                const { data: { publicUrl } } = supabaseClient.storage.from('slider-images').getPublicUrl(fileName);
+                imageUrl = publicUrl;
+            }
+            const sliderData = { image_url: imageUrl, title: document.getElementById('sliderTitle').value, is_active: true };
+            if (editItemId) {
+                await supabaseClient.from('sliders').update(sliderData).eq('id', editItemId);
+                Toast.show('Slider updated');
+            } else {
+                await supabaseClient.from('sliders').insert([sliderData]);
+                Toast.show('Slider added');
+            }
+            hideModal(); await loadAllData(); renderSliders();
+        }
+        
+        async function deleteSlider(id) { if(!confirm('Delete slider?')) return; await supabaseClient.from('sliders').delete().eq('id', id); Toast.show('Slider deleted'); await loadAllData(); renderSliders(); }
+        
+        // ========== SPONSORED ==========
+        function renderSponsored() {
+            const allApprovedShops = allShops.filter(s => s.status === 'approved');
+            const featuredIds = allFeaturedShops.map(f => f.shop_id);
+            const availableShops = allApprovedShops.filter(s => !featuredIds.includes(s.id));
+            document.getElementById('contentArea').innerHTML = `
+                <div class="content-card"><div class="card-header"><h2>Sponsored Shops</h2></div>
+                <div style="padding: 20px;">
+                    <div class="form-group"><label>Add Shop</label><select id="sponsoredShopSelect" class="form-control"><option value="">Select Shop</option>${availableShops.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}</select>
+                    <button class="btn-primary" style="margin-top: 12px;" onclick="addSponsoredShop()">Add to Sponsored</button></div>
+                    <h5 class="mt-4">Current (${allFeaturedShops.length})</h5>
+                    ${allFeaturedShops.map(f => `<div style="background: var(--gray-100); padding: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center;"><strong>${f.shops?.name}</strong> <button class="btn-danger btn-sm" onclick="removeSponsored('${f.id}')">Remove</button></div>`).join('')}
+                </div></div>
+            `;
+        }
+        
+        async function addSponsoredShop() { const shopId = document.getElementById('sponsoredShopSelect').value; if(!shopId) return; await supabaseClient.from('featured_shops').insert([{ shop_id: shopId, active: true }]); Toast.show('Added'); await loadAllData(); renderSponsored(); }
+        async function removeSponsored(id) { await supabaseClient.from('featured_shops').delete().eq('id', id); Toast.show('Removed'); await loadAllData(); renderSponsored(); }
+        
+        // ========== ORDERS ==========
+        function renderOrders() {
+            document.getElementById('contentArea').innerHTML = `
+                <div class="content-card"><div class="card-header"><h2>Orders</h2></div>
+                <div class="table-wrapper"><table class="data-table"><thead><tr><th>Order ID</th><th>Total</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>
+                ${allOrders.map(o => `<tr>
+                    <td>${o.id.slice(0,8)}</td
+                    <td>₹${o.total || 0}</td
+                    <td>${o.order_status || 'pending'}</td
+                    <td>${new Date(o.created_at).toLocaleDateString()}</td
+                    <td><button class="btn-danger btn-sm" onclick="deleteOrder('${o.id}')">Delete</button></td
+                </tr>`).join('')}
+                </tbody></table></div></div>
+            `;
+        }
+        async function deleteOrder(id) { await supabaseClient.from('orders').delete().eq('id', id); Toast.show('Order deleted'); await loadAllData(); renderOrders(); }
+        
+        // ========== SETTINGS ==========
+        function renderSettings() {
+            document.getElementById('contentArea').innerHTML = `
+                <div class="content-card">
+                    <div class="card-header"><h2><i class="fas fa-cog"></i> System Settings</h2></div>
+                    <div style="padding: 24px;">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-rupee-sign"></i> Registration Fee (₹)</label>
+                            <input type="number" id="regFee" class="form-control" value="${appSettings.registrationFee}">
+                            <button class="btn-primary" style="margin-top: 12px;" onclick="updateSetting('registration_fee', document.getElementById('regFee').value)">Save Registration Fee</button>
+                        </div>
+                        <div class="form-group mt-4">
+                            <label class="form-label"><i class="fas fa-truck"></i> Delivery Fee (₹)</label>
+                            <input type="number" id="deliveryFee" class="form-control" value="${appSettings.deliveryFee}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-gift"></i> Free Delivery Threshold (₹)</label>
+                            <input type="number" id="freeThreshold" class="form-control" value="${appSettings.freeDeliveryThreshold}">
+                            <button class="btn-primary" style="margin-top: 12px;" onclick="updateDeliverySettings()">Save Delivery Settings</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        async function updateDeliverySettings() {
+            await updateSetting('delivery_fee', document.getElementById('deliveryFee').value);
+            await updateSetting('free_delivery_threshold', document.getElementById('freeThreshold').value);
+        }
+        
+        async function updateSetting(key, value) { 
+            await supabaseClient.from('app_settings').upsert([{ key, value }], { onConflict: 'key' }); 
+            Toast.show('Setting saved'); 
+            await loadAllData(); 
+            renderSettings();
+        }
+        
+        // ========== UTILITY ==========
+        function showModal(html) { document.getElementById('modalContent').innerHTML = html; document.getElementById('modalOverlay').style.display = 'flex'; }
+        function hideModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+        async function handleLogout() { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; }
+        
+        document.querySelectorAll('.menu-item[data-section]').forEach(item => {
+            item.addEventListener('click', () => loadSection(item.dataset.section));
+        });
+        
+        document.addEventListener('DOMContentLoaded', checkAdmin);
+        
+        // Export all functions to global scope
+        window.approveShop = approveShop; window.deleteShop = deleteShop;
+        window.toggleUserStatus = toggleUserStatus; window.deleteUser = deleteUser;
+        window.deleteCategory = deleteCategory; window.showAddCategoryModal = showAddCategoryModal; window.showEditCategoryModal = showEditCategoryModal; window.saveCategory = saveCategory;
+        window.deleteProduct = deleteProduct; window.toggleFeatured = toggleFeatured; window.showAddProductModal = showAddProductModal;
+        window.deleteSlider = deleteSlider; window.showAddSliderModal = showAddSliderModal; window.editSlider = editSlider; window.saveSlider = saveSlider;
+        window.addSponsoredShop = addSponsoredShop; window.removeSponsored = removeSponsored;
+        window.deleteOrder = deleteOrder; window.updateSetting = updateSetting; window.updateDeliverySettings = updateDeliverySettings;
+        window.showAddOfferModal = showAddOfferModal; window.editOffer = editOffer; window.saveOfferCard = saveOfferCard; window.deleteOffer = deleteOffer;
+        window.hideModal = hideModal; window.handleLogout = handleLogout;
+        window.handleOfferImage = handleOfferImage; window.handleSliderImage = handleSliderImage; window.handleCategoryImage = handleCategoryImage;
+        window.filterShopStatus = filterShopStatus; window.filterShopsList = filterShopsList;
+        window.filterUsersList = filterUsersList; window.filterProductsList = filterProductsList;
+    </script>
+</body>
+</html>
