@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Offline - Zatpat</title>
+    <meta name="theme-color" content="#16A34A">
+    
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #16A34A;
+            --primary-light: #22C55E;
+            --primary-bg-light: #F0FDF4;
+            --accent-orange: #F97316;
+            --bg-light: #F9FAFB;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-light: #E5E7EB;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .offline-container {
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .offline-icon {
+            width: 120px;
+            height: 120px;
+            background: var(--primary-bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .offline-icon i {
+            font-size: 60px;
+            color: var(--primary);
+        }
+
+        .offline-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .offline-message {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .offline-tips {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: left;
+            border: 1px solid var(--border-light);
+            margin-bottom: 24px;
+        }
+
+        .tips-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .tip-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .tip-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--primary-bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .tip-icon i {
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .tip-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .tip-text strong {
+            color: var(--text-primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 20px;
+            border-radius: var(--radius-full);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:active {
+            background: var(--primary-light);
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:active {
+            background: var(--primary-bg-light);
+            transform: scale(0.98);
+        }
+
+        .connection-status {
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .connection-status i {
+            color: var(--accent-orange);
+            margin-right: 6px;
+        }
+
+        .reconnect-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 4px;
+        }
+
+        /* Cached Pages */
+        .cached-pages {
+            margin-top: 20px;
+        }
+
+        .cached-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .cached-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .cached-link {
+            background: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            border: 1px solid var(--border-light);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cached-link i {
+            color: var(--primary);
+            font-size: 11px;
+        }
+
+        .cached-link:active {
+            background: var(--bg-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <!-- Icon -->
+        <div class="offline-icon">
+            <i class="fas fa-wifi-slash"></i>
+        </div>
+
+        <!-- Title -->
+        <h1 class="offline-title">You're Offline</h1>
+        
+        <!-- Message -->
+        <p class="offline-message">
+            No internet connection detected. Don't worry, you can still browse cached content!
+        </p>
+
+        <!-- Tips Card -->
+        <div class="offline-tips">
+            <div class="tips-title">
+                <i class="fas fa-lightbulb"></i> Quick Tips
+            </div>
+            
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-wifi"></i></div>
+                <div class="tip-text">
+                    <strong>Check Wi-Fi</strong><br>
+                    Make sure Wi-Fi is turned on and connected
+                </div>
+            </div>
+            
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-signal"></i></div>
+                <div class="tip-text">
+                    <strong>Check Mobile Data</strong><br>
+                    Enable mobile data if Wi-Fi is unavailable
+                </div>
+            </div>
+            
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-plane"></i></div>
+                <div class="tip-text">
+                    <strong>Turn Off Airplane Mode</strong><br>
+                    Airplane mode disables all connections
+                </div>
+            </div>
+            
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-sync-alt"></i></div>
+                <div class="tip-text">
+                    <strong>Restart Your Device</strong><br>
+                    Sometimes a quick restart fixes connection issues
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="retryConnection()">
+                <i class="fas fa-redo-alt"></i> Retry
+            </button>
+            <a href="index.html" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Home
+            </a>
+        </div>
+
+        <!-- Cached Pages -->
+        <div class="cached-pages">
+            <div class="cached-title">
+                <i class="fas fa-save"></i> Available Offline Pages
+            </div>
+            <div class="cached-links">
+                <a href="index.html" class="cached-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="cart.html" class="cached-link">
+                    <i class="fas fa-shopping-bag"></i> Cart
+                </a>
+                <a href="profile.html" class="cached-link">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+                <a href="orders.html" class="cached-link">
+                    <i class="fas fa-receipt"></i> Orders
+                </a>
+            </div>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="connection-status">
+            <i class="fas fa-circle"></i> 
+            <span id="statusText">No internet connection</span>
+            <button class="reconnect-btn" onclick="retryConnection()">Try again</button>
+        </div>
+    </div>
+
+    <script>
+        // Check if actually online
+        function checkConnection() {
+            return navigator.onLine;
+        }
+
+        function updateStatus() {
+            const statusText = document.getElementById('statusText');
+            const offlineIcon = document.querySelector('.offline-icon i');
+            
+            if (navigator.onLine) {
+                statusText.innerHTML = '🟢 Connected! Redirecting...';
+                offlineIcon.className = 'fas fa-wifi';
+                
+                // Redirect to home after 1 second
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                statusText.innerHTML = '🔴 No internet connection';
+                offlineIcon.className = 'fas fa-wifi-slash';
+            }
+        }
+
+        function retryConnection() {
+            const retryBtn = document.querySelector('.btn-primary');
+            retryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            retryBtn.disabled = true;
+            
+            // Check connection
+            setTimeout(() => {
+                updateStatus();
+                retryBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Retry';
+                retryBtn.disabled = false;
+                
+                if (navigator.onLine) {
+                    window.location.href = 'index.html';
+                } else {
+                    // Animate offline icon
+                    const icon = document.querySelector('.offline-icon');
+                    icon.style.animation = 'none';
+                    setTimeout(() => icon.style.animation = '', 10);
+                }
+            }, 1000);
+        }
+
+        // Listen for online/offline events
+        window.addEventListener('online', () => {
+            updateStatus();
+            setTimeout(() => {
+                if (confirm('Internet connection restored! Go to home page?')) {
+                    window.location.href = 'index.html';
+                }
+            }, 500);
+        });
+
+        window.addEventListener('offline', updateStatus);
+
+        // Check connection on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus();
+            
+            // If already online, redirect
+            if (navigator.onLine) {
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            }
+        });
+
+        // Keyboard shortcut: R for retry
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                retryConnection();
+            }
+        });
+
+        // Swipe down to retry (mobile gesture)
+        let touchStartY = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const touchEndY = e.changedTouches[0].clientY;
+            if (touchEndY - touchStartY > 100) {
+                retryConnection();
+            }
+        });
+    </script>
+</body>
+</html>

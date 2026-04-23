@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Register Shop - Zatpat</title>
+    <meta name="theme-color" content="#16A34A">
+    
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <style>
+        :root {
+            --primary: #16A34A;
+            --primary-light: #22C55E;
+            --primary-bg-light: #F0FDF4;
+            --accent-orange: #F97316;
+            --bg-light: #F9FAFB;
+            --card-white: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-light: #E5E7EB;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .top-bar {
+            background: var(--card-white);
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            z-index: 1000;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .back-btn {
+            width: 40px; height: 40px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .brand-name { font-size: 22px; font-weight: 800; }
+        .brand-name .normal { color: var(--text-primary); }
+        .brand-name .pat { color: var(--primary); }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 16px; }
+
+        .main-content {
+            padding-top: 80px;
+            padding-bottom: 100px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            margin: 16px;
+            padding: 32px 24px;
+            border-radius: var(--radius-2xl);
+            text-align: center;
+            color: white;
+        }
+        .hero-icon { font-size: 48px; margin-bottom: 16px; }
+        .hero-title { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+        .fee-badge {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: var(--radius-full);
+            margin-top: 16px;
+            font-weight: 600;
+        }
+
+        .form-card {
+            background: white;
+            margin: 16px;
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+        .form-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--primary-bg-light);
+        }
+        .form-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: var(--primary); }
+        .form-body { padding: 24px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block; }
+        .form-label i { color: var(--primary); width: 20px; margin-right: 6px; }
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); }
+
+        .image-upload-area {
+            border: 2px dashed var(--primary);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--primary-bg-light);
+        }
+        .image-upload-area:hover { background: #DCFCE7; }
+        .image-preview { max-width: 100%; max-height: 150px; margin-top: 10px; border-radius: var(--radius-md); display: none; }
+
+        .location-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .location-status {
+            font-size: 12px;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-light);
+            margin-top: 10px;
+        }
+        .location-address {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            padding: 8px;
+            background: var(--bg-light);
+            border-radius: var(--radius-sm);
+        }
+
+        .payment-section {
+            background: var(--primary-bg-light);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .payment-section-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .fee-summary {
+            background: var(--bg-light);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .fee-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .fee-row.total {
+            border-top: 1px solid var(--border-light);
+            padding-top: 12px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .total-amount { color: var(--primary); }
+
+        .auth-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .auth-btn:hover { background: var(--primary-light); transform: translateY(-2px); }
+        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            z-index: 10050;
+            display: none;
+            white-space: nowrap;
+        }
+        .toast-notification.show { display: flex; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+        .alert-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10060;
+        }
+        .alert-content {
+            background: white;
+            border-radius: var(--radius-2xl);
+            padding: 28px;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+        }
+        .alert-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .loading-spinner { text-align: center; padding: 60px; color: var(--primary); }
+        .text-muted { color: var(--text-secondary); font-size: 12px; }
+        .login-prompt {
+            text-align: center;
+            padding: 60px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+        <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+        <div class="page-title">Register Shop</div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Loading registration form...</p></div>
+    </div>
+
+    <div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+    <div id="customAlert" class="alert-modal"><div class="alert-content"><div id="alertMessage"></div><button class="alert-btn" onclick="closeAlert()">OK</button></div></div>
+
+    <script>
+        const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const RAZORPAY_KEY = 'rzp_test_YOUR_TEST_KEY'; // Replace with actual key
+
+        let categories = [];
+        let registrationFee = 499;
+        let shopLatitude = null;
+        let shopLongitude = null;
+        let selectedImageFile = null;
+        let selectedQrFile = null;
+        let isProcessing = false;
+        let currentOtpEmail = null;
+        let otpTimerInterval = null;
+        let registrationData = {};
+        let currentUser = null;
+
+        // ========== UTILITY ==========
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastMsg');
+            document.getElementById('toastText').innerHTML = message;
+            toast.style.background = isError ? '#EF4444' : '#111827';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function showAlert(message) {
+            document.getElementById('alertMessage').innerHTML = message;
+            document.getElementById('customAlert').style.display = 'flex';
+        }
+
+        function closeAlert() {
+            document.getElementById('customAlert').style.display = 'none';
+        }
+
+        function goBack() { window.history.back(); }
+
+        // ========== CHECK LOGIN ==========
+        async function checkUser() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                showLoginPrompt();
+                return false;
+            }
+            currentUser = session.user;
+            return true;
+        }
+
+        function showLoginPrompt() {
+            document.getElementById('mainContent').innerHTML = `
+                <div class="login-prompt">
+                    <i class="fas fa-lock" style="font-size:64px;color:var(--text-secondary);margin-bottom:20px;"></i>
+                    <h3>Please Login First</h3>
+                    <p style="color:var(--text-secondary);margin:12px 0;">You need to login to register a shop</p>
+                    <button class="auth-btn" onclick="window.location.href='index.html'">
+                        <i class="fas fa-sign-in-alt"></i> Go to Login
+                    </button>
+                </div>
+            `;
+        }
+
+        // ========== LOAD DATA ==========
+        async function loadSettings() {
+            try {
+                const { data } = await supabaseClient
+                    .from('app_settings')
+                    .select('value')
+                    .eq('key', 'registration_fee')
+                    .maybeSingle();
+                if (data) registrationFee = parseInt(data.value) || 499;
+            } catch (error) { console.error('Settings error:', error); }
+        }
+
+        async function loadCategories() {
+            try {
+                const { data } = await supabaseClient
+                    .from('categories')
+                    .select('id, name')
+                    .eq('is_active', true)
+                    .is('parent_id', null)
+                    .order('name');
+                if (data) categories = data;
+            } catch (error) { console.error('Categories error:', error); }
+        }
+
+        // ========== IMAGE UPLOAD ==========
+        async function uploadImage(file, folder) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `${folder}/${fileName}`;
+            
+            const { error: uploadError } = await supabaseClient.storage.from('shop-images').upload(filePath, file);
+            if (uploadError) throw uploadError;
+            
+            const { data: publicUrl } = supabaseClient.storage.from('shop-images').getPublicUrl(filePath);
+            return publicUrl.publicUrl;
+        }
+
+        // ========== LOCATION ==========
+        async function getAddressFromCoords(lat, lng) {
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=en`);
+                const data = await response.json();
+                const address = data.display_name || `${lat}, ${lng}`;
+                const addressDiv = document.getElementById('locationAddress');
+                if (addressDiv) {
+                    addressDiv.innerHTML = `<i class="fas fa-map-pin"></i> ${address.substring(0, 100)}...`;
+                    addressDiv.style.display = 'block';
+                }
+            } catch (error) {
+                const addressDiv = document.getElementById('locationAddress');
+                if (addressDiv) {
+                    addressDiv.innerHTML = `<i class="fas fa-map-pin"></i> Lat: ${lat}, Lng: ${lng}`;
+                    addressDiv.style.display = 'block';
+                }
+            }
+        }
+
+        function captureShopLocation() {
+            if (!navigator.geolocation) {
+                showAlert('Location Error: Your browser does not support location services.');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('locationStatus');
+            statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting location...';
+            
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    shopLatitude = position.coords.latitude;
+                    shopLongitude = position.coords.longitude;
+                    document.getElementById('shopLatitude').value = shopLatitude;
+                    document.getElementById('shopLongitude').value = shopLongitude;
+                    statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> Location captured successfully!';
+                    statusDiv.style.color = 'var(--success)';
+                    await getAddressFromCoords(shopLatitude, shopLongitude);
+                },
+                (error) => {
+                    let errorMsg = '';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED: errorMsg = 'Location permission denied.'; break;
+                        case error.POSITION_UNAVAILABLE: errorMsg = 'Location unavailable.'; break;
+                        case error.TIMEOUT: errorMsg = 'Location request timeout.'; break;
+                        default: errorMsg = 'Location detection failed.';
+                    }
+                    statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + errorMsg;
+                    statusDiv.style.color = 'var(--danger)';
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        // ========== EMAIL OTP ==========
+        async function sendRegisterOTP() {
+            const email = document.getElementById('registerEmail').value.trim();
+            const name = document.getElementById('registerName').value.trim();
+            const phone = document.getElementById('registerPhone').value.trim();
+            const whatsapp = document.getElementById('ownerWhatsapp').value.trim();
+            
+            if (!name) { showAlert('Please enter full name'); return; }
+            if (!email) { showAlert('Please enter email address'); return; }
+            if (!phone) { showAlert('Please enter mobile number'); return; }
+            if (!whatsapp) { showAlert('Please enter WhatsApp number'); return; }
+            
+            registrationData = { name, email, phone, whatsapp };
+            
+            const { error } = await supabaseClient.auth.signInWithOtp({
+                email: email,
+                options: {
+                    shouldCreateUser: true,
+                    data: { name: name, phone: phone, whatsapp: whatsapp, role: 'shop_owner' }
+                }
+            });
+            
+            if (error) {
+                showAlert('Error: ' + error.message);
+            } else {
+                currentOtpEmail = email;
+                document.getElementById('registerStepEmail').style.display = 'none';
+                document.getElementById('registerStepOTP').style.display = 'block';
+                document.getElementById('otpEmailDisplay').innerText = email;
+                startResendTimer();
+                showToast('✅ OTP sent to your email!');
+            }
+        }
+
+        async function verifyRegisterOTP() {
+            const otp = document.getElementById('registerOtp').value.trim();
+            if (!otp || otp.length < 4) { showAlert('Please enter OTP'); return; }
+            
+            const { data, error } = await supabaseClient.auth.verifyOtp({
+                email: currentOtpEmail,
+                token: otp,
+                type: 'email'
+            });
+            
+            if (error) {
+                showAlert('Invalid OTP: ' + error.message);
+            } else {
+                showToast('✅ Email verified! Now fill shop details.');
+                document.getElementById('registerStepOTP').style.display = 'none';
+                document.getElementById('shopDetailsForm').style.display = 'block';
+                
+                // Update user role to shop_owner
+                await supabaseClient
+                    .from('users')
+                    .upsert({ 
+                        id: data.user.id, 
+                        role: 'shop_owner',
+                        name: registrationData.name,
+                        phone: registrationData.phone
+                    });
+                
+                await loadCategories();
+                await loadSettings();
+                updateFeeDisplay();
+            }
+        }
+
+        function startResendTimer() {
+            let seconds = 60;
+            const btn = document.getElementById('resendOtpBtn');
+            if (!btn) return;
+            if (otpTimerInterval) clearInterval(otpTimerInterval);
+            btn.disabled = true;
+            otpTimerInterval = setInterval(() => {
+                seconds--;
+                btn.innerText = `Resend OTP (${seconds}s)`;
+                if (seconds <= 0) {
+                    clearInterval(otpTimerInterval);
+                    btn.disabled = false;
+                    btn.innerText = 'Resend OTP';
+                }
+            }, 1000);
+        }
+
+        async function resendOTP() {
+            if (!registrationData.email) {
+                document.getElementById('registerStepOTP').style.display = 'none';
+                document.getElementById('registerStepEmail').style.display = 'block';
+                return;
+            }
+            
+            const { error } = await supabaseClient.auth.signInWithOtp({
+                email: registrationData.email,
+                options: {
+                    shouldCreateUser: true,
+                    data: { 
+                        name: registrationData.name, 
+                        phone: registrationData.phone, 
+                        whatsapp: registrationData.whatsapp, 
+                        role: 'shop_owner' 
+                    }
+                }
+            });
+            
+            if (error) { showAlert('Error: ' + error.message); }
+            else { startResendTimer(); showToast('✅ New OTP sent!'); }
+        }
+
+        function updateFeeDisplay() {
+            const heroFee = document.querySelector('.fee-badge');
+            if (heroFee) heroFee.innerHTML = `<i class="fas fa-rupee-sign"></i> ₹${registrationFee} Registration Fee`;
+            const payBtn = document.getElementById('registerShopBtn');
+            if (payBtn) payBtn.innerHTML = `Pay ₹${registrationFee} & Register`;
+        }
+
+        // ========== PAYMENT & REGISTRATION ==========
+        async function processPayment(shopName, ownerName, email, phone) {
+            return new Promise((resolve, reject) => {
+                const options = {
+                    key: RAZORPAY_KEY,
+                    amount: registrationFee * 100,
+                    currency: "INR",
+                    name: "Zatpat Shop Registration",
+                    description: `Registration fee for ${shopName}`,
+                    handler: function(response) {
+                        resolve({ success: true, paymentId: response.razorpay_payment_id });
+                    },
+                    prefill: { name: ownerName, email: email, contact: phone },
+                    theme: { color: "#16A34A" },
+                    modal: { 
+                        ondismiss: function() {
+                            reject({ success: false, error: "Payment cancelled" });
+                        }
+                    }
+                };
+                const razorpay = new Razorpay(options);
+                razorpay.open();
+            });
+        }
+
+        async function registerShop() {
+            if (isProcessing) return;
+            
+            const shopName = document.getElementById('shopName').value.trim();
+            const category = document.getElementById('shopCategory').value;
+            const shopPhone = document.getElementById('shopPhone').value.trim();
+            const shopWhatsapp = document.getElementById('shopWhatsapp').value.trim();
+            const address = document.getElementById('shopAddress').value.trim();
+            const city = document.getElementById('shopCity').value.trim();
+            const pincode = document.getElementById('shopPincode').value.trim();
+            const description = document.getElementById('shopDesc').value.trim();
+            const upiId = document.getElementById('shopUpiId').value.trim();
+            const upiName = document.getElementById('shopUpiName').value.trim();
+            const latitude = document.getElementById('shopLatitude').value;
+            const longitude = document.getElementById('shopLongitude').value;
+            
+            if (!shopName) { showAlert('Please enter shop name'); return; }
+            if (!category) { showAlert('Please select category'); return; }
+            if (!shopPhone) { showAlert('Please enter phone number'); return; }
+            if (!address) { showAlert('Please enter address'); return; }
+            if (!city) { showAlert('Please enter city'); return; }
+            if (!pincode || pincode.length !== 6) { showAlert('Please enter valid 6-digit pincode'); return; }
+            if (!latitude || !longitude) { showAlert('Please capture shop location'); return; }
+            
+            isProcessing = true;
+            const btn = document.getElementById('registerShopBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+            
+            try {
+                // Get current user
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error('Please login first');
+                
+                // Process payment
+                const paymentResult = await processPayment(shopName, registrationData.name, registrationData.email, registrationData.phone);
+                if (!paymentResult.success) throw new Error('Payment failed');
+                
+                // Upload images
+                let shopImageUrl = null;
+                if (selectedImageFile) {
+                    try { shopImageUrl = await uploadImage(selectedImageFile, 'shops'); }
+                    catch(e) { console.error('Image upload error:', e); }
+                }
+                
+                let qrImageUrl = null;
+                if (selectedQrFile) {
+                    try { qrImageUrl = await uploadImage(selectedQrFile, 'qrcodes'); }
+                    catch(e) { console.error('QR upload error:', e); }
+                }
+                
+                // Create shop
+                const { error: shopError } = await supabaseClient.from('shops').insert([{
+                    owner_id: user.id,
+                    name: shopName,
+                    category: category,
+                    phone: shopPhone,
+                    whatsapp: shopWhatsapp || registrationData.whatsapp,
+                    address: address,
+                    city: city,
+                    pincode: pincode,
+                    description: description || null,
+                    latitude: parseFloat(latitude),
+                    longitude: parseFloat(longitude),
+                    image_url: shopImageUrl,
+                    qr_code_url: qrImageUrl,
+                    upi_id: upiId || null,
+                    upi_name: upiName || null,
+                    status: 'pending',
+                    is_open: false,
+                    rating: 0,
+                    payment_id: paymentResult.paymentId,
+                    created_at: new Date().toISOString()
+                }]);
+                
+                if (shopError) throw new Error(shopError.message);
+                
+                showToast('✅ Registration successful! Pending admin approval.');
+                setTimeout(() => window.location.href = 'index.html', 2000);
+                
+            } catch (error) {
+                showAlert('Registration failed: ' + error.message);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                isProcessing = false;
+            }
+        }
+
+        // ========== RENDER FORM ==========
+        async function renderForm() {
+            const isLoggedIn = await checkUser();
+            if (!isLoggedIn) return;
+            
+            await loadSettings();
+            
+            const container = document.getElementById('mainContent');
+            container.innerHTML = `
+                <div class="hero-section">
+                    <div class="hero-icon"><i class="fas fa-store"></i></div>
+                    <div class="hero-title">Start Your Business</div>
+                    <p style="opacity:0.9;margin-bottom:8px;">Join Zatpat and grow your shop online</p>
+                    <div class="fee-badge"><i class="fas fa-rupee-sign"></i> ₹${registrationFee} Registration Fee</div>
+                </div>
+                
+                <div class="form-card">
+                    <div class="form-header"><h2><i class="fas fa-clipboard-list"></i> Shop Registration</h2></div>
+                    <div class="form-body">
+                        <!-- Step 1: Email OTP -->
+                        <div id="registerStepEmail">
+                            <div class="form-group"><label class="form-label"><i class="fas fa-user"></i> Owner Name *</label><input type="text" id="registerName" class="form-control" placeholder="Full name"></div>
+                            <div class="form-group"><label class="form-label"><i class="fas fa-envelope"></i> Email Address *</label><input type="email" id="registerEmail" class="form-control" placeholder="your@email.com"></div>
+                            <div class="form-group"><label class="form-label"><i class="fas fa-phone"></i> Phone Number *</label><input type="tel" id="registerPhone" class="form-control" placeholder="Mobile number"></div>
+                            <div class="form-group"><label class="form-label"><i class="fab fa-whatsapp"></i> WhatsApp Number *</label><input type="tel" id="ownerWhatsapp" class="form-control" placeholder="WhatsApp number"></div>
+                            <button class="auth-btn" onclick="sendRegisterOTP()"><i class="fas fa-paper-plane"></i> Send OTP</button>
+                        </div>
+                        
+                        <!-- Step 2: OTP Verify -->
+                        <div id="registerStepOTP" style="display: none;">
+                            <p style="margin-bottom:16px;">📧 OTP sent to <strong id="otpEmailDisplay"></strong></p>
+                            <input type="text" id="registerOtp" class="form-control" placeholder="Enter 6-digit OTP" maxlength="6" style="margin-bottom:16px;">
+                            <button class="auth-btn" onclick="verifyRegisterOTP()"><i class="fas fa-check-circle"></i> Verify OTP</button>
+                            <button class="auth-btn" id="resendOtpBtn" onclick="resendOTP()" style="background: transparent; border: 1px solid var(--border-light); color: var(--text-primary); margin-top:12px;">Resend OTP</button>
+                        </div>
+                        
+                        <!-- Step 3: Shop Details -->
+                        <div id="shopDetailsForm" style="display: none;">
+                            <div class="form-group"><label class="form-label"><i class="fas fa-image"></i> Shop Photo</label>
+                                <div class="image-upload-area" id="imageUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Click to upload shop photo</p><input type="file" id="shopImageInput" accept="image/*" style="display:none"><img id="imagePreview" class="image-preview"></div>
+                            </div>
+                            <div class="form-group"><label class="form-label"><i class="fas fa-store"></i> Shop Name *</label><input type="text" id="shopName" class="form-control" placeholder="Your shop name"></div>
+                            <div class="form-group"><label class="form-label"><i class="fas fa-tag"></i> Category *</label><select id="shopCategory" class="form-control"><option value="">Select Category</option>${categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}</select></div>
+                            <div class="form-group"><label class="form-label"><i class="fas fa-phone"></i> Shop Phone *</label><input type="tel" id="shopPhone" class="form-control" placeholder="Contact number"></div>
+                            <div class="form-group"><label class="form-label"><i class="fab fa-whatsapp"></i> Shop WhatsApp</label><input type="tel" id="shopWhatsapp" class="form-control" placeholder="Optional"></div>
+                            
+                            <div class="form-group"><label class="form-label"><i class="fas fa-map-marker-alt"></i> Shop Location *</label>
+                                <button type="button" class="location-btn" onclick="captureShopLocation()"><i class="fas fa-location-dot"></i> Detect My Location</button>
+                                <div id="locationStatus" class="location-status"><i class="fas fa-info-circle"></i> Click to capture GPS location</div>
+                                <div id="locationAddress" class="location-address" style="display: none;"></div>
+                                <input type="hidden" id="shopLatitude"><input type="hidden" id="shopLongitude">
+                            </div>
+                            
+                            <div class="form-group"><label class="form-label"><i class="fas fa-address-card"></i> Address *</label><textarea id="shopAddress" class="form-control" rows="2" placeholder="Full address"></textarea></div>
+                            <div class="form-group"><label class="form-label"><i class="fas fa-city"></i> City *</label><input type="text" id="shopCity" class="form-control" placeholder="City"></div>
+                            <div class="form-group"><label class="form-label"><i class="fas fa-map-pin"></i> Pincode *</label><input type="text" id="shopPincode" class="form-control" placeholder="6-digit pincode" maxlength="6"></div>
+                            <div class="form-group"><label class="form-label"><i class="fas fa-info-circle"></i> Description</label><textarea id="shopDesc" class="form-control" rows="2" placeholder="Tell customers about your shop"></textarea></div>
+                            
+                            <div class="payment-section">
+                                <div class="payment-section-title"><i class="fas fa-credit-card"></i> Payment Settings (Optional)</div>
+                                <div class="form-group"><label class="form-label"><i class="fas fa-qrcode"></i> UPI ID</label><input type="text" id="shopUpiId" class="form-control" placeholder="example@okhdfcbank"></div>
+                                <div class="form-group"><label class="form-label"><i class="fas fa-user"></i> UPI Holder Name</label><input type="text" id="shopUpiName" class="form-control" placeholder="Name on UPI"></div>
+                                <div class="form-group"><label class="form-label"><i class="fas fa-camera"></i> QR Code</label>
+                                    <div class="image-upload-area" id="qrUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Upload QR Code</p><input type="file" id="qrImageInput" accept="image/*" style="display:none"><img id="qrPreview" class="image-preview"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="fee-summary">
+                                <div class="fee-row"><span>Registration Fee</span><span>₹${registrationFee}</span></div>
+                                <div class="fee-row total"><span>Total Payable</span><span class="total-amount">₹${registrationFee}</span></div>
+                            </div>
+                            
+                            <button class="auth-btn" id="registerShopBtn" onclick="registerShop()"><i class="fas fa-lock"></i> Pay ₹${registrationFee} & Register</button>
+                            <p class="text-muted" style="margin-top:12px;text-align:center;"><i class="fas fa-shield-alt"></i> Secure payment via Razorpay</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Image upload handlers
+            const uploadArea = document.getElementById('imageUploadArea');
+            const fileInput = document.getElementById('shopImageInput');
+            const imagePreview = document.getElementById('imagePreview');
+            if (uploadArea) {
+                uploadArea.onclick = () => fileInput.click();
+                fileInput.onchange = (e) => {
+                    if (e.target.files[0]) {
+                        selectedImageFile = e.target.files[0];
+                        const reader = new FileReader();
+                        reader.onload = (event) => { imagePreview.src = event.target.result; imagePreview.style.display = 'block'; };
+                        reader.readAsDataURL(selectedImageFile);
+                    }
+                };
+            }
+            
+            const qrUploadArea = document.getElementById('qrUploadArea');
+            const qrFileInput = document.getElementById('qrImageInput');
+            const qrPreview = document.getElementById('qrPreview');
+            if (qrUploadArea) {
+                qrUploadArea.onclick = () => qrFileInput.click();
+                qrFileInput.onchange = (e) => {
+                    if (e.target.files[0]) {
+                        selectedQrFile = e.target.files[0];
+                        const reader = new FileReader();
+                        reader.onload = (event) => { qrPreview.src = event.target.result; qrPreview.style.display = 'block'; };
+                        reader.readAsDataURL(selectedQrFile);
+                    }
+                };
+            }
+        }
+
+        // ========== INIT ==========
+        document.addEventListener('DOMContentLoaded', renderForm);
+
+        window.sendRegisterOTP = sendRegisterOTP;
+        window.verifyRegisterOTP = verifyRegisterOTP;
+        window.resendOTP = resendOTP;
+        window.registerShop = registerShop;
+        window.captureShopLocation = captureShopLocation;
+        window.goBack = goBack;
+        window.closeAlert = closeAlert;
+    </script>
+</body>
+</html>

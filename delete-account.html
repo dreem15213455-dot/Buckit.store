@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Delete Account - Zatpat</title>
+    <meta name="theme-color" content="#16A34A">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #16A34A;
+            --primary-light: #22C55E;
+            --primary-bg-light: #F0FDF4;
+            --accent-orange: #F97316;
+            --bg-white: #FFFFFF;
+            --bg-light: #F9FAFB;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-light: #E5E7EB;
+            --error: #DC2626;
+            --error-bg: #FEF2F2;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            padding-bottom: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #pageProgress {
+            position: fixed; top: 0; left: 0; width: 0%; height: 3px;
+            background: var(--primary); z-index: 10001; transition: width 0.3s ease;
+        }
+        #pageProgress.loading { width: 90%; }
+        #pageProgress.complete { width: 100%; opacity: 0; transition: opacity 0.3s; }
+
+        .container {
+            max-width: 450px; margin: 0 auto; padding: 20px; width: 100%;
+        }
+
+        /* Header */
+        .top-bar {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+        }
+        .back-btn {
+            width: 40px; height: 40px; background: var(--bg-white); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+        .back-btn i { font-size: 18px; color: var(--text-primary); }
+        .top-title {
+            font-size: 20px; font-weight: 700; color: var(--error);
+        }
+
+        /* Warning Card */
+        .warning-card {
+            background: var(--error-bg); border-radius: var(--radius-lg);
+            padding: 32px 24px; text-align: center; margin-bottom: 24px;
+            border: 2px solid var(--error);
+        }
+        .warning-icon {
+            width: 80px; height: 80px; background: var(--error);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .warning-icon i { font-size: 40px; color: white; }
+        .warning-title {
+            font-size: 22px; font-weight: 800; color: var(--error); margin-bottom: 12px;
+        }
+        .warning-text {
+            font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;
+        }
+        .warning-list {
+            text-align: left; margin: 20px 0; padding: 0 20px;
+        }
+        .warning-list li {
+            font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;
+            display: flex; align-items: flex-start; gap: 8px;
+        }
+        .warning-list li i { color: var(--error); font-size: 14px; margin-top: 2px; }
+
+        /* Form Card */
+        .form-card {
+            background: var(--bg-white); border-radius: var(--radius-lg);
+            padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light);
+        }
+        .form-title {
+            font-size: 16px; font-weight: 700; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .form-title i { color: var(--error); }
+
+        .input-group { margin-bottom: 20px; }
+        .input-label {
+            font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px;
+        }
+        .input-field {
+            width: 100%; padding: 14px 16px; border: 1px solid var(--border-light);
+            border-radius: var(--radius-full); font-size: 14px; outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-field:focus { border-color: var(--error); }
+
+        .checkbox-group {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+        }
+        .checkbox-group input {
+            width: 20px; height: 20px; accent-color: var(--error);
+        }
+        .checkbox-group label {
+            font-size: 13px; color: var(--text-secondary);
+        }
+
+        .delete-btn {
+            width: 100%; background: var(--error); color: white; border: none;
+            padding: 16px; border-radius: var(--radius-full); font-size: 16px; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.2s; opacity: 0.5;
+        }
+        .delete-btn.active {
+            opacity: 1;
+        }
+        .delete-btn.active:active { background: #B91C1C; }
+
+        .cancel-btn {
+            width: 100%; background: transparent; color: var(--text-secondary);
+            border: 1px solid var(--border-light); padding: 14px; margin-top: 12px;
+            border-radius: var(--radius-full); font-size: 14px; font-weight: 600;
+            cursor: pointer; text-align: center;
+        }
+
+        /* Confirmation Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: white; border-radius: var(--radius-lg); padding: 28px;
+            max-width: 350px; width: 90%; text-align: center;
+        }
+        .modal-icon {
+            width: 70px; height: 70px; background: var(--error-bg);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .modal-icon i { font-size: 32px; color: var(--error); }
+        .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .modal-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn {
+            flex: 1; padding: 14px; border-radius: var(--radius-full); font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        .modal-btn.confirm {
+            background: var(--error); color: white; border: none;
+        }
+        .modal-btn.cancel {
+            background: transparent; color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+        }
+
+        /* Success Modal */
+        .success-modal .modal-icon { background: var(--primary-bg-light); }
+        .success-modal .modal-icon i { color: var(--primary); }
+        .success-modal .modal-btn {
+            background: var(--primary); color: white; border: none;
+        }
+
+        /* Toast */
+        .toast-notification {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--text-primary); color: white; padding: 12px 24px;
+            border-radius: var(--radius-full); font-size: 13px; z-index: 10050;
+            display: none; white-space: nowrap;
+        }
+        .toast-notification.show { display: flex; }
+
+        .loading-spinner { text-align: center; padding: 20px; }
+        .spinner {
+            width: 24px; height: 24px; border: 3px solid var(--border-light);
+            border-top-color: var(--error); border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div id="pageProgress"></div>
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-card">
+        <div class="modal-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="modal-title">Delete Account?</div>
+        <div class="modal-text">This action cannot be undone. All your data will be permanently deleted.</div>
+        <div class="modal-actions">
+            <button class="modal-btn cancel" onclick="closeConfirmModal()">Cancel</button>
+            <button class="modal-btn confirm" onclick="confirmDelete()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay success-modal" id="successModal">
+    <div class="modal-card">
+        <div class="modal-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="modal-title">Account Deleted</div>
+        <div class="modal-text">Your account has been successfully deleted. Thank you for using Zatpat.</div>
+        <div class="modal-actions">
+            <button class="modal-btn" onclick="goToHome()">Go to Home</button>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="mainContent">
+    <!-- Content will be rendered here -->
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+    const zatpatDB = supabase.createClient(supabaseUrl, supabaseKey);
+
+    let currentUser = null;
+    let deleteConfirmed = false;
+    let reasonSelected = '';
+
+    function startProgress() { const b = document.getElementById('pageProgress'); b.style.width = '0%'; b.classList.add('loading'); setTimeout(() => b.style.width = '90%', 10); }
+    function completeProgress() { const b = document.getElementById('pageProgress'); b.classList.remove('loading'); b.classList.add('complete'); setTimeout(() => { b.style.width = '0%'; b.classList.remove('complete'); }, 300); }
+    window.fastNavigate = function(url) { startProgress(); setTimeout(() => window.location.href = url, 50); };
+    function goBack() { window.history.back(); }
+
+    function showToast(msg, isError = false) {
+        const t = document.getElementById('toastMsg');
+        document.getElementById('toastText').innerHTML = msg;
+        t.style.background = isError ? '#DC2626' : '#111827';
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    async function checkUser() {
+        const { data: { session } } = await zatpatDB.auth.getSession();
+        currentUser = session?.user || null;
+        return currentUser;
+    }
+
+    function renderPage() {
+        const container = document.getElementById('mainContent');
+        
+        if (!currentUser) {
+            container.innerHTML = `
+                <div class="top-bar">
+                    <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+                    <div class="top-title">Delete Account</div>
+                </div>
+                <div class="warning-card">
+                    <div class="warning-icon"><i class="fas fa-user-slash"></i></div>
+                    <div class="warning-title">Not Logged In</div>
+                    <div class="warning-text">Please login to delete your account.</div>
+                    <button class="delete-btn active" onclick="fastNavigate('index.html')">
+                        <i class="fas fa-sign-in-alt"></i> Go to Login
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="top-bar">
+                <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+                <div class="top-title"><i class="fas fa-trash-alt"></i> Delete Account</div>
+            </div>
+
+            <div class="warning-card">
+                <div class="warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="warning-title">Warning!</div>
+                <div class="warning-text">
+                    You are about to permanently delete your Zatpat account. This action cannot be undone.
+                </div>
+                <ul class="warning-list">
+                    <li><i class="fas fa-times-circle"></i> All your personal data will be erased</li>
+                    <li><i class="fas fa-times-circle"></i> Order history will be permanently deleted</li>
+                    <li><i class="fas fa-times-circle"></i> Saved addresses and preferences will be lost</li>
+                    <li><i class="fas fa-times-circle"></i> You will lose access to all active orders</li>
+                </ul>
+            </div>
+
+            <div class="form-card">
+                <div class="form-title"><i class="fas fa-clipboard-list"></i> Please tell us why</div>
+                
+                <div class="input-group">
+                    <div class="input-label">Reason for leaving (Optional)</div>
+                    <select class="input-field" id="reasonSelect" onchange="reasonSelected = this.value">
+                        <option value="">Select a reason</option>
+                        <option value="not_using">I'm not using the app</option>
+                        <option value="found_better">Found a better alternative</option>
+                        <option value="too_expensive">Prices are too high</option>
+                        <option value="privacy">Privacy concerns</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="confirmCheck" onchange="toggleDeleteButton()">
+                    <label for="confirmCheck">I understand that this action is permanent and cannot be undone</label>
+                </div>
+
+                <button class="delete-btn" id="deleteBtn" onclick="showConfirmModal()" disabled>
+                    <i class="fas fa-trash-alt"></i> Delete My Account
+                </button>
+                
+                <div class="cancel-btn" onclick="goBack()">Cancel</div>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <p style="font-size: 12px; color: var(--text-secondary);">
+                    <i class="fas fa-headset"></i> Need help? <a href="#" onclick="contactSupport()" style="color: var(--primary);">Contact Support</a>
+                </p>
+            </div>
+        `;
+    }
+
+    window.toggleDeleteButton = function() {
+        const checkbox = document.getElementById('confirmCheck');
+        const deleteBtn = document.getElementById('deleteBtn');
+        
+        if (checkbox.checked) {
+            deleteBtn.disabled = false;
+            deleteBtn.classList.add('active');
+        } else {
+            deleteBtn.disabled = true;
+            deleteBtn.classList.remove('active');
+        }
+    };
+
+    window.showConfirmModal = function() {
+        document.getElementById('confirmModal').classList.add('active');
+    };
+
+    window.closeConfirmModal = function() {
+        document.getElementById('confirmModal').classList.remove('active');
+    };
+
+    window.confirmDelete = async function() {
+        closeConfirmModal();
+        
+        const deleteBtn = document.getElementById('deleteBtn');
+        deleteBtn.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+        deleteBtn.disabled = true;
+
+        try {
+            // Save feedback
+            const reason = document.getElementById('reasonSelect')?.value || 'not_specified';
+            
+            try {
+                await zatpatDB.from('deletion_feedback').insert([{
+                    user_id: currentUser.id,
+                    reason: reason,
+                    email: currentUser.email,
+                    deleted_at: new Date().toISOString()
+                }]);
+            } catch (e) {}
+
+            // Delete user data
+            await zatpatDB.from('orders').delete().eq('user_id', currentUser.id);
+            
+            // Delete auth user
+            const { error } = await zatpatDB.rpc('delete_user');
+            
+            if (error) {
+                // Fallback: just sign out
+                await zatpatDB.auth.signOut();
+            }
+
+            // Clear local storage
+            localStorage.clear();
+            
+            // Show success modal
+            document.getElementById('successModal').classList.add('active');
+
+        } catch (e) {
+            console.error('Delete error:', e);
+            showToast('Failed to delete account. Please try again.', true);
+            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete My Account';
+            deleteBtn.disabled = false;
+        }
+    };
+
+    window.goToHome = function() {
+        window.location.href = 'index.html';
+    };
+
+    window.contactSupport = function() {
+        window.open('https://wa.me/918600252238?text=I need help with account deletion', '_blank');
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+        await checkUser();
+        renderPage();
+    });
+
+    window.goBack = goBack;
+    window.toggleDeleteButton = toggleDeleteButton;
+    window.showConfirmModal = showConfirmModal;
+    window.closeConfirmModal = closeConfirmModal;
+    window.confirmDelete = confirmDelete;
+    window.contactSupport = contactSupport;
+    window.goToHome = goToHome;
+</script>
+</body>
+</html>
