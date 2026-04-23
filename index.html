@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes, maximum-scale=1.0">
+    <title>Zatpat - स्थानिक दुकान, झटपट डिलिव्हरी</title>
+    <meta name="theme-color" content="#16A34A">
+    <meta name="description" content="Zatpat - स्थानिक दुकान, झटपट डिलिव्हरी | Local shops, fast delivery">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+    
+    <style>
+        :root {
+            --primary: #16A34A;
+            --primary-light: #22C55E;
+            --primary-bg-light: #DCFCE7;
+            --primary-bg-dark: #BBF7D0;
+            --primary-border-dark: #15803D;
+            --accent-orange: #F97316;
+            --accent-orange-dark: #EA580C;
+            --bg-white: #FFFFFF;
+            --bg-light: #F9FAFB;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-light: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+            padding-bottom: 85px;
+        }
+
+        /* Loader Styles */
+        #pageProgress {
+            position: fixed; top: 0; left: 0; width: 0%; height: 3px;
+            background: var(--primary); z-index: 10001; transition: width 0.3s ease;
+        }
+        #pageProgress.loading { width: 90%; }
+        #pageProgress.complete { width: 100%; opacity: 0; transition: opacity 0.3s; }
+
+        #simpleLoader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-white); z-index: 10002;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; }
+        .simple-spinner {
+            width: 48px; height: 48px; border: 4px solid var(--border-light);
+            border-top-color: var(--primary); border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Skeleton Loader for Sections */
+        .skeleton-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 0 12px;
+        }
+        .skeleton-category-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .skeleton-category-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            margin-bottom: 8px;
+        }
+        .skeleton-text {
+            height: 12px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 4px;
+        }
+        .skeleton-text-sm { width: 60%; height: 10px; }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--bg-white); 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%;
+            z-index: 1000; 
+            padding: 8px 12px; 
+            box-shadow: var(--shadow-sm); 
+            border-bottom: 1px solid var(--border-light);
+        }
+        .top-row-1 { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 8px; 
+            margin-bottom: 8px;
+        }
+        .left-group { display: flex; align-items: center; gap: 10px; }
+        .menu-btn { 
+            width: 38px; 
+            height: 38px; 
+            background: var(--bg-light); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+        }
+        .menu-btn i { color: var(--text-secondary); font-size: 18px; }
+        .brand-name { font-size: 24px; font-weight: 800; }
+        .brand-name .normal { color: var(--text-primary); }
+        .brand-name .pat { color: var(--primary); }
+        .right-group { display: flex; align-items: center; gap: 8px; }
+        .location-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            padding: 6px 12px; 
+            background: var(--bg-light); 
+            border-radius: var(--radius-full); 
+            cursor: pointer; 
+        }
+        .location-header i { color: var(--primary); font-size: 12px; }
+        .location-header span { 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: var(--text-primary); 
+            max-width: 100px; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap;
+        }
+        .notification-btn { 
+            width: 38px; 
+            height: 38px; 
+            background: var(--bg-light); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            position: relative; 
+        }
+        .notification-btn i { color: var(--text-secondary); font-size: 18px; }
+        
+        .search-box {
+            background: var(--bg-light); 
+            border-radius: var(--radius-full);
+            display: flex; 
+            align-items: center; 
+            padding: 10px 16px; 
+            gap: 10px;
+            border: 1px solid var(--border-light); 
+            width: 100%;
+        }
+        .search-box:focus-within { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(22,163,74,0.1); 
+        }
+        .search-box i { color: var(--text-secondary); font-size: 14px; }
+        .search-box input { 
+            flex: 1; 
+            border: none; 
+            outline: none; 
+            background: transparent; 
+            font-size: 14px; 
+            width: 100%; 
+        }
+
+        /* Menu */
+        #menuOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(2px);
+            z-index: 1001; display: none;
+        }
+        #menuDropdown {
+            position: fixed; top: 70px; left: 12px; 
+            background: white; 
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); 
+            z-index: 1002; 
+            min-width: 280px; 
+            display: none; 
+            overflow: hidden;
+            max-height: calc(100vh - 80px); 
+            overflow-y: auto;
+        }
+        #menuDropdown ul { list-style: none; padding: 8px 0; margin: 0; }
+        #menuDropdown li { 
+            padding: 14px 20px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            font-size: 14px; 
+            font-weight: 500; 
+            color: var(--text-primary); 
+            border-bottom: 1px solid var(--border-light); 
+        }
+        #menuDropdown li:last-child { border-bottom: none; }
+        #menuDropdown li:hover { background: var(--primary-bg-light); }
+        #menuDropdown li i { width: 22px; color: var(--primary); font-size: 16px; }
+        .menu-divider { height: 1px; background: var(--border-light); margin: 8px 0; }
+
+        /* Main Content */
+        .main-content { 
+            padding-top: 110px; 
+            overflow-x: hidden; 
+            width: 100%; 
+            max-width: 100%; 
+        }
+
+        /* Sections Common */
+        .categories-section, 
+        .hero-section, 
+        .featured-section, 
+        .trending-section, 
+        .offers-section,
+        .sponsored-section {
+            margin-bottom: 20px;
+        }
+        
+        .section-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0 14px; 
+            margin-bottom: 12px;
+        }
+        .section-header h2, .section-header h3 { 
+            font-size: 18px; 
+            font-weight: 800; 
+            margin: 0; 
+            color: #000000;
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+        }
+        .section-header h2 i, .section-header h3 i { color: var(--primary); font-size: 18px; }
+        .view-all { 
+            color: var(--primary); 
+            font-size: 13px; 
+            font-weight: 700; 
+            text-decoration: none; 
+            cursor: pointer; 
+        }
+
+        /* Categories Grid - FIXED: 4 per row, 3 rows, less gap */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px 8px;
+            padding: 0 12px;
+        }
+        .category-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            cursor: pointer; 
+            text-align: center;
+        }
+        .category-icon { 
+            width: 70px; 
+            height: 70px; 
+            border-radius: 20px; 
+            background: white;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 8px; 
+            color: var(--primary); 
+            font-size: 32px; 
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 2px solid var(--primary-border-dark);
+        }
+        .category-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .category-icon i { font-size: 34px; color: var(--primary); }
+        .category-name { 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: #000000; 
+            text-align: center; 
+            line-height: 1.3;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Hero Slider */
+        .hero-slider { 
+            border-radius: var(--radius-lg); 
+            overflow: hidden;
+            margin: 0 12px;
+        }
+        .hero-slide { 
+            position: relative; 
+            height: 150px; 
+            border-radius: var(--radius-lg); 
+            overflow: hidden; 
+            cursor: pointer; 
+        }
+        .hero-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay { 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            padding: 16px; 
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); 
+        }
+        .hero-title { font-size: 18px; font-weight: 800; color: white; }
+
+        /* Offers Slider - Moved below featured products */
+        .offers-section {
+            background: white;
+            padding: 8px 0;
+        }
+        .offers-slider-container { 
+            padding: 0 12px; 
+            position: relative; 
+        }
+        .offers-slider { 
+            overflow: hidden; 
+            border-radius: var(--radius-lg); 
+        }
+        .offers-track { 
+            display: flex; 
+            transition: transform 0.5s ease; 
+        }
+        .offers-track-group { 
+            display: flex; 
+            min-width: 100%; 
+            gap: 12px; 
+        }
+        .offer-card {
+            flex: 1; 
+            position: relative; 
+            border-radius: var(--radius-lg); 
+            overflow: hidden;
+            cursor: pointer; 
+            min-height: 120px; 
+            background: var(--accent-orange);
+        }
+        .offer-card-image { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            z-index: 0; 
+        }
+        .offer-card-overlay { 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            padding: 12px; 
+            background: linear-gradient(to top, rgba(0,0,0,0.4), transparent); 
+            z-index: 1; 
+        }
+        .offer-content h4 { 
+            font-size: 14px; 
+            font-weight: 800; 
+            color: white; 
+            margin-bottom: 4px; 
+        }
+        .offer-btn { 
+            background: var(--accent-orange-dark); 
+            color: white; 
+            border: none; 
+            padding: 5px 14px; 
+            border-radius: var(--radius-full); 
+            font-size: 11px; 
+            font-weight: 700; 
+            display: inline-block; 
+        }
+        .slider-dots { 
+            display: flex; 
+            justify-content: center; 
+            gap: 8px; 
+            margin-top: 10px; 
+        }
+        .slider-dot { 
+            width: 6px; 
+            height: 6px; 
+            border-radius: 50%; 
+            background: #CBD5E1; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        .slider-dot.active { 
+            width: 24px; 
+            border-radius: 4px; 
+            background: var(--primary); 
+        }
+
+        /* Products Grid */
+        .products-scroll { 
+            padding: 0 12px;
+        }
+        .products-scroll-content { 
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .product-card:active { transform: scale(0.98); }
+        .product-img { 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            position: relative; 
+            overflow: hidden; 
+            background: var(--bg-light);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; }
+        .product-img i { font-size: 40px; color: var(--primary); }
+        .discount-tag { 
+            position: absolute; 
+            bottom: 6px; 
+            left: 6px; 
+            background: var(--accent-orange); 
+            color: white; 
+            font-size: 9px; 
+            font-weight: 800; 
+            padding: 3px 7px; 
+            border-radius: var(--radius-full); 
+            z-index: 1; 
+        }
+        .product-info { padding: 8px; }
+        .product-name { 
+            font-size: 12px; 
+            font-weight: 700; 
+            margin-bottom: 4px; 
+            color: #000000; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        .product-rating { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+        .product-rating i { color: #FACC15; font-size: 10px; }
+        .product-rating span { font-size: 10px; color: var(--text-secondary); }
+        .product-price { 
+            font-size: 14px; 
+            font-weight: 800; 
+            color: #000000; 
+            margin-bottom: 6px;
+        }
+        .original-price { 
+            font-size: 10px; 
+            color: var(--text-secondary); 
+            text-decoration: line-through; 
+            margin-left: 5px; 
+            font-weight: normal;
+        }
+        .add-cart {
+            background: var(--primary); 
+            color: white; 
+            border: none;
+            border-radius: var(--radius-full); 
+            padding: 6px 0; 
+            font-size: 11px; 
+            font-weight: 700;
+            width: 100%; 
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        .add-cart:active { background: var(--primary-light); transform: scale(0.97); }
+
+        /* Sponsored */
+        .sponsored-scroll { 
+            padding: 0 12px; 
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            scrollbar-width: none; 
+            -webkit-overflow-scrolling: touch; 
+        }
+        .sponsored-scroll::-webkit-scrollbar { display: none; }
+        .sponsored-card {
+            background: white; 
+            border-radius: var(--radius-md); 
+            overflow: hidden; 
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light); 
+            cursor: pointer; 
+            min-width: 140px; 
+            position: relative;
+        }
+        .sponsored-img { width: 100%; height: 85px; object-fit: cover; }
+        .sponsored-badge { 
+            position: absolute; 
+            top: 8px; 
+            left: 8px; 
+            background: var(--accent-orange); 
+            color: white; 
+            font-size: 9px; 
+            font-weight: 700; 
+            padding: 3px 8px; 
+            border-radius: var(--radius-full); 
+        }
+        .sponsored-info { padding: 8px; }
+        .sponsored-name { 
+            font-size: 12px; 
+            font-weight: 700; 
+            color: #000000; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            background: white; 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%;
+            display: flex; 
+            justify-content: space-around; 
+            padding: 8px 16px 12px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05); 
+            z-index: 1000; 
+            border-top: 1px solid var(--border-light);
+        }
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-decoration: none; 
+            font-size: 11px; 
+            font-weight: 500; 
+            color: var(--text-secondary); 
+            cursor: pointer; 
+            position: relative;
+        }
+        .nav-item.active { color: var(--primary); font-weight: 700; }
+        .nav-item i { font-size: 22px; margin-bottom: 3px; }
+        .cart-count { 
+            position: absolute; 
+            top: -8px; 
+            right: -12px; 
+            background: var(--primary); 
+            color: white; 
+            border-radius: 50%; 
+            width: 18px; 
+            height: 18px; 
+            font-size: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border: 2px solid white; 
+        }
+
+        /* Modals */
+        .auth-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center; z-index: 9990;
+        }
+        .auth-content { 
+            background: white; 
+            border-radius: 24px; 
+            padding: 28px; 
+            max-width: 90%; 
+            width: 360px; 
+            text-align: center; 
+        }
+        .auth-content h3 { margin-bottom: 20px; color: var(--primary); font-weight: 800; }
+        .auth-input { 
+            margin-bottom: 14px; 
+            border-radius: var(--radius-md); 
+            padding: 12px 14px; 
+            border: 1px solid var(--border-light); 
+            font-size: 14px; 
+            width: 100%; 
+        }
+        .auth-input:focus { outline: none; border-color: var(--primary); }
+        .auth-btn { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: var(--radius-md); 
+            font-weight: 600; 
+            width: 100%; 
+            margin-bottom: 12px; 
+            cursor: pointer; 
+        }
+        .google-btn {
+            background: white; 
+            color: var(--text-primary); 
+            border: 1px solid var(--border-light);
+            padding: 12px; 
+            border-radius: var(--radius-md); 
+            font-weight: 600; 
+            width: 100%;
+            margin-bottom: 12px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px;
+        }
+        .google-btn i { color: #4285F4; font-size: 18px; }
+        .back-link { 
+            background: none; 
+            border: none; 
+            color: var(--primary); 
+            cursor: pointer; 
+            margin-top: 10px; 
+        }
+
+        /* Toast */
+        .toast-notification {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background: var(--text-primary); color: white; padding: 12px 24px;
+            border-radius: var(--radius-full); font-size: 14px; font-weight: 500;
+            z-index: 10050; display: none; white-space: nowrap;
+        }
+        .toast-notification.show { display: flex; animation: toastUp 0.3s ease; }
+        @keyframes toastUp { 
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); } 
+            to { opacity: 1; transform: translateX(-50%) translateY(0); } 
+        }
+
+        .error-state { 
+            text-align: center; 
+            padding: 40px 20px; 
+            color: var(--text-secondary); 
+        }
+        .error-state button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: var(--radius-full);
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 480px) {
+            .brand-name { font-size: 22px; }
+            .hero-slide { height: 130px; }
+            .offer-card { min-height: 110px; }
+            .products-scroll-content { gap: 10px; }
+            .product-name { font-size: 11px; }
+            .product-price { font-size: 13px; }
+            .category-icon { width: 65px; height: 65px; }
+            .category-icon i { font-size: 30px; }
+            .category-name { font-size: 11px; }
+            .categories-grid { gap: 14px 6px; }
+        }
+        
+        @media (max-width: 380px) {
+            .category-icon { width: 58px; height: 58px; }
+            .category-name { font-size: 10px; }
+        }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+</head>
+<body>
+
+<!-- Initial Page Loader -->
+<div id="simpleLoader"><div class="simple-spinner"></div></div>
+<div id="pageProgress"></div>
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+<div id="menuOverlay" onclick="closeMenu()"></div>
+
+<div id="mainApp">
+    <div class="top-bar">
+        <div class="top-row-1">
+            <div class="left-group">
+                <div class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+                <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+            </div>
+            <div class="right-group">
+                <div class="location-header" id="locationHeaderBtn" onclick="showLocationInfo()">
+                    <i class="fas fa-map-pin"></i>
+                    <span id="currentLocation">Sillod</span>
+                </div>
+                <div class="notification-btn" id="notificationBtn" onclick="showNotifications()">
+                    <i class="far fa-bell"></i>
+                </div>
+            </div>
+        </div>
+        <div class="top-row-2">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search products, shops..." autocomplete="off">
+            </div>
+        </div>
+    </div>
+
+    <div id="menuDropdown">
+        <ul>
+            <li id="authMenuItem" onclick="showAuthModal()"><i class="fas fa-user-circle"></i> Login / Register</li>
+            <li id="logoutMenuItem" style="display:none;" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+            <div class="menu-divider"></div>
+            <li onclick="fastNavigate('all-shops.html')"><i class="fas fa-store"></i> All Shops</li>
+            <li onclick="fastNavigate('shop-categories.html')"><i class="fas fa-tags"></i> Shop Categories</li>
+            <li onclick="fastNavigate('shop-register.html')"><i class="fas fa-store-alt"></i> Register Shop</li>
+            <li onclick="fastNavigate('products.html')"><i class="fas fa-boxes"></i> All Products</li>
+            <li onclick="fastNavigate('offers.html')"><i class="fas fa-tag"></i> Hot Offers</li>
+            <li onclick="fastNavigate('wishlist.html')"><i class="fas fa-heart"></i> My Wishlist</li>
+            <li onclick="fastNavigate('offline.html')"><i class="fas fa-wifi"></i> Offline Mode</li>
+            <div class="menu-divider"></div>
+            <li onclick="fastNavigate('order-tracking.html')"><i class="fas fa-truck"></i> Track Order</li>
+            <li onclick="fastNavigate('orders.html')"><i class="fas fa-clipboard-list"></i> My Orders</li>
+            <div class="menu-divider"></div>
+            <li onclick="window.open('https://wa.me/918600252238', '_blank')"><i class="fab fa-whatsapp"></i> WhatsApp Support</li>
+            <li onclick="showHelpModal()"><i class="fas fa-headset"></i> Help & Support</li>
+            <div class="menu-divider"></div>
+            <li onclick="fastNavigate('refund-policy.html')"><i class="fas fa-money-bill-wave"></i> Refund Policy</li>
+            <li onclick="fastNavigate('privacy-policy.html')"><i class="fas fa-shield-alt"></i> Privacy Policy</li>
+            <li onclick="fastNavigate('terms.html')"><i class="fas fa-file-contract"></i> Terms & Conditions</li>
+            <li onclick="fastNavigate('delete-account.html')"><i class="fas fa-trash-alt"></i> Delete Account</li>
+            <li onclick="showAboutUs()"><i class="fas fa-info-circle"></i> About Us</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <!-- Categories Section: Grid Layout - 4 per row -->
+        <div class="categories-section">
+            <div class="section-header"><h2><i class="fas fa-th-large"></i> Shop by Category</h2><span class="view-all" onclick="fastNavigate('shop-categories.html')">View All →</span></div>
+            <div class="categories-grid" id="categoriesContainer"></div>
+        </div>
+
+        <!-- Hero Slider -->
+        <div class="hero-section">
+            <div class="swiper hero-slider" id="heroSwiper">
+                <div class="swiper-wrapper" id="heroContainer"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+
+        <!-- Featured Products -->
+        <div class="featured-section">
+            <div class="section-header"><h3><i class="fas fa-star"></i> Featured Products</h3><span class="view-all" onclick="fastNavigate('products.html')">View All →</span></div>
+            <div class="products-scroll"><div class="products-scroll-content" id="featuredContainer"></div></div>
+        </div>
+
+        <!-- Trending Products -->
+        <div class="trending-section">
+            <div class="section-header"><h3><i class="fas fa-chart-line"></i> Trending Now</h3><span class="view-all" onclick="fastNavigate('products.html')">View All →</span></div>
+            <div class="products-scroll"><div class="products-scroll-content" id="trendingContainer"></div></div>
+        </div>
+
+        <!-- Offers Section - MOVED HERE (below featured products) -->
+        <div class="offers-section">
+            <div class="section-header"><h3><i class="fas fa-fire"></i> Hot Offers</h3><span class="view-all" onclick="fastNavigate('offers.html')">View All →</span></div>
+            <div class="offers-slider-container">
+                <div class="offers-slider" id="offersSlider"><div class="offers-track" id="offersTrack"></div></div>
+                <div class="slider-dots" id="offersDots"></div>
+            </div>
+        </div>
+
+        <!-- Sponsored Shops -->
+        <div class="sponsored-section">
+            <div class="section-header"><h3><i class="fas fa-crown"></i> Sponsored Shops</h3><span class="view-all" onclick="fastNavigate('sponsored-shops.html')">View All →</span></div>
+            <div class="sponsored-scroll" id="sponsoredContainer"></div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a class="nav-item active" onclick="fastNavigate('index.html')"><i class="fas fa-home"></i><span>Home</span></a>
+        <a class="nav-item" onclick="fastNavigate('products.html')"><i class="fas fa-box"></i><span>Explore</span></a>
+        <a class="nav-item" onclick="fastNavigate('cart.html')"><i class="fas fa-shopping-cart"></i><span>Cart</span><span class="cart-count" id="cartCount">0</span></a>
+        <a class="nav-item" onclick="fastNavigate('profile.html')"><i class="fas fa-user"></i><span>Profile</span></a>
+        <a class="nav-item" onclick="fastNavigate('orders.html')"><i class="fas fa-receipt"></i><span>Orders</span></a>
+    </nav>
+
+    <!-- Modals -->
+    <div id="authModal" class="auth-modal" style="display:none;">
+        <div class="auth-content">
+            <h3>Welcome to Zatpat</h3>
+            <button class="google-btn" onclick="signInWithGoogle()"><i class="fab fa-google"></i> Continue with Google</button>
+            <div style="display: flex; align-items: center; gap: 10px; margin: 16px 0;"><hr style="flex: 1; border: none; border-top: 1px solid var(--border-light);"><span style="color: var(--text-secondary); font-size: 12px;">OR</span><hr style="flex: 1; border: none; border-top: 1px solid var(--border-light);"></div>
+            <div id="loginStepEmail">
+                <input type="email" id="loginEmail" class="auth-input" placeholder="Email Address" required>
+                <button class="auth-btn" onclick="sendLoginOTP()">Send OTP</button>
+                <p class="small">New here? <a href="#" onclick="showRegisterForm()">Create Account</a></p>
+            </div>
+            <div id="loginStepOTP" style="display: none;">
+                <p>OTP sent to <strong id="otpEmailDisplay"></strong></p>
+                <input type="text" id="loginOtp" class="auth-input" placeholder="Enter OTP" maxlength="8">
+                <button class="auth-btn" onclick="verifyLoginOTP()">Verify & Login</button>
+                <button class="auth-btn" id="resendLoginBtn" onclick="resendLoginOTP()" style="background: transparent; border: 1px solid var(--border-light); color: var(--text-primary);">Resend OTP</button>
+                <button class="back-link" onclick="backToEmail()">← Back to Email</button>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <input type="text" id="registerName" class="auth-input" placeholder="Full Name" required>
+                <input type="email" id="registerEmail" class="auth-input" placeholder="Email Address" required>
+                <input type="tel" id="registerPhone" class="auth-input" placeholder="Mobile Number" required>
+                <button class="auth-btn" onclick="sendRegisterOTP()">Register & Send OTP</button>
+                <p class="small">Already have account? <a href="#" onclick="showLoginForm()">Login</a></p>
+            </div>
+            <div id="registerStepOTP" style="display: none;">
+                <p>OTP sent to <strong id="regOtpEmailDisplay"></strong></p>
+                <input type="text" id="registerOtp" class="auth-input" placeholder="Enter OTP" maxlength="8">
+                <button class="auth-btn" onclick="verifyRegisterOTP()">Verify & Complete Registration</button>
+                <button class="auth-btn" id="resendRegisterBtn" onclick="resendRegisterOTP()" style="background: transparent; border: 1px solid var(--border-light); color: var(--text-primary);">Resend OTP</button>
+                <button class="back-link" onclick="backToRegisterEmail()">← Back</button>
+            </div>
+            <button class="back-link" style="margin-top: 12px;" onclick="hideAuthModal()">Close</button>
+        </div>
+    </div>
+
+    <div id="helpModal" class="auth-modal" style="display:none;">
+        <div class="auth-content">
+            <h3><i class="fas fa-headset"></i> Help & Support</h3>
+            <div style="text-align: left; margin: 20px 0;"><p><strong><i class="fas fa-phone"></i> Helpline:</strong> 8600252238</p><p><strong><i class="fas fa-envelope"></i> Email:</strong> sk12shaikh@gmail.com</p></div>
+            <button class="auth-btn" style="background:#25D366; color:white;" onclick="window.open('https://wa.me/918600252238', '_blank')"><i class="fab fa-whatsapp"></i> WhatsApp Chat</button>
+            <button class="back-link" onclick="hideHelpModal()">Close</button>
+        </div>
+    </div>
+
+    <div id="aboutUsModal" class="auth-modal" style="display:none;">
+        <div class="auth-content">
+            <h3><i class="fas fa-info-circle"></i> About Zatpat</h3>
+            <div style="text-align: left; margin: 20px 0;"><p><strong>Version:</strong> 4.0.0</p><p><strong>Developer:</strong> Solutions SK</p><p>Zatpat is your local shopping companion, delivering groceries and essentials in minutes.</p></div>
+            <button class="auth-btn" onclick="hideAboutUs()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========== INITIAL LOADER ==========
+    window.addEventListener('load', function() { 
+        setTimeout(function() { 
+            const loader = document.getElementById('simpleLoader');
+            if(loader) loader.classList.add('fade-out'); 
+        }, 500); 
+    });
+    
+    window.addEventListener('error', function(e) { 
+        console.error('Global error:', e.error); 
+        showToast('Something went wrong. Please refresh.', true); 
+        return false; 
+    });
+    
+    if ('serviceWorker' in navigator) { 
+        navigator.serviceWorker.register('/sw.js').then(reg => console.log('✅ SW registered')).catch(err => console.log('❌ SW failed:', err)); 
+    }
+
+    // ========== SUPABASE ==========
+    const supabaseUrl = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    const supabaseKey = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+    const zatpatDB = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // ========== CACHE (Faster loading) ==========
+    const Cache = {
+        set(key, data, ttl = 3600000) { // 1 hour default for categories
+            try { 
+                localStorage.setItem(`cache_${key}`, JSON.stringify({ data, expiry: Date.now() + ttl })); 
+            } catch(e) { console.warn('Cache set failed:', e); }
+        },
+        get(key) { 
+            try { 
+                const c = localStorage.getItem(`cache_${key}`); 
+                if (!c) return null; 
+                const p = JSON.parse(c); 
+                return Date.now() > p.expiry ? null : p.data; 
+            } catch(e) { return null; }
+        }
+    };
+
+    // ========== GLOBAL VARIABLES ==========
+    let currentUser = null, userLocation = { lat: 20.3730, lng: 75.5640 }, heroSwiper = null, offersInterval = null, offersSliderIndex = 0, otpTimerInterval = null, currentOtpEmail = null;
+    const DEFAULT_LOCATION = { lat: 20.3730, lng: 75.5640, city: 'Sillod' };
+    
+    // ========== HELPER FUNCTIONS ==========
+    function showToast(m, e = false) { 
+        const t = document.getElementById('toastMsg'), s = document.getElementById('toastText'); 
+        if(!t || !s) return; 
+        s.innerHTML = m; 
+        t.style.background = e ? '#EF4444' : '#111827'; 
+        t.classList.add('show'); 
+        setTimeout(() => t.classList.remove('show'), 2500); 
+    }
+    
+    function startProgress() { 
+        const b = document.getElementById('pageProgress'); 
+        if(b) { 
+            b.style.width = '0%'; 
+            b.classList.add('loading'); 
+            setTimeout(() => b.style.width = '90%', 10); 
+        } 
+    }
+    
+    function completeProgress() { 
+        const b = document.getElementById('pageProgress'); 
+        if(b) { 
+            b.classList.remove('loading'); 
+            b.classList.add('complete'); 
+            setTimeout(() => { 
+                b.style.width = '0%'; 
+                b.classList.remove('complete'); 
+            }, 300); 
+        } 
+    }
+    
+    window.fastNavigate = function(url) { 
+        startProgress(); 
+        closeMenu(); 
+        setTimeout(() => window.location.href = url, 50); 
+    };
+    
+    function showLocationInfo() { 
+        showToast(`📍 ${localStorage.getItem('user_city') || DEFAULT_LOCATION.city}`); 
+    }
+    
+    function showNotifications() { 
+        showToast('🔔 No new notifications'); 
+    }
+
+    // ========== LOCATION HANDLING (Android Studio Compatible) ==========
+    window.setLocationFromAndroid = function(lat, lng) { 
+        if (!lat || !lng) { 
+            useSillodLocation(); 
+            return; 
+        } 
+        userLocation = { lat: parseFloat(lat), lng: parseFloat(lng) }; 
+        localStorage.setItem('user_lat', userLocation.lat); 
+        localStorage.setItem('user_lng', userLocation.lng); 
+        getCityName(userLocation.lat, userLocation.lng).then(c => { 
+            localStorage.setItem('user_city', c); 
+            const locSpan = document.getElementById('currentLocation');
+            if(locSpan) locSpan.innerHTML = c;
+            loadAllData(); 
+        }).catch(() => { 
+            const locSpan = document.getElementById('currentLocation');
+            if(locSpan) locSpan.innerHTML = DEFAULT_LOCATION.city;
+            loadAllData(); 
+        }); 
+    };
+    
+    function useSillodLocation() { 
+        userLocation = { lat: DEFAULT_LOCATION.lat, lng: DEFAULT_LOCATION.lng }; 
+        localStorage.setItem('user_lat', DEFAULT_LOCATION.lat); 
+        localStorage.setItem('user_lng', DEFAULT_LOCATION.lng); 
+        localStorage.setItem('user_city', DEFAULT_LOCATION.city); 
+        const locSpan = document.getElementById('currentLocation');
+        if(locSpan) locSpan.innerHTML = DEFAULT_LOCATION.city;
+        loadAllData(); 
+    }
+    
+    async function getCityName(lat, lng) { 
+        try { 
+            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`); 
+            const d = await r.json(); 
+            return d.address?.city || d.address?.town || DEFAULT_LOCATION.city; 
+        } catch { 
+            return DEFAULT_LOCATION.city; 
+        } 
+    }
+
+    // ========== MENU ==========
+    function toggleMenu() { 
+        const m = document.getElementById('menuDropdown'), o = document.getElementById('menuOverlay'); 
+        if (m) { 
+            m.style.display = m.style.display === 'none' ? 'block' : 'none'; 
+            o.style.display = m.style.display; 
+        } 
+    }
+    
+    function closeMenu() { 
+        const m = document.getElementById('menuDropdown'), o = document.getElementById('menuOverlay'); 
+        if(m) m.style.display = 'none'; 
+        if(o) o.style.display = 'none'; 
+    }
+
+    // ========== AUTH FUNCTIONS ==========
+    async function signInWithGoogle() { 
+        try { 
+            const { error } = await zatpatDB.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/index.html' } }); 
+            if (error) throw error; 
+        } catch (e) { 
+            showToast('Google login failed. Try email OTP.', true); 
+        } 
+    }
+
+    async function sendLoginOTP() { 
+        const e = document.getElementById('loginEmail')?.value.trim(); 
+        if (!e) { showToast('Enter email', true); return; } 
+        try { 
+            const { error } = await zatpatDB.auth.signInWithOtp({ email: e, options: { shouldCreateUser: false } }); 
+            if (error) { 
+                showToast('Error: ' + error.message, true); 
+            } else { 
+                currentOtpEmail = e; 
+                const otpDisplay = document.getElementById('otpEmailDisplay');
+                if(otpDisplay) otpDisplay.innerText = e;
+                const loginStep = document.getElementById('loginStepEmail');
+                const otpStep = document.getElementById('loginStepOTP');
+                if(loginStep) loginStep.style.display = 'none';
+                if(otpStep) otpStep.style.display = 'block';
+                startResendTimer('login'); 
+                showToast('✅ OTP sent!'); 
+            } 
+        } catch(e) { 
+            showToast('Failed to send OTP', true); 
+        } 
+    }
+    
+    async function verifyLoginOTP() { 
+        const o = document.getElementById('loginOtp')?.value.trim(); 
+        if (!o || o.length < 4) { showToast('Enter OTP', true); return; } 
+        try { 
+            const { error } = await zatpatDB.auth.verifyOtp({ email: currentOtpEmail, token: o, type: 'email' }); 
+            if (error) { 
+                showToast('Invalid OTP', true); 
+            } else { 
+                showToast('✅ Login!'); 
+                await new Promise(r => setTimeout(r, 500)); 
+                await checkLoggedInUser(); 
+                hideAuthModal(); 
+                updateUIAfterLogin(); 
+            } 
+        } catch(e) { 
+            showToast('Verification failed', true); 
+        } 
+    }
+    
+    function updateUIAfterLogin() { 
+        if (currentUser) { 
+            const authItem = document.getElementById('authMenuItem');
+            const logoutItem = document.getElementById('logoutMenuItem');
+            if(authItem) authItem.style.display = 'none';
+            if(logoutItem) logoutItem.style.display = 'block';
+        } else { 
+            const authItem = document.getElementById('authMenuItem');
+            const logoutItem = document.getElementById('logoutMenuItem');
+            if(authItem) authItem.style.display = 'block';
+            if(logoutItem) logoutItem.style.display = 'none';
+        } 
+        loadAllData(); 
+    }
+    
+    async function resendLoginOTP() { 
+        if (!currentOtpEmail) { backToEmail(); return; } 
+        await zatpatDB.auth.signInWithOtp({ email: currentOtpEmail, options: { shouldCreateUser: false } }); 
+        startResendTimer('login'); 
+        showToast('✅ New OTP!'); 
+    }
+    
+    async function sendRegisterOTP() { 
+        const n = document.getElementById('registerName')?.value.trim(), e = document.getElementById('registerEmail')?.value.trim(), p = document.getElementById('registerPhone')?.value.trim(); 
+        if (!n || !e || !p) { showToast('All fields required', true); return; } 
+        try { 
+            const { error } = await zatpatDB.auth.signInWithOtp({ email: e, options: { shouldCreateUser: true, data: { name: n, phone: p, role: 'user' } } }); 
+            if (error) { 
+                showToast('Error: ' + error.message, true); 
+            } else { 
+                currentOtpEmail = e; 
+                const regOtpDisplay = document.getElementById('regOtpEmailDisplay');
+                if(regOtpDisplay) regOtpDisplay.innerText = e;
+                const regForm = document.getElementById('registerForm');
+                const regOtpStep = document.getElementById('registerStepOTP');
+                if(regForm) regForm.style.display = 'none';
+                if(regOtpStep) regOtpStep.style.display = 'block';
+                startResendTimer('register'); 
+                showToast('✅ OTP sent!'); 
+            } 
+        } catch(e) { 
+            showToast('Registration failed', true); 
+        } 
+    }
+    
+    async function verifyRegisterOTP() { 
+        const o = document.getElementById('registerOtp')?.value.trim(); 
+        if (!o || o.length < 4) { showToast('Enter OTP', true); return; } 
+        try { 
+            const { error } = await zatpatDB.auth.verifyOtp({ email: currentOtpEmail, token: o, type: 'email' }); 
+            if (error) { 
+                showToast('Invalid OTP', true); 
+            } else { 
+                showToast('✅ Registered!'); 
+                backToEmail(); 
+                showLoginForm(); 
+            } 
+        } catch(e) { 
+            showToast('Verification failed', true); 
+        } 
+    }
+    
+    async function resendRegisterOTP() { 
+        const n = document.getElementById('registerName')?.value.trim(), e = currentOtpEmail, p = document.getElementById('registerPhone')?.value.trim(); 
+        if (!e) { backToRegisterEmail(); return; } 
+        await zatpatDB.auth.signInWithOtp({ email: e, options: { shouldCreateUser: true, data: { name: n, phone: p, role: 'user' } } }); 
+        startResendTimer('register'); 
+        showToast('✅ New OTP!'); 
+    }
+    
+    function startResendTimer(type) { 
+        let s = 60; 
+        const b = document.getElementById(type === 'login' ? 'resendLoginBtn' : 'resendRegisterBtn'); 
+        if (!b) return; 
+        if (otpTimerInterval) clearInterval(otpTimerInterval); 
+        b.disabled = true; 
+        b.style.opacity = '0.6'; 
+        otpTimerInterval = setInterval(() => { 
+            s--; 
+            b.innerText = `Resend OTP (${s}s)`; 
+            if (s <= 0) { 
+                clearInterval(otpTimerInterval); 
+                b.disabled = false; 
+                b.style.opacity = '1'; 
+                b.innerText = 'Resend OTP'; 
+            } 
+        }, 1000); 
+    }
+    
+    function backToEmail() { 
+        if (otpTimerInterval) clearInterval(otpTimerInterval); 
+        const otpStep = document.getElementById('loginStepOTP');
+        const emailStep = document.getElementById('loginStepEmail');
+        const otpInput = document.getElementById('loginOtp');
+        if(otpStep) otpStep.style.display = 'none';
+        if(emailStep) emailStep.style.display = 'block';
+        if(otpInput) otpInput.value = '';
+        currentOtpEmail = null; 
+    }
+    
+    function backToRegisterEmail() { 
+        if (otpTimerInterval) clearInterval(otpTimerInterval); 
+        const regOtpStep = document.getElementById('registerStepOTP');
+        const regForm = document.getElementById('registerForm');
+        const regOtpInput = document.getElementById('registerOtp');
+        if(regOtpStep) regOtpStep.style.display = 'none';
+        if(regForm) regForm.style.display = 'block';
+        if(regOtpInput) regOtpInput.value = '';
+        currentOtpEmail = null; 
+    }
+    
+    function showAuthModal() { 
+        const modal = document.getElementById('authModal');
+        if(modal) modal.style.display = 'flex';
+        closeMenu(); 
+    }
+    
+    function hideAuthModal() { 
+        const modal = document.getElementById('authModal');
+        if(modal) modal.style.display = 'none';
+    }
+    
+    function showRegisterForm() { 
+        const loginEmail = document.getElementById('loginStepEmail');
+        const loginOtp = document.getElementById('loginStepOTP');
+        const registerForm = document.getElementById('registerForm');
+        if(loginEmail) loginEmail.style.display = 'none';
+        if(loginOtp) loginOtp.style.display = 'none';
+        if(registerForm) registerForm.style.display = 'block';
+    }
+    
+    function showLoginForm() { 
+        const registerForm = document.getElementById('registerForm');
+        const registerOtp = document.getElementById('registerStepOTP');
+        const loginEmail = document.getElementById('loginStepEmail');
+        if(registerForm) registerForm.style.display = 'none';
+        if(registerOtp) registerOtp.style.display = 'none';
+        if(loginEmail) loginEmail.style.display = 'block';
+    }
+    
+    function showHelpModal() { 
+        const modal = document.getElementById('helpModal');
+        if(modal) modal.style.display = 'flex';
+        closeMenu(); 
+    }
+    
+    function hideHelpModal() { 
+        const modal = document.getElementById('helpModal');
+        if(modal) modal.style.display = 'none';
+    }
+    
+    function showAboutUs() { 
+        const modal = document.getElementById('aboutUsModal');
+        if(modal) modal.style.display = 'flex';
+        closeMenu(); 
+    }
+    
+    function hideAboutUs() { 
+        const modal = document.getElementById('aboutUsModal');
+        if(modal) modal.style.display = 'none';
+    }
+    
+    async function handleLogout() { 
+        if (confirm('Logout?')) { 
+            await zatpatDB.auth.signOut(); 
+            localStorage.clear(); 
+            fastNavigate('index.html'); 
+        } 
+    }
+    
+    async function checkLoggedInUser() { 
+        try { 
+            const { data: { session } } = await zatpatDB.auth.getSession(); 
+            if (session) { 
+                const { data: { user } } = await zatpatDB.auth.getUser(); 
+                const { data: profile } = await zatpatDB.from('users').select('role').eq('id', user.id).maybeSingle(); 
+                if (profile?.role === 'admin') fastNavigate('admin-panel.html'); 
+                else if (profile?.role === 'shop_owner') fastNavigate('shop-dashboard.html'); 
+                else { 
+                    currentUser = user; 
+                    updateUIAfterLogin(); 
+                } 
+            } else { 
+                currentUser = null; 
+                const authItem = document.getElementById('authMenuItem');
+                const logoutItem = document.getElementById('logoutMenuItem');
+                if(authItem) authItem.style.display = 'block';
+                if(logoutItem) logoutItem.style.display = 'none';
+            } 
+        } catch(e) { 
+            console.error('Auth check error:', e); 
+        } 
+    }
+
+    // ========== SKELETON LOADERS (for better UX) ==========
+    function showCategorySkeleton() {
+        const container = document.getElementById('categoriesContainer');
+        if(!container) return;
+        const skeletonHtml = Array(12).fill(0).map(() => `
+            <div class="category-skeleton-card">
+                <div class="skeleton-category-icon"></div>
+                <div class="skeleton-text skeleton-text-sm" style="width: 60px; margin: 0 auto;"></div>
+            </div>
+        `).join('');
+        container.innerHTML = skeletonHtml;
+    }
+    
+    function showProductsSkeleton(containerId) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        const skeletonHtml = Array(6).fill(0).map(() => `
+            <div class="skeleton-product-card">
+                <div class="skeleton-img"></div>
+                <div class="skeleton-text skeleton-text-md" style="margin: 8px;"></div>
+                <div class="skeleton-text skeleton-text-sm" style="margin: 8px;"></div>
+                <div class="skeleton-text skeleton-text-sm" style="margin: 8px; width: 50%;"></div>
+            </div>
+        `).join('');
+        container.innerHTML = `<div class="skeleton-grid">${skeletonHtml}</div>`;
+    }
+    
+    function showSponsoredSkeleton() {
+        const container = document.getElementById('sponsoredContainer');
+        if(!container) return;
+        const skeletonHtml = Array(4).fill(0).map(() => `
+            <div class="sponsored-card" style="min-width: 140px;">
+                <div class="skeleton-img" style="height: 85px;"></div>
+                <div class="skeleton-text skeleton-text-md" style="margin: 8px;"></div>
+            </div>
+        `).join('');
+        container.innerHTML = skeletonHtml;
+    }
+
+    // ========== LOAD DATA WITH SKELETON & FAST CACHE ==========
+    async function loadAllData() { 
+        startProgress(); 
+        try { 
+            await Promise.allSettled([
+                loadCategories(), 
+                loadHeroSlider(), 
+                loadFeaturedProducts(), 
+                loadTrendingProducts(),
+                loadOffers(),
+                loadSponsoredShops()
+            ]); 
+        } catch (e) { console.error('Load error:', e); } 
+        completeProgress(); 
+    }
+    
+    // CATEGORIES - Grid layout (4 per row, 3 rows = 12 categories max)
+    async function loadCategories() { 
+        const container = document.getElementById('categoriesContainer'); 
+        if (!container) return;
+        showCategorySkeleton();
+        
+        const c = Cache.get('categories'); 
+        if (c && c.length > 0) { 
+            renderCategories(c); 
+            return; 
+        } 
+        try { 
+            const { data } = await zatpatDB.from('categories').select('*').eq('is_active', true).limit(12); 
+            if (data?.length) { 
+                Cache.set('categories', data, 3600000); // 1 hour cache
+                renderCategories(data); 
+            } else { 
+                container.innerHTML = '<div class="error-state">No categories found</div>'; 
+            } 
+        } catch (e) { 
+            console.error('Categories error:', e);
+            container.innerHTML = '<div class="error-state">⚠️ Failed to load categories<br><button onclick="loadCategories()">Retry</button></div>'; 
+        } 
+    }
+    
+    function renderCategories(c) { 
+        const container = document.getElementById('categoriesContainer');
+        if (!container) return;
+        const iconMap = { 
+            'Grocery & Kirana': 'fa-shopping-basket', 
+            'Fresh Vegetables': 'fa-carrot', 
+            'Fresh Fruits': 'fa-apple-alt', 
+            'Dairy Products': 'fa-cheese', 
+            'Bakery Items': 'fa-bread-slice', 
+            'Personal Care': 'fa-pump-soap', 
+            'Household Items': 'fa-home', 
+            'Beverages': 'fa-mug-hot', 
+            'Snacks & Biscuits': 'fa-cookie', 
+            'Frozen Foods': 'fa-snowflake', 
+            'Spices & Masala': 'fa-mortar-pestle', 
+            'Rice & Grains': 'fa-wheat-alt' 
+        };
+        container.innerHTML = c.map(cat => { 
+            const icon = iconMap[cat.name] || 'fa-store';
+            if (cat.image_url) {
+                return `<div class="category-item" onclick="filterByCategory('${cat.id}', '${cat.name.replace(/'/g, "\\'")}')"><div class="category-icon"><img src="${cat.image_url}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><i class="fas ${icon}" style="display:none;"></i></div><div class="category-name">${cat.name}</div></div>`;
+            } else {
+                return `<div class="category-item" onclick="filterByCategory('${cat.id}', '${cat.name.replace(/'/g, "\\'")}')"><div class="category-icon"><i class="fas ${icon}"></i></div><div class="category-name">${cat.name}</div></div>`;
+            }
+        }).join(''); 
+    }
+    
+    // HERO SLIDER
+    async function loadHeroSlider() { 
+        const container = document.getElementById('heroContainer'); 
+        if (!container) return; 
+        const c = Cache.get('hero_sliders'); 
+        if (c) { 
+            renderHeroSlider(c); 
+            return; 
+        } 
+        try { 
+            const { data } = await zatpatDB.from('sliders').select('*').eq('is_active', true).order('display_order'); 
+            if (data?.length) { 
+                Cache.set('hero_sliders', data, 1800000); // 30 minutes
+                renderHeroSlider(data); 
+            } else { 
+                container.innerHTML = `<div class="swiper-slide hero-slide"><div class="hero-overlay"><div class="hero-title">Welcome to Zatpat</div></div></div>`; 
+            } 
+        } catch (e) { console.error('Hero error:', e); } 
+    }
+    
+    function renderHeroSlider(s) { 
+        const container = document.getElementById('heroContainer'); 
+        if (!container) return; 
+        container.innerHTML = s.map(sl => `<div class="swiper-slide hero-slide" onclick="fastNavigate('${sl.link || '#'}')"><img src="${sl.image_url}" loading="lazy"><div class="hero-overlay"><div class="hero-title">${sl.title || ''}</div></div></div>`).join(''); 
+        if (heroSwiper) heroSwiper.destroy(); 
+        heroSwiper = new Swiper('#heroSwiper', { loop: true, autoplay: { delay: 4000 }, pagination: { el: '.swiper-pagination', clickable: true } }); 
+    }
+    
+    // FEATURED PRODUCTS
+    async function loadFeaturedProducts() { 
+        const container = document.getElementById('featuredContainer'); 
+        if (!container) return;
+        showProductsSkeleton('featuredContainer');
+        
+        const c = Cache.get('featured_products'); 
+        if (c) { 
+            renderProducts('featuredContainer', c); 
+            return; 
+        } 
+        try { 
+            const { data } = await zatpatDB.from('products').select('*').eq('is_featured', true).eq('is_active', true).limit(6); 
+            if (data?.length) { 
+                Cache.set('featured_products', data, 600000); // 10 minutes
+                renderProducts('featuredContainer', data); 
+            } else { 
+                container.innerHTML = '<div class="error-state">No featured products</div>'; 
+            } 
+        } catch (e) { 
+            container.innerHTML = '<div class="error-state">⚠️ Failed to load<br><button onclick="loadFeaturedProducts()">Retry</button></div>';
+        } 
+    }
+    
+    // TRENDING PRODUCTS
+    async function loadTrendingProducts() { 
+        const container = document.getElementById('trendingContainer'); 
+        if (!container) return;
+        showProductsSkeleton('trendingContainer');
+        
+        const c = Cache.get('trending_products'); 
+        if (c) { 
+            renderProducts('trendingContainer', c); 
+            return; 
+        } 
+        try { 
+            const { data: oi } = await zatpatDB.from('order_items').select('product_id, quantity').limit(500); 
+            if (oi?.length) { 
+                const pc = {}; 
+                oi.forEach(i => { pc[i.product_id] = (pc[i.product_id] || 0) + (i.quantity || 1); }); 
+                const ids = Object.entries(pc).sort((a, b) => b[1] - a[1]).slice(0, 6).map(e => e[0]); 
+                const { data: p } = await zatpatDB.from('products').select('*').in('id', ids).eq('is_active', true); 
+                if (p?.length) { 
+                    const s = ids.map(id => p.find(pr => pr.id === id)).filter(Boolean); 
+                    Cache.set('trending_products', s, 600000); 
+                    renderProducts('trendingContainer', s); 
+                    return; 
+                } 
+            } 
+            const { data } = await zatpatDB.from('products').select('*').eq('is_active', true).limit(6); 
+            if (data?.length) {
+                Cache.set('trending_products', data, 600000);
+                renderProducts('trendingContainer', data); 
+            } else { 
+                container.innerHTML = '<div class="error-state">No trending products</div>'; 
+            } 
+        } catch (e) { 
+            container.innerHTML = '<div class="error-state">⚠️ Failed to load<br><button onclick="loadTrendingProducts()">Retry</button></div>';
+        } 
+    }
+    
+    function renderProducts(cid, p) { 
+        const container = document.getElementById(cid);
+        if (!container) return;
+        if(!p || p.length === 0) {
+            container.innerHTML = '<div class="error-state">No products found</div>';
+            return;
+        }
+        container.innerHTML = p.map(pr => { 
+            const img = pr.images?.[0] || pr.image_url || '';
+            const d = pr.offer_price ? Math.round((1 - pr.offer_price/pr.price) * 100) : 0; 
+            return `<div class="product-card" onclick="openProductDetails('${pr.id}')"><div class="product-img">${d > 0 ? `<div class="discount-tag">${d}% OFF</div>` : ''}${img ? `<img src="${img}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}<i class="fas fa-box-open" style="font-size:32px; color:var(--primary); ${img ? 'display:none;' : ''}"></i></div><div class="product-info"><div class="product-name">${pr.name}</div><div class="product-rating"><i class="fas fa-star"></i><span>${pr.rating || 4.5}</span></div><div class="product-price">₹${pr.offer_price || pr.price}${pr.offer_price ? `<span class="original-price">₹${pr.price}</span>` : ''}</div><button class="add-cart" onclick="event.stopPropagation(); addToCart('${pr.id}', '${pr.name.replace(/'/g, "\\'")}', ${pr.offer_price || pr.price}, '${img}')">Add</button></div></div>`; 
+        }).join(''); 
+    }
+    
+    // OFFERS SLIDER (Moved below featured)
+    async function loadOffers() { 
+        const track = document.getElementById('offersTrack'), dots = document.getElementById('offersDots'); 
+        if (!track || !dots) return; 
+        const c = Cache.get('offers'); 
+        if (c) { 
+            renderOffers(c); 
+            return; 
+        } 
+        try { 
+            const { data } = await zatpatDB.from('offers').select('*').eq('is_active', true).order('priority').limit(6); 
+            if (data?.length) { 
+                Cache.set('offers', data, 1800000);
+                renderOffers(data); 
+            } 
+        } catch (e) { console.error('Offers error:', e); } 
+    }
+    
+    function renderOffers(o) { 
+        const t = document.getElementById('offersTrack'), d = document.getElementById('offersDots'); 
+        if (!t || !d || !o.length) return; 
+        let h = ''; 
+        for (let i = 0; i < o.length; i += 2) { 
+            h += `<div class="offers-track-group">`; 
+            [o[i], o[i+1]].filter(Boolean).forEach(of => { 
+                h += `<div class="offer-card" onclick="fastNavigate('${of.link || 'offers.html'}')">${of.image_url ? `<img src="${of.image_url}" class="offer-card-image" loading="lazy">` : ''}<div class="offer-card-overlay"><div class="offer-content"><h4>${of.title || ''}</h4><button class="offer-btn">${of.discount_value}${of.discount_type === 'percentage' ? '% OFF' : '₹ OFF'}</button></div></div></div>`; 
+            }); 
+            h += `</div>`; 
+        } 
+        t.innerHTML = h; 
+        const c = Math.ceil(o.length / 2); 
+        d.innerHTML = Array(c).fill(0).map((_, i) => `<div class="slider-dot ${i===0?'active':''}" data-index="${i}"></div>`).join(''); 
+        document.querySelectorAll('.slider-dot').forEach(dot => dot.onclick = () => { 
+            offersSliderIndex = parseInt(dot.dataset.index); 
+            t.style.transform = `translateX(-${offersSliderIndex * 100}%)`; 
+            document.querySelectorAll('.slider-dot').forEach((dd, i) => dd.classList.toggle('active', i === offersSliderIndex)); 
+        }); 
+        if (offersInterval) clearInterval(offersInterval); 
+        if (c > 1) offersInterval = setInterval(() => { 
+            const s = document.querySelectorAll('.offers-track-group'); 
+            offersSliderIndex = (offersSliderIndex + 1) % s.length; 
+            t.style.transform = `translateX(-${offersSliderIndex * 100}%)`; 
+            document.querySelectorAll('.slider-dot').forEach((dd, i) => dd.classList.toggle('active', i === offersSliderIndex)); 
+        }, 4000); 
+    }
+    
+    // SPONSORED SHOPS
+    async function loadSponsoredShops() { 
+        const container = document.getElementById('sponsoredContainer'); 
+        if (!container) return;
+        showSponsoredSkeleton();
+        
+        try { 
+            const { data } = await zatpatDB.from('featured_shops').select('*, shops(id, name, image_url)').eq('active', true).limit(6); 
+            if (data?.length) { 
+                container.innerHTML = data.map(f => { 
+                    const s = f.shops; 
+                    if (!s) return ''; 
+                    return `<div class="sponsored-card" onclick="openShopDetails('${s.id}')"><img src="${s.image_url || 'https://placehold.co/140x85/F0FDF4/16A34A?text=Shop'}" class="sponsored-img" loading="lazy" onerror="this.src='https://placehold.co/140x85/F0FDF4/16A34A?text=Shop'"><div class="sponsored-badge"><i class="fas fa-crown"></i> Sponsored</div><div class="sponsored-info"><div class="sponsored-name">${s.name}</div></div></div>`; 
+                }).join(''); 
+            } else { 
+                container.innerHTML = '<div class="error-state">No sponsored shops</div>'; 
+            } 
+        } catch (e) { 
+            container.innerHTML = '<div class="error-state">⚠️ Failed to load<br><button onclick="loadSponsoredShops()">Retry</button></div>';
+        } 
+    }
+    
+    // CART FUNCTIONS
+    function addToCart(id, n, p, img) { 
+        try { 
+            let c = JSON.parse(localStorage.getItem('zatpat_cart')) || []; 
+            const e = c.find(i => i.id === id); 
+            if (e) e.quantity += 1; 
+            else c.push({ id, name: n, price: p, image: img, quantity: 1 }); 
+            localStorage.setItem('zatpat_cart', JSON.stringify(c)); 
+            const cartCount = document.getElementById('cartCount');
+            if(cartCount) cartCount.innerText = c.reduce((s, i) => s + (i.quantity || 1), 0); 
+            showToast(`🛒 ${n} added`); 
+            if (navigator.vibrate) navigator.vibrate(10); 
+        } catch(e) { 
+            showToast('Failed to add item', true); 
+        } 
+    }
+    
+    function openProductDetails(id) { if(id) fastNavigate(`product-detail.html?id=${id}`); }
+    function openShopDetails(id) { if(id) fastNavigate(`shop-details.html?id=${id}`); }
+    function filterByCategory(catId, catName) { if(catId) fastNavigate(`products.html?category_id=${catId}&category_name=${encodeURIComponent(catName)}`); }
+
+    // ========== ANDROID WEBVIEW BACK BUTTON ==========
+    window.handleBackPress = function() {
+        const menuDropdown = document.getElementById('menuDropdown');
+        const authModal = document.getElementById('authModal');
+        const helpModal = document.getElementById('helpModal');
+        const aboutModal = document.getElementById('aboutUsModal');
+        
+        if (menuDropdown && menuDropdown.style.display === 'block') {
+            closeMenu();
+            return true;
+        }
+        if (authModal && authModal.style.display === 'flex') {
+            hideAuthModal();
+            return true;
+        }
+        if (helpModal && helpModal.style.display === 'flex') {
+            hideHelpModal();
+            return true;
+        }
+        if (aboutModal && aboutModal.style.display === 'flex') {
+            hideAboutUs();
+            return true;
+        }
+        return false;
+    };
+
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            await checkLoggedInUser();
+            const cart = JSON.parse(localStorage.getItem('zatpat_cart')) || []; 
+            const cartCountElem = document.getElementById('cartCount');
+            if(cartCountElem) cartCountElem.innerText = cart.reduce((s, i) => s + (i.quantity || 1), 0);
+            
+            const slat = localStorage.getItem('user_lat'), slng = localStorage.getItem('user_lng');
+            if (slat && slng) { 
+                userLocation = { lat: parseFloat(slat), lng: parseFloat(slng) }; 
+                const locationSpan = document.getElementById('currentLocation');
+                if(locationSpan) locationSpan.innerHTML = localStorage.getItem('user_city') || DEFAULT_LOCATION.city;
+                loadAllData(); 
+            } else { 
+                useSillodLocation(); 
+            }
+            
+            // Search input with debounce
+            let t; 
+            const searchInput = document.getElementById('searchInput');
+            if(searchInput) {
+                searchInput.addEventListener('input', e => { 
+                    clearTimeout(t); 
+                    t = setTimeout(() => { 
+                        if (e.target.value.trim().length > 2) 
+                            fastNavigate(`products.html?search=${encodeURIComponent(e.target.value.trim())}`); 
+                    }, 400); 
+                });
+            }
+            
+            // Notify Android that page is ready
+            if (window.Android && window.Android.pageReady) {
+                window.Android.pageReady();
+            }
+            
+            // Request location if not available
+            if (!localStorage.getItem('user_lat')) {
+                if (window.Android && window.Android.requestLocation) {
+                    window.Android.requestLocation();
+                }
+            }
+        } catch(e) { 
+            console.error('Init error:', e); 
+        }
+    });
+
+    // ========== EXPOSE FUNCTIONS TO GLOBAL ==========
+    window.toggleMenu = toggleMenu;
+    window.closeMenu = closeMenu;
+    window.fastNavigate = fastNavigate;
+    window.showLocationInfo = showLocationInfo;
+    window.showNotifications = showNotifications;
+    window.showAuthModal = showAuthModal;
+    window.hideAuthModal = hideAuthModal;
+    window.showRegisterForm = showRegisterForm;
+    window.showLoginForm = showLoginForm;
+    window.showHelpModal = showHelpModal;
+    window.hideHelpModal = hideHelpModal;
+    window.showAboutUs = showAboutUs;
+    window.hideAboutUs = hideAboutUs;
+    window.handleLogout = handleLogout;
+    window.addToCart = addToCart;
+    window.openProductDetails = openProductDetails;
+    window.openShopDetails = openShopDetails;
+    window.filterByCategory = filterByCategory;
+    window.sendLoginOTP = sendLoginOTP;
+    window.verifyLoginOTP = verifyLoginOTP;
+    window.resendLoginOTP = resendLoginOTP;
+    window.sendRegisterOTP = sendRegisterOTP;
+    window.verifyRegisterOTP = verifyRegisterOTP;
+    window.resendRegisterOTP = resendRegisterOTP;
+    window.backToEmail = backToEmail;
+    window.backToRegisterEmail = backToRegisterEmail;
+    window.signInWithGoogle = signInWithGoogle;
+    window.setLocationFromAndroid = setLocationFromAndroid;
+    window.loadCategories = loadCategories;
+    window.loadFeaturedProducts = loadFeaturedProducts;
+    window.loadTrendingProducts = loadTrendingProducts;
+    window.loadSponsoredShops = loadSponsoredShops;
+</script>
+</body>
+</html>
