@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>My Wishlist - Zatpat</title>
+    <meta name="theme-color" content="#16A34A">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #16A34A; --primary-light: #22C55E; --primary-dark: #15803D;
+            --primary-bg: #F0FDF4; --primary-bg-dark: #DCFCE7;
+            --danger: #EF4444; --danger-bg: #FEE2E2;
+            --warning: #F59E0B; --warning-bg: #FEF3C7;
+            --success: #10B981; --success-bg: #D1FAE5;
+            --border: #E5E7EB; --card: #FFFFFF; --bg: #F9FAFB;
+            --text: #111827; --text-secondary: #6B7280;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+            --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg); color: var(--text);
+            padding-bottom: 80px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(50px); } }
+        @keyframes heartBeat { 0%,100%{transform:scale(1)} 25%{transform:scale(1.2)} 50%{transform:scale(1)} 75%{transform:scale(1.2)} }
+        
+        .top-bar {
+            background: var(--primary); position: fixed; top: 0; left: 0; width: 100%;
+            z-index: 100; padding: 10px 14px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 2px 12px rgba(22,163,74,0.3);
+        }
+        .back-btn {
+            width: 36px; height: 36px; background: rgba(255,255,255,0.2);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: none; color: white; font-size: 15px;
+        }
+        .back-btn:active { background: rgba(255,255,255,0.35); }
+        .top-title { flex: 1; font-size: 17px; font-weight: 700; color: white; }
+        .top-count { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500; }
+        
+        .main-content { padding-top: 58px; max-width: 600px; margin: 0 auto; }
+        
+        /* ========== WISHLIST ITEMS ========== */
+        .wishlist-items { padding: 12px 14px; }
+        
+        .wishlist-item {
+            background: var(--card); border-radius: var(--radius-lg); padding: 12px;
+            margin-bottom: 10px; display: flex; gap: 12px; align-items: center;
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+        .wishlist-item.removing { animation: fadeOut 0.3s ease forwards; }
+        
+        .item-image {
+            width: 70px; height: 70px; border-radius: var(--radius-md);
+            background: var(--bg); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .item-image img { width: 100%; height: 100%; object-fit: cover; }
+        .item-image i { font-size: 28px; color: #D1D5DB; }
+        
+        .item-details { flex: 1; min-width: 0; }
+        .item-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+        .item-price { font-size: 15px; font-weight: 800; color: var(--primary-dark); }
+        .item-price-cut { font-size: 11px; color: var(--text-secondary); text-decoration: line-through; margin-left: 6px; }
+        .item-unit { font-size: 10px; color: var(--text-secondary); }
+        
+        .item-actions { display: flex; flex-direction: column; gap: 6px; }
+        .move-cart-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 8px 16px; border-radius: var(--radius-full);
+            font-size: 11px; font-weight: 700; cursor: pointer;
+            white-space: nowrap; transition: all 0.15s;
+        }
+        .move-cart-btn:active { background: var(--primary-dark); }
+        
+        .remove-btn {
+            position: absolute; top: 8px; right: 8px;
+            width: 24px; height: 24px; background: var(--danger-bg);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: none; color: var(--danger); font-size: 10px;
+        }
+        .remove-btn:active { background: #FECACA; }
+        .remove-btn i.animating { animation: heartBeat 0.4s ease; }
+        
+        /* ========== EMPTY ========== */
+        .empty-state {
+            text-align: center; padding: 60px 20px; animation: fadeIn 0.4s ease;
+        }
+        .empty-state i { font-size: 56px; color: #D1D5DB; margin-bottom: 12px; display: block; }
+        .empty-state h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+        .empty-state p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+        .empty-state button {
+            background: var(--primary); color: white; border: none;
+            padding: 12px 24px; border-radius: var(--radius-full);
+            font-size: 14px; font-weight: 700; cursor: pointer;
+        }
+        
+        /* ========== BOTTOM NAV ========== */
+        .bottom-nav {
+            background: white; position: fixed; bottom: 0; left: 0; width: 100%;
+            display: flex; justify-content: space-around; padding: 6px 12px 10px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100;
+            border-top: 1px solid var(--border);
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            font-size: 10px; font-weight: 500; color: var(--text-secondary);
+            cursor: pointer; padding: 4px 12px; border-radius: var(--radius-full);
+            border: none; background: transparent; transition: all 0.15s;
+        }
+        .nav-item.active { color: var(--primary); font-weight: 700; }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+        
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: #111827; color: white; padding: 10px 20px;
+            border-radius: var(--radius-full); font-size: 12px; font-weight: 600;
+            z-index: 200; opacity: 0; visibility: hidden;
+            white-space: nowrap; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: all 0.25s;
+        }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-5px); }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
+    <span class="top-title">My Wishlist</span>
+    <span class="top-count" id="wishlistCount">0 items</span>
+</div>
+
+<div class="main-content" id="mainContent"></div>
+
+<nav class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item" onclick="window.location.href='products.html'"><i class="fas fa-box"></i><span>Explore</span></button>
+    <button class="nav-item" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-cart"></i><span>Cart</span></button>
+    <button class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
+    <button class="nav-item active" onclick="window.location.href='wishlist.html'"><i class="fas fa-heart"></i><span>Wishlist</span></button>
+</nav>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var wishlist = [];
+    var isLoggedIn = false;
+    var currentUser = null;
+    
+    function showToast(msg) {
+        var t = document.getElementById('toastMsg');
+        t.textContent = msg; t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2000);
+    }
+    
+    function goBack() { window.history.back(); }
+    
+    async function checkUser() {
+        var res = await sb.auth.getSession();
+        if (res.data.session) {
+            currentUser = res.data.session.user;
+            isLoggedIn = true;
+            return true;
+        }
+        return false;
+    }
+    
+    function loadWishlist() {
+        try {
+            var data = localStorage.getItem('zatpat_wishlist');
+            wishlist = data ? JSON.parse(data) : [];
+        } catch(e) {
+            wishlist = [];
+        }
+        return wishlist;
+    }
+    
+    function saveWishlist() {
+        try {
+            localStorage.setItem('zatpat_wishlist', JSON.stringify(wishlist));
+        } catch(e) {
+            showToast('Storage full!');
+        }
+    }
+    
+    function updateCount() {
+        var count = wishlist.length;
+        document.getElementById('wishlistCount').textContent = count + ' item' + (count !== 1 ? 's' : '');
+        return count;
+    }
+    
+    function moveToCart(index) {
+        if (index < 0 || index >= wishlist.length) return;
+        
+        var item = wishlist[index];
+        var cart = JSON.parse(localStorage.getItem('zatpat_cart') || '[]');
+        
+        var found = cart.find(function(c) { return c.id === item.id; });
+        if (found) {
+            found.quantity = (found.quantity || 1) + 1;
+        } else {
+            cart.push({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                image: item.image || '',
+                quantity: 1,
+                unit: item.unit || 'piece'
+            });
+        }
+        
+        localStorage.setItem('zatpat_cart', JSON.stringify(cart));
+        showToast('🛒 ' + (item.name || 'Item') + ' added to cart!');
+    }
+    
+    function removeItem(index) {
+        if (index < 0 || index >= wishlist.length) return;
+        
+        var item = wishlist[index];
+        
+        // Animate
+        var el = document.getElementById('wishlistItem' + index);
+        if (el) {
+            el.classList.add('removing');
+            setTimeout(function() {
+                wishlist.splice(index, 1);
+                saveWishlist();
+                renderWishlist();
+                showToast('❤️ Removed from wishlist');
+            }, 300);
+        } else {
+            wishlist.splice(index, 1);
+            saveWishlist();
+            renderWishlist();
+            showToast('❤️ Removed from wishlist');
+        }
+    }
+    
+    function renderWishlist() {
+        loadWishlist();
+        var container = document.getElementById('mainContent');
+        
+        if (wishlist.length === 0) {
+            container.innerHTML = [
+                '<div class="empty-state">',
+                '<i class="far fa-heart"></i>',
+                '<h3>Your wishlist is empty</h3>',
+                '<p>Save your favorite items here</p>',
+                '<button onclick="window.location.href=\'products.html\'">Browse Products</button>',
+                '</div>'
+            ].join('');
+            updateCount();
+            return;
+        }
+        
+        var html = '<div class="wishlist-items">';
+        
+        for (var i = 0; i < wishlist.length; i++) {
+            var item = wishlist[i];
+            var img = item.image || '';
+            
+            html += '<div class="wishlist-item" id="wishlistItem' + i + '">';
+            html += '<button class="remove-btn" onclick="removeItem(' + i + ')"><i class="fas fa-times"></i></button>';
+            html += '<div class="item-image">';
+            if (img) {
+                html += '<img src="' + img + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">';
+                html += '<i class="fas fa-box-open" style="display:none;"></i>';
+            } else {
+                html += '<i class="fas fa-box-open"></i>';
+            }
+            html += '</div>';
+            html += '<div class="item-details">';
+            html += '<div class="item-name">' + (item.name || 'Product') + '</div>';
+            html += '<div class="item-price">₹' + (item.price || 0).toLocaleString('en-IN') + '</div>';
+            if (item.unit) {
+                html += '<div class="item-unit">' + item.unit + '</div>';
+            }
+            html += '</div>';
+            html += '<button class="move-cart-btn" onclick="moveToCart(' + i + ')">Add to Cart</button>';
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
+        updateCount();
+    }
+    
+    // INIT
+    document.addEventListener('DOMContentLoaded', async function() {
+        await checkUser();
+        
+        if (!isLoggedIn) {
+            document.getElementById('mainContent').innerHTML = [
+                '<div class="empty-state" style="padding-top:80px;">',
+                '<i class="fas fa-user-lock"></i>',
+                '<h3>Login Required</h3>',
+                '<p style="color:var(--text-secondary);margin:6px 0;">Please login to view your wishlist</p>',
+                '<button onclick="window.location.href=\'index.html\'">Go to Login</button>',
+                '</div>'
+            ].join('');
+            document.getElementById('wishlistCount').textContent = '0 items';
+            return;
+        }
+        
+        renderWishlist();
+    });
+</script>
+</body>
+</html>

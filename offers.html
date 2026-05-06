@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Hot Offers - Zatpat</title>
+    <meta name="theme-color" content="#16A34A">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root { --primary: #16A34A; --primary-dark: #15803D; --primary-bg: #F0FDF4; --accent: #F97316; --border: #E5E7EB; --card: #FFFFFF; --bg: #F9FAFB; --text: #111827; --text-secondary: #6B7280; --shadow: 0 1px 3px rgba(0,0,0,0.08); --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-full: 9999px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .top-bar { background: var(--primary); position: fixed; top: 0; left: 0; width: 100%; z-index: 100; padding: 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(22,163,74,0.3); }
+        .back-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; }
+        .top-title { flex: 1; font-size: 17px; font-weight: 700; color: white; }
+        .main-content { padding-top: 58px; max-width: 600px; margin: 0 auto; }
+        
+        .offer-card {
+            background: var(--card); margin: 10px 14px; border-radius: var(--radius-lg); overflow: hidden;
+            border: 1px solid var(--border); box-shadow: var(--shadow); cursor: pointer;
+            animation: slideUp 0.3s ease; transition: transform 0.15s;
+        }
+        .offer-card:active { transform: scale(0.98); }
+        .offer-banner { height: 120px; background: linear-gradient(135deg, #F97316, #EA580C); display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; font-weight: 800; position: relative; overflow: hidden; }
+        .offer-banner img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+        .offer-banner span { position: relative; z-index: 1; }
+        .offer-body { padding: 14px; }
+        .offer-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .offer-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+        .offer-meta { display: flex; gap: 10px; font-size: 10px; color: var(--text-secondary); }
+        .offer-meta span { background: var(--bg); padding: 3px 8px; border-radius: var(--radius-full); }
+        
+        .bottom-nav { background: white; position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 6px 12px 10px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100; border-top: 1px solid var(--border); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 500; color: var(--text-secondary); cursor: pointer; padding: 4px 12px; border-radius: var(--radius-full); border: none; background: transparent; }
+        .nav-item.active { color: var(--primary); font-weight: 700; }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state i { font-size: 48px; color: #D1D5DB; display: block; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+    <span class="top-title">🔥 Hot Offers</span>
+</div>
+
+<div class="main-content" id="mainContent">
+    <div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin" style="color:var(--primary);font-size:24px;"></i></div>
+</div>
+
+<nav class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Home</span></button>
+    <button class="nav-item" onclick="window.location.href='products.html'"><i class="fas fa-box"></i><span>Explore</span></button>
+    <button class="nav-item" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-cart"></i><span>Cart</span></button>
+    <button class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>Profile</span></button>
+    <button class="nav-item active"><i class="fas fa-tag"></i><span>Offers</span></button>
+</nav>
+
+<script>
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    function esc(s) { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    
+    async function loadOffers() {
+        var c = document.getElementById('mainContent');
+        try {
+            var r = await sb.from('offers').select('*').eq('is_active', true).order('priority');
+            var offers = r.data || [];
+            if (!offers.length) { c.innerHTML = '<div class="empty-state"><i class="fas fa-tag"></i><h3>No offers available</h3></div>'; return; }
+            var h = '';
+            for (var i = 0; i < offers.length; i++) {
+                var o = offers[i];
+                h += '<div class="offer-card" onclick="window.location.href=\'offer-detail.html?id='+o.id+'\'">';
+                h += '<div class="offer-banner">'+(o.image_url?'<img src="'+o.image_url+'" alt="">':'')+'<span>'+o.discount_value+(o.discount_type==='percentage'?'% OFF':'₹ OFF')+'</span></div>';
+                h += '<div class="offer-body"><div class="offer-title">'+esc(o.title||'Special Offer')+'</div>';
+                h += '<div class="offer-desc">'+esc(o.subtitle||'Grab this deal now!')+'</div>';
+                h += '<div class="offer-meta"><span>'+o.discount_value+(o.discount_type==='percentage'?'%':'₹')+' OFF</span>';
+                if (o.min_order_amount > 0) h += '<span>Min ₹'+o.min_order_amount+'</span>';
+                h += '<span>'+(o.apply_to==='global'?'All Products':o.apply_to)+'</span></div></div></div>';
+            }
+            c.innerHTML = h;
+        } catch(e) { c.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Failed to load</h3></div>'; }
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadOffers);
+</script>
+</body>
+</html>

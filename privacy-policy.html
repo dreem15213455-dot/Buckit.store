@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Privacy Policy - Zatpat</title>
+    <meta name="theme-color" content="#16A34A">
+    
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #16A34A;
+            --primary-light: #22C55E;
+            --primary-bg-light: #F0FDF4;
+            --accent-orange: #F97316;
+            --bg-light: #F9FAFB;
+            --card-white: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-light: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            padding-bottom: 40px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #pageProgress {
+            position: fixed; top: 0; left: 0; width: 0%; height: 3px;
+            background: var(--primary); z-index: 10001; transition: width 0.3s ease;
+        }
+        #pageProgress.loading { width: 90%; }
+        #pageProgress.complete { width: 100%; opacity: 0; transition: opacity 0.3s; }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--card-white); position: sticky; top: 0; left: 0; width: 100%;
+            z-index: 1000; padding: 12px 16px; box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 12px;
+        }
+        .back-btn {
+            width: 40px; height: 40px; background: var(--bg-light); border-radius: var(--radius-full);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        .back-btn i { font-size: 18px; color: var(--text-primary); }
+        .brand-name { font-size: 22px; font-weight: 800; }
+        .brand-name .normal { color: var(--text-primary); }
+        .brand-name .pat { color: var(--primary); }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 16px; color: var(--text-primary); }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px 16px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .policy-card {
+            background: var(--card-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .policy-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .policy-title i { color: var(--accent-orange); }
+
+        .policy-date {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 24px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title i { color: var(--primary); font-size: 16px; }
+
+        .section-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .section-text strong { color: var(--text-primary); }
+
+        .highlight-box {
+            background: var(--primary-bg-light);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin: 24px 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .highlight-box i { color: var(--primary); margin-right: 8px; }
+
+        .contact-info {
+            background: var(--bg-light);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .contact-info i { color: var(--primary); margin-right: 6px; }
+        .contact-info a { color: var(--primary); text-decoration: none; font-weight: 600; }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            background: var(--card-white);
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            display: flex; justify-content: space-around;
+            padding: 6px 16px 8px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+            z-index: 1000;
+            border-top: 1px solid var(--border-light);
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            font-size: 10px; font-weight: 500; color: var(--text-secondary);
+            cursor: pointer; position: relative; text-decoration: none;
+        }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+        .cart-count {
+            position: absolute; top: -5px; right: -5px; background: var(--primary); color: white;
+            border-radius: 50%; width: 16px; height: 16px; font-size: 9px; display: flex;
+            align-items: center; justify-content: center; border: 2px solid white;
+        }
+
+        /* Toast */
+        .toast-notification {
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+            background: var(--text-primary); color: white; padding: 10px 20px;
+            border-radius: var(--radius-full); font-size: 12px; z-index: 10050;
+            display: none; white-space: nowrap;
+        }
+        .toast-notification.show { display: flex; }
+    </style>
+</head>
+<body>
+
+<div id="pageProgress"></div>
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<div id="mainApp">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
+        <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+        <div class="page-title"><i class="fas fa-shield-alt"></i> Privacy Policy</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="policy-card">
+            <div class="policy-title">
+                <i class="fas fa-lock"></i> Privacy Policy
+            </div>
+            <div class="policy-date">
+                <i class="far fa-calendar-alt"></i> Last Updated: April 21, 2026
+            </div>
+
+            <div class="section-text">
+                At <strong>Zatpat</strong>, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information when you use our app and services.
+            </div>
+
+            <div class="highlight-box">
+                <i class="fas fa-check-circle"></i> <strong>Your Trust Matters:</strong> We never sell your personal data to third parties. Your information is only used to provide you with the best shopping experience.
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-database"></i> 1. Information We Collect
+            </div>
+            <div class="section-text">
+                We collect information you provide directly to us when you:
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Create an account (name, email, phone number)</li>
+                    <li>Place an order (delivery address, payment details)</li>
+                    <li>Contact customer support</li>
+                    <li>Register your shop (business details, location)</li>
+                </ul>
+            </div>
+            <div class="section-text">
+                We also automatically collect certain information when you use our app, including:
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Device information (model, OS version)</li>
+                    <li>Location data (for delivery purposes)</li>
+                    <li>Usage data (pages visited, time spent)</li>
+                </ul>
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-cogs"></i> 2. How We Use Your Information
+            </div>
+            <div class="section-text">
+                We use your information to:
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Process and deliver your orders</li>
+                    <li>Communicate order updates and promotional offers</li>
+                    <li>Improve our app and services</li>
+                    <li>Prevent fraud and ensure security</li>
+                    <li>Comply with legal obligations</li>
+                </ul>
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-share-alt"></i> 3. Information Sharing
+            </div>
+            <div class="section-text">
+                We share your information only in the following circumstances:
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>With Shop Owners:</strong> To fulfill your order (name, address, phone)</li>
+                    <li><strong>With Delivery Partners:</strong> To deliver your order</li>
+                    <li><strong>With Payment Processors:</strong> To process payments securely</li>
+                    <li><strong>When Required by Law:</strong> To comply with legal requests</li>
+                </ul>
+            </div>
+            <div class="section-text">
+                <strong>We DO NOT sell, rent, or trade your personal information to third parties for marketing purposes.</strong>
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-shield-virus"></i> 4. Data Security
+            </div>
+            <div class="section-text">
+                We implement industry-standard security measures to protect your data:
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>All data is encrypted in transit using SSL/TLS</li>
+                    <li>Payment information is processed through secure PCI-compliant gateways (Razorpay)</li>
+                    <li>We regularly review our security practices</li>
+                </ul>
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-user-check"></i> 5. Your Rights
+            </div>
+            <div class="section-text">
+                You have the right to:
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Access your personal data</li>
+                    <li>Correct inaccurate information</li>
+                    <li>Request deletion of your account and data</li>
+                    <li>Opt-out of promotional communications</li>
+                    <li>Withdraw consent at any time</li>
+                </ul>
+            </div>
+            <div class="section-text">
+                You can manage your data through the <strong>Profile</strong> section in the app or by contacting us directly.
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-cookie-bite"></i> 6. Cookies & Tracking
+            </div>
+            <div class="section-text">
+                We use cookies and similar technologies to:
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Remember your preferences</li>
+                    <li>Keep you logged in</li>
+                    <li>Analyze app usage for improvements</li>
+                </ul>
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-child"></i> 7. Children's Privacy
+            </div>
+            <div class="section-text">
+                Zatpat is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you believe we have collected such information, please contact us immediately.
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-clock"></i> 8. Data Retention
+            </div>
+            <div class="section-text">
+                We retain your personal information for as long as your account is active or as needed to provide services. If you delete your account, we will delete your data within 30 days, except where required by law.
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-globe"></i> 9. International Data Transfers
+            </div>
+            <div class="section-text">
+                Your information may be transferred and processed in India where our servers are located. By using Zatpat, you consent to this transfer.
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-sync-alt"></i> 10. Changes to This Policy
+            </div>
+            <div class="section-text">
+                We may update this Privacy Policy from time to time. We will notify you of any significant changes through the app or via email. The "Last Updated" date at the top indicates when this policy was last revised.
+            </div>
+
+            <div class="contact-info">
+                <i class="fas fa-envelope"></i> <strong>Contact Us</strong><br>
+                <span style="color: var(--text-secondary);">If you have any questions about this Privacy Policy:</span><br>
+                <a href="mailto:sk12shaikh@gmail.com"><i class="fas fa-envelope-open-text"></i> sk12shaikh@gmail.com</a><br>
+                <a href="tel:8600252238"><i class="fas fa-phone-alt"></i> 8600252238</a><br>
+                <a href="https://wa.me/918600252238" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Support</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a class="nav-item" onclick="fastNavigate('index.html')"><i class="fas fa-home"></i><span>Home</span></a>
+        <a class="nav-item" onclick="fastNavigate('products.html')"><i class="fas fa-search"></i><span>Explore</span></a>
+        <a class="nav-item" onclick="fastNavigate('cart.html')"><i class="fas fa-shopping-bag"></i><span>Cart</span><span class="cart-count" id="cartCount">0</span></a>
+        <a class="nav-item" onclick="fastNavigate('profile.html')"><i class="fas fa-user"></i><span>Profile</span></a>
+        <a class="nav-item" onclick="fastNavigate('orders.html')"><i class="fas fa-receipt"></i><span>Orders</span></a>
+    </nav>
+</div>
+
+<script>
+    function startProgress() { const b = document.getElementById('pageProgress'); b.style.width = '0%'; b.classList.add('loading'); setTimeout(() => b.style.width = '90%', 10); }
+    function completeProgress() { const b = document.getElementById('pageProgress'); b.classList.remove('loading'); b.classList.add('complete'); setTimeout(() => { b.style.width = '0%'; b.classList.remove('complete'); }, 300); }
+    window.fastNavigate = function(url) { startProgress(); setTimeout(() => window.location.href = url, 50); };
+    function goBack() { window.history.back(); }
+
+    function showToast(msg) {
+        const t = document.getElementById('toastMsg');
+        document.getElementById('toastText').innerHTML = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('zatpat_cart')) || [];
+        document.getElementById('cartCount').innerText = cart.reduce((s, i) => s + (i.quantity || 1), 0);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCartBadge();
+    });
+
+    window.goBack = goBack;
+</script>
+</body>
+</html>

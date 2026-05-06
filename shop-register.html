@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Register Shop - Zatpat</title>
+    <meta name="theme-color" content="#16A34A">
+    <meta name="description" content="Register your shop on Zatpat - Free registration">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #16A34A;
+            --primary-light: #22C55E;
+            --primary-dark: #15803D;
+            --primary-bg-light: #F0FDF4;
+            --primary-bg-dark: #DCFCE7;
+            --accent-orange: #F97316;
+            --accent-red: #EF4444;
+            --accent-yellow: #FACC15;
+            --bg-white: #FFFFFF;
+            --bg-light: #F9FAFB;
+            --bg-dark: #F3F4F6;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --text-white: #FFFFFF;
+            --border-light: #E5E7EB;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ========== TOP BAR - GREEN ========== */
+        .top-bar {
+            background: var(--primary);
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            z-index: 1000;
+            padding: 10px 14px;
+            box-shadow: 0 2px 12px rgba(22,163,74,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none; outline: none;
+            transition: background var(--transition-fast);
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .back-btn:active { background: rgba(255,255,255,0.35); }
+        .back-btn i { font-size: 15px; color: white; }
+        
+        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; flex-shrink: 0; }
+        .brand-name .normal { color: white; }
+        .brand-name .pat { color: #BBF7D0; }
+        
+        .page-title { 
+            flex: 1; text-align: center; font-weight: 600; font-size: 14px; 
+            color: white; letter-spacing: -0.2px;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            padding-top: 56px;
+            padding-bottom: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ========== PROGRESS STEPS ========== */
+        .progress-steps {
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px 16px; gap: 0;
+        }
+        .progress-step {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 600; color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        .progress-step.completed { color: var(--primary); }
+        .progress-step.active { color: var(--primary); font-weight: 700; }
+        .step-circle {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: var(--border-light); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700;
+            transition: all var(--transition-normal);
+        }
+        .progress-step.completed .step-circle { background: var(--primary); }
+        .progress-step.active .step-circle { background: var(--primary); animation: pulse 1.5s infinite; }
+        .progress-line {
+            width: 30px; height: 2px; background: var(--border-light); margin: 0 4px;
+            transition: background var(--transition-normal);
+        }
+        .progress-line.completed { background: var(--primary); }
+
+        /* ========== HERO ========== */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary), #059669);
+            margin: 12px 14px;
+            padding: 28px 20px;
+            border-radius: var(--radius-2xl);
+            text-align: center;
+            color: white;
+            animation: fadeInUp 0.4s ease;
+            box-shadow: var(--shadow-lg);
+        }
+        .hero-icon { font-size: 44px; margin-bottom: 12px; }
+        .hero-title { font-size: 26px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .hero-subtitle { font-size: 13px; opacity: 0.9; margin-bottom: 14px; }
+        .fee-badge {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
+            font-weight: 700; font-size: 13px;
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(4px);
+        }
+        .fee-badge i { margin-right: 6px; }
+
+        /* ========== FORM CARD ========== */
+        .form-card {
+            background: white;
+            margin: 0 14px 20px;
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: fadeInUp 0.4s ease;
+        }
+        .form-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--primary-bg-light);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .form-header i { color: var(--primary); font-size: 18px; }
+        .form-header h2 { font-size: 18px; font-weight: 700; color: var(--primary-dark); }
+        .form-body { padding: 22px; }
+        .form-section { animation: slideDown 0.3s ease; }
+
+        /* ========== FORM ELEMENTS ========== */
+        .form-group { margin-bottom: 18px; }
+        .form-label { 
+            font-weight: 600; font-size: 13px; margin-bottom: 6px; display: block;
+            color: var(--text-primary); letter-spacing: -0.2px;
+        }
+        .form-label i { color: var(--primary); width: 18px; margin-right: 4px; font-size: 12px; }
+        .form-label .required { color: var(--danger); margin-left: 2px; }
+        
+        .form-control {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all var(--transition-fast);
+            background: var(--bg-white);
+            color: var(--text-primary);
+            -webkit-appearance: none;
+            outline: none;
+        }
+        .form-control:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(22,163,74,0.08); 
+        }
+        .form-control.error { border-color: var(--danger); }
+        .form-control.success { border-color: var(--success); }
+        .error-msg {
+            font-size: 11px; color: var(--danger); margin-top: 4px;
+            display: none;
+        }
+        .error-msg.show { display: block; animation: fadeInUp 0.2s ease; }
+        
+        select.form-control {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            padding-right: 36px;
+        }
+
+        /* ========== IMAGE UPLOAD ========== */
+        .image-upload-area {
+            border: 2px dashed var(--primary);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--primary-bg-light);
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+        .image-upload-area:hover { background: var(--primary-bg-dark); }
+        .image-upload-area:active { transform: scale(0.98); }
+        .image-upload-area i { font-size: 28px; color: var(--primary); margin-bottom: 6px; }
+        .image-upload-area p { font-size: 12px; color: var(--primary); font-weight: 500; }
+        .image-preview { 
+            max-width: 100%; max-height: 140px; margin-top: 10px; 
+            border-radius: var(--radius-md); display: none; 
+            box-shadow: var(--shadow-sm);
+        }
+        .compress-info { 
+            font-size: 11px; color: var(--primary); margin-top: 6px; 
+            display: none; font-weight: 600;
+        }
+
+        /* ========== LOCATION ========== */
+        .location-btn {
+            width: 100%;
+            padding: 13px;
+            background: var(--bg-dark);
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-weight: 600; font-size: 13px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all var(--transition-fast);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            color: var(--text-primary);
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .location-btn:active { background: var(--primary-bg-light); border-color: var(--primary); }
+        .location-btn i { color: var(--primary); }
+        
+        .location-status {
+            font-size: 12px; padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-light);
+            margin-top: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .location-status.success { color: var(--success); background: #ECFDF5; }
+        .location-status.error { color: var(--danger); background: #FEF2F2; }
+        .location-address {
+            font-size: 11px; color: var(--text-secondary); margin-top: 8px;
+            padding: 8px 12px; background: var(--bg-light); border-radius: var(--radius-sm);
+            display: none;
+        }
+        .location-coords {
+            font-size: 10px; color: var(--text-secondary); margin-top: 4px;
+            font-family: monospace;
+        }
+
+        /* ========== BUTTONS ========== */
+        .auth-btn {
+            background: var(--primary);
+            color: white; border: none;
+            padding: 15px; border-radius: var(--radius-full);
+            font-weight: 700; font-size: 15px;
+            width: 100%; cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.2px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .auth-btn:active { background: var(--primary-dark); transform: scale(0.98); }
+        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        .auth-btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--border-light);
+            color: var(--text-primary);
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        .auth-btn-outline:active { background: var(--bg-light); }
+
+        .text-muted { 
+            color: var(--text-secondary); font-size: 12px; 
+            text-align: center; margin-top: 12px; 
+        }
+
+        /* ========== OTP MESSAGE ========== */
+        .otp-message {
+            background: var(--primary-bg-light);
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+            font-size: 13px; color: var(--primary-dark);
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 500;
+            border: 1px solid var(--primary-bg-dark);
+        }
+
+        /* ========== FEE SUMMARY ========== */
+        .fee-summary {
+            background: var(--bg-light);
+            border-radius: var(--radius-lg);
+            padding: 14px 16px;
+            margin-bottom: 22px;
+            border: 1px solid var(--border-light);
+        }
+        .fee-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; font-size: 13px;
+        }
+        .fee-row.total {
+            border-top: 1px solid var(--border-light);
+            padding-top: 10px; margin-bottom: 0;
+            font-weight: 700; font-size: 15px;
+        }
+        .free-tag {
+            color: var(--success); font-weight: 700; font-size: 13px;
+        }
+
+        /* ========== TOAST ========== */
+        .toast-notification {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: var(--text-primary); color: white;
+            padding: 12px 24px; border-radius: var(--radius-full);
+            font-size: 13px; font-weight: 600;
+            z-index: 10050; opacity: 0; visibility: hidden;
+            white-space: nowrap; box-shadow: var(--shadow-xl);
+            transition: opacity 0.25s, visibility 0.25s, transform 0.25s;
+        }
+        .toast-notification.show { 
+            opacity: 1; visibility: visible; 
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ========== ALERT MODAL ========== */
+        .alert-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 10060;
+        }
+        .alert-content {
+            background: white; border-radius: var(--radius-2xl);
+            padding: 28px; max-width: 320px; width: 90%; text-align: center;
+            animation: fadeInUp 0.3s ease;
+            box-shadow: var(--shadow-xl);
+        }
+        .alert-content i { font-size: 48px; display: block; margin-bottom: 14px; }
+        .alert-content i.warning { color: var(--warning); }
+        .alert-content i.error { color: var(--danger); }
+        .alert-content i.success { color: var(--success); }
+        .alert-content h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+        .alert-content p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+        .alert-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 12px 24px; border-radius: var(--radius-full);
+            font-weight: 700; cursor: pointer; width: 100%;
+            font-family: 'Inter', sans-serif; font-size: 14px;
+            outline: none;
+        }
+        .alert-btn:active { background: var(--primary-dark); }
+
+        /* ========== LOADING ========== */
+        .loading-spinner { 
+            text-align: center; padding: 60px; color: var(--primary);
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+        }
+        .loading-spinner i { font-size: 36px; }
+        .loading-spinner p { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 380px) {
+            .hero-section { padding: 22px 16px; }
+            .hero-title { font-size: 22px; }
+            .form-body { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <button class="back-btn" onclick="goBack()" aria-label="Go back">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+    <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+    <div class="page-title">Register Shop</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content" id="mainContent">
+    <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Loading registration form...</p>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<!-- ALERT MODAL -->
+<div id="customAlert" class="alert-modal">
+    <div class="alert-content">
+        <i id="alertIcon" class="fas fa-info-circle warning"></i>
+        <h3 id="alertTitle">Notice</h3>
+        <p id="alertMessage">Message here</p>
+        <button class="alert-btn" onclick="closeAlert()">OK</button>
+    </div>
+</div>
+
+<script>
+// ==================== SUPABASE INIT ====================
+const supabaseClient = supabase.createClient(
+    'https://zwajyovemwdqtkecipeb.supabase.co',
+    'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'
+);
+
+// ==================== GLOBAL STATE ====================
+let categories = [];
+let selectedImageFile = null;
+let selectedQrFile = null;
+let isProcessing = false;
+let registrationData = {};
+let currentStep = 1;
+let currentUserId = null;
+let otpTimerInterval = null;
+
+// ==================== UTILITY FUNCTIONS ====================
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toastMsg');
+    const text = document.getElementById('toastText');
+    if(!toast || !text) return;
+    text.innerHTML = message;
+    toast.style.background = isError ? '#EF4444' : '#111827';
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function showAlert(message, title = 'Notice', icon = 'warning') {
+    document.getElementById('alertMessage').textContent = message;
+    document.getElementById('alertTitle').textContent = title;
+    const iconEl = document.getElementById('alertIcon');
+    iconEl.className = `fas ${icon === 'success' ? 'fa-check-circle' : icon === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} ${icon}`;
+    document.getElementById('customAlert').style.display = 'flex';
+}
+
+function closeAlert() {
+    document.getElementById('customAlert').style.display = 'none';
+}
+
+function goBack() { 
+    if (window.history.length > 1) {
+        window.history.back(); 
+    } else {
+        window.location.href = 'index.html';
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// ==================== IMAGE COMPRESSION ====================
+async function compressImage(file) {
+    if (!file || !file.type?.startsWith('image/')) return file;
+    if (file.size < 150 * 1024) return file;
+    
+    try {
+        if (window.imageCompression) {
+            const options = {
+                maxSizeMB: 0.15,
+                maxWidthOrHeight: 800,
+                useWebWorker: true,
+                fileType: 'image/jpeg',
+                initialQuality: 0.7
+            };
+            const compressed = await window.imageCompression(file, options);
+            return compressed;
+        }
+        return file;
+    } catch(e) {
+        console.error('Compression error:', e);
+        return file;
+    }
+}
+
+// ==================== UPLOAD IMAGE ====================
+async function uploadImage(file, folder) {
+    if (!file) return null;
+    const compressedFile = await compressImage(file);
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    const fileName = `${timestamp}_${random}.jpg`;
+    const filePath = `${folder}/${fileName}`;
+    
+    const { error: uploadError } = await supabaseClient.storage
+        .from('shop-images')
+        .upload(filePath, compressedFile);
+    
+    if (uploadError) throw new Error(uploadError.message);
+    
+    const { data: urlData } = supabaseClient.storage
+        .from('shop-images')
+        .getPublicUrl(filePath);
+    
+    return urlData.publicUrl;
+}
+
+// ==================== LOAD CATEGORIES ====================
+async function loadCategories() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('categories')
+            .select('id, name')
+            .eq('is_active', true)
+            .order('name');
+        
+        if (error) throw error;
+        categories = data || [];
+        return categories;
+    } catch (error) {
+        console.error('Categories error:', error);
+        return [];
+    }
+}
+
+// ==================== LOCATION ====================
+function captureShopLocation() {
+    if (!navigator.geolocation) {
+        showAlert('Geolocation is not supported by your browser', 'Error', 'error');
+        return;
+    }
+    
+    const statusDiv = document.getElementById('locationStatus');
+    statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting location...';
+    statusDiv.className = 'location-status';
+    
+    // Timeout after 10 seconds
+    const timeoutId = setTimeout(() => {
+        statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Location timeout. Try again or enter manually.';
+        statusDiv.className = 'location-status error';
+    }, 10000);
+    
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            clearTimeout(timeoutId);
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            document.getElementById('shopLatitude').value = lat;
+            document.getElementById('shopLongitude').value = lng;
+            document.getElementById('locationCoords').textContent = `📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> Location captured successfully!';
+            statusDiv.className = 'location-status success';
+            
+            // Get address
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`,
+                    { headers: { 'User-Agent': 'ZatpatApp/5.0' } }
+                );
+                const data = await response.json();
+                const addrEl = document.getElementById('locationAddress');
+                if (addrEl && data.display_name) {
+                    addrEl.innerHTML = `<i class="fas fa-map-pin"></i> ${data.display_name.substring(0, 120)}`;
+                    addrEl.style.display = 'block';
+                    
+                    // Auto-fill city if empty
+                    const cityInput = document.getElementById('shopCity');
+                    if (cityInput && !cityInput.value) {
+                        const city = data.address?.city || data.address?.town || data.address?.village || '';
+                        if (city) cityInput.value = city;
+                    }
+                }
+            } catch(e) {}
+            
+            showToast('📍 Location captured!', false);
+        },
+        (error) => {
+            clearTimeout(timeoutId);
+            statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Location failed. Enable GPS and try again.';
+            statusDiv.className = 'location-status error';
+            
+            let errorMsg = 'Failed to get location. ';
+            if (error.code === 1) errorMsg += 'Please allow location permission.';
+            else if (error.code === 2) errorMsg += 'GPS signal unavailable.';
+            else if (error.code === 3) errorMsg += 'Location request timed out.';
+            showAlert(errorMsg, 'Location Error', 'error');
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+    );
+}
+
+// ==================== OTP FUNCTIONS ====================
+async function sendRegisterOTP() {
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const phone = document.getElementById('registerPhone').value.trim();
+    const whatsapp = document.getElementById('ownerWhatsapp').value.trim();
+    
+    // Validation
+    if (!name || name.length < 2) { showAlert('Please enter your full name', 'Invalid Input', 'error'); return; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('Please enter a valid email address', 'Invalid Input', 'error'); return; }
+    if (!phone || !/^\d{10}$/.test(phone)) { showAlert('Please enter a valid 10-digit mobile number', 'Invalid Input', 'error'); return; }
+    if (!whatsapp || !/^\d{10}$/.test(whatsapp)) { showAlert('Please enter a valid WhatsApp number', 'Invalid Input', 'error'); return; }
+    
+    registrationData = { name, email, phone, whatsapp };
+    
+    const btn = document.querySelector('#registerStepEmail .auth-btn');
+    if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...'; }
+    
+    const { error } = await supabaseClient.auth.signInWithOtp({
+        email: email,
+        options: {
+            shouldCreateUser: true,
+            data: { name, phone, whatsapp, role: 3 }
+        }
+    });
+    
+    if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; }
+    
+    if (error) {
+        showAlert('Failed to send OTP: ' + error.message, 'Error', 'error');
+    } else {
+        showToast('✅ OTP sent to ' + email);
+        document.getElementById('registerStepEmail').style.display = 'none';
+        document.getElementById('registerStepOTP').style.display = 'block';
+        document.getElementById('otpEmailDisplay').textContent = email;
+        startResendTimer();
+        updateProgress(2);
+    }
+}
+
+function startResendTimer() {
+    let seconds = 45;
+    const btn = document.getElementById('resendOtpBtn');
+    if (!btn) return;
+    if (otpTimerInterval) clearInterval(otpTimerInterval);
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    
+    otpTimerInterval = setInterval(() => {
+        seconds--;
+        btn.textContent = `Resend OTP (${seconds}s)`;
+        if (seconds <= 0) {
+            clearInterval(otpTimerInterval);
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.textContent = 'Resend OTP';
+        }
+    }, 1000);
+}
+
+async function resendOTP() {
+    if (!registrationData.email) {
+        document.getElementById('registerStepOTP').style.display = 'none';
+        document.getElementById('registerStepEmail').style.display = 'block';
+        updateProgress(1);
+        return;
+    }
+    
+    const { error } = await supabaseClient.auth.signInWithOtp({
+        email: registrationData.email,
+        options: { shouldCreateUser: true, data: registrationData }
+    });
+    
+    if (error) { 
+        showAlert('Error: ' + error.message, 'Error', 'error'); 
+    } else { 
+        startResendTimer(); 
+        showToast('✅ New OTP sent!'); 
+    }
+}
+
+async function verifyOTP() {
+    const otp = document.getElementById('registerOtp').value.trim();
+    if (!otp || otp.length < 6) {
+        showAlert('Please enter the 6-digit OTP sent to your email', 'Invalid OTP', 'error');
+        return;
+    }
+    
+    const btn = document.querySelector('#registerStepOTP .auth-btn');
+    if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...'; }
+    
+    try {
+        const { data, error } = await supabaseClient.auth.verifyOtp({
+            email: registrationData.email,
+            token: otp,
+            type: 'email'
+        });
+        
+        if (error) {
+            if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify OTP'; }
+            showAlert('Invalid OTP. Please check and try again.', 'Verification Failed', 'error');
+            return;
+        }
+        
+        if (data?.user) {
+            currentUserId = data.user.id;
+            
+            // Update user profile
+            await supabaseClient.from('users').upsert({
+                id: data.user.id,
+                role: 3,
+                name: registrationData.name,
+                phone: registrationData.phone,
+                email: registrationData.email
+            });
+            
+            showToast('✅ Email verified!');
+            await loadCategories();
+            
+            document.getElementById('registerStepOTP').style.display = 'none';
+            document.getElementById('shopDetailsForm').style.display = 'block';
+            updateProgress(3);
+            
+            // Populate category dropdown
+            const categorySelect = document.getElementById('shopCategory');
+            if (categorySelect) {
+                categorySelect.innerHTML = '<option value="">Select Category</option>' +
+                    categories.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
+            }
+        }
+    } catch(e) {
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify OTP'; }
+        showAlert('Verification failed: ' + e.message, 'Error', 'error');
+    }
+}
+
+// ==================== PROGRESS STEPS ====================
+function updateProgress(step) {
+    currentStep = step;
+    const steps = document.querySelectorAll('.progress-step');
+    const lines = document.querySelectorAll('.progress-line');
+    
+    steps.forEach((s, i) => {
+        const stepNum = i + 1;
+        s.classList.remove('active', 'completed');
+        if (stepNum < step) s.classList.add('completed');
+        if (stepNum === step) s.classList.add('active');
+    });
+    
+    lines.forEach((l, i) => {
+        if (i < step - 1) l.classList.add('completed');
+        else l.classList.remove('completed');
+    });
+}
+
+// ==================== REGISTER SHOP ====================
+async function registerShop() {
+    if (isProcessing) return;
+    
+    const shopName = document.getElementById('shopName').value.trim();
+    const category = document.getElementById('shopCategory').value;
+    const shopPhone = document.getElementById('shopPhone').value.trim();
+    const shopWhatsapp = document.getElementById('shopWhatsapp').value.trim();
+    const address = document.getElementById('shopAddress').value.trim();
+    const city = document.getElementById('shopCity').value.trim();
+    const pincode = document.getElementById('shopPincode').value.trim();
+    const description = document.getElementById('shopDesc').value.trim();
+    const latitude = document.getElementById('shopLatitude').value;
+    const longitude = document.getElementById('shopLongitude').value;
+    
+    // Validation
+    if (!shopName) { showAlert('Please enter shop name', 'Shop Name Required', 'error'); return; }
+    if (!category) { showAlert('Please select a category', 'Category Required', 'error'); return; }
+    if (!shopPhone || !/^\d{10}$/.test(shopPhone)) { showAlert('Please enter valid 10-digit shop phone', 'Phone Required', 'error'); return; }
+    if (!address) { showAlert('Please enter shop address', 'Address Required', 'error'); return; }
+    if (!city) { showAlert('Please enter city name', 'City Required', 'error'); return; }
+    if (!pincode || pincode.length !== 6) { showAlert('Please enter valid 6-digit pincode', 'Pincode Required', 'error'); return; }
+    if (!latitude || !longitude) { showAlert('Please capture shop location first', 'Location Required', 'error'); return; }
+    
+    isProcessing = true;
+    const btn = document.getElementById('registerShopBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+    btn.disabled = true;
+    
+    try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) throw new Error('Please verify OTP first');
+        
+        // Upload images
+        let shopImageUrl = null, qrImageUrl = null;
+        
+        if (selectedImageFile) {
+            showToast('Uploading shop photo...', false);
+            try { shopImageUrl = await uploadImage(selectedImageFile, 'shops'); } catch(e) { console.error(e); }
+        }
+        
+        if (selectedQrFile) {
+            try { qrImageUrl = await uploadImage(selectedQrFile, 'qrcodes'); } catch(e) { console.error(e); }
+        }
+        
+        // Save to database
+        const { error: shopError } = await supabaseClient.from('shops').insert([{
+            owner_id: user.id,
+            name: shopName,
+            category: category,
+            phone: shopPhone,
+            whatsapp: shopWhatsapp || registrationData.whatsapp,
+            address: address,
+            city: city,
+            pincode: pincode,
+            description: description || null,
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude),
+            image_url: shopImageUrl,
+            qr_code_url: qrImageUrl,
+            status: 'pending',
+            is_open: false,
+            rating: 0,
+            created_at: new Date().toISOString()
+        }]);
+        
+        if (shopError) throw new Error(shopError.message);
+        
+        // Update user role
+        await supabaseClient.from('users').upsert({
+            id: user.id,
+            role: 2
+        });
+        
+        showAlert('Your shop has been registered! Admin will review and approve shortly.', 'Registration Successful! 🎉', 'success');
+        
+        // Redirect after 3 seconds
+        setTimeout(() => {
+            window.location.href = 'shop-dashboard.html';
+        }, 3000);
+        
+    } catch (error) {
+        showAlert('Registration failed: ' + error.message, 'Error', 'error');
+        btn.innerHTML = '<i class="fas fa-store"></i> Register Shop (Free)';
+        btn.disabled = false;
+        isProcessing = false;
+    }
+}
+
+// ==================== RENDER FORM ====================
+async function renderForm() {
+    await loadCategories();
+    
+    let categoryOptions = '<option value="">Select Category</option>';
+    categories.forEach(cat => {
+        categoryOptions += `<option value="${escapeHtml(cat.name)}">${escapeHtml(cat.name)}</option>`;
+    });
+    
+    // Check if user is already logged in
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const isLoggedIn = !!user;
+    
+    const container = document.getElementById('mainContent');
+    container.innerHTML = `
+        <div class="progress-steps">
+            <div class="progress-step active">
+                <span class="step-circle">1</span> Details
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step">
+                <span class="step-circle">2</span> Verify OTP
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step">
+                <span class="step-circle">3</span> Shop Info
+            </div>
+        </div>
+        
+        <div class="hero-section">
+            <div class="hero-icon"><i class="fas fa-store-alt"></i></div>
+            <div class="hero-title">Start Your Business</div>
+            <div class="hero-subtitle">Join Zatpat and grow your shop online</div>
+            <div class="fee-badge"><i class="fas fa-gift"></i> 100% Free Registration</div>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-header">
+                <i class="fas fa-clipboard-list"></i>
+                <h2>Shop Registration</h2>
+            </div>
+            <div class="form-body">
+                <!-- STEP 1: Email Form -->
+                <div id="registerStepEmail" class="form-section" style="display:${isLoggedIn ? 'none' : 'block'}">
+                    ${isLoggedIn ? '' : `
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-user"></i> Owner Name <span class="required">*</span></label>
+                        <input type="text" id="registerName" class="form-control" placeholder="Enter full name" autocomplete="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
+                        <input type="email" id="registerEmail" class="form-control" placeholder="your@email.com" autocomplete="email" required>
+                        <small style="color:#6B7280;font-size:10px;">OTP will be sent to this email</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-phone"></i> Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="registerPhone" class="form-control" placeholder="10-digit mobile number" maxlength="10" autocomplete="tel" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fab fa-whatsapp"></i> WhatsApp Number <span class="required">*</span></label>
+                        <input type="tel" id="ownerWhatsapp" class="form-control" placeholder="WhatsApp number" maxlength="10" required>
+                    </div>
+                    <button class="auth-btn" onclick="sendRegisterOTP()">
+                        <i class="fas fa-paper-plane"></i> Send OTP
+                    </button>
+                    `}
+                    ${isLoggedIn ? '<p style="text-align:center;color:var(--success);"><i class="fas fa-check-circle"></i> Already logged in</p>' : ''}
+                </div>
+                
+                <!-- STEP 2: OTP Verification -->
+                <div id="registerStepOTP" class="form-section" style="display:none;">
+                    <div class="otp-message">
+                        <i class="fas fa-envelope-open-text"></i> 
+                        OTP sent to <strong id="otpEmailDisplay"></strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-key"></i> Enter OTP <span class="required">*</span></label>
+                        <input type="text" id="registerOtp" class="form-control" placeholder="Enter 6-digit OTP" maxlength="6" autocomplete="one-time-code" required>
+                    </div>
+                    <button class="auth-btn" onclick="verifyOTP()">
+                        <i class="fas fa-check-circle"></i> Verify OTP
+                    </button>
+                    <button class="auth-btn auth-btn-outline" id="resendOtpBtn" onclick="resendOTP()">Resend OTP</button>
+                    <button class="auth-btn auth-btn-outline" onclick="document.getElementById('registerStepOTP').style.display='none';document.getElementById('registerStepEmail').style.display='block';updateProgress(1);" style="margin-top:4px;background:transparent;border:none;color:var(--text-secondary);">
+                        ← Change Email
+                    </button>
+                </div>
+                
+                <!-- STEP 3: Shop Details -->
+                <div id="shopDetailsForm" class="form-section" style="display:${isLoggedIn ? 'block' : 'none'}">
+                    ${isLoggedIn ? `
+                    <div class="otp-message" style="background:#ECFDF5;border-color:#A7F3D0;">
+                        <i class="fas fa-check-circle"></i> Logged in as <strong>${escapeHtml(user.email || 'User')}</strong>
+                    </div>` : ''}
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-camera"></i> Shop Photo</label>
+                        <div class="image-upload-area" id="imageUploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Tap to upload (max 150KB)</p>
+                            <input type="file" id="shopImageInput" accept="image/*" style="display:none">
+                            <img id="imagePreview" class="image-preview" alt="Preview">
+                            <div id="imageCompressInfo" class="compress-info"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-store"></i> Shop Name <span class="required">*</span></label>
+                        <input type="text" id="shopName" class="form-control" placeholder="Your shop name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-tags"></i> Category <span class="required">*</span></label>
+                        <select id="shopCategory" class="form-control" required>
+                            ${categoryOptions}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-phone"></i> Shop Phone <span class="required">*</span></label>
+                        <input type="tel" id="shopPhone" class="form-control" placeholder="Contact number" maxlength="10" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fab fa-whatsapp"></i> Shop WhatsApp</label>
+                        <input type="tel" id="shopWhatsapp" class="form-control" placeholder="WhatsApp number (optional)" maxlength="10">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-map-marker-alt"></i> Shop Location <span class="required">*</span></label>
+                        <button type="button" class="location-btn" onclick="captureShopLocation()">
+                            <i class="fas fa-location-dot"></i> Capture My Location
+                        </button>
+                        <div id="locationStatus" class="location-status">
+                            <i class="fas fa-info-circle"></i> Click to capture GPS location
+                        </div>
+                        <div id="locationCoords" class="location-coords"></div>
+                        <div id="locationAddress" class="location-address"></div>
+                        <input type="hidden" id="shopLatitude">
+                        <input type="hidden" id="shopLongitude">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-address-card"></i> Full Address <span class="required">*</span></label>
+                        <textarea id="shopAddress" class="form-control" rows="2" placeholder="Shop address" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-city"></i> City <span class="required">*</span></label>
+                        <input type="text" id="shopCity" class="form-control" placeholder="City name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-map-pin"></i> Pincode <span class="required">*</span></label>
+                        <input type="text" id="shopPincode" class="form-control" placeholder="6-digit pincode" maxlength="6" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <textarea id="shopDesc" class="form-control" rows="2" placeholder="About your shop (optional)"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-qrcode"></i> QR Code (Optional)</label>
+                        <div class="image-upload-area" id="qrUploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Upload QR code for payments</p>
+                            <input type="file" id="qrImageInput" accept="image/*" style="display:none">
+                            <img id="qrPreview" class="image-preview" alt="QR Preview">
+                            <div id="qrCompressInfo" class="compress-info"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="fee-summary">
+                        <div class="fee-row"><span>Registration Fee</span><span class="free-tag">FREE</span></div>
+                        <div class="fee-row"><span>Listing Fee</span><span class="free-tag">FREE</span></div>
+                        <div class="fee-row total"><span>Total Payable</span><span style="color:var(--success);">₹0 (No Charges)</span></div>
+                    </div>
+                    
+                    <button class="auth-btn" id="registerShopBtn" onclick="registerShop()">
+                        <i class="fas fa-rocket"></i> Register My Shop
+                    </button>
+                    <p class="text-muted"><i class="fas fa-clock"></i> Admin will approve within 24 hours</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // If already logged in, jump to step 3
+    if (isLoggedIn) {
+        currentUserId = user.id;
+        updateProgress(3);
+        
+        // Pre-fill from user data if available
+        const { data: profile } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+        
+        if (profile) {
+            registrationData.name = profile.name;
+            registrationData.email = profile.email;
+            registrationData.phone = profile.phone;
+        }
+    }
+    
+    // Setup image upload handlers
+    setupImageUpload('imageUploadArea', 'shopImageInput', 'imagePreview', 'imageCompressInfo', 'selectedImageFile');
+    setupImageUpload('qrUploadArea', 'qrImageInput', 'qrPreview', 'qrCompressInfo', 'selectedQrFile');
+}
+
+function setupImageUpload(areaId, inputId, previewId, compressId, fileVar) {
+    const area = document.getElementById(areaId);
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    
+    if (!area || !input) return;
+    
+    area.onclick = () => input.click();
+    
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        if (file.size > 5 * 1024 * 1024) {
+            showAlert('Image too large. Please select an image under 5MB.', 'File Too Large', 'error');
+            return;
+        }
+        
+        const originalSize = (file.size / 1024).toFixed(0);
+        const compressEl = document.getElementById(compressId);
+        if (compressEl) {
+            compressEl.style.display = 'block';
+            compressEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Compressing...';
+        }
+        
+        const compressed = await compressImage(file);
+        const compressedSize = (compressed.size / 1024).toFixed(0);
+        
+        // Set the appropriate variable
+        if (fileVar === 'selectedImageFile') selectedImageFile = compressed;
+        else if (fileVar === 'selectedQrFile') selectedQrFile = compressed;
+        
+        if (compressEl) {
+            compressEl.innerHTML = `<i class="fas fa-check-circle"></i> Ready: ${compressedSize}KB`;
+            setTimeout(() => { if(compressEl) compressEl.style.display = 'none'; }, 3000);
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            if(preview) { preview.src = event.target.result; preview.style.display = 'block'; }
+        };
+        reader.readAsDataURL(compressed);
+        
+        if (originalSize !== compressedSize) {
+            showToast(`📸 Compressed: ${originalSize}KB → ${compressedSize}KB`);
+        }
+    };
+}
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', renderForm);
+
+// ==================== EXPOSE FUNCTIONS ====================
+window.sendRegisterOTP = sendRegisterOTP;
+window.verifyOTP = verifyOTP;
+window.resendOTP = resendOTP;
+window.registerShop = registerShop;
+window.captureShopLocation = captureShopLocation;
+window.goBack = goBack;
+window.closeAlert = closeAlert;
+</script>
+</body>
+</html>

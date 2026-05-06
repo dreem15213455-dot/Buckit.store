@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Track Order - Zatpat</title>
+    <meta name="theme-color" content="#16A34A">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root { --primary: #16A34A; --primary-dark: #15803D; --primary-bg: #F0FDF4; --primary-bg-dark: #DCFCE7; --danger: #EF4444; --warning: #F59E0B; --warning-bg: #FEF3C7; --success: #10B981; --success-bg: #D1FAE5; --info: #3B82F6; --info-bg: #DBEAFE; --border: #E5E7EB; --card: #FFFFFF; --bg: #F9FAFB; --text: #111827; --text-secondary: #6B7280; --shadow: 0 1px 3px rgba(0,0,0,0.08); --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px; --radius-full: 9999px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 40px; -webkit-tap-highlight-color: transparent; min-height: 100vh; }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        @keyframes checkmark { 0%{transform:scale(0)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+        
+        .top-bar { background: var(--primary); position: fixed; top: 0; left: 0; width: 100%; z-index: 100; padding: 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(22,163,74,0.3); }
+        .back-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; }
+        .top-title { flex: 1; font-size: 17px; font-weight: 700; color: white; }
+        .main-content { padding-top: 60px; max-width: 600px; margin: 0 auto; }
+        
+        /* ========== SEARCH ========== */
+        .search-section { background: var(--card); margin: 12px 14px; padding: 20px 16px; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow); text-align: center; animation: slideUp 0.3s ease; }
+        .search-section i { font-size: 40px; color: var(--primary); margin-bottom: 10px; }
+        .search-section h3 { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+        .search-section p { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
+        .search-input { width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: var(--radius-full); font-size: 14px; font-family: 'Inter', sans-serif; outline: none; text-align: center; text-transform: uppercase; letter-spacing: 2px; transition: all 0.15s; }
+        .search-input:focus { border-color: var(--primary); }
+        .track-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: var(--radius-full); font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .track-btn:active { background: var(--primary-dark); }
+        
+        /* ========== TRACKING STEPS ========== */
+        .tracking-card { background: var(--card); margin: 12px 14px; padding: 20px 16px; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow); animation: slideUp 0.3s ease; }
+        .order-id-display { text-align: center; font-size: 14px; font-weight: 700; margin-bottom: 20px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius-full); display: inline-block; }
+        .order-date { text-align: center; font-size: 11px; color: var(--text-secondary); margin-bottom: 20px; }
+        
+        .steps-container { position: relative; }
+        .step { display: flex; gap: 14px; padding-bottom: 24px; position: relative; }
+        .step:last-child { padding-bottom: 0; }
+        
+        .step-line { position: absolute; left: 19px; top: 40px; width: 2px; height: calc(100% - 16px); background: var(--border); }
+        .step.completed .step-line { background: var(--primary); }
+        .step.current .step-line { background: linear-gradient(to bottom, var(--primary), var(--border)); }
+        
+        .step-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 1; font-size: 16px; border: 3px solid var(--border); background: white; color: #D1D5DB; }
+        .step.completed .step-icon { border-color: var(--primary); background: var(--primary); color: white; }
+        .step.current .step-icon { border-color: var(--primary); background: white; color: var(--primary); animation: pulse 2s infinite; }
+        .step.completed .step-icon i { animation: checkmark 0.4s ease; }
+        
+        .step-content { flex: 1; padding-top: 6px; }
+        .step-title { font-size: 13px; font-weight: 700; }
+        .step.completed .step-title { color: var(--primary); }
+        .step.current .step-title { color: var(--primary); }
+        .step.pending .step-title { color: var(--text-secondary); }
+        .step-desc { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+        .step-time { font-size: 9px; color: #9CA3AF; margin-top: 2px; }
+        
+        /* ========== ORDER SUMMARY ========== */
+        .summary-card { background: var(--card); margin: 12px 14px; padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow); animation: slideUp 0.3s ease; }
+        .summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-row.total { font-size: 15px; font-weight: 800; color: var(--text); border-top: 2px solid var(--text); padding-top: 10px; margin-top: 4px; }
+        
+        .action-buttons { display: flex; gap: 10px; padding: 0 14px; margin-top: 12px; }
+        .action-btn { flex: 1; padding: 12px; border-radius: var(--radius-full); font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; border: none; }
+        .btn-outline { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+        .btn-primary { background: var(--primary); color: white; }
+        
+        .empty-state { text-align: center; padding: 40px 20px; }
+        .empty-state i { font-size: 48px; color: #D1D5DB; display: block; margin-bottom: 12px; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #111827; color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; z-index: 200; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: all 0.25s; }
+        .toast.show { opacity: 1; visibility: visible; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+    <span class="top-title">Track Order</span>
+</div>
+
+<div class="main-content" id="mainContent">
+    <!-- Search -->
+    <div class="search-section" id="searchSection">
+        <i class="fas fa-truck-fast"></i>
+        <h3>Track Your Order</h3>
+        <p>Enter your Order ID to check status</p>
+        <input type="text" id="orderIdInput" class="search-input" placeholder="Enter Order ID" maxlength="36">
+        <button class="track-btn" onclick="trackOrder()"><i class="fas fa-search"></i> Track Order</button>
+        <p style="font-size:10px;color:#9CA3AF;margin-top:8px;">Order ID is in confirmation email/SMS</p>
+    </div>
+    
+    <!-- Tracking Result -->
+    <div id="trackingResult"></div>
+</div>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    
+    function showToast(msg) { var t = document.getElementById('toastMsg'); t.textContent = msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 2500); }
+    function esc(s) { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    
+    var trackingSteps = [
+        { key: 'pending', icon: 'fa-clock', title: 'Order Placed', desc: 'Your order has been received' },
+        { key: 'confirmed', icon: 'fa-check-circle', title: 'Order Confirmed', desc: 'Shop has confirmed your order' },
+        { key: 'processed', icon: 'fa-box', title: 'Order Processed', desc: 'Items are being packed' },
+        { key: 'shipped', icon: 'fa-truck', title: 'Out for Delivery', desc: 'Delivery partner is on the way' },
+        { key: 'delivered', icon: 'fa-box-check', title: 'Delivered', desc: 'Order delivered successfully' }
+    ];
+    
+    window.trackOrder = async function() {
+        var orderId = (document.getElementById('orderIdInput')?.value || '').trim();
+        if (!orderId) { showToast('⚠️ Please enter Order ID'); return; }
+        
+        var resultContainer = document.getElementById('trackingResult');
+        resultContainer.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin" style="color:var(--primary);font-size:20px;"></i></div>';
+        
+        try {
+            // Try direct ID match first
+            var r = await sb.from('orders').select('*').eq('id', orderId).single();
+            
+            // If not found, try partial match
+            if (!r.data) {
+                var partialResult = await sb.from('orders').select('*').ilike('id', orderId + '%').single();
+                r = partialResult;
+            }
+            
+            if (!r.data) {
+                resultContainer.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>Order Not Found</h3><p style="color:var(--text-secondary);">Please check the Order ID</p></div>';
+                return;
+            }
+            
+            var order = r.data;
+            var status = order.status || 'pending';
+            var currentStepIndex = trackingSteps.findIndex(function(s) { return s.key === status; });
+            if (currentStepIndex < 0) currentStepIndex = 0;
+            
+            var orderIdShort = (order.id || '').slice(0, 8).toUpperCase();
+            var date = order.created_at ? new Date(order.created_at).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+            
+            // Hide search, show result
+            document.getElementById('searchSection').style.display = 'none';
+            
+            var html = '';
+            
+            // Tracking steps
+            html += '<div class="tracking-card">';
+            html += '<div style="text-align:center;"><span class="order-id-display">📦 Order #' + orderIdShort + '</span></div>';
+            html += '<div class="order-date">Placed on ' + date + '</div>';
+            html += '<div class="steps-container">';
+            
+            for (var i = 0; i < trackingSteps.length; i++) {
+                var step = trackingSteps[i];
+                var cls = '';
+                if (i < currentStepIndex) cls = 'completed';
+                else if (i === currentStepIndex) cls = 'current';
+                else cls = 'pending';
+                
+                html += '<div class="step ' + cls + '">';
+                if (i < trackingSteps.length - 1) html += '<div class="step-line"></div>';
+                html += '<div class="step-icon"><i class="fas ' + (cls === 'completed' ? 'fa-check' : step.icon) + '"></i></div>';
+                html += '<div class="step-content"><div class="step-title">' + step.title + '</div>';
+                html += '<div class="step-desc">' + step.desc + '</div>';
+                if (cls === 'current') html += '<div class="step-time" style="color:var(--primary);font-weight:600;">In Progress...</div>';
+                if (cls === 'completed') html += '<div class="step-time">✓ Done</div>';
+                html += '</div></div>';
+            }
+            
+            html += '</div></div>';
+            
+            // Order summary
+            var items = order.items || [];
+            var subtotal = parseFloat(order.subtotal) || 0;
+            var deliveryFee = parseFloat(order.delivery_fee) || 0;
+            var total = parseFloat(order.total_amount) || 0;
+            
+            html += '<div class="summary-card">';
+            html += '<div style="font-size:13px;font-weight:700;margin-bottom:10px;"><i class="fas fa-receipt" style="color:var(--primary);"></i> Order Summary</div>';
+            html += '<div class="summary-row"><span>Items</span><span>' + items.length + ' item(s)</span></div>';
+            html += '<div class="summary-row"><span>Subtotal</span><span>₹' + subtotal.toLocaleString('en-IN') + '</span></div>';
+            html += '<div class="summary-row"><span>Delivery</span><span style="color:' + (deliveryFee===0?'var(--primary)':'') + '">' + (deliveryFee===0?'FREE':'₹'+deliveryFee) + '</span></div>';
+            html += '<div class="summary-row total"><span>Total</span><span>₹' + total.toLocaleString('en-IN') + '</span></div>';
+            html += '</div>';
+            
+            // Actions
+            html += '<div class="action-buttons">';
+            html += '<button class="action-btn btn-outline" onclick="window.location.href=\'order-details.html?id='+order.id+'\'">View Details</button>';
+            html += '<button class="action-btn btn-primary" onclick="window.open(\'https://wa.me/918600252238\',\'_blank\')"><i class="fab fa-whatsapp"></i> Need Help?</button>';
+            html += '</div>';
+            
+            html += '<div style="text-align:center;padding:12px;"><button style="background:none;border:none;color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;" onclick="resetSearch()">← Track Another Order</button></div>';
+            
+            resultContainer.innerHTML = html;
+            
+        } catch(e) {
+            resultContainer.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Error</h3><p style="color:var(--text-secondary);">Something went wrong</p></div>';
+        }
+    };
+    
+    window.resetSearch = function() {
+        document.getElementById('searchSection').style.display = 'block';
+        document.getElementById('trackingResult').innerHTML = '';
+        document.getElementById('orderIdInput').value = '';
+    };
+</script>
+</body>
+</html>
