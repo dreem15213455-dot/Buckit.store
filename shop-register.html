@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Register Shop - Zatpat</title>
+    <meta name="theme-color" content="#16A34A">
+    <meta name="description" content="Register your shop on Zatpat - Free registration">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.min.js"></script>
+    <style>
+        :root { --primary: #16A34A; --primary-light: #22C55E; --primary-dark: #15803D; --primary-bg-light: #F0FDF4; --primary-bg-dark: #DCFCE7; --accent-orange: #F97316; --accent-red: #EF4444; --accent-yellow: #FACC15; --bg-white: #FFFFFF; --bg-light: #F9FAFB; --bg-dark: #F3F4F6; --text-primary: #111827; --text-secondary: #6B7280; --text-white: #FFFFFF; --border-light: #E5E7EB; --success: #10B981; --danger: #EF4444; --warning: #F59E0B; --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px; --radius-2xl: 24px; --radius-full: 9999px; --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05); --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1); --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1); --transition-fast: 0.15s ease; --transition-normal: 0.25s ease; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--text-primary); -webkit-tap-highlight-color: transparent; min-height: 100vh; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+        
+        .top-bar { background: var(--primary); position: fixed; top: 0; left: 0; width: 100%; z-index: 100; padding: 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(22,163,74,0.3); }
+        .back-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; }
+        .brand-name { font-size: 20px; font-weight: 800; }
+        .brand-name .normal { color: white; }
+        .brand-name .pat { color: #BBF7D0; }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 14px; color: white; }
+        .main-content { padding-top: 56px; padding-bottom: 40px; max-width: 600px; margin: 0 auto; }
+        
+        .progress-steps { display: flex; align-items: center; justify-content: center; padding: 20px 16px; gap: 0; }
+        .progress-step { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+        .progress-step.completed { color: var(--primary); }
+        .progress-step.active { color: var(--primary); font-weight: 700; }
+        .step-circle { width: 24px; height: 24px; border-radius: 50%; background: var(--border-light); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+        .progress-step.completed .step-circle { background: var(--primary); }
+        .progress-step.active .step-circle { background: var(--primary); animation: pulse 1.5s infinite; }
+        .progress-line { width: 30px; height: 2px; background: var(--border-light); margin: 0 4px; }
+        .progress-line.completed { background: var(--primary); }
+        
+        .hero-section { background: linear-gradient(135deg, var(--primary), #059669); margin: 12px 14px; padding: 28px 20px; border-radius: var(--radius-2xl); text-align: center; color: white; animation: fadeInUp 0.4s ease; }
+        .hero-icon { font-size: 44px; margin-bottom: 12px; }
+        .hero-title { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+        .hero-subtitle { font-size: 13px; opacity: 0.9; margin-bottom: 14px; }
+        .fee-badge { background: rgba(255,255,255,0.2); display: inline-block; padding: 8px 18px; border-radius: var(--radius-full); font-weight: 700; font-size: 13px; border: 1px solid rgba(255,255,255,0.3); }
+        
+        .form-card { background: white; margin: 0 14px 20px; border-radius: var(--radius-2xl); box-shadow: var(--shadow-lg); overflow: hidden; animation: fadeInUp 0.4s ease; }
+        .form-header { padding: 18px 22px; border-bottom: 1px solid var(--border-light); background: var(--primary-bg-light); display: flex; align-items: center; gap: 8px; }
+        .form-header i { color: var(--primary); font-size: 18px; }
+        .form-header h2 { font-size: 18px; font-weight: 700; color: var(--primary-dark); }
+        .form-body { padding: 22px; }
+        
+        .form-group { margin-bottom: 14px; }
+        .form-label { font-weight: 600; font-size: 12px; margin-bottom: 4px; display: block; color: var(--text-primary); }
+        .form-label i { color: var(--primary); width: 16px; margin-right: 3px; }
+        .form-label .required { color: var(--danger); }
+        .form-control { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border-light); border-radius: var(--radius-md); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; background: white; transition: all 0.15s; }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22,163,74,0.06); }
+        select.form-control { -webkit-appearance: none; padding-right: 32px; }
+        textarea.form-control { resize: vertical; min-height: 60px; }
+        
+        .image-upload-area { border: 2px dashed var(--primary); border-radius: var(--radius-md); padding: 16px; text-align: center; cursor: pointer; background: var(--primary-bg-light); }
+        .image-upload-area i { font-size: 24px; color: var(--primary); margin-bottom: 4px; }
+        .image-upload-area p { font-size: 11px; color: var(--primary); font-weight: 500; }
+        .image-preview { max-width: 100%; max-height: 120px; margin-top: 8px; border-radius: var(--radius-md); display: none; }
+        .compress-info { font-size: 10px; color: var(--primary); margin-top: 4px; display: none; }
+        
+        .location-btn { width: 100%; padding: 11px; background: var(--bg-dark); border: 1.5px solid var(--border-light); border-radius: var(--radius-md); font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-primary); }
+        .location-btn:active { background: var(--primary-bg-light); border-color: var(--primary); }
+        .location-status { font-size: 11px; padding: 8px 10px; border-radius: var(--radius-sm); background: var(--bg-light); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+        .location-status.success { color: var(--success); background: #ECFDF5; }
+        .location-status.error { color: var(--danger); }
+        
+        .auth-btn { background: var(--primary); color: white; border: none; padding: 13px; border-radius: var(--radius-full); font-weight: 700; font-size: 14px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .auth-btn:active { background: var(--primary-dark); }
+        .auth-btn:disabled { opacity: 0.6; }
+        .auth-btn-outline { background: transparent; border: 1.5px solid var(--border-light); color: var(--text-primary); margin-top: 8px; font-weight: 600; }
+        .text-muted { color: var(--text-secondary); font-size: 11px; text-align: center; margin-top: 10px; }
+        
+        .otp-message { background: var(--primary-bg-light); padding: 10px 14px; border-radius: var(--radius-md); margin-bottom: 14px; font-size: 12px; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; }
+        .fee-summary { background: var(--bg-light); border-radius: var(--radius-lg); padding: 12px 14px; margin-bottom: 18px; border: 1px solid var(--border-light); }
+        .fee-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+        .fee-row.total { border-top: 1px solid var(--border-light); padding-top: 8px; font-weight: 700; font-size: 14px; }
+        .free-tag { color: var(--success); font-weight: 700; }
+        
+        .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; z-index: 1000; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-xl); transition: all 0.25s; }
+        .toast-notification.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-5px); }
+        
+        .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .alert-modal.show { display: flex; }
+        .alert-content { background: white; border-radius: var(--radius-xl); padding: 24px; max-width: 300px; width: 90%; text-align: center; animation: fadeInUp 0.3s ease; }
+        .alert-content i { font-size: 40px; display: block; margin-bottom: 10px; }
+        .alert-content h3 { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+        .alert-content p { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
+        .alert-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-weight: 700; cursor: pointer; width: 100%; font-size: 13px; }
+        
+        .already-shop-msg { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: var(--radius-md); padding: 14px; text-align: center; color: #92400E; font-weight: 600; font-size: 13px; margin: 12px 14px; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
+    <div class="brand-name"><span class="normal">Zat</span><span class="pat">pat</span></div>
+    <div class="page-title">Register Shop</div>
+</div>
+
+<div class="main-content" id="mainContent">
+    <div style="text-align:center;padding:60px;"><i class="fas fa-spinner fa-spin" style="color:var(--primary);font-size:24px;"></i><p style="color:var(--text-secondary);margin-top:12px;">Loading...</p></div>
+</div>
+
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<div id="customAlert" class="alert-modal">
+    <div class="alert-content">
+        <i id="alertIcon" class="fas fa-info-circle" style="color:var(--warning);"></i>
+        <h3 id="alertTitle">Notice</h3>
+        <p id="alertMessage"></p>
+        <button class="alert-btn" onclick="closeAlert()">OK</button>
+    </div>
+</div>
+
+<script>
+var supabaseClient = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+var categories = [], selectedImageFile = null, selectedQrFile = null, isProcessing = false, registrationData = {}, currentStep = 1, currentUserId = null, otpTimerInterval = null;
+
+function showToast(msg, isErr) {
+    var t = document.getElementById('toastMsg'), s = document.getElementById('toastText');
+    if(!t||!s) return;
+    s.textContent = msg; t.style.background = isErr ? '#EF4444' : '#111827';
+    t.classList.add('show'); clearTimeout(t._timer);
+    t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function showAlert(msg, title, icon) {
+    title = title || 'Notice'; icon = icon || 'warning';
+    document.getElementById('alertMessage').textContent = msg;
+    document.getElementById('alertTitle').textContent = title;
+    var iconEl = document.getElementById('alertIcon');
+    iconEl.style.color = icon === 'success' ? 'var(--success)' : icon === 'error' ? 'var(--danger)' : 'var(--warning)';
+    iconEl.className = 'fas ' + (icon === 'success' ? 'fa-check-circle' : icon === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
+    document.getElementById('customAlert').classList.add('show');
+}
+
+function closeAlert() { document.getElementById('customAlert').classList.remove('show'); }
+
+function goBack() { if(window.history.length>1){window.history.back();}else{window.location.href='index.html';} }
+
+function escapeHtml(str) { if(!str) return ''; var d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
+
+async function compressImage(file) {
+    if(!file||!file.type||file.type.indexOf('image/')!==0) return file;
+    if(file.size<150*1024) return file;
+    try{ if(window.imageCompression){ var opts={maxSizeMB:0.15,maxWidthOrHeight:800,useWebWorker:true,fileType:'image/jpeg',initialQuality:0.7}; return await window.imageCompression(file,opts); } return file; }catch(e){return file;}
+}
+
+async function uploadImage(file, folder) {
+    if(!file) return null;
+    var compressed = await compressImage(file);
+    var fn = Date.now()+'_'+Math.random().toString(36).substr(2,6)+'.jpg';
+    var uploadResult = await supabaseClient.storage.from('shop-images').upload(folder+'/'+fn, compressed);
+    if(uploadResult.error) throw new Error(uploadResult.error.message);
+    return supabaseClient.storage.from('shop-images').getPublicUrl(folder+'/'+fn).data.publicUrl;
+}
+
+async function loadCategories() {
+    try{ var r=await supabaseClient.from('categories').select('id,name').eq('is_active',true).order('name'); if(r.error)throw r.error; categories=r.data||[]; return categories; }catch(e){return[];}
+}
+
+// 🔥 CHECK EXISTING SHOP
+async function checkExistingShop(userId) {
+    try {
+        var r = await supabaseClient.from('shops').select('id,status').eq('owner_id', userId).maybeSingle();
+        return r.data || null;
+    } catch(e) { return null; }
+}
+
+function captureShopLocation() {
+    if(!navigator.geolocation){ showAlert('Geolocation not supported','Error','error'); return; }
+    var statusDiv = document.getElementById('locationStatus');
+    statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
+    statusDiv.className = 'location-status';
+    
+    var timeoutId = setTimeout(function(){
+        statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Timeout';
+        statusDiv.className = 'location-status error';
+    },10000);
+    
+    navigator.geolocation.getCurrentPosition(
+        async function(pos){
+            clearTimeout(timeoutId);
+            var lat=pos.coords.latitude, lng=pos.coords.longitude;
+            document.getElementById('shopLatitude').value=lat;
+            document.getElementById('shopLongitude').value=lng;
+            document.getElementById('locationCoords').textContent='📍 '+lat.toFixed(6)+', '+lng.toFixed(6);
+            statusDiv.innerHTML='<i class="fas fa-check-circle"></i> Captured!';
+            statusDiv.className='location-status success';
+            try{
+                var resp=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18',{headers:{'User-Agent':'ZatpatApp/5.0'}});
+                var data=await resp.json();
+                var addrEl=document.getElementById('locationAddress');
+                if(addrEl&&data.display_name){ addrEl.innerHTML='<i class="fas fa-map-pin"></i> '+data.display_name.substring(0,100); addrEl.style.display='block'; }
+                var cityInput=document.getElementById('shopCity');
+                if(cityInput&&!cityInput.value){ var city=data.address?.city||data.address?.town||''; if(city)cityInput.value=city; }
+            }catch(e){}
+            showToast('📍 Location captured!');
+        },
+        function(err){
+            clearTimeout(timeoutId);
+            statusDiv.innerHTML='<i class="fas fa-exclamation-triangle"></i> Failed. Enable GPS.';
+            statusDiv.className='location-status error';
+        },
+        {enableHighAccuracy:true,timeout:10000,maximumAge:300000}
+    );
+}
+
+async function sendRegisterOTP() {
+    var name = document.getElementById('registerName').value.trim();
+    var email = document.getElementById('registerEmail').value.trim();
+    var phone = document.getElementById('registerPhone').value.trim();
+    var whatsapp = document.getElementById('ownerWhatsapp').value.trim();
+    
+    if(!name||name.length<2){ showAlert('Enter full name','Error','error'); return; }
+    if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showAlert('Enter valid email','Error','error'); return; }
+    if(!phone||!/^\d{10}$/.test(phone)){ showAlert('Enter valid 10-digit phone','Error','error'); return; }
+    if(!whatsapp||!/^\d{10}$/.test(whatsapp)){ showAlert('Enter valid WhatsApp','Error','error'); return; }
+    
+    registrationData = { name:name, email:email, phone:phone, whatsapp:whatsapp };
+    
+    var btn = document.querySelector('#registerStepEmail .auth-btn');
+    if(btn){ btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...'; }
+    
+    var r = await supabaseClient.auth.signInWithOtp({ email:email, options:{ shouldCreateUser:true, data:{ name:name, phone:phone, whatsapp:whatsapp, role:2 } } });
+    
+    if(btn){ btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; }
+    
+    if(r.error){ showAlert('Failed: '+r.error.message,'Error','error'); }
+    else {
+        showToast('✅ OTP sent to '+email);
+        document.getElementById('registerStepEmail').style.display='none';
+        document.getElementById('registerStepOTP').style.display='block';
+        document.getElementById('otpEmailDisplay').textContent = email;
+        startResendTimer(); updateProgress(2);
+    }
+}
+
+function startResendTimer() {
+    var sec=45, btn=document.getElementById('resendOtpBtn');
+    if(!btn) return;
+    if(otpTimerInterval) clearInterval(otpTimerInterval);
+    btn.disabled=true; btn.style.opacity='0.6';
+    otpTimerInterval=setInterval(function(){
+        sec--; btn.textContent='Resend ('+sec+'s)';
+        if(sec<=0){ clearInterval(otpTimerInterval); btn.disabled=false; btn.style.opacity='1'; btn.textContent='Resend OTP'; }
+    },1000);
+}
+
+async function resendOTP() {
+    if(!registrationData.email){ document.getElementById('registerStepOTP').style.display='none'; document.getElementById('registerStepEmail').style.display='block'; updateProgress(1); return; }
+    var r = await supabaseClient.auth.signInWithOtp({ email:registrationData.email, options:{ shouldCreateUser:true, data:registrationData } });
+    if(r.error){ showAlert('Error: '+r.error.message,'Error','error'); } else { startResendTimer(); showToast('✅ New OTP sent!'); }
+}
+
+async function verifyOTP() {
+    var otp = document.getElementById('registerOtp').value.trim();
+    if(!otp||otp.length<6){ showAlert('Enter 6-digit OTP','Error','error'); return; }
+    
+    var btn = document.querySelector('#registerStepOTP .auth-btn');
+    if(btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Verifying...'; }
+    
+    try {
+        var r = await supabaseClient.auth.verifyOtp({ email:registrationData.email, token:otp, type:'email' });
+        if(r.error){ if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-check-circle"></i> Verify OTP';} showAlert('Invalid OTP','Error','error'); return; }
+        
+        if(r.data?.user) {
+            currentUserId = r.data.user.id;
+            
+            // 🔥 CHECK: Already has shop?
+            var existingShop = await checkExistingShop(r.data.user.id);
+            if(existingShop) {
+                if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-check-circle"></i> Verify OTP';}
+                
+                if(existingShop.status === 'approved') {
+                    showAlert('⚠️ You already have an active shop! Redirecting to dashboard...', 'Shop Exists', 'warning');
+                    setTimeout(function(){ window.location.href = 'shop-dashboard.html'; }, 2500);
+                } else if(existingShop.status === 'pending') {
+                    showAlert('⏳ Your shop is pending approval. Please wait for admin review.', 'Shop Pending', 'warning');
+                }
+                return;
+            }
+            
+            // Set role = 2 (Shop Owner)
+            await supabaseClient.from('users').upsert({ id: r.data.user.id, role: 2, name: registrationData.name, phone: registrationData.phone, email: registrationData.email });
+            
+            showToast('✅ Email verified!');
+            await loadCategories();
+            document.getElementById('registerStepOTP').style.display='none';
+            document.getElementById('shopDetailsForm').style.display='block';
+            updateProgress(3);
+            
+            var catSelect = document.getElementById('shopCategory');
+            if(catSelect){ catSelect.innerHTML = '<option value="">Select Category</option>'+categories.map(function(c){return'<option value="'+escapeHtml(c.name)+'">'+escapeHtml(c.name)+'</option>';}).join(''); }
+        }
+    } catch(e){ if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-check-circle"></i> Verify OTP';} showAlert('Failed: '+e.message,'Error','error'); }
+}
+
+function updateProgress(step) {
+    currentStep=step;
+    var steps=document.querySelectorAll('.progress-step'), lines=document.querySelectorAll('.progress-line');
+    steps.forEach(function(s,i){ var sn=i+1; s.classList.remove('active','completed'); if(sn<step)s.classList.add('completed'); if(sn===step)s.classList.add('active'); });
+    lines.forEach(function(l,i){ if(i<step-1)l.classList.add('completed'); else l.classList.remove('completed'); });
+}
+
+async function registerShop() {
+    if(isProcessing) return;
+    var shopName = document.getElementById('shopName').value.trim();
+    var category = document.getElementById('shopCategory').value;
+    var shopPhone = document.getElementById('shopPhone').value.trim();
+    var shopWhatsapp = document.getElementById('shopWhatsapp').value.trim();
+    var address = document.getElementById('shopAddress').value.trim();
+    var city = document.getElementById('shopCity').value.trim();
+    var pincode = document.getElementById('shopPincode').value.trim();
+    var desc = document.getElementById('shopDesc').value.trim();
+    var lat = document.getElementById('shopLatitude').value;
+    var lng = document.getElementById('shopLongitude').value;
+    
+    if(!shopName){ showAlert('Enter shop name','Error','error'); return; }
+    if(!category){ showAlert('Select category','Error','error'); return; }
+    if(!shopPhone||!/^\d{10}$/.test(shopPhone)){ showAlert('Enter valid phone','Error','error'); return; }
+    if(!address){ showAlert('Enter address','Error','error'); return; }
+    if(!city){ showAlert('Enter city','Error','error'); return; }
+    if(!pincode||pincode.length!==6){ showAlert('Enter valid pincode','Error','error'); return; }
+    if(!lat||!lng){ showAlert('Capture location first','Error','error'); return; }
+    
+    isProcessing = true;
+    var btn = document.getElementById('registerShopBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+    btn.disabled = true;
+    
+    try {
+        var userResult = await supabaseClient.auth.getUser();
+        var user = userResult.data.user;
+        if(!user) throw new Error('Please verify OTP first');
+        
+        var shopImageUrl = null, qrImageUrl = null;
+        if(selectedImageFile){ try{ shopImageUrl = await uploadImage(selectedImageFile, 'shops'); }catch(e){} }
+        if(selectedQrFile){ try{ qrImageUrl = await uploadImage(selectedQrFile, 'qrcodes'); }catch(e){} }
+        
+        var shopResult = await supabaseClient.from('shops').insert([{
+            owner_id: user.id, name: shopName, category: category,
+            phone: shopPhone, whatsapp: shopWhatsapp || registrationData.whatsapp,
+            address: address, city: city, pincode: pincode,
+            description: desc || null,
+            latitude: parseFloat(lat), longitude: parseFloat(lng),
+            image_url: shopImageUrl, qr_code_url: qrImageUrl,
+            status: 'pending', is_open: false, rating: 0,
+            created_at: new Date().toISOString()
+        }]);
+        
+        if(shopResult.error) throw new Error(shopResult.error.message);
+        
+        await supabaseClient.from('users').upsert({ id: user.id, role: 2 });
+        
+        showAlert('✅ Shop registered! You will be notified when admin approves.', 'Success! 🎉', 'success');
+        
+        // 🔥 REDIRECT TO HOME PAGE
+        setTimeout(function(){ window.location.href = 'index.html'; }, 3000);
+        
+    } catch(e) {
+        showAlert('Failed: '+e.message,'Error','error');
+        btn.innerHTML = '<i class="fas fa-store"></i> Register Shop (Free)';
+        btn.disabled = false;
+        isProcessing = false;
+    }
+}
+
+async function renderForm() {
+    await loadCategories();
+    var catOpts = '<option value="">Select Category</option>';
+    categories.forEach(function(c){ catOpts += '<option value="'+escapeHtml(c.name)+'">'+escapeHtml(c.name)+'</option>'; });
+    
+    var userResult = await supabaseClient.auth.getUser();
+    var user = userResult.data.user;
+    var isLoggedIn = !!user;
+    
+    // 🔥 Already logged in - check for existing shop
+    if(isLoggedIn) {
+        var existingShop = await checkExistingShop(user.id);
+        if(existingShop && existingShop.status === 'approved') {
+            document.getElementById('mainContent').innerHTML = 
+                '<div class="already-shop-msg" style="margin-top:12px;">' +
+                '<i class="fas fa-check-circle" style="font-size:36px;color:var(--success);display:block;margin-bottom:8px;"></i>' +
+                '<h3 style="color:#059669;">You Already Have a Shop!</h3>' +
+                '<p style="color:#6B7280;margin:8px 0;">Your shop is active and approved.</p>' +
+                '<button class="auth-btn" onclick="window.location.href=\'shop-dashboard.html\'" style="margin-top:12px;">Go to Dashboard</button>' +
+                '<button class="auth-btn auth-btn-outline" onclick="window.location.href=\'index.html\'">Go to Home</button>' +
+                '</div>';
+            return;
+        }
+        if(existingShop && existingShop.status === 'pending') {
+            document.getElementById('mainContent').innerHTML = 
+                '<div class="already-shop-msg" style="margin-top:12px;">' +
+                '<i class="fas fa-clock" style="font-size:36px;color:var(--warning);display:block;margin-bottom:8px;"></i>' +
+                '<h3 style="color:#92400E;">Shop Pending Approval</h3>' +
+                '<p style="color:#6B7280;margin:8px 0;">Admin will review your shop soon.</p>' +
+                '<button class="auth-btn" onclick="window.location.href=\'index.html\'" style="margin-top:12px;">Go to Home</button>' +
+                '</div>';
+            return;
+        }
+    }
+    
+    var container = document.getElementById('mainContent');
+    container.innerHTML = 
+        '<div class="progress-steps">' +
+        '<div class="progress-step active"><span class="step-circle">1</span> Details</div><div class="progress-line"></div>' +
+        '<div class="progress-step"><span class="step-circle">2</span> Verify OTP</div><div class="progress-line"></div>' +
+        '<div class="progress-step"><span class="step-circle">3</span> Shop Info</div></div>' +
+        '<div class="hero-section"><div class="hero-icon"><i class="fas fa-store-alt"></i></div><div class="hero-title">Start Your Business</div><div class="hero-subtitle">Join Zatpat and grow online</div><div class="fee-badge"><i class="fas fa-gift"></i> 100% Free</div></div>' +
+        '<div class="form-card"><div class="form-header"><i class="fas fa-clipboard-list"></i><h2>Shop Registration</h2></div><div class="form-body">' +
+        '<div id="registerStepEmail" class="form-section" style="display:'+(isLoggedIn?'none':'block')+'">'+
+        (isLoggedIn?'':'<div class="form-group"><label class="form-label"><i class="fas fa-user"></i> Owner Name <span class="required">*</span></label><input type="text" id="registerName" class="form-control" placeholder="Full name" autocomplete="name"></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-envelope"></i> Email <span class="required">*</span></label><input type="email" id="registerEmail" class="form-control" placeholder="your@email.com" autocomplete="email"><small style="color:#6B7280;font-size:10px;">OTP sent here</small></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-phone"></i> Phone <span class="required">*</span></label><input type="tel" id="registerPhone" class="form-control" placeholder="10-digit" maxlength="10" autocomplete="tel"></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fab fa-whatsapp"></i> WhatsApp <span class="required">*</span></label><input type="tel" id="ownerWhatsapp" class="form-control" placeholder="WhatsApp" maxlength="10"></div>'+
+        '<button class="auth-btn" onclick="sendRegisterOTP()"><i class="fas fa-paper-plane"></i> Send OTP</button>')+
+        (isLoggedIn?'<p style="text-align:center;color:var(--success);"><i class="fas fa-check-circle"></i> Already logged in</p>':'')+
+        '</div>'+
+        '<div id="registerStepOTP" class="form-section" style="display:none;">'+
+        '<div class="otp-message"><i class="fas fa-envelope"></i> OTP sent to <strong id="otpEmailDisplay"></strong></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-key"></i> Enter OTP <span class="required">*</span></label><input type="text" id="registerOtp" class="form-control" placeholder="6-digit OTP" maxlength="6" autocomplete="one-time-code"></div>'+
+        '<button class="auth-btn" onclick="verifyOTP()"><i class="fas fa-check-circle"></i> Verify OTP</button>'+
+        '<button class="auth-btn auth-btn-outline" id="resendOtpBtn" onclick="resendOTP()">Resend OTP</button>'+
+        '<button class="auth-btn auth-btn-outline" onclick="document.getElementById(\'registerStepOTP\').style.display=\'none\';document.getElementById(\'registerStepEmail\').style.display=\'block\';updateProgress(1);" style="margin-top:4px;background:transparent;border:none;color:var(--text-secondary);">← Change Email</button></div>'+
+        '<div id="shopDetailsForm" class="form-section" style="display:none;">'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-camera"></i> Shop Photo</label><div class="image-upload-area" id="imageUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Tap to upload (max 150KB)</p><input type="file" id="shopImageInput" accept="image/*" style="display:none"><img id="imagePreview" class="image-preview"><div id="imageCompressInfo" class="compress-info"></div></div></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-store"></i> Shop Name <span class="required">*</span></label><input type="text" id="shopName" class="form-control" placeholder="Your shop name"></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-tags"></i> Category <span class="required">*</span></label><select id="shopCategory" class="form-control">'+catOpts+'</select></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-phone"></i> Shop Phone <span class="required">*</span></label><input type="tel" id="shopPhone" class="form-control" placeholder="Contact" maxlength="10"></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fab fa-whatsapp"></i> Shop WhatsApp</label><input type="tel" id="shopWhatsapp" class="form-control" placeholder="Optional" maxlength="10"></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-map-marker-alt"></i> Location <span class="required">*</span></label><button type="button" class="location-btn" onclick="captureShopLocation()"><i class="fas fa-location-dot"></i> Capture GPS</button><div id="locationStatus" class="location-status"><i class="fas fa-info-circle"></i> Click to capture</div><div id="locationCoords" class="location-coords"></div><div id="locationAddress" class="location-address"></div><input type="hidden" id="shopLatitude"><input type="hidden" id="shopLongitude"></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-address-card"></i> Address <span class="required">*</span></label><textarea id="shopAddress" class="form-control" rows="2" placeholder="Full address"></textarea></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-city"></i> City <span class="required">*</span></label><input type="text" id="shopCity" class="form-control" placeholder="City"></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-map-pin"></i> Pincode <span class="required">*</span></label><input type="text" id="shopPincode" class="form-control" placeholder="6-digit" maxlength="6"></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-align-left"></i> Description</label><textarea id="shopDesc" class="form-control" rows="2" placeholder="About shop (optional)"></textarea></div>'+
+        '<div class="form-group"><label class="form-label"><i class="fas fa-qrcode"></i> QR Code</label><div class="image-upload-area" id="qrUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Upload QR (optional)</p><input type="file" id="qrImageInput" accept="image/*" style="display:none"><img id="qrPreview" class="image-preview"><div id="qrCompressInfo" class="compress-info"></div></div></div>'+
+        '<div class="fee-summary"><div class="fee-row"><span>Registration</span><span class="free-tag">FREE</span></div><div class="fee-row total"><span>Total</span><span style="color:var(--success);">₹0</span></div></div>'+
+        '<button class="auth-btn" id="registerShopBtn" onclick="registerShop()"><i class="fas fa-rocket"></i> Register My Shop</button>'+
+        '<p class="text-muted"><i class="fas fa-clock"></i> Admin approval within 24 hours</p></div></div></div>';
+    
+    if(isLoggedIn){ currentUserId=user.id; updateProgress(1); }
+    setupImageUpload('imageUploadArea','shopImageInput','imagePreview','imageCompressInfo','selectedImageFile');
+    setupImageUpload('qrUploadArea','qrImageInput','qrPreview','qrCompressInfo','selectedQrFile');
+}
+
+function setupImageUpload(areaId,inputId,previewId,compressId,fileVar){
+    var area=document.getElementById(areaId),input=document.getElementById(inputId),preview=document.getElementById(previewId);
+    if(!area||!input)return;
+    area.onclick=function(){input.click();};
+    input.onchange=async function(e){
+        var file=e.target.files[0]; if(!file)return;
+        if(file.size>5*1024*1024){showAlert('Image too large (max 5MB)','Error','error');return;}
+        var origSize=(file.size/1024).toFixed(0);
+        var compEl=document.getElementById(compressId);
+        if(compEl){compEl.style.display='block';compEl.innerHTML='<i class="fas fa-spinner fa-spin"></i> Compressing...';}
+        var compressed=await compressImage(file);
+        var compSize=(compressed.size/1024).toFixed(0);
+        if(fileVar==='selectedImageFile')selectedImageFile=compressed;
+        else if(fileVar==='selectedQrFile')selectedQrFile=compressed;
+        if(compEl){compEl.innerHTML='<i class="fas fa-check-circle"></i> Ready: '+compSize+'KB';setTimeout(function(){compEl.style.display='none';},3000);}
+        var reader=new FileReader();
+        reader.onload=function(ev){if(preview){preview.src=ev.target.result;preview.style.display='block';}};
+        reader.readAsDataURL(compressed);
+        if(origSize!==compSize)showToast('📸 Compressed: '+origSize+'KB → '+compSize+'KB');
+    };
+}
+
+document.addEventListener('DOMContentLoaded',renderForm);
+
+window.sendRegisterOTP=sendRegisterOTP;
+window.verifyOTP=verifyOTP;
+window.resendOTP=resendOTP;
+window.registerShop=registerShop;
+window.captureShopLocation=captureShopLocation;
+window.goBack=goBack;
+window.closeAlert=closeAlert;
+</script>
+</body>
+</html>
