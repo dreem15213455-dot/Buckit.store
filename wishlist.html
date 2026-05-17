@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>मेरी विशलिस्ट - Zatpat</title>
+    <meta name="theme-color" content="#0F6E3B">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #0F6E3B; --primary-light: #16A34A; --primary-dark: #0B5C30;
+            --primary-bg: #DCFCE7; --primary-bg-dark: #BBF7D0;
+            --danger: #EF4444; --danger-bg: #FEE2E2;
+            --warning: #F59E0B; --warning-bg: #FEF3C7;
+            --border: #E5E7EB; --card: #FFFFFF; --bg: #F9FAFB;
+            --text: #111827; --text-secondary: #6B7280;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 15px rgba(15,110,59,0.10);
+            --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
+            --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg); color: var(--text);
+            padding-bottom: 85px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(60px); } }
+        @keyframes heartPop { 0%{transform:scale(1)} 30%{transform:scale(1.3)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
+        
+        /* ========== TOP BAR - ZATPAT STYLE ========== */
+        .top-bar {
+            background: var(--primary); position: fixed; top: 0; left: 0; width: 100%;
+            z-index: 100; padding: 10px 14px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 2px 12px rgba(15,110,59,0.3);
+            overflow: hidden;
+        }
+        
+        .top-bar::before {
+            content: ''; position: absolute; top: -60%; left: -35%;
+            width: 90%; height: 220%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 40%, transparent 100%);
+            transform: rotate(-12deg); pointer-events: none; z-index: 0;
+        }
+        
+        .back-btn {
+            width: 36px; height: 36px; background: rgba(255,255,255,0.2);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: none; color: white; font-size: 15px;
+            position: relative; z-index: 1; transition: all 0.15s;
+        }
+        .back-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.92); }
+        .top-title { flex: 1; font-size: 17px; font-weight: 800; color: white; position: relative; z-index: 1; }
+        .top-count { 
+            font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 600;
+            background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: var(--radius-full);
+            position: relative; z-index: 1;
+        }
+        
+        .main-content { padding-top: 60px; max-width: 600px; margin: 0 auto; }
+        
+        /* ========== WISHLIST ITEMS ========== */
+        .wishlist-items { padding: 12px 14px; }
+        
+        .wishlist-item {
+            background: var(--card); border-radius: var(--radius-lg); padding: 14px;
+            margin-bottom: 10px; display: flex; gap: 12px; align-items: center;
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            animation: slideUp 0.3s ease forwards; position: relative;
+            transition: all 0.2s ease;
+        }
+        .wishlist-item:active { box-shadow: var(--shadow-md); }
+        .wishlist-item.removing { animation: fadeOut 0.25s ease forwards; }
+        
+        .item-image {
+            width: 72px; height: 72px; border-radius: var(--radius-md);
+            background: var(--bg); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; border: 1px solid var(--border);
+        }
+        .item-image img { width: 100%; height: 100%; object-fit: cover; }
+        .item-image i { font-size: 28px; color: #D1D5DB; }
+        
+        .item-details { flex: 1; min-width: 0; }
+        .item-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; line-height: 1.3; }
+        .item-price-row { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+        .item-price { font-size: 16px; font-weight: 800; color: #000; }
+        .item-price-cut { font-size: 11px; color: var(--text-secondary); text-decoration: line-through; }
+        .item-unit { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+        .item-discount-badge {
+            font-size: 9px; font-weight: 800; color: #fff;
+            background: #F97316; padding: 2px 6px; border-radius: 4px;
+            margin-left: 4px;
+        }
+        
+        .item-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+        .move-cart-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 9px 18px; border-radius: var(--radius-full);
+            font-size: 11px; font-weight: 700; cursor: pointer;
+            white-space: nowrap; transition: all 0.15s; letter-spacing: 0.3px;
+        }
+        .move-cart-btn:active { background: var(--primary-dark); transform: scale(0.95); }
+        .move-cart-btn.done { background: #10B981; }
+        
+        .remove-btn {
+            width: 28px; height: 28px; background: var(--danger-bg);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: none; color: var(--danger); font-size: 10px;
+            transition: all 0.15s;
+        }
+        .remove-btn:active { background: #FECACA; transform: scale(0.9); }
+        .remove-btn i.animating { animation: heartPop 0.4s ease; }
+        
+        /* ========== EMPTY STATE ========== */
+        .empty-state {
+            text-align: center; padding: 70px 30px; animation: fadeIn 0.5s ease;
+        }
+        .empty-icon {
+            width: 80px; height: 80px; background: #F3F4F6; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .empty-icon i { font-size: 36px; color: #D1D5DB; }
+        .empty-state h3 { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+        .empty-state p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
+        .browse-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 12px 28px; border-radius: var(--radius-full);
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .browse-btn:active { background: var(--primary-dark); transform: scale(0.95); }
+        
+        /* ========== LOGIN REQUIRED ========== */
+        .login-required {
+            text-align: center; padding: 80px 30px; animation: fadeIn 0.5s ease;
+        }
+        .login-required .lock-icon {
+            width: 80px; height: 80px; background: #F3F4F6; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .login-required .lock-icon i { font-size: 34px; color: #9CA3AF; }
+        .login-required h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+        .login-required p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
+        .login-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 12px 28px; border-radius: var(--radius-full);
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .login-btn:active { background: var(--primary-dark); transform: scale(0.95); }
+        
+        /* ========== BOTTOM NAV ========== */
+        .bottom-nav {
+            background: white; position: fixed; bottom: 0; left: 0; width: 100%;
+            display: flex; justify-content: space-around; padding: 6px 12px 10px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 100;
+            border-top: 1px solid var(--border);
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            font-size: 10px; font-weight: 500; color: var(--text-secondary);
+            cursor: pointer; padding: 4px 12px; border-radius: var(--radius-full);
+            border: none; background: transparent; transition: all 0.15s;
+        }
+        .nav-item:active { background: var(--primary-bg); }
+        .nav-item.active { color: var(--primary); font-weight: 700; background: var(--primary-bg); }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+        
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: #111827; color: white; padding: 10px 20px;
+            border-radius: var(--radius-full); font-size: 12px; font-weight: 600;
+            z-index: 200; opacity: 0; visibility: hidden;
+            white-space: nowrap; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: all 0.25s;
+        }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-5px); }
+        .toast.error { background: #EF4444; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
+    <span class="top-title">❤️ मेरी विशलिस्ट</span>
+    <span class="top-count" id="wishlistCount">0 आइटम</span>
+</div>
+
+<div class="main-content" id="mainContent"></div>
+
+<nav class="bottom-nav">
+    <button class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>होम</span></button>
+    <button class="nav-item" onclick="window.location.href='products.html'"><i class="fas fa-box"></i><span>खोजें</span></button>
+    <button class="nav-item" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-cart"></i><span>कार्ट</span></button>
+    <button class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i><span>प्रोफाइल</span></button>
+    <button class="nav-item active"><i class="fas fa-heart"></i><span>विशलिस्ट</span></button>
+</nav>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var wishlist = [];
+    var isLoggedIn = false;
+    var currentUser = null;
+    
+    function showToast(msg, isError) {
+        var t = document.getElementById('toastMsg');
+        t.textContent = msg; t.className = 'toast';
+        if (isError) t.classList.add('error');
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+    }
+    
+    function goBack() { 
+        if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
+            window.history.back();
+        } else {
+            window.location.href = 'index.html';
+        }
+    }
+    
+    async function checkUser() {
+        try {
+            var res = await sb.auth.getSession();
+            if (res.data.session) {
+                currentUser = res.data.session.user;
+                isLoggedIn = true;
+                return true;
+            }
+        } catch(e) {}
+        return false;
+    }
+    
+    function loadWishlist() {
+        try {
+            var data = localStorage.getItem('zatpat_wishlist');
+            wishlist = data ? JSON.parse(data) : [];
+        } catch(e) {
+            wishlist = [];
+        }
+        return wishlist;
+    }
+    
+    function saveWishlist() {
+        try {
+            localStorage.setItem('zatpat_wishlist', JSON.stringify(wishlist));
+        } catch(e) {
+            showToast('स्टोरेज फुल! कुछ आइटम हटाएं', true);
+        }
+    }
+    
+    function updateCount() {
+        var count = wishlist.length;
+        var label = count === 1 ? 'आइटम' : 'आइटम';
+        document.getElementById('wishlistCount').textContent = count + ' ' + label;
+        return count;
+    }
+    
+    function moveToCart(index) {
+        if (index < 0 || index >= wishlist.length) return;
+        
+        var item = wishlist[index];
+        try {
+            var cart = JSON.parse(localStorage.getItem('zatpat_cart') || '[]');
+            var found = cart.find(function(c) { return c.id === item.id; });
+            if (found) {
+                found.quantity = (found.quantity || 1) + 1;
+            } else {
+                cart.push({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    image: item.image || '',
+                    quantity: 1,
+                    unit: item.unit || 'piece'
+                });
+            }
+            localStorage.setItem('zatpat_cart', JSON.stringify(cart));
+            
+            // Button animation
+            var btn = document.querySelector('#wishlistItem' + index + ' .move-cart-btn');
+            if (btn) {
+                btn.textContent = '✓ जुड़ गया';
+                btn.classList.add('done');
+                setTimeout(function() {
+                    btn.textContent = 'कार्ट में डालें';
+                    btn.classList.remove('done');
+                }, 1500);
+            }
+            
+            showToast('🛒 ' + (item.name || 'आइटम') + ' कार्ट में जुड़ गया!');
+            if (navigator.vibrate) navigator.vibrate(10);
+        } catch(e) {
+            showToast('कुछ गलत हुआ!', true);
+        }
+    }
+    
+    function removeItem(index) {
+        if (index < 0 || index >= wishlist.length) return;
+        
+        var item = wishlist[index];
+        var el = document.getElementById('wishlistItem' + index);
+        
+        if (el) {
+            el.classList.add('removing');
+            setTimeout(function() {
+                wishlist.splice(index, 1);
+                saveWishlist();
+                renderWishlist();
+                showToast('❤️ विशलिस्ट से हटाया');
+            }, 250);
+        } else {
+            wishlist.splice(index, 1);
+            saveWishlist();
+            renderWishlist();
+            showToast('❤️ विशलिस्ट से हटाया');
+        }
+    }
+    
+    function renderWishlist() {
+        loadWishlist();
+        var container = document.getElementById('mainContent');
+        
+        if (wishlist.length === 0) {
+            container.innerHTML = [
+                '<div class="empty-state">',
+                '<div class="empty-icon"><i class="far fa-heart"></i></div>',
+                '<h3>आपकी विशलिस्ट खाली है</h3>',
+                '<p>अपने पसंदीदा आइटम यहाँ सेव करें</p>',
+                '<button class="browse-btn" onclick="window.location.href=\'products.html\'"><i class="fas fa-shopping-bag"></i> प्रोडक्ट्स देखें</button>',
+                '</div>'
+            ].join('');
+            updateCount();
+            return;
+        }
+        
+        var html = '<div class="wishlist-items">';
+        
+        for (var i = 0; i < wishlist.length; i++) {
+            var item = wishlist[i];
+            var img = item.image || '';
+            
+            html += '<div class="wishlist-item" id="wishlistItem' + i + '" style="animation-delay:' + (i * 0.05) + 's;">';
+            
+            // Remove button
+            html += '<div class="item-actions">';
+            html += '<button class="remove-btn" onclick="removeItem(' + i + ')" title="हटाएं"><i class="fas fa-times"></i></button>';
+            html += '</div>';
+            
+            // Image
+            html += '<div class="item-image">';
+            if (img) {
+                html += '<img src="' + img + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">';
+                html += '<i class="fas fa-box-open" style="display:none;"></i>';
+            } else {
+                html += '<i class="fas fa-box-open"></i>';
+            }
+            html += '</div>';
+            
+            // Details
+            html += '<div class="item-details">';
+            html += '<div class="item-name">' + (item.name || 'प्रोडक्ट') + '</div>';
+            html += '<div class="item-price-row">';
+            html += '<span class="item-price">₹' + Number(item.price || 0).toLocaleString('en-IN') + '</span>';
+            if (item.originalPrice && item.originalPrice > item.price) {
+                html += '<span class="item-price-cut">₹' + Number(item.originalPrice).toLocaleString('en-IN') + '</span>';
+                var discount = Math.round((1 - item.price / item.originalPrice) * 100);
+                html += '<span class="item-discount-badge">' + discount + '% OFF</span>';
+            }
+            html += '</div>';
+            if (item.unit) {
+                html += '<div class="item-unit">' + item.unit + '</div>';
+            }
+            html += '</div>';
+            
+            // Add to cart button
+            html += '<button class="move-cart-btn" onclick="moveToCart(' + i + ')">कार्ट में डालें</button>';
+            
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
+        updateCount();
+    }
+    
+    // INIT
+    document.addEventListener('DOMContentLoaded', async function() {
+        await checkUser();
+        
+        if (!isLoggedIn) {
+            document.getElementById('mainContent').innerHTML = [
+                '<div class="login-required">',
+                '<div class="lock-icon"><i class="fas fa-lock"></i></div>',
+                '<h3>लॉगिन आवश्यक है</h3>',
+                '<p>विशलिस्ट देखने के लिए कृपया लॉगिन करें</p>',
+                '<button class="login-btn" onclick="window.location.href=\'index.html#login\'"><i class="fas fa-sign-in-alt"></i> लॉगिन करें</button>',
+                '</div>'
+            ].join('');
+            document.getElementById('wishlistCount').textContent = '0 आइटम';
+            return;
+        }
+        
+        renderWishlist();
+    });
+</script>
+</body>
+</html>

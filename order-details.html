@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ऑर्डर विवरण - Zatpat</title>
+    <meta name="theme-color" content="#0F6E3B">
+    <meta name="description" content="Zatpat - ऑर्डर का पूरा विवरण देखें">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #0F6E3B; --primary-light: #16A34A; --primary-dark: #0B5C30;
+            --primary-bg-light: #DCFCE7; --primary-bg-dark: #BBF7D0;
+            --accent-orange: #F97316; --accent-orange-dark: #EA580C;
+            --accent-red: #EF4444; --accent-yellow: #FACC15; --accent-gold: #F59E0B;
+            --bg-white: #FFFFFF; --bg-light: #F9FAFB; --text-primary: #111827;
+            --text-secondary: #6B7280; --text-white: #FFFFFF; --border-light: #E5E7EB;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+            --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px;
+            --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
+            background: var(--bg-light); color: var(--text-primary);
+            padding-bottom: 30px; -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased; min-height: 100vh;
+            overflow-x: hidden; width: 100%; max-width: 100%;
+        }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 36px; height: 36px; border: 3px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
+        .loader-logo { font-size: 22px; font-weight: 800; color: var(--primary); }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .top-bar { background: var(--primary); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(15,110,59,0.3); }
+        .back-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; outline: none; -webkit-tap-highlight-color: transparent; transition: all 0.15s; }
+        .back-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.92); }
+        .top-title { flex: 1; font-size: 16px; font-weight: 700; color: var(--text-white); }
+        
+        .main-content { padding-top: 58px; max-width: 600px; margin: 0 auto; min-height: 70vh; }
+        
+        .status-banner { margin: 12px 14px; padding: 16px; border-radius: var(--radius-lg); display: flex; align-items: center; gap: 12px; animation: slideUp 0.3s ease; }
+        .status-banner.pending { background: #FEF3C7; border: 1px solid #FCD34D; }
+        .status-banner.confirmed { background: #DBEAFE; border: 1px solid #93C5FD; }
+        .status-banner.delivered { background: #D1FAE5; border: 1px solid #A7F3D0; }
+        .status-banner.cancelled { background: #FEE2E2; border: 1px solid #FECACA; }
+        .status-banner.shipped { background: #E0E7FF; border: 1px solid #A5B4FC; }
+        
+        .status-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .pending .status-icon { background: #FDE68A; color: #D97706; }
+        .confirmed .status-icon { background: #BFDBFE; color: #2563EB; }
+        .delivered .status-icon { background: #A7F3D0; color: #059669; }
+        .cancelled .status-icon { background: #FECACA; color: #DC2626; }
+        .shipped .status-icon { background: #C7D2FE; color: #4F46E5; }
+        
+        .status-text { flex: 1; }
+        .status-title { font-size: 15px; font-weight: 700; }
+        .status-subtitle { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+        
+        .section { background: var(--bg-white); margin: 10px 14px; border-radius: var(--radius-lg); padding: 16px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); animation: slideUp 0.3s ease; }
+        .section-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--text-primary); }
+        .section-title i { color: var(--primary); width: 18px; text-align: center; }
+        
+        .info-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 12px; }
+        .info-label { color: var(--text-secondary); }
+        .info-value { font-weight: 600; text-align: right; max-width: 60%; word-break: break-word; font-family: 'Courier New', monospace; font-size: 11px; }
+        .info-value.order-id-full { letter-spacing: 0.3px; }
+        
+        .order-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-light); align-items: flex-start; }
+        .order-item:last-child { border-bottom: none; }
+        .item-img { width: 48px; height: 48px; border-radius: var(--radius-sm); background: var(--bg-light); flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .item-img img { width: 100%; height: 100%; object-fit: cover; }
+        .item-img i { font-size: 18px; color: #D1D5DB; }
+        .item-detail { flex: 1; min-width: 0; }
+        .item-name { font-size: 12px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-qty { font-size: 10px; color: var(--text-secondary); }
+        .item-price { font-size: 13px; font-weight: 700; text-align: right; white-space: nowrap; }
+        
+        .bill-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; color: var(--text-secondary); }
+        .bill-row.total { border-top: 2px solid var(--text-primary); padding-top: 10px; margin-top: 6px; font-size: 16px; font-weight: 800; color: var(--text-primary); }
+        .free-tag { color: var(--primary); font-weight: 700; }
+        
+        .address-card { font-size: 12px; line-height: 1.6; }
+        .address-card strong { font-size: 13px; display: block; margin-bottom: 2px; }
+        .address-card p { color: var(--text-secondary); margin-top: 2px; word-break: break-word; }
+        
+        .action-buttons { display: flex; gap: 10px; padding: 0 14px; margin-top: 16px; flex-wrap: wrap; }
+        .action-btn { flex: 1; min-width: 100px; padding: 12px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.15s; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; outline: none; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        .btn-reorder { background: var(--primary); color: white; }
+        .btn-reorder:active { background: var(--primary-dark); transform: scale(0.96); }
+        .btn-cancel { background: #FEE2E2; color: #EF4444; }
+        .btn-cancel:active { background: #FECACA; transform: scale(0.96); }
+        .btn-track { background: var(--primary-bg-light); color: var(--primary); border: 1px solid var(--primary); }
+        .btn-track:active { background: var(--primary-bg-dark); transform: scale(0.96); }
+        .btn-support { background: var(--bg-light); color: var(--text-primary); border: 1px solid var(--border-light); }
+        .btn-support:active { background: var(--border-light); transform: scale(0.96); }
+        
+        .invite-banner { margin: 12px 14px; padding: 14px; background: linear-gradient(135deg, #FEF3C7, #FFFBEB); border: 1px solid #FCD34D; border-radius: var(--radius-lg); text-align: center; animation: slideUp 0.3s ease; }
+        .invite-banner .invite-title { font-size: 14px; font-weight: 800; color: #92400E; margin-bottom: 4px; }
+        .invite-banner .invite-subtitle { font-size: 11px; color: #A16207; margin-bottom: 10px; }
+        .invite-banner .btn-invite-big { background: linear-gradient(135deg, #F59E0B, #D97706); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+        .invite-banner .btn-invite-big:active { transform: scale(0.96); }
+        
+        .loading-state { text-align: center; padding: 60px 20px; }
+        .spinner { width: 36px; height: 36px; border: 3px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+        
+        .error-state { text-align: center; padding: 50px 20px; animation: fadeIn 0.3s ease; }
+        .error-state i { font-size: 48px; color: #D1D5DB; margin-bottom: 12px; display: block; }
+        .error-state h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+        .error-state p { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
+        .error-state button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #111827; color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-lg); transition: all 0.25s; }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-5px); }
+        
+        .cancel-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9990; }
+        .cancel-modal.show { display: flex; }
+        .cancel-card { background: white; border-radius: var(--radius-xl); padding: 24px; width: 90%; max-width: 320px; text-align: center; animation: slideUp 0.3s ease; box-shadow: var(--shadow-lg); }
+        .cancel-card h4 { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+        .cancel-card p { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
+        .cancel-card button { width: 100%; padding: 12px; border-radius: var(--radius-full); font-size: 13px; font-weight: 700; cursor: pointer; border: none; margin-bottom: 8px; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+        .cancel-card button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .cancel-confirm { background: #EF4444; color: white; }
+        .cancel-confirm:active { background: #DC2626; }
+        .cancel-dismiss { background: var(--bg-light); color: var(--text-primary); }
+        .cancel-dismiss:active { background: var(--border-light); }
+        
+        @media (max-width: 380px) {
+            .action-btn { font-size: 10px; padding: 10px 8px; min-width: 80px; }
+            .section { padding: 12px; margin: 8px 10px; }
+            .status-banner { margin: 8px 10px; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo">Zatpat</div></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()" aria-label="वापस"><i class="fas fa-arrow-left"></i></button>
+        <span class="top-title">ऑर्डर विवरण</span>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="loading-state"><div class="spinner"></div><p style="color:var(--text-secondary);font-size:13px;">लोड हो रहा है...</p></div>
+    </div>
+</div>
+
+<div class="cancel-modal" id="cancelModal">
+    <div class="cancel-card">
+        <i class="fas fa-exclamation-triangle" style="font-size:36px;color:#EF4444;margin-bottom:8px;"></i>
+        <h4>ऑर्डर रद्द करें?</h4>
+        <p>क्या आप वाकई यह ऑर्डर रद्द करना चाहते हैं? यह क्रिया वापस नहीं ली जा सकती।</p>
+        <button class="cancel-confirm" id="cancelConfirmBtn" onclick="confirmCancel()">हाँ, रद्द करें</button>
+        <button class="cancel-dismiss" onclick="closeCancelModal()">नहीं, रखें</button>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+(function() {
+    'use strict';
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    var orderData = null;
+    var orderId = null;
+    var currentUser = null;
+    var isCancelling = false;
+    var initComplete = false;
+
+    function getFullUrl(url) {
+        if (!url) return '';
+        if (url.indexOf('http') === 0 || url.indexOf('data:') === 0) return url;
+        return SUPABASE_URL + '/storage/v1/object/public/' + url;
+    }
+
+    // 🆕 Format Order ID: first 8 + ... + last 4
+    function formatOrderId(fullId) {
+        if (!fullId) return '';
+        if (fullId.length <= 12) return '#' + fullId.toUpperCase();
+        var first = fullId.substring(0, 8).toUpperCase();
+        var last = fullId.substring(fullId.length - 4).toUpperCase();
+        return '#' + first + '...' + last;
+    }
+
+    function showApp() {
+        var loader = document.getElementById('simpleLoader');
+        var app = document.getElementById('mainApp');
+        if (app) app.style.display = '';
+        if (loader) {
+            loader.classList.add('fade-out');
+            setTimeout(function() {
+                if (loader.parentNode) loader.parentNode.removeChild(loader);
+            }, 350);
+        }
+    }
+
+    try { orderId = new URLSearchParams(window.location.search).get('id'); } catch(e) { orderId = null; }
+
+    var Cache = { 
+        set: function(k,d,t){try{localStorage.setItem('zc_'+k,JSON.stringify({d:d,e:Date.now()+(t||1800000)}));}catch(e){}}, 
+        get: function(k){try{var c=localStorage.getItem('zc_'+k);if(!c)return null;var p=JSON.parse(c);return Date.now()>p.e?(localStorage.removeItem('zc_'+k),null):p.d;}catch(e){return null;}} 
+    };
+
+    async function safeFetch(fetchFn, maxRetries) {
+        maxRetries = maxRetries || 3;
+        var lastError = null;
+        for (var i = 0; i < maxRetries; i++) {
+            try {
+                var result = await fetchFn();
+                if (result.error) {
+                    lastError = new Error(result.error.message || 'Database error');
+                    if (i === maxRetries - 1) throw lastError;
+                    await new Promise(function(r) { setTimeout(r, Math.pow(2, i) * 500); });
+                    continue;
+                }
+                return result;
+            } catch (err) {
+                lastError = err;
+                if (i === maxRetries - 1) throw lastError;
+                if (i < maxRetries - 1) {
+                    await new Promise(function(r) { setTimeout(r, Math.pow(2, i) * 500); });
+                }
+            }
+        }
+        throw lastError || new Error('Fetch failed');
+    }
+
+    window.addEventListener('online', function() { showToast('✅ इंटरनेट बहाल!'); if (initComplete) loadOrder(true); });
+    window.addEventListener('offline', function() { showToast('⚠️ ऑफलाइन', true); });
+
+    var touchStartY = 0;
+    document.addEventListener('touchstart', function(e) { touchStartY = e.touches[0].clientY; }, {passive: true});
+    document.addEventListener('touchend', function(e) {
+        if (window.scrollY === 0 && e.changedTouches[0].clientY - touchStartY > 100) {
+            showToast('🔄 रिफ्रेश हो रहा है...');
+            loadOrder(true);
+        }
+    }, {passive: true});
+
+    function showToast(msg, isError) {
+        isError = isError || false;
+        var t = document.getElementById('toastMsg');
+        if(!t) return;
+        t.textContent = msg; t.style.background = isError ? '#EF4444' : '#111827';
+        t.classList.add('show'); clearTimeout(t._timer);
+        t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+    }
+
+    function goBack() { 
+        try { 
+            if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) { 
+                window.history.back(); 
+                return; 
+            } 
+        } catch(e) {}
+        window.location.href = 'orders.html';
+    }
+    window.fastNavigate = function(url) { window.location.href = url; };
+
+    async function checkUser() {
+        try {
+            var res = await sb.auth.getSession();
+            if (res.data && res.data.session) {
+                currentUser = res.data.session.user;
+                return true;
+            }
+        } catch(e) {}
+        currentUser = null;
+        return false;
+    }
+
+    function getStatusInfo(status) {
+        var map = {
+            'pending': { icon: 'fa-clock', title: 'ऑर्डर लंबित', subtitle: 'कन्फर्मेशन का इंतज़ार है', cls: 'pending' },
+            'confirmed': { icon: 'fa-check-circle', title: 'ऑर्डर कन्फर्म', subtitle: 'आपका ऑर्डर प्रोसेस हो रहा है', cls: 'confirmed' },
+            'shipped': { icon: 'fa-truck', title: 'ऑर्डर भेजा गया', subtitle: 'आपका ऑर्डर रास्ते में है', cls: 'shipped' },
+            'delivered': { icon: 'fa-box-check', title: 'ऑर्डर डिलीवर', subtitle: 'खरीदारी का आनंद लें! 🎉', cls: 'delivered' },
+            'cancelled': { icon: 'fa-times-circle', title: 'ऑर्डर रद्द', subtitle: 'यह ऑर्डर रद्द कर दिया गया', cls: 'cancelled' }
+        };
+        return map[status] || map['pending'];
+    }
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    async function loadOrder(skipCache) {
+        skipCache = skipCache || false;
+        var container = document.getElementById('mainContent');
+        
+        if (!orderId) {
+            container.innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><h3>ऑर्डर नहीं मिला</h3><p>कोई ऑर्डर ID प्रदान नहीं की गई</p><button onclick="fastNavigate(\'orders.html\')">📋 सभी ऑर्डर देखें</button></div>';
+            return;
+        }
+        
+        if (!skipCache) {
+            var cached = Cache.get('order_detail_' + orderId);
+            if (cached) {
+                orderData = cached;
+                renderOrder();
+            }
+        }
+        
+        try {
+            var result = await safeFetch(function() {
+                return sb.from('orders').select('*').eq('id', orderId).single();
+            });
+            
+            if (result.data) {
+                orderData = result.data;
+                Cache.set('order_detail_' + orderId, orderData, 1800000);
+                renderOrder();
+            } else if (!orderData) {
+                container.innerHTML = '<div class="error-state"><i class="fas fa-search"></i><h3>ऑर्डर नहीं मिला</h3><p>यह ऑर्डर मौजूद नहीं है या हटा दिया गया</p><button onclick="fastNavigate(\'orders.html\')">📋 सभी ऑर्डर देखें</button></div>';
+            }
+        } catch(e) {
+            if (!orderData) {
+                container.innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><h3>लोड विफल</h3><p>कनेक्शन जांचें और पुनः प्रयास करें</p><button onclick="loadOrder(true)">🔄 पुनः प्रयास करें</button></div>';
+            }
+            showToast('❌ ऑर्डर लोड नहीं हुआ', true);
+        }
+    }
+
+    function renderOrder() {
+        if (!orderData) return;
+        
+        var statusInfo = getStatusInfo(orderData.status);
+        var orderIdDisplay = formatOrderId(orderData.id);
+        var fullOrderId = orderData.id || '';
+        var date = orderData.created_at ? new Date(orderData.created_at).toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+        var items = orderData.items || [];
+        var subtotal = parseFloat(orderData.subtotal) || 0;
+        var deliveryFee = parseFloat(orderData.delivery_fee);
+        if (isNaN(deliveryFee)) deliveryFee = 0;
+        var total = parseFloat(orderData.total_amount) || 0;
+        if (isNaN(total)) total = subtotal + deliveryFee;
+        
+        var html = '';
+        
+        // Status Banner
+        html += '<div class="status-banner ' + statusInfo.cls + '" style="animation-delay:0.05s;">';
+        html += '<div class="status-icon"><i class="fas ' + statusInfo.icon + '"></i></div>';
+        html += '<div class="status-text"><div class="status-title">' + statusInfo.title + '</div>';
+        html += '<div class="status-subtitle">' + statusInfo.subtitle + '</div></div></div>';
+        
+        // Order Info
+        html += '<div class="section" style="animation-delay:0.1s;"><div class="section-title"><i class="fas fa-info-circle"></i> ऑर्डर जानकारी</div>';
+        html += '<div class="info-row"><span class="info-label">ऑर्डर ID</span><span class="info-value order-id-full" title="' + escapeHTML(fullOrderId) + '">' + orderIdDisplay + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">तारीख</span><span class="info-value">' + escapeHTML(date) + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">भुगतान</span><span class="info-value">' + (orderData.payment_method === 'cod' ? '💵 कैश ऑन डिलीवरी' : '📱 UPI/ऑनलाइन') + '</span></div>';
+        if (orderData.payment_status) {
+            html += '<div class="info-row"><span class="info-label">भुगतान स्थिति</span><span class="info-value" style="color:' + (orderData.payment_status === 'paid' ? 'var(--primary)' : '#D97706') + ';">' + (orderData.payment_status === 'paid' ? '✅ भुगतान हो गया' : '⏳ लंबित') + '</span></div>';
+        }
+        html += '</div>';
+        
+        // Items
+        html += '<div class="section" style="animation-delay:0.15s;"><div class="section-title"><i class="fas fa-shopping-bag"></i> आइटम (' + items.length + ')</div>';
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            var qty = item.quantity || 1;
+            var price = parseFloat(item.price) || 0;
+            var img = getFullUrl(item.image || item.image_url || '');
+            var itemName = item.product_name || item.name || 'आइटम';
+            
+            html += '<div class="order-item">';
+            html += '<div class="item-img">';
+            if (img) {
+                html += '<img src="' + img + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" alt="' + escapeHTML(itemName) + '">';
+                html += '<i class="fas fa-box-open" style="display:none;"></i>';
+            } else { html += '<i class="fas fa-box-open"></i>'; }
+            html += '</div>';
+            html += '<div class="item-detail"><div class="item-name">' + escapeHTML(itemName) + '</div><div class="item-qty">' + qty + ' × ₹' + price.toLocaleString('en-IN') + '</div></div>';
+            html += '<div class="item-price">₹' + (price * qty).toLocaleString('en-IN') + '</div></div>';
+        }
+        html += '</div>';
+        
+        // Bill
+        html += '<div class="section" style="animation-delay:0.2s;"><div class="section-title"><i class="fas fa-receipt"></i> बिल विवरण</div>';
+        html += '<div class="bill-row"><span>आइटम कुल</span><span>₹' + subtotal.toLocaleString('en-IN') + '</span></div>';
+        html += '<div class="bill-row"><span>डिलीवरी शुल्क</span><span class="' + (deliveryFee === 0 ? 'free-tag' : '') + '">' + (deliveryFee === 0 ? '🎉 मुफ़्त' : '₹' + deliveryFee.toLocaleString('en-IN')) + '</span></div>';
+        if (orderData.discount_amount && parseFloat(orderData.discount_amount) > 0) {
+            html += '<div class="bill-row"><span>छूट</span><span style="color:var(--primary);">− ₹' + parseFloat(orderData.discount_amount).toLocaleString('en-IN') + '</span></div>';
+        }
+        html += '<div class="bill-row total"><span>कुल राशि</span><span>₹' + total.toLocaleString('en-IN') + '</span></div></div>';
+        
+        // Delivery Address
+        html += '<div class="section" style="animation-delay:0.25s;"><div class="section-title"><i class="fas fa-map-marker-alt"></i> डिलीवरी पता</div>';
+        html += '<div class="address-card"><strong>' + escapeHTML(orderData.customer_name || 'ग्राहक') + '</strong> 📞 ' + escapeHTML(orderData.customer_phone || '');
+        html += '<p>' + escapeHTML(orderData.customer_address || '') + ', ' + escapeHTML(orderData.customer_city || '') + ' — ' + escapeHTML(orderData.customer_pincode || '') + '</p></div></div>';
+        
+        // Actions
+        html += '<div class="action-buttons">';
+        html += '<button class="action-btn btn-reorder" onclick="reorder()"><i class="fas fa-redo"></i> दोबारा ऑर्डर</button>';
+        if (orderData.status === 'pending' || orderData.status === 'confirmed' || orderData.status === 'shipped') {
+            html += '<button class="action-btn btn-track" onclick="fastNavigate(\'order-tracking.html?id=' + orderData.id + '\')"><i class="fas fa-truck"></i> ट्रैक करें</button>';
+        }
+        if (orderData.status === 'pending') {
+            html += '<button class="action-btn btn-cancel" onclick="showCancelModal()"><i class="fas fa-times"></i> रद्द करें</button>';
+        }
+        html += '<button class="action-btn btn-support" onclick="window.open(\'https://wa.me/918600252238\',\'_blank\')"><i class="fab fa-whatsapp"></i> सहायता</button>';
+        html += '</div>';
+        
+        // 🎁 Invite & Earn (delivered orders)
+        if (orderData.status === 'delivered') {
+            html += '<div class="invite-banner" style="animation-delay:0.3s;">';
+            html += '<div class="invite-title">🎁 दोस्तों को इन्वाइट करें और ₹50 पाएं!</div>';
+            html += '<div class="invite-subtitle">हर दोस्त के पहले ऑर्डर पर आपको ₹50 मिलेंगे</div>';
+            html += '<button class="btn-invite-big" onclick="fastNavigate(\'invite-earn.html\')"><i class="fas fa-gift"></i> अभी इन्वाइट करें</button>';
+            html += '</div>';
+        }
+        
+        document.getElementById('mainContent').innerHTML = html;
+    }
+
+    window.reorder = function() {
+        if (!orderData || !orderData.items || !orderData.items.length) { showToast('कोई आइटम नहीं', true); return; }
+        try {
+            var cart = JSON.parse(localStorage.getItem('zatpat_cart') || '[]');
+            for (var i = 0; i < orderData.items.length; i++) {
+                var item = orderData.items[i];
+                var itemId = item.product_id || item.id;
+                if (!itemId) continue;
+                var itemImage = getFullUrl(item.image || item.image_url || '');
+                var found = cart.find(function(c) { return c.id === itemId; });
+                if (found) { found.quantity += (item.quantity || 1); }
+                else { cart.push({ id: itemId, name: item.product_name || item.name || 'प्रोडक्ट', price: item.price || 0, image: itemImage, quantity: item.quantity || 1, unit: item.unit || 'piece' }); }
+            }
+            localStorage.setItem('zatpat_cart', JSON.stringify(cart));
+            showToast('🛒 सभी आइटम कार्ट में जोड़े गए!');
+            if (navigator.vibrate) navigator.vibrate(10);
+            setTimeout(function() { fastNavigate('cart.html'); }, 500);
+        } catch(e) { showToast('❌ कार्ट में जोड़ने में विफल', true); }
+    };
+
+    window.showCancelModal = function() {
+        if (isCancelling) return;
+        var modal = document.getElementById('cancelModal');
+        if (modal) modal.classList.add('show');
+    };
+
+    window.closeCancelModal = function() {
+        if (isCancelling) return;
+        var modal = document.getElementById('cancelModal');
+        if (modal) modal.classList.remove('show');
+    };
+
+    window.confirmCancel = async function() {
+        if (isCancelling) return;
+        isCancelling = true;
+        var btn = document.getElementById('cancelConfirmBtn');
+        if (btn) { btn.disabled = true; btn.textContent = 'रद्द हो रहा है...'; }
+        
+        try {
+            if (!currentUser || !currentUser.id) {
+                var loggedIn = await checkUser();
+                if (!loggedIn) {
+                    showToast('❌ कृपया पहले लॉगिन करें', true);
+                    closeCancelModal();
+                    isCancelling = false;
+                    if (btn) { btn.disabled = false; btn.textContent = 'हाँ, रद्द करें'; }
+                    return;
+                }
+            }
+            
+            if (orderData.user_id && orderData.user_id !== currentUser.id) {
+                showToast('❌ अनधिकृत कार्रवाई', true);
+                closeCancelModal();
+                isCancelling = false;
+                if (btn) { btn.disabled = false; btn.textContent = 'हाँ, रद्द करें'; }
+                return;
+            }
+            
+            await safeFetch(function() { return sb.from('orders').update({ status: 'cancelled', cancelled_at: new Date().toISOString() }).eq('id', orderData.id).eq('user_id', currentUser.id); });
+            
+            orderData.status = 'cancelled';
+            Cache.set('order_detail_' + orderId, orderData, 1800000);
+            closeCancelModal();
+            renderOrder();
+            showToast('❌ ऑर्डर रद्द कर दिया गया');
+        } catch(e) {
+            showToast('❌ रद्द करने में विफल', true);
+        }
+        
+        isCancelling = false;
+        if (btn) { btn.disabled = false; btn.textContent = 'हाँ, रद्द करें'; }
+    };
+
+    window.handleBackPress = function() { goBack(); return true; };
+
+    async function init() {
+        var loggedIn = await checkUser();
+        if (!loggedIn || !currentUser) {
+            document.getElementById('mainContent').innerHTML = '<div class="error-state"><i class="fas fa-user-lock"></i><h3>लॉगिन आवश्यक</h3><p>ऑर्डर विवरण देखने के लिए कृपया लॉगिन करें</p><button onclick="localStorage.setItem(\'zatpat_redirect_after_login\',\'order-details.html?id=' + (orderId || '') + '\');fastNavigate(\'index.html\')">🔐 लॉगिन करें</button></div>';
+            showApp();
+            initComplete = true;
+            return;
+        }
+        await loadOrder();
+        showApp();
+        initComplete = true;
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    window.goBack = goBack;
+    window.fastNavigate = fastNavigate;
+    window.reorder = reorder;
+    window.showCancelModal = showCancelModal;
+    window.closeCancelModal = closeCancelModal;
+    window.confirmCancel = confirmCancel;
+    window.loadOrder = loadOrder;
+})();
+</script>
+</body>
+</html>

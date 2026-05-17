@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>दुकान श्रेणियाँ - Zatpat</title>
+    <meta name="theme-color" content="#0F6E3B">
+    <meta name="description" content="Zatpat पर सभी दुकान श्रेणियाँ ब्राउज़ करें">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #0F6E3B; --primary-light: #16A34A; --primary-dark: #0B5C30;
+            --primary-bg-light: #DCFCE7; --primary-bg-dark: #BBF7D0;
+            --accent-orange: #F97316; --accent-gold: #F59E0B;
+            --bg-white: #FFFFFF; --bg-light: #F9FAFB; --text-primary: #111827;
+            --text-secondary: #6B7280; --text-white: #FFFFFF; --border-light: #E5E7EB;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Noto Sans Devanagari', sans-serif; background: var(--bg-light); color: var(--text-primary); padding-bottom: 85px; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 36px; height: 36px; border: 3px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
+        .loader-logo { font-size: 22px; font-weight: 800; color: var(--primary); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .top-bar { background: var(--primary); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(15,110,59,0.3); }
+        .back-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; outline: none; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+        .back-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.92); }
+        .top-title { flex: 1; font-size: 17px; font-weight: 700; color: var(--text-white); }
+        .main-content { padding-top: 58px; max-width: 600px; margin: 0 auto; min-height: 70vh; }
+        
+        .categories-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px 14px; }
+        .category-card { background: var(--bg-white); border-radius: var(--radius-lg); padding: 20px 16px; text-align: center; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); cursor: pointer; animation: slideUp 0.3s ease forwards; transition: transform 0.15s, box-shadow 0.15s; }
+        .category-card:active { transform: scale(0.96); box-shadow: var(--shadow-md); }
+        .category-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-bg-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; color: var(--primary); overflow: hidden; }
+        .category-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .category-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        
+        .empty-state { text-align: center; padding: 60px 20px; animation: fadeIn 0.3s ease; }
+        .empty-state i { font-size: 48px; color: #D1D5DB; display: block; margin-bottom: 12px; }
+        .empty-state h3 { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+        .empty-state p { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
+        .empty-state button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        .loading-state { text-align: center; padding: 40px; }
+        .spinner { width: 28px; height: 28px; border: 3px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 10px; }
+        
+        .bottom-nav { background: white; position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 6px 12px 10px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 1000; border-top: 1px solid var(--border-light); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 500; color: var(--text-secondary); cursor: pointer; padding: 4px 12px; border-radius: var(--radius-full); border: none; background: transparent; outline: none; transition: all 0.15s; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .nav-item:active { background: var(--primary-bg-light); }
+        .nav-item.active { color: var(--primary); font-weight: 700; }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+        
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #111827; color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: 0 10px 25px rgba(0,0,0,0.15); transition: all 0.25s; }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-5px); }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo">Zatpat</div></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()" aria-label="वापस"><i class="fas fa-arrow-left"></i></button>
+        <span class="top-title">दुकान श्रेणियाँ</span>
+    </div>
+    <div class="main-content" id="mainContent">
+        <div class="loading-state"><div class="spinner"></div><p style="font-size:12px;color:var(--text-secondary);">लोड हो रही हैं...</p></div>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <button class="nav-item" onclick="fastNavigate('index.html')"><i class="fas fa-home"></i><span>होम</span></button>
+    <button class="nav-item" onclick="fastNavigate('products.html')"><i class="fas fa-box"></i><span>खोजें</span></button>
+    <button class="nav-item" onclick="fastNavigate('cart.html')"><i class="fas fa-shopping-cart"></i><span>कार्ट</span></button>
+    <button class="nav-item" onclick="fastNavigate('profile.html')"><i class="fas fa-user"></i><span>प्रोफाइल</span></button>
+    <button class="nav-item active"><i class="fas fa-tags"></i><span>श्रेणियाँ</span></button>
+</nav>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+(function() {
+    'use strict';
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    var initComplete = false;
+
+    function getFullUrl(url) { if(!url) return ''; if(url.indexOf('http')===0||url.indexOf('data:')===0) return url; return SUPABASE_URL+'/storage/v1/object/public/'+url; }
+    function escapeHTML(s) { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+    function showApp() { var l=document.getElementById('simpleLoader'),a=document.getElementById('mainApp'); if(a)a.style.display=''; if(l){l.classList.add('fade-out');setTimeout(function(){if(l.parentNode)l.parentNode.removeChild(l);},300);} }
+
+    var Cache = { set:function(k,d,t){try{localStorage.setItem('zc_'+k,JSON.stringify({d:d,e:Date.now()+(t||1800000)}));}catch(e){}}, get:function(k){try{var c=localStorage.getItem('zc_'+k);if(!c)return null;var p=JSON.parse(c);return Date.now()>p.e?(localStorage.removeItem('zc_'+k),null):p.d;}catch(e){return null;}} };
+
+    async function safeFetch(fn,r){r=r||3;var le=null;for(var i=0;i<r;i++){try{var res=await fn();if(res.error){le=new Error(res.error.message);if(i===r-1)throw le;}else return res;}catch(e){le=e;if(i===r-1)throw le;}await new Promise(function(rs){setTimeout(rs,Math.pow(2,i)*500);});}throw le;}
+
+    window.addEventListener('online',function(){showToast('✅ इंटरनेट बहाल!');if(initComplete)loadCategories();});
+    window.addEventListener('offline',function(){showToast('⚠️ ऑफलाइन',true);});
+    var tsY=0;document.addEventListener('touchstart',function(e){tsY=e.touches[0].clientY;},{passive:true});
+    document.addEventListener('touchend',function(e){if(window.scrollY===0&&e.changedTouches[0].clientY-tsY>100){showToast('🔄 रिफ्रेश हो रहा है...');loadCategories();}},{passive:true});
+
+    function showToast(m,e){e=e||false;var t=document.getElementById('toastMsg');if(!t)return;t.textContent=m;t.style.background=e?'#EF4444':'#111827';t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2200);}
+    function goBack(){try{if(document.referrer&&document.referrer.indexOf(window.location.host)!==-1){window.history.back();return;}}catch(e){}window.location.href='index.html';}
+    window.fastNavigate=function(u){window.location.href=u;};
+
+    async function loadCategories(){
+        var c=document.getElementById('mainContent');if(!c)return;
+        try{
+            var cached=Cache.get('shop_categories');var cats=cached;
+            if(!cats){var cr=await safeFetch(function(){return sb.from('categories').select('*').eq('is_active',true).order('name');});cats=cr.data||[];if(cats.length)Cache.set('shop_categories',cats,1800000);}
+            if(!cats.length){c.innerHTML='<div class="empty-state"><i class="fas fa-tags"></i><h3>कोई श्रेणी नहीं</h3><p>अभी तक कोई श्रेणी उपलब्ध नहीं है</p><button onclick="fastNavigate(\'index.html\')">होम पेज पर जाएं</button></div>';return;}
+            var iconMap={'Grocery & Kirana':'fa-shopping-basket','Fresh Vegetables':'fa-carrot','Fresh Fruits':'fa-apple-alt','Dairy Products':'fa-cheese','Bakery Items':'fa-bread-slice','Personal Care':'fa-pump-soap','Household Items':'fa-home','Beverages':'fa-mug-hot','Snacks & Biscuits':'fa-cookie','Frozen Foods':'fa-snowflake','Spices & Masala':'fa-mortar-pestle','Rice & Grains':'fa-wheat-awn'};
+            var h='<div class="categories-grid">';
+            for(var i=0;i<cats.length;i++){var cat=cats[i],icon=iconMap[cat.name]||'fa-store',imgUrl=getFullUrl(cat.image_url);h+='<div class="category-card" onclick="fastNavigate(\'category-shops.html?id='+cat.id+'&name='+encodeURIComponent(cat.name)+'\')" style="animation-delay:'+(i*0.05)+'s;">';h+='<div class="category-icon">'+(imgUrl?'<img src="'+imgUrl+'" loading="lazy" alt="'+escapeHTML(cat.name)+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">':'')+'<i class="fas '+icon+'"'+(imgUrl?' style="display:none;"':'')+'></i></div>';h+='<div class="category-name">'+escapeHTML(cat.name)+'</div></div>';}
+            h+='</div>';c.innerHTML=h;
+        }catch(e){c.innerHTML='<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>लोड विफल</h3><p>कृपया अपना कनेक्शन जांचें</p><button onclick="loadCategories()">🔄 पुनः प्रयास करें</button></div>';showToast('❌ लोड विफल',true);}
+    }
+
+    window.handleBackPress=function(){goBack();return true;};
+    document.addEventListener('DOMContentLoaded',function(){loadCategories();showApp();initComplete=true;});
+    window.loadCategories=loadCategories;window.goBack=goBack;window.fastNavigate=fastNavigate;
+})();
+</script>
+</body>
+</html>

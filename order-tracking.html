@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ऑर्डर ट्रैक करें - Zatpat</title>
+    <meta name="theme-color" content="#0F6E3B">
+    <meta name="description" content="Zatpat - अपने ऑर्डर को रियल-टाइम ट्रैक करें">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #0F6E3B; --primary-light: #16A34A; --primary-dark: #0B5C30;
+            --primary-bg-light: #DCFCE7; --primary-bg-dark: #BBF7D0;
+            --accent-orange: #F97316; --accent-orange-dark: #EA580C;
+            --accent-red: #EF4444; --accent-yellow: #FACC15; --accent-gold: #F59E0B;
+            --bg-white: #FFFFFF; --bg-light: #F9FAFB; --text-primary: #111827;
+            --text-secondary: #6B7280; --text-white: #FFFFFF; --border-light: #E5E7EB;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+            --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px;
+            --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', 'Noto Sans Devanagari', sans-serif; 
+            background: var(--bg-light); color: var(--text-primary); 
+            padding-bottom: 40px; -webkit-tap-highlight-color: transparent; 
+            -webkit-font-smoothing: antialiased; min-height: 100vh;
+            overflow-x: hidden; width: 100%; max-width: 100%;
+        }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 36px; height: 36px; border: 3px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
+        .loader-logo { font-size: 22px; font-weight: 800; color: var(--primary); }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%,100%{opacity:1; box-shadow: 0 0 0 0 rgba(15,110,59,0.4);} 50%{opacity:0.8; box-shadow: 0 0 0 8px rgba(15,110,59,0);} }
+        @keyframes pulse-red { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
+        
+        .top-bar { background: var(--primary); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(15,110,59,0.3); }
+        .back-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; outline: none; -webkit-tap-highlight-color: transparent; transition: all 0.15s; }
+        .back-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.92); }
+        .top-title { flex: 1; font-size: 17px; font-weight: 700; color: var(--text-white); }
+        
+        .main-content { padding-top: 60px; max-width: 600px; margin: 0 auto; min-height: 70vh; }
+        
+        .search-section { background: var(--bg-white); margin: 12px 14px; padding: 24px 16px; border-radius: var(--radius-xl); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); text-align: center; animation: slideUp 0.3s ease; }
+        .search-section .search-icon { font-size: 44px; color: var(--primary); margin-bottom: 12px; display: block; }
+        .search-section h3 { font-size: 17px; font-weight: 800; margin-bottom: 6px; color: var(--text-primary); }
+        .search-section p { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
+        .search-input { width: 100%; padding: 13px 16px; border: 2px solid var(--border-light); border-radius: var(--radius-full); font-size: 14px; font-family: 'Inter', sans-serif; outline: none; text-align: center; text-transform: uppercase; letter-spacing: 2px; transition: all 0.2s; background: var(--bg-light); }
+        .search-input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(15,110,59,0.1); }
+        .search-input::placeholder { text-transform: none; letter-spacing: normal; font-size: 12px; }
+        .track-btn { width: 100%; padding: 13px; background: var(--primary); color: white; border: none; border-radius: var(--radius-full); font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 12px; outline: none; -webkit-tap-highlight-color: transparent; transition: all 0.15s; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .track-btn:active { background: var(--primary-dark); transform: scale(0.97); }
+        .track-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .search-hint { font-size: 10px; color: #9CA3AF; margin-top: 10px; }
+        
+        .tracking-card { background: var(--bg-white); margin: 12px 14px; padding: 20px 16px; border-radius: var(--radius-xl); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); animation: slideUp 0.3s ease; }
+        .order-id-display { text-align: center; font-size: 14px; font-weight: 700; margin-bottom: 6px; padding: 8px 16px; background: var(--primary-bg-light); border-radius: var(--radius-full); display: inline-block; color: var(--primary-dark); font-family: 'Courier New', monospace; letter-spacing: 0.5px; }
+        .order-date { text-align: center; font-size: 11px; color: var(--text-secondary); margin-bottom: 22px; }
+        
+        .cancelled-banner { text-align: center; padding: 20px 10px; }
+        .cancelled-icon { font-size: 48px; color: #EF4444; margin-bottom: 10px; display: block; animation: pulse-red 2s infinite; }
+        .cancelled-title { font-size: 16px; font-weight: 800; color: #DC2626; margin-bottom: 4px; }
+        .cancelled-subtitle { font-size: 12px; color: #6B7280; margin-bottom: 2px; }
+        
+        .steps-container { position: relative; padding-left: 4px; }
+        .step { display: flex; gap: 14px; padding-bottom: 22px; position: relative; }
+        .step:last-child { padding-bottom: 0; }
+        .step-line { position: absolute; left: 19px; top: 42px; width: 2px; height: calc(100% - 20px); background: var(--border-light); border-radius: 1px; }
+        .step.completed .step-line { background: var(--primary); }
+        .step.current .step-line { background: linear-gradient(to bottom, var(--primary), var(--border-light)); }
+        .step.cancelled-step .step-line { background: #FECACA; }
+        .step-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 1; font-size: 16px; border: 3px solid var(--border-light); background: white; color: #D1D5DB; transition: all 0.3s ease; }
+        .step.completed .step-icon { border-color: var(--primary); background: var(--primary); color: white; }
+        .step.current .step-icon { border-color: var(--primary); background: white; color: var(--primary); animation: pulse 2s infinite; }
+        .step.cancelled-step .step-icon { border-color: #EF4444; background: #FEE2E2; color: #EF4444; }
+        .step-content { flex: 1; padding-top: 7px; }
+        .step-title { font-size: 13px; font-weight: 700; transition: color 0.3s; }
+        .step.completed .step-title, .step.current .step-title { color: var(--primary); }
+        .step.pending .step-title { color: var(--text-secondary); }
+        .step.cancelled-step .step-title { color: #DC2626; }
+        .step-desc { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+        .step-time { font-size: 9px; color: #9CA3AF; margin-top: 2px; font-weight: 500; }
+        
+        .summary-card { background: var(--bg-white); margin: 12px 14px; padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); animation: slideUp 0.35s ease; }
+        .summary-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .summary-title i { color: var(--primary); }
+        .summary-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 12px; color: var(--text-secondary); border-bottom: 1px solid var(--border-light); }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-row.total { font-size: 16px; font-weight: 800; color: var(--text-primary); border-top: 2px solid var(--text-primary); padding-top: 12px; margin-top: 6px; }
+        .free-tag { color: var(--primary); font-weight: 700; }
+        
+        .action-buttons { display: flex; gap: 10px; padding: 0 14px; margin-top: 14px; }
+        .action-btn { flex: 1; padding: 12px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; border: none; outline: none; -webkit-tap-highlight-color: transparent; transition: all 0.15s; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-outline { background: var(--bg-light); color: var(--text-primary); border: 1px solid var(--border-light); }
+        .btn-outline:active { background: var(--border-light); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:active { background: var(--primary-dark); transform: scale(0.96); }
+        .btn-whatsapp { background: #25D366; color: white; }
+        .btn-whatsapp:active { background: #1DA851; transform: scale(0.96); }
+        
+        .reset-link { text-align: center; padding: 14px; }
+        .reset-link button { background: none; border: none; color: var(--primary); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        .multiple-results { background: var(--bg-white); margin: 12px 14px; padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); animation: slideUp 0.3s ease; }
+        .multiple-results h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+        .result-item { padding: 10px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 8px; cursor: pointer; transition: all 0.15s; display: flex; justify-content: space-between; align-items: center; }
+        .result-item:active { background: var(--primary-bg-light); }
+        .result-item:last-child { margin-bottom: 0; }
+        .result-id { font-size: 12px; font-weight: 600; font-family: 'Courier New', monospace; }
+        .result-date { font-size: 10px; color: var(--text-secondary); }
+        .result-status { font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: var(--radius-full); }
+        
+        .error-detail { background: #FEF2F2; border: 1px solid #FECACA; border-radius: var(--radius-md); padding: 12px; margin-top: 12px; font-size: 11px; color: #991B1B; word-break: break-word; text-align: left; font-family: 'Courier New', monospace; }
+        
+        .empty-state { text-align: center; padding: 50px 20px; animation: fadeIn 0.3s ease; }
+        .empty-state i { font-size: 48px; color: #D1D5DB; display: block; margin-bottom: 12px; }
+        .empty-state h3 { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+        .empty-state p { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
+        .empty-state button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        .loading-state { text-align: center; padding: 30px; }
+        .spinner { width: 28px; height: 28px; border: 3px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 10px; }
+        
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #111827; color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-lg); transition: all 0.25s; }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-5px); }
+        
+        @media (max-width: 380px) {
+            .search-section { padding: 18px 12px; }
+            .tracking-card { padding: 16px 12px; }
+            .step { gap: 10px; }
+            .action-btn { font-size: 10px; padding: 10px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo">Zatpat</div></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()" aria-label="वापस"><i class="fas fa-arrow-left"></i></button>
+        <span class="top-title">ऑर्डर ट्रैक करें</span>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="search-section" id="searchSection">
+            <i class="fas fa-truck-fast search-icon"></i>
+            <h3>अपना ऑर्डर ट्रैक करें</h3>
+            <p>ऑर्डर ID का कम से कम 4 अक्षर डालें</p>
+            <input type="text" id="orderIdInput" class="search-input" placeholder="जैसे: 14BB4AFB" maxlength="50" autocomplete="off" autocorrect="off" autocapitalize="characters">
+            <button class="track-btn" id="trackBtn" onclick="trackOrder()"><i class="fas fa-search"></i> ऑर्डर ट्रैक करें</button>
+            <p class="search-hint"><i class="fas fa-info-circle" style="color:var(--accent-yellow);margin-right:4px;"></i> ऑर्डर ID कन्फर्मेशन SMS/ईमेल में है</p>
+        </div>
+        <div id="trackingResult"></div>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+(function() {
+    'use strict';
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    var currentUser = null;
+    var isTracking = false;
+    var initComplete = false;
+
+    function getFullUrl(url) {
+        if (!url) return '';
+        if (url.indexOf('http') === 0 || url.indexOf('data:') === 0) return url;
+        return SUPABASE_URL + '/storage/v1/object/public/' + url;
+    }
+
+    function formatOrderId(fullId) {
+        if (!fullId) return '';
+        if (fullId.length <= 12) return '#' + fullId.toUpperCase();
+        var first = fullId.substring(0, 8).toUpperCase();
+        var last = fullId.substring(fullId.length - 4).toUpperCase();
+        return '#' + first + '...' + last;
+    }
+
+    function showApp() {
+        var loader = document.getElementById('simpleLoader');
+        var app = document.getElementById('mainApp');
+        if (app) app.style.display = '';
+        if (loader) {
+            loader.classList.add('fade-out');
+            setTimeout(function() {
+                if (loader.parentNode) loader.parentNode.removeChild(loader);
+            }, 350);
+        }
+    }
+
+    var Cache = { 
+        set: function(k,d,t){try{localStorage.setItem('zc_'+k,JSON.stringify({d:d,e:Date.now()+(t||600000)}));}catch(e){}}, 
+        get: function(k){try{var c=localStorage.getItem('zc_'+k);if(!c)return null;var p=JSON.parse(c);return Date.now()>p.e?(localStorage.removeItem('zc_'+k),null):p.d;}catch(e){return null;}} 
+    };
+
+    async function safeFetch(fetchFn, maxRetries) {
+        maxRetries = maxRetries || 2;
+        var lastError = null;
+        for (var i = 0; i < maxRetries; i++) {
+            try {
+                var result = await fetchFn();
+                if (result.error) {
+                    lastError = new Error(result.error.message || 'Database error');
+                    lastError.code = result.error.code;
+                    lastError.details = result.error.details;
+                    lastError.hint = result.error.hint;
+                    if (i === maxRetries - 1) throw lastError;
+                    await new Promise(function(r) { setTimeout(r, Math.pow(2, i) * 500); });
+                    continue;
+                }
+                return result;
+            } catch (err) {
+                lastError = err;
+                if (i === maxRetries - 1) throw lastError;
+                if (i < maxRetries - 1) {
+                    await new Promise(function(r) { setTimeout(r, Math.pow(2, i) * 500); });
+                }
+            }
+        }
+        throw lastError || new Error('Fetch failed');
+    }
+
+    window.addEventListener('online', function() { showToast('✅ इंटरनेट बहाल!'); });
+    window.addEventListener('offline', function() { showToast('⚠️ ऑफलाइन', true); });
+
+    var touchStartY = 0;
+    document.addEventListener('touchstart', function(e) { touchStartY = e.touches[0].clientY; }, {passive: true});
+    document.addEventListener('touchend', function(e) {
+        if (window.scrollY === 0 && e.changedTouches[0].clientY - touchStartY > 100) {
+            showToast('🔄 रिफ्रेश हो रहा है...');
+            var orderIdInput = document.getElementById('orderIdInput');
+            if (orderIdInput && orderIdInput.value.trim()) trackOrder();
+        }
+    }, {passive: true});
+
+    function showToast(msg, isError) {
+        isError = isError || false;
+        var t = document.getElementById('toastMsg');
+        if(!t) return;
+        t.textContent = msg; t.style.background = isError ? '#EF4444' : '#111827';
+        t.classList.add('show'); clearTimeout(t._timer);
+        t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2500);
+    }
+
+    function goBack() { 
+        try { 
+            if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) { 
+                window.history.back(); 
+                return; 
+            } 
+        } catch(e) {}
+        window.location.href = 'orders.html';
+    }
+    window.fastNavigate = function(url) { window.location.href = url; };
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+
+    function sanitizeOrderId(raw) {
+        if (!raw) return '';
+        return raw.replace(/[^a-zA-Z0-9\-_]/g, '').substring(0, 50);
+    }
+
+    async function checkUser() {
+        try {
+            var res = await sb.auth.getSession();
+            if (res.data && res.data.session) {
+                currentUser = res.data.session.user;
+                return true;
+            }
+        } catch(e) {}
+        currentUser = null;
+        return false;
+    }
+
+    function getStatusBadge(status) {
+        var map = {
+            'pending': 'background:#FEF3C7;color:#D97706;',
+            'confirmed': 'background:#DBEAFE;color:#2563EB;',
+            'delivered': 'background:#D1FAE5;color:#059669;',
+            'cancelled': 'background:#FEE2E2;color:#DC2626;',
+            'shipped': 'background:#E0E7FF;color:#4F46E5;'
+        };
+        return map[status] || 'background:#F3F4F6;color:#6B7280;';
+    }
+
+    function getStatusText(status) {
+        var map = {'pending':'लंबित','confirmed':'कन्फर्म','delivered':'डिलीवर','cancelled':'रद्द','shipped':'शिप'};
+        return map[status] || status;
+    }
+
+    var trackingSteps = [
+        { key: 'pending', icon: 'fa-clock', title: 'ऑर्डर प्लेस हुआ', desc: 'आपका ऑर्डर प्राप्त हो गया है' },
+        { key: 'confirmed', icon: 'fa-check-circle', title: 'ऑर्डर कन्फर्म', desc: 'दुकान ने ऑर्डर कन्फर्म कर दिया' },
+        { key: 'processed', icon: 'fa-box', title: 'प्रोसेस हो रहा है', desc: 'आइटम पैक किए जा रहे हैं' },
+        { key: 'shipped', icon: 'fa-truck', title: 'डिलीवरी के लिए निकला', desc: 'डिलीवरी पार्टनर रास्ते में है' },
+        { key: 'delivered', icon: 'fa-box-check', title: 'डिलीवर हो गया', desc: 'ऑर्डर सफलतापूर्वक डिलीवर हो गया' }
+    ];
+
+    // 🔍 SMART SEARCH: Exact UUID → SQL Function → Fallback
+    async function findOrder(orderId) {
+        var errors = [];
+        
+        // Step 1: Exact UUID match (agar pura UUID dala ho)
+        if (orderId.length >= 32) {
+            try {
+                var exact = await sb.from('orders').select('*').eq('id', orderId).single();
+                if (exact.error && exact.error.code !== 'PGRST116') {
+                    errors.push('Exact match: ' + (exact.error.message || 'Unknown'));
+                }
+                if (exact.data) return { order: exact.data, multiple: false };
+            } catch(e) {
+                errors.push('Exact match failed: ' + (e.message || 'Network error'));
+            }
+        }
+        
+        // Step 2: SQL function se partial search (UUID → text cast)
+        if (orderId.length >= 4) {
+            try {
+                var funcResult = await sb.rpc('search_orders_by_partial_id', { search_term: orderId });
+                
+                if (funcResult.error) {
+                    errors.push('Function error [' + (funcResult.error.code || '') + ']: ' + (funcResult.error.message || 'Unknown'));
+                }
+                if (funcResult.data?.length === 1) {
+                    return { order: funcResult.data[0], multiple: false };
+                }
+                if (funcResult.data?.length > 1) {
+                    return { orders: funcResult.data, multiple: true };
+                }
+            } catch(e) {
+                errors.push('Function call failed: ' + (e.message || 'Network error'));
+            }
+        }
+        
+        if (errors.length > 0) return { error: errors.join(' | ') };
+        return null;
+    }
+
+    window.trackOrder = async function() {
+        if (isTracking) return;
+        
+        var rawId = (document.getElementById('orderIdInput')?.value || '').trim();
+        var orderId = sanitizeOrderId(rawId);
+        
+        if (!orderId || orderId.length < 4) { 
+            showToast('⚠️ कृपया कम से कम 4 अक्षर डालें', true); 
+            return; 
+        }
+        
+        isTracking = true;
+        var resultContainer = document.getElementById('trackingResult');
+        var trackBtn = document.getElementById('trackBtn');
+        
+        resultContainer.innerHTML = '<div class="loading-state"><div class="spinner"></div><p style="font-size:12px;color:var(--text-secondary);">खोज रहे हैं...</p></div>';
+        if (trackBtn) { trackBtn.disabled = true; trackBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> खोज रहे हैं...'; }
+        
+        try {
+            // Check cache
+            var cached = Cache.get('tracking_' + orderId);
+            var searchResult = null;
+            
+            if (cached) {
+                searchResult = { order: cached, multiple: false };
+            } else {
+                searchResult = await findOrder(orderId);
+                if (searchResult && !searchResult.multiple && !searchResult.error && searchResult.order) {
+                    Cache.set('tracking_' + orderId, searchResult.order, 600000);
+                }
+            }
+            
+            // Handle errors
+            if (searchResult && searchResult.error) {
+                var errorHtml = '<div class="empty-state">';
+                errorHtml += '<i class="fas fa-exclamation-triangle" style="color:#EF4444;"></i>';
+                errorHtml += '<h3>त्रुटि</h3>';
+                errorHtml += '<p>ऑर्डर खोजने में समस्या आई</p>';
+                errorHtml += '<div class="error-detail">' + escapeHTML(searchResult.error) + '</div>';
+                errorHtml += '<button onclick="resetSearch()" style="margin-top:12px;">🔄 पुनः प्रयास करें</button>';
+                errorHtml += '</div>';
+                resultContainer.innerHTML = errorHtml;
+                if (trackBtn) { trackBtn.disabled = false; trackBtn.innerHTML = '<i class="fas fa-search"></i> ऑर्डर ट्रैक करें'; }
+                isTracking = false;
+                return;
+            }
+            
+            // No results
+            if (!searchResult) {
+                resultContainer.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>ऑर्डर नहीं मिला</h3><p>"' + escapeHTML(orderId) + '" से कोई ऑर्डर नहीं मिला। कृपया ID जांचें।</p><button onclick="resetSearch()">🔄 दोबारा प्रयास करें</button></div>';
+                if (trackBtn) { trackBtn.disabled = false; trackBtn.innerHTML = '<i class="fas fa-search"></i> ऑर्डर ट्रैक करें'; }
+                isTracking = false;
+                return;
+            }
+            
+            // Multiple results
+            if (searchResult.multiple) {
+                renderMultipleResults(searchResult.orders);
+                if (trackBtn) { trackBtn.disabled = false; trackBtn.innerHTML = '<i class="fas fa-search"></i> ऑर्डर ट्रैक करें'; }
+                isTracking = false;
+                return;
+            }
+            
+            // Single result
+            renderTracking(searchResult.order);
+            
+        } catch(e) {
+            var errorHtml = '<div class="empty-state">';
+            errorHtml += '<i class="fas fa-exclamation-circle" style="color:#EF4444;"></i>';
+            errorHtml += '<h3>अनपेक्षित त्रुटि</h3>';
+            errorHtml += '<div class="error-detail">' + escapeHTML(e.message || 'Unknown error') + '</div>';
+            errorHtml += '<button onclick="resetSearch()" style="margin-top:12px;">🔄 पुनः प्रयास करें</button>';
+            errorHtml += '</div>';
+            resultContainer.innerHTML = errorHtml;
+            showToast('❌ ऑर्डर लोड नहीं हुआ', true);
+        }
+        
+        if (trackBtn) { trackBtn.disabled = false; trackBtn.innerHTML = '<i class="fas fa-search"></i> ऑर्डर ट्रैक करें'; }
+        isTracking = false;
+    };
+
+    function renderMultipleResults(orders) {
+        var resultContainer = document.getElementById('trackingResult');
+        var html = '<div class="multiple-results"><h4>🔍 ' + orders.length + ' ऑर्डर मिले — कृपया चुनें:</h4>';
+        
+        for (var i = 0; i < orders.length; i++) {
+            var o = orders[i];
+            var shortId = formatOrderId(o.id);
+            var date = o.created_at ? new Date(o.created_at).toLocaleDateString('hi-IN', {day:'numeric',month:'short'}) : '';
+            
+            html += '<div class="result-item" onclick="selectOrder(\'' + o.id + '\')">';
+            html += '<div><div class="result-id">' + shortId + '</div><div class="result-date">' + escapeHTML(date) + ' • ₹' + (parseFloat(o.total_amount)||0).toLocaleString('en-IN') + '</div></div>';
+            html += '<span class="result-status" style="' + getStatusBadge(o.status) + '">' + getStatusText(o.status) + '</span>';
+            html += '</div>';
+        }
+        html += '</div>';
+        html += '<div class="reset-link"><button onclick="resetSearch()"><i class="fas fa-arrow-left"></i> दूसरा ऑर्डर खोजें</button></div>';
+        
+        document.getElementById('searchSection').style.display = 'none';
+        resultContainer.innerHTML = html;
+    }
+
+    window.selectOrder = function(fullOrderId) {
+        document.getElementById('orderIdInput').value = fullOrderId;
+        trackOrder();
+    };
+
+    function renderTracking(order) {
+        var status = order.status || 'pending';
+        var isCancelled = status === 'cancelled';
+        var currentStepIndex = trackingSteps.findIndex(function(s) { return s.key === status; });
+        if (currentStepIndex < 0) currentStepIndex = 0;
+        
+        var orderIdDisplay = formatOrderId(order.id);
+        var date = order.created_at ? new Date(order.created_at).toLocaleDateString('hi-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+        
+        document.getElementById('searchSection').style.display = 'none';
+        
+        var html = '';
+        
+        html += '<div class="tracking-card" style="animation-delay:0.05s;">';
+        html += '<div style="text-align:center;"><span class="order-id-display" style="' + (isCancelled ? 'background:#FEE2E2;color:#DC2626;' : '') + '">📦 ' + orderIdDisplay + (isCancelled ? ' ❌' : '') + '</span></div>';
+        html += '<div class="order-date">📅 प्लेस किया: ' + escapeHTML(date) + '</div>';
+        
+        if (isCancelled) {
+            html += '<div class="cancelled-banner">';
+            html += '<i class="fas fa-times-circle cancelled-icon"></i>';
+            html += '<div class="cancelled-title">यह ऑर्डर रद्द कर दिया गया है</div>';
+            html += '<div class="cancelled-subtitle">यह ऑर्डर अब प्रोसेस नहीं होगा</div>';
+            if (order.cancelled_at) {
+                var cancelDate = new Date(order.cancelled_at).toLocaleDateString('hi-IN', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+                html += '<div class="cancelled-subtitle" style="margin-top:4px;">रद्द किया गया: ' + escapeHTML(cancelDate) + '</div>';
+            }
+            html += '</div>';
+            
+            if (currentStepIndex >= 0) {
+                html += '<div class="steps-container">';
+                for (var i = 0; i < trackingSteps.length; i++) {
+                    var step = trackingSteps[i];
+                    var cls = i <= currentStepIndex ? 'completed' : 'pending';
+                    if (i === currentStepIndex) cls = 'cancelled-step';
+                    
+                    html += '<div class="step ' + cls + '">';
+                    if (i < trackingSteps.length - 1) html += '<div class="step-line"></div>';
+                    html += '<div class="step-icon"><i class="fas ' + (cls === 'completed' ? 'fa-check' : cls === 'cancelled-step' ? 'fa-times' : step.icon) + '"></i></div>';
+                    html += '<div class="step-content"><div class="step-title">' + step.title + '</div><div class="step-desc">' + (cls === 'cancelled-step' ? 'इस चरण पर रद्द हुआ' : step.desc) + '</div>';
+                    if (cls === 'completed') html += '<div class="step-time" style="color:var(--primary);">✓ पूर्ण</div>';
+                    if (cls === 'cancelled-step') html += '<div class="step-time" style="color:#EF4444;">✗ रद्द</div>';
+                    html += '</div></div>';
+                }
+                html += '</div>';
+            }
+        } else {
+            html += '<div class="steps-container">';
+            for (var i = 0; i < trackingSteps.length; i++) {
+                var step = trackingSteps[i];
+                var cls = i < currentStepIndex ? 'completed' : i === currentStepIndex ? 'current' : 'pending';
+                
+                html += '<div class="step ' + cls + '">';
+                if (i < trackingSteps.length - 1) html += '<div class="step-line"></div>';
+                html += '<div class="step-icon"><i class="fas ' + (cls === 'completed' ? 'fa-check' : step.icon) + '"></i></div>';
+                html += '<div class="step-content"><div class="step-title">' + step.title + '</div><div class="step-desc">' + step.desc + '</div>';
+                if (cls === 'current') html += '<div class="step-time" style="color:var(--primary);font-weight:700;">⚡ प्रगति में...</div>';
+                if (cls === 'completed') html += '<div class="step-time" style="color:var(--primary);">✓ पूर्ण</div>';
+                html += '</div></div>';
+            }
+            html += '</div>';
+        }
+        html += '</div>';
+        
+        var items = order.items || [];
+        var subtotal = parseFloat(order.subtotal) || 0;
+        if (isNaN(subtotal)) subtotal = 0;
+        var deliveryFee = parseFloat(order.delivery_fee);
+        if (isNaN(deliveryFee)) deliveryFee = 0;
+        var total = parseFloat(order.total_amount) || subtotal + deliveryFee;
+        if (isNaN(total)) total = 0;
+        
+        html += '<div class="summary-card" style="animation-delay:0.15s;">';
+        html += '<div class="summary-title"><i class="fas fa-receipt"></i> ऑर्डर सारांश</div>';
+        html += '<div class="summary-row"><span>कुल आइटम</span><span>' + items.length + ' आइटम</span></div>';
+        html += '<div class="summary-row"><span>सबटोटल</span><span>₹' + subtotal.toLocaleString('en-IN') + '</span></div>';
+        html += '<div class="summary-row"><span>डिलीवरी शुल्क</span><span class="' + (deliveryFee === 0 ? 'free-tag' : '') + '">' + (deliveryFee === 0 ? '🎉 मुफ़्त' : '₹' + deliveryFee.toLocaleString('en-IN')) + '</span></div>';
+        html += '<div class="summary-row total"><span>कुल राशि</span><span>₹' + total.toLocaleString('en-IN') + '</span></div>';
+        html += '</div>';
+        
+        html += '<div class="action-buttons">';
+        html += '<button class="action-btn btn-outline" onclick="fastNavigate(\'order-details.html?id=' + order.id + '\')"><i class="fas fa-info-circle"></i> विवरण</button>';
+        if (!isCancelled) {
+            html += '<button class="action-btn btn-whatsapp" onclick="window.open(\'https://wa.me/918600252238?text=Order%20' + encodeURIComponent(order.id) + '\',\'_blank\')"><i class="fab fa-whatsapp"></i> सहायता</button>';
+        }
+        html += '</div>';
+        
+        if (!isCancelled && status === 'delivered') {
+            html += '<div style="margin:12px 14px;padding:14px;background:linear-gradient(135deg,#FEF3C7,#FFFBEB);border:1px solid #FCD34D;border-radius:var(--radius-lg);text-align:center;animation:slideUp 0.35s ease;">';
+            html += '<div style="font-size:14px;font-weight:800;color:#92400E;margin-bottom:4px;">🎁 दोस्तों को इन्वाइट करें और ₹50 पाएं!</div>';
+            html += '<div style="font-size:11px;color:#A16207;margin-bottom:10px;">हर दोस्त के पहले ऑर्डर पर आपको ₹50 मिलेंगे</div>';
+            html += '<button style="background:linear-gradient(135deg,#F59E0B,#D97706);color:white;border:none;padding:10px 20px;border-radius:var(--radius-full);font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;" onclick="fastNavigate(\'invite-earn.html\')"><i class="fas fa-gift"></i> अभी इन्वाइट करें</button>';
+            html += '</div>';
+        }
+        
+        html += '<div class="reset-link"><button onclick="resetSearch()"><i class="fas fa-arrow-left"></i> दूसरा ऑर्डर ट्रैक करें</button></div>';
+        
+        document.getElementById('trackingResult').innerHTML = html;
+    }
+
+    window.resetSearch = function() {
+        document.getElementById('searchSection').style.display = 'block';
+        document.getElementById('trackingResult').innerHTML = '';
+        var input = document.getElementById('orderIdInput');
+        if (input) { input.value = ''; input.focus(); }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.handleBackPress = function() { goBack(); return true; };
+
+    async function init() {
+        await checkUser();
+        
+        document.getElementById('orderIdInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') trackOrder();
+        });
+        
+        try {
+            var urlParams = new URLSearchParams(window.location.search);
+            var autoId = urlParams.get('id') || urlParams.get('order_id');
+            if (autoId) {
+                var sanitized = sanitizeOrderId(autoId);
+                if (sanitized) {
+                    var input = document.getElementById('orderIdInput');
+                    if (input) input.value = sanitized;
+                    trackOrder();
+                }
+            }
+        } catch(e) {}
+        
+        showApp();
+        initComplete = true;
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    window.goBack = goBack;
+    window.fastNavigate = fastNavigate;
+    window.trackOrder = trackOrder;
+    window.resetSearch = resetSearch;
+    window.selectOrder = selectOrder;
+})();
+</script>
+</body>
+</html>
