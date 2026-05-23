@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>गोपनीयता नीति - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="Zymart - गोपनीयता नीति">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-green-light: #0F6E3B; --brand-green-dark: #083D21;
+            --brand-orange: #F59E0B; --brand-orange-dark: #E8890A;
+            --brand-white: #F5F5F5;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 2px 16px rgba(11,90,49,0.3);
+            --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
+            background: var(--neutral-bg); color: var(--neutral-dark);
+            padding-bottom: 85px; min-height: 100vh;
+            -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased;
+        }
+        
+        .top-bar { background: var(--brand-green); padding: 12px 14px; display: flex; align-items: center; gap: 10px; position: fixed; top: 0; left: 0; width: 100%; z-index: 100; box-shadow: var(--shadow-md); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; transition: all 0.15s ease; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { font-family: 'Poppins', sans-serif; flex: 1; font-size: 16px; font-weight: 700; color: var(--brand-white); }
+        
+        .content { padding: 66px 14px 30px; max-width: 800px; margin: 0 auto; }
+        
+        .section { background: var(--neutral-white); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 14px; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-xs); }
+        h2 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--brand-green); display: flex; align-items: center; gap: 8px; }
+        h2 i { color: var(--brand-orange); }
+        h3 { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; margin: 16px 0 8px; color: var(--neutral-dark); display: flex; align-items: center; gap: 6px; }
+        h3 i { color: var(--brand-green); font-size: 14px; }
+        p { font-size: 14px; color: var(--neutral-gray); line-height: 1.7; margin-bottom: 10px; }
+        ul { margin: 8px 0 12px 20px; }
+        li { font-size: 14px; color: var(--neutral-gray); line-height: 1.7; margin-bottom: 6px; }
+        a { color: var(--brand-orange); font-weight: 600; text-decoration: none; }
+        
+        .highlight-box { background: #EDF7F1; border-radius: var(--radius-sm); padding: 14px; margin: 16px 0; border-left: 4px solid var(--brand-green); }
+        .highlight-box strong { color: var(--brand-green); }
+        
+        .contact-info { background: #EDF7F1; border-radius: var(--radius-sm); padding: 14px; margin-top: 20px; text-align: center; border: 1px solid #C8E6C9; }
+        .contact-info strong { color: var(--brand-green); }
+        .contact-info a { color: var(--brand-green); font-weight: 700; }
+        
+        .bottom-nav { background: white; position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 5px 10px 10px; box-shadow: 0 -4px 16px rgba(0,0,0,0.03); z-index: 100; border-top: 1px solid var(--neutral-border); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 9px; font-weight: 500; color: var(--neutral-gray); cursor: pointer; padding: 3px 10px; border-radius: var(--radius-full); border: none; background: transparent; transition: all 0.15s ease; font-family: 'Inter', sans-serif; }
+        .nav-item:active { background: #EDF7F1; }
+        .nav-item i { font-size: 18px; margin-bottom: 1px; }
+        .cart-count { position: absolute; top: -4px; right: -5px; background: var(--brand-orange); color: white; border-radius: 50%; width: 15px; height: 15px; font-size: 8px; display: flex; align-items: center; justify-content: center; border: 2px solid white; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="back-btn" onclick="goBack()" aria-label="वापस"><i class="fas fa-arrow-left"></i></button>
+    <span class="top-title">गोपनीयता नीति</span>
+</div>
+
+<div class="content">
+    <div class="section">
+        <h2><i class="fas fa-shield-alt"></i> गोपनीयता नीति</h2>
+        <p><strong>अंतिम अपडेट:</strong> 21 अप्रैल 2026</p>
+
+        <p>Zymart में, हम आपकी गोपनीयता को गंभीरता से लेते हैं। यह गोपनीयता नीति बताती है कि हम आपकी व्यक्तिगत जानकारी कैसे एकत्र, उपयोग और सुरक्षित करते हैं।</p>
+
+        <div class="highlight-box">
+            <strong>✅ आपका विश्वास महत्वपूर्ण है:</strong> हम आपका व्यक्तिगत डेटा कभी भी तीसरे पक्ष को नहीं बेचते। आपकी जानकारी केवल आपको सबसे अच्छा खरीदारी अनुभव देने के लिए उपयोग की जाती है।
+        </div>
+
+        <h3><i class="fas fa-database"></i> 1. हम कौन सी जानकारी एकत्र करते हैं</h3>
+        <p>जब आप हमारी सेवाओं का उपयोग करते हैं तो हम निम्नलिखित जानकारी एकत्र करते हैं:</p>
+        <ul>
+            <li><strong>खाता निर्माण:</strong> नाम, ईमेल, फ़ोन नंबर</li>
+            <li><strong>ऑर्डर प्लेसमेंट:</strong> डिलीवरी पता, भुगतान विवरण</li>
+            <li><strong>ग्राहक सहायता:</strong> संपर्क इतिहास</li>
+            <li><strong>दुकान रजिस्ट्रेशन:</strong> व्यवसाय विवरण, स्थान</li>
+            <li><strong>स्वचालित डेटा:</strong> डिवाइस जानकारी, स्थान डेटा, उपयोग डेटा</li>
+        </ul>
+
+        <h3><i class="fas fa-cogs"></i> 2. हम आपकी जानकारी का उपयोग कैसे करते हैं</h3>
+        <ul>
+            <li>ऑर्डर प्रोसेस और डिलीवरी के लिए</li>
+            <li>ऑर्डर अपडेट और प्रचार ऑफर भेजने के लिए</li>
+            <li>ऐप और सेवाओं में सुधार के लिए</li>
+            <li>धोखाधड़ी रोकने और सुरक्षा के लिए</li>
+            <li>कानूनी दायित्वों का पालन करने के लिए</li>
+        </ul>
+
+        <h3><i class="fas fa-share-alt"></i> 3. जानकारी साझाकरण</h3>
+        <p>हम आपकी जानकारी केवल निम्नलिखित स्थितियों में साझा करते हैं:</p>
+        <ul>
+            <li><strong>दुकान मालिकों के साथ:</strong> ऑर्डर पूरा करने के लिए</li>
+            <li><strong>डिलीवरी पार्टनर के साथ:</strong> ऑर्डर डिलीवर करने के लिए</li>
+            <li><strong>भुगतान प्रोसेसर के साथ:</strong> सुरक्षित भुगतान के लिए</li>
+            <li><strong>कानूनी आवश्यकता होने पर:</strong> कानूनी अनुरोधों का पालन करने के लिए</li>
+        </ul>
+        <p><strong>हम आपका व्यक्तिगत डेटा मार्केटिंग उद्देश्यों के लिए तीसरे पक्ष को नहीं बेचते, किराए पर नहीं देते।</strong></p>
+
+        <h3><i class="fas fa-shield-virus"></i> 4. डेटा सुरक्षा</h3>
+        <ul>
+            <li>सभी डेटा SSL/TLS का उपयोग करके एन्क्रिप्ट किया जाता है</li>
+            <li>भुगतान जानकारी सुरक्षित PCI-अनुपालक गेटवे के माध्यम से प्रोसेस होती है</li>
+            <li>हम नियमित रूप से अपनी सुरक्षा प्रथाओं की समीक्षा करते हैं</li>
+        </ul>
+
+        <h3><i class="fas fa-user-check"></i> 5. आपके अधिकार</h3>
+        <ul>
+            <li>अपना व्यक्तिगत डेटा एक्सेस करें</li>
+            <li>गलत जानकारी सही करें</li>
+            <li>खाता और डेटा हटाने का अनुरोध करें</li>
+            <li>प्रचार संचार से ऑप्ट-आउट करें</li>
+            <li>किसी भी समय सहमति वापस लें</li>
+        </ul>
+
+        <h3><i class="fas fa-clock"></i> 6. डेटा अवधारण</h3>
+        <p>हम आपकी जानकारी तब तक रखते हैं जब तक आपका खाता सक्रिय है। खाता हटाने पर, कानून द्वारा आवश्यक को छोड़कर, 30 दिनों के भीतर डेटा हटा दिया जाएगा।</p>
+
+        <div class="contact-info">
+            <strong>📞 संपर्क करें:</strong><br>
+            📧 <a href="mailto:sk12shaikh@gmail.com">sk12shaikh@gmail.com</a><br>
+            📞 <a href="tel:8600252238">8600252238</a><br>
+            💬 <a href="https://wa.me/918600252238" style="color:#25D366;">WhatsApp सपोर्ट</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function goBack() {
+        try { if (document.referrer && document.referrer.indexOf(window.location.host) > -1) { window.history.back(); return; } } catch(e) {}
+        window.location.href = 'index.html';
+    }
+    window.fastNavigate = function(url) { window.location.href = url; };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            var cart = JSON.parse(localStorage.getItem('zatpat_cart') || '[]');
+            var count = cart.reduce(function(s, i) { return s + (i.quantity || 1); }, 0);
+            var badge = document.querySelector('.cart-count');
+            if (badge) badge.textContent = count;
+        } catch(e) {}
+    });
+</script>
+</body>
+</html>

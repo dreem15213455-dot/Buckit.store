@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ऑर्डर विवरण - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="Zymart - ऑर्डर का पूरा विवरण देखें">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-green-light: #0F6E3B; --brand-green-dark: #083D21;
+            --brand-orange: #F59E0B; --brand-orange-dark: #E8890A; --brand-orange-light: #FFB020;
+            --brand-white: #F5F5F5;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-xl: 22px; --radius-full: 9999px;
+            --ease-fast: cubic-bezier(0.4,0,0.2,1); --ease-smooth: cubic-bezier(0.45,0,0.15,1); --ease-spring: cubic-bezier(0.34,1.15,0.64,1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--neutral-bg); color: var(--neutral-dark);
+            padding-bottom: 30px; -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased; min-height: 100vh;
+            overflow-x: hidden; width: 100%; max-width: 100%;
+        }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--neutral-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; transition: opacity 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; }
+        .loader-zy { color: var(--brand-green); }
+        .loader-mart { color: var(--brand-orange); }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* TOP BAR - Better touch target */
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; outline: none; transition: all 0.15s ease; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { font-family: 'Poppins', sans-serif; flex: 1; font-size: 16px; font-weight: 700; color: var(--brand-white); }
+        .share-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; outline: none; transition: all 0.15s ease; }
+        .share-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        
+        .main-content { padding-top: 62px; max-width: 600px; margin: 0 auto; min-height: 70vh; }
+        
+        /* STATUS BANNER - Better sized */
+        .status-banner { margin: 12px 14px; padding: 16px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px; animation: slideUp 0.3s ease; }
+        .status-banner.pending { background: #FFF8EB; border: 1px solid #FDE68A; }
+        .status-banner.confirmed { background: #EFF6FF; border: 1px solid #BFDBFE; }
+        .status-banner.delivered { background: #EDF7F1; border: 1px solid #A7F3D0; }
+        .status-banner.cancelled { background: #FEF2F2; border: 1px solid #FECACA; }
+        .status-banner.shipped { background: #E0E7FF; border: 1px solid #A5B4FC; }
+        .status-icon { width: 48px; height: 48px; min-width: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .pending .status-icon { background: #FDE68A; color: #D97706; }
+        .confirmed .status-icon { background: #BFDBFE; color: #2563EB; }
+        .delivered .status-icon { background: #A7F3D0; color: #059669; }
+        .cancelled .status-icon { background: #FECACA; color: #DC2626; }
+        .shipped .status-icon { background: #C7D2FE; color: #4F46E5; }
+        .status-text { flex: 1; }
+        .status-title { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; line-height: 1.3; }
+        .status-subtitle { font-size: 12px; color: var(--neutral-gray); margin-top: 2px; line-height: 1.4; }
+        
+        /* SECTION - Better spacing */
+        .section { background: var(--neutral-white); margin: 10px 14px; border-radius: var(--radius-md); padding: 16px; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-xs); animation: slideUp 0.3s ease; }
+        .section-title { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: var(--brand-green); width: 18px; font-size: 15px; text-align: center; }
+        
+        /* INFO ROWS - Better readable */
+        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; }
+        .info-label { color: var(--neutral-gray); font-weight: 500; }
+        .info-value { font-weight: 600; text-align: right; max-width: 60%; word-break: break-word; font-size: 13px; }
+        .info-value.mono { font-family: 'SF Mono', 'Courier New', monospace; font-size: 12px; letter-spacing: 0.3px; background: #F3F5F4; padding: 3px 8px; border-radius: 6px; }
+        
+        /* ORDER ITEMS - Better sized */
+        .order-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--neutral-border); align-items: flex-start; }
+        .order-item:last-child { border-bottom: none; }
+        .item-img { width: 52px; height: 52px; min-width: 52px; border-radius: var(--radius-sm); background: var(--neutral-bg); flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .item-img img { width: 100%; height: 100%; object-fit: cover; }
+        .item-img i { font-size: 20px; color: #D1D5DB; }
+        .item-detail { flex: 1; min-width: 0; }
+        .item-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+        .item-qty { font-size: 11px; color: var(--neutral-gray); margin-top: 1px; }
+        .item-price { font-size: 14px; font-weight: 700; text-align: right; white-space: nowrap; }
+        
+        /* BILL - Better hierarchy */
+        .bill-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; color: var(--neutral-gray); }
+        .bill-row.total { border-top: 2px solid var(--neutral-dark); padding-top: 12px; margin-top: 6px; font-size: 17px; font-weight: 800; color: var(--neutral-dark); }
+        .bill-row.total .bill-amount { color: var(--brand-green); }
+        .free-tag { color: #22C55E; font-weight: 700; }
+        .discount-row { color: #22C55E; font-weight: 600; }
+        
+        /* ADDRESS - Better readable */
+        .address-card { font-size: 13px; line-height: 1.7; }
+        .address-card strong { font-size: 14px; display: block; margin-bottom: 2px; }
+        .address-card .phone { color: var(--brand-green); font-weight: 600; }
+        .address-card p { color: var(--neutral-gray); margin-top: 2px; word-break: break-word; font-size: 12px; }
+        
+        /* ACTIONS - Better sized buttons */
+        .action-buttons { display: flex; gap: 10px; padding: 0 14px; margin-top: 16px; flex-wrap: wrap; }
+        .action-btn { flex: 1; min-width: 100px; padding: 13px 10px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.15s ease; border: none; display: flex; align-items: center; justify-content: center; gap: 6px; outline: none; font-family: 'Inter', sans-serif; letter-spacing: 0.1px; }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        .btn-reorder { background: var(--brand-green); color: white; box-shadow: 0 4px 14px rgba(11,90,49,0.25); }
+        .btn-reorder:active { background: var(--brand-green-dark); transform: scale(0.96); }
+        .btn-cancel { background: #FEF2F2; color: #EF4444; border: 1px solid #FECACA; }
+        .btn-cancel:active { background: #FECACA; transform: scale(0.96); }
+        .btn-track { background: #EDF7F1; color: var(--brand-green); border: 1px solid var(--brand-green); }
+        .btn-track:active { background: #C8E6C9; transform: scale(0.96); }
+        .btn-support { background: var(--neutral-bg); color: var(--neutral-dark); border: 1px solid var(--neutral-border); }
+        .btn-support:active { background: var(--neutral-border); transform: scale(0.96); }
+        
+        /* INVITE BANNER */
+        .invite-banner { margin: 12px 14px; padding: 14px; background: #FFF8EB; border: 1px solid #FDE68A; border-radius: var(--radius-md); text-align: center; animation: slideUp 0.3s ease; }
+        .invite-banner .invite-title { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; color: #92400E; margin-bottom: 4px; }
+        .invite-banner .invite-subtitle { font-size: 11px; color: #A16207; margin-bottom: 10px; }
+        .btn-invite-big { background: var(--brand-orange); color: white; border: none; padding: 11px 22px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s ease; box-shadow: 0 4px 14px rgba(245,158,11,0.25); }
+        .btn-invite-big:active { background: var(--brand-orange-dark); transform: scale(0.96); }
+        
+        /* STATES */
+        .loading-state { text-align: center; padding: 60px 20px; }
+        .spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+        .loading-state p { color: var(--neutral-gray); font-size: 13px; }
+        
+        .error-state { text-align: center; padding: 50px 20px; animation: slideUp 0.3s ease; }
+        .error-state i { font-size: 52px; color: #D1D5DB; margin-bottom: 12px; display: block; }
+        .error-state h3 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .error-state p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 16px; }
+        .error-state button { background: var(--brand-green); color: white; border: none; padding: 11px 24px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .error-state .btn-orange { background: var(--brand-orange); }
+        
+        /* TOAST */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 11px 22px; border-radius: var(--radius-full); font-size: 12px; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-lg); transition: all 0.3s ease; }
+        .toast.show { opacity: 1; visibility: visible; }
+        
+        /* CANCEL MODAL */
+        .cancel-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8,61,33,0.75); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 9990; }
+        .cancel-modal.show { display: flex; }
+        .cancel-card { background: white; border-radius: var(--radius-xl); padding: 28px 24px; width: 90%; max-width: 330px; text-align: center; animation: slideUp 0.3s ease; box-shadow: var(--shadow-lg); }
+        .cancel-card .warn-icon { font-size: 40px; color: #EF4444; margin-bottom: 10px; }
+        .cancel-card h4 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .cancel-card p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 18px; line-height: 1.5; }
+        .cancel-card button { width: 100%; padding: 13px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; border: none; margin-bottom: 8px; font-family: 'Inter', sans-serif; transition: all 0.15s ease; }
+        .cancel-card button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .cancel-confirm { background: #EF4444; color: white; }
+        .cancel-confirm:active { background: #DC2626; }
+        .cancel-dismiss { background: var(--neutral-bg); color: var(--neutral-dark); border: 1px solid var(--neutral-border); }
+        
+        @media (max-width: 380px) {
+            .status-title { font-size: 15px; }
+            .section-title { font-size: 13px; }
+            .item-name { font-size: 12px; }
+            .item-price { font-size: 13px; }
+            .bill-row { font-size: 12px; }
+            .bill-row.total { font-size: 16px; }
+            .action-btn { font-size: 11px; min-width: 85px; padding: 11px 8px; }
+            .section { padding: 14px; margin: 8px 10px; }
+            .status-banner { margin: 8px 10px; padding: 14px; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">mart</span></div></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()" aria-label="वापस"><i class="fas fa-arrow-left"></i></button>
+        <span class="top-title">ऑर्डर विवरण</span>
+        <button class="share-btn" id="shareBtn" onclick="shareOrder()" aria-label="शेयर"><i class="fas fa-share-alt"></i></button>
+    </div>
+    <div class="main-content" id="mainContent">
+        <div class="loading-state"><div class="spinner"></div><p>ऑर्डर लोड हो रहा है...</p></div>
+    </div>
+</div>
+
+<div class="cancel-modal" id="cancelModal">
+    <div class="cancel-card">
+        <div class="warn-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <h4>ऑर्डर रद्द करें?</h4>
+        <p>क्या आप वाकई यह ऑर्डर रद्द करना चाहते हैं? यह क्रिया वापस नहीं ली जा सकती।</p>
+        <button class="cancel-confirm" id="cancelConfirmBtn" onclick="confirmCancel()">हाँ, रद्द करें</button>
+        <button class="cancel-dismiss" onclick="closeCancelModal()">नहीं, रखें</button>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    // ============ CRASH-PROOF ============
+    window.addEventListener('error', function(e) { try { console.error('[Zymart Crash]', e.message); } catch(ex) {} });
+    window.addEventListener('unhandledrejection', function(e) { try { console.error('[Zymart Promise Crash]', e.reason); } catch(ex) {} e.preventDefault(); });
+    
+    function safeJSONParse(s, f) { try { return s ? JSON.parse(s) : f; } catch(e) { return f; } }
+    function safeGetElement(id) { try { return document.getElementById(id); } catch(e) { return null; } }
+    function safeSetText(id, t) { try { var el = document.getElementById(id); if (el) el.textContent = t; } catch(e) {} }
+    function escapeHTML(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+    
+    // ============ INIT ============
+    var sb = null;
+    try { sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'); }
+    catch(e) { sb = { auth: { getSession: function() { return Promise.resolve({ data: { session: null } }); } } }; }
+    
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    var orderData = null, orderId = null, currentUser = null, isCancelling = false, initComplete = false;
+    
+    function getFullUrl(u) { if (!u || typeof u !== 'string') return ''; if (u.indexOf('http')===0 || u.indexOf('data:')===0) return u; return SUPABASE_URL + '/storage/v1/object/public/' + u; }
+    function formatOrderId(fid) { if (!fid) return ''; if (fid.length <= 12) return '#' + fid.toUpperCase(); return '#' + fid.substring(0,8).toUpperCase() + '...' + fid.substring(fid.length-4).toUpperCase(); }
+    
+    function showApp() { var l = safeGetElement('simpleLoader'), a = safeGetElement('mainApp'); if (a) a.style.display = ''; if (l) { l.classList.add('fade-out'); setTimeout(function() { if (l && l.parentNode) l.parentNode.removeChild(l); }, 350); } }
+    function showToast(m, e) { try { var t = safeGetElement('toastMsg'); if (!t) return; t.textContent = m; t.style.background = e ? '#EF4444' : '#1A1A1A'; t.classList.add('show'); clearTimeout(t._timer); t._timer = setTimeout(function() { t.classList.remove('show'); }, 2500); } catch(ex) {} }
+    
+    try { orderId = new URLSearchParams(window.location.search).get('id'); } catch(e) { orderId = null; }
+    
+    var Cache = { set: function(k,d,t) { try { localStorage.setItem('zm_'+k, JSON.stringify({d:d,e:Date.now()+(t||1800000)})); } catch(e) {} }, get: function(k) { try { var c=localStorage.getItem('zm_'+k); if(!c) return null; var p=JSON.parse(c); return Date.now()>p.e ? (localStorage.removeItem('zm_'+k), null) : p.d; } catch(e) { return null; } } };
+    
+    async function safeFetch(fn, r) { r=r||3; for(var i=0;i<r;i++){try{var res=await fn();if(res&&res.error){if(i===r-1)throw new Error(res.error.message);await new Promise(function(x){setTimeout(x,600*(i+1));});continue;}return res||{data:null};}catch(e){if(i===r-1)return{data:null};await new Promise(function(x){setTimeout(x,600*(i+1));});}} return {data:null}; }
+    
+    window.addEventListener('online', function() { showToast('✅ इंटरनेट बहाल!'); if (initComplete) loadOrder(true); });
+    window.addEventListener('offline', function() { showToast('⚠️ ऑफलाइन', true); });
+    
+    function goBack() { try { if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) { window.history.back(); return; } } catch(e) {} window.location.href = 'orders.html'; }
+    window.fastNavigate = function(url) { window.location.href = url; };
+    
+    async function checkUser() { try { var r = await sb.auth.getSession(); if (r && r.data && r.data.session) { currentUser = r.data.session.user; return true; } } catch(e) {} currentUser = null; return false; }
+    
+    function getStatusInfo(s) { var m = { 'pending': { icon: 'fa-clock', title: 'ऑर्डर लंबित', subtitle: 'कन्फर्मेशन का इंतज़ार है', cls: 'pending' }, 'confirmed': { icon: 'fa-check-circle', title: 'ऑर्डर कन्फर्म', subtitle: 'आपका ऑर्डर प्रोसेस हो रहा है', cls: 'confirmed' }, 'shipped': { icon: 'fa-truck', title: 'रास्ते में है', subtitle: 'जल्द ही आप तक पहुँचेगा', cls: 'shipped' }, 'delivered': { icon: 'fa-box-check', title: 'डिलीवर हो गया', subtitle: 'खरीदारी का आनंद लें! 🎉', cls: 'delivered' }, 'cancelled': { icon: 'fa-times-circle', title: 'ऑर्डर रद्द', subtitle: 'यह ऑर्डर रद्द कर दिया गया है', cls: 'cancelled' } }; return m[s] || m['pending']; }
+    
+    async function loadOrder(skip) {
+        var c = safeGetElement('mainContent');
+        if (!orderId) { if (c) c.innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><h3>ऑर्डर नहीं मिला</h3><p>कोई ऑर्डर ID प्रदान नहीं की गई</p><button onclick="fastNavigate(\'orders.html\')">📋 सभी ऑर्डर देखें</button></div>'; return; }
+        if (!skip) { var cached = Cache.get('order_detail_' + orderId); if (cached) { orderData = cached; renderOrder(); } }
+        try {
+            var r = await safeFetch(function() { return sb.from('orders').select('*').eq('id', orderId).single(); });
+            if (r.data) { orderData = r.data; Cache.set('order_detail_' + orderId, orderData, 1800000); renderOrder(); }
+            else if (!orderData && c) { c.innerHTML = '<div class="error-state"><i class="fas fa-search"></i><h3>ऑर्डर नहीं मिला</h3><p>यह ऑर्डर मौजूद नहीं है या हटा दिया गया</p><button onclick="fastNavigate(\'orders.html\')">📋 सभी ऑर्डर देखें</button></div>'; }
+        } catch(e) { if (!orderData && c) { c.innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><h3>लोड विफल</h3><p>कनेक्शन जांचें और पुनः प्रयास करें</p><button onclick="loadOrder(true)">🔄 पुनः प्रयास करें</button></div>'; } }
+    }
+    
+    function renderOrder() {
+        if (!orderData) return;
+        var si = getStatusInfo(orderData.status), oid = formatOrderId(orderData.id), fid = orderData.id || '';
+        var date = orderData.created_at ? new Date(orderData.created_at).toLocaleDateString('hi-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+        var items = orderData.items || [], subtotal = parseFloat(orderData.subtotal) || 0, df = parseFloat(orderData.delivery_fee) || 0, total = parseFloat(orderData.total_amount) || (subtotal+df);
+        var discount = parseFloat(orderData.discount_amount) || 0;
+        
+        // Status Banner
+        var html = '<div class="status-banner ' + si.cls + '" style="animation-delay:0.05s;"><div class="status-icon"><i class="fas ' + si.icon + '"></i></div><div class="status-text"><div class="status-title">' + si.title + '</div><div class="status-subtitle">' + si.subtitle + '</div></div></div>';
+        
+        // Order Info — better formatted
+        html += '<div class="section" style="animation-delay:0.1s;"><div class="section-title"><i class="fas fa-info-circle"></i> ऑर्डर जानकारी</div>';
+        html += '<div class="info-row"><span class="info-label">ऑर्डर ID</span><span class="info-value mono" title="' + escapeHTML(fid) + '">' + oid + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">तारीख</span><span class="info-value">' + escapeHTML(date) + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">भुगतान विधि</span><span class="info-value">' + (orderData.payment_method === 'cod' ? '💵 कैश ऑन डिलीवरी' : '📱 UPI / ऑनलाइन') + '</span></div>';
+        if (orderData.payment_status) {
+            var psText = orderData.payment_status === 'paid' ? '✅ भुगतान हो गया' : '⏳ लंबित';
+            var psColor = orderData.payment_status === 'paid' ? '#059669' : '#D97706';
+            html += '<div class="info-row"><span class="info-label">भुगतान स्थिति</span><span class="info-value" style="color:' + psColor + ';">' + psText + '</span></div>';
+        }
+        html += '</div>';
+        
+        // Items
+        html += '<div class="section" style="animation-delay:0.15s;"><div class="section-title"><i class="fas fa-shopping-bag"></i> ऑर्डर आइटम (' + items.length + ')</div>';
+        for (var i = 0; i < items.length; i++) { var item = items[i], qty = item.quantity || 1, price = parseFloat(item.price) || 0, img = getFullUrl(item.image || item.image_url || ''), iname = item.product_name || item.name || 'आइटम'; html += '<div class="order-item"><div class="item-img">' + (img ? '<img src="' + img + '" loading="lazy" onerror="this.style.display=\'none\';"><i class="fas fa-box-open"></i>' : '<i class="fas fa-box-open"></i>') + '</div><div class="item-detail"><div class="item-name">' + escapeHTML(iname) + '</div><div class="item-qty">' + qty + ' × ₹' + price.toLocaleString('en-IN') + '</div></div><div class="item-price">₹' + (price*qty).toLocaleString('en-IN') + '</div></div>'; }
+        html += '</div>';
+        
+        // Bill
+        html += '<div class="section" style="animation-delay:0.2s;"><div class="section-title"><i class="fas fa-receipt"></i> बिल विवरण</div>';
+        html += '<div class="bill-row"><span>आइटम कुल</span><span>₹' + subtotal.toLocaleString('en-IN') + '</span></div>';
+        html += '<div class="bill-row"><span>डिलीवरी शुल्क</span><span class="' + (df===0?'free-tag':'') + '">' + (df===0?'🎉 मुफ़्त':'₹'+df.toLocaleString('en-IN')) + '</span></div>';
+        if (discount > 0) { html += '<div class="bill-row discount-row"><span>🎫 छूट</span><span>− ₹' + discount.toLocaleString('en-IN') + '</span></div>'; }
+        html += '<div class="bill-row total"><span>कुल राशि</span><span class="bill-amount">₹' + total.toLocaleString('en-IN') + '</span></div></div>';
+        
+        // Address
+        html += '<div class="section" style="animation-delay:0.25s;"><div class="section-title"><i class="fas fa-map-marker-alt"></i> डिलीवरी पता</div>';
+        html += '<div class="address-card"><strong>' + escapeHTML(orderData.customer_name || 'ग्राहक') + '</strong> <span class="phone">📞 ' + escapeHTML(orderData.customer_phone || '') + '</span>';
+        html += '<p>' + escapeHTML(orderData.customer_address || '') + ', ' + escapeHTML(orderData.customer_city || '') + ' — ' + escapeHTML(orderData.customer_pincode || '') + '</p></div></div>';
+        
+        // Actions
+        html += '<div class="action-buttons">';
+        html += '<button class="action-btn btn-reorder" onclick="reorder()"><i class="fas fa-redo"></i> दोबारा ऑर्डर करें</button>';
+        if (orderData.status === 'pending' || orderData.status === 'confirmed') { html += '<button class="action-btn btn-track" onclick="fastNavigate(\'order-tracking.html?id=' + orderData.id + '\')"><i class="fas fa-truck"></i> ट्रैक करें</button>'; }
+        if (orderData.status === 'pending') { html += '<button class="action-btn btn-cancel" onclick="showCancelModal()"><i class="fas fa-times"></i> रद्द करें</button>'; }
+        html += '<button class="action-btn btn-support" onclick="window.open(\'https://wa.me/918600252238\',\'_blank\')"><i class="fab fa-whatsapp"></i> सहायता</button>';
+        html += '</div>';
+        
+        // Invite for delivered orders
+        if (orderData.status === 'delivered') { html += '<div class="invite-banner" style="animation-delay:0.3s;"><div class="invite-title">🎁 दोस्तों को इन्वाइट करें और ₹50 पाएं!</div><div class="invite-subtitle">हर दोस्त के पहले ऑर्डर पर आपको ₹50 मिलेंगे</div><button class="btn-invite-big" onclick="fastNavigate(\'invite-earn.html\')"><i class="fas fa-gift"></i> अभी इन्वाइट करें</button></div>'; }
+        
+        var mc = safeGetElement('mainContent'); if (mc) mc.innerHTML = html;
+    }
+    
+    // ============ SHARE ORDER ============
+    window.shareOrder = function() {
+        if (!orderData) return;
+        var text = '🧾 Zymart ऑर्डर #' + formatOrderId(orderData.id) + '\n📦 ' + (orderData.items||[]).length + ' आइटम | ₹' + (parseFloat(orderData.total_amount)||0).toLocaleString('en-IN') + '\n📅 ' + new Date(orderData.created_at).toLocaleDateString('hi-IN');
+        if (navigator.share) { navigator.share({ title: 'Zymart Order', text: text }).catch(function() {}); }
+        else { try { navigator.clipboard.writeText(text); showToast('📋 कॉपी हो गया!'); } catch(e) { showToast('शेयर समर्थित नहीं', true); } }
+    };
+    
+    // ============ REORDER ============
+    window.reorder = function() {
+        if (!orderData || !orderData.items || !orderData.items.length) { showToast('कोई आइटम नहीं', true); return; }
+        try {
+            var cart = safeJSONParse(localStorage.getItem('zatpat_cart'), []);
+            for (var i=0;i<orderData.items.length;i++) { var item=orderData.items[i], iid=item.product_id||item.id; if(!iid)continue; var img=getFullUrl(item.image||item.image_url||''), found=cart.find(function(c){return c.id===iid;}); if(found)found.quantity+=(item.quantity||1); else cart.push({id:iid,name:item.product_name||item.name||'प्रोडक्ट',price:item.price||0,image:img,quantity:item.quantity||1,unit:item.unit||'piece'}); }
+            localStorage.setItem('zatpat_cart',JSON.stringify(cart)); showToast('🛒 सभी आइटम कार्ट में जोड़े!');
+            if(navigator.vibrate)navigator.vibrate(15); setTimeout(function(){fastNavigate('cart.html');},500);
+        } catch(e) { showToast('❌ कार्ट में जोड़ने में विफल', true); }
+    };
+    
+    // ============ CANCEL ============
+    window.showCancelModal = function() { if (isCancelling) return; var m = safeGetElement('cancelModal'); if (m) m.classList.add('show'); };
+    window.closeCancelModal = function() { if (isCancelling) return; var m = safeGetElement('cancelModal'); if (m) m.classList.remove('show'); };
+    
+    window.confirmCancel = async function() {
+        if (isCancelling) return; isCancelling = true;
+        var btn = safeGetElement('cancelConfirmBtn'); if (btn) { btn.disabled = true; btn.textContent = 'रद्द हो रहा है...'; }
+        try {
+            if (!currentUser) { var li = await checkUser(); if (!li) { showToast('❌ कृपया पहले लॉगिन करें', true); closeCancelModal(); isCancelling=false; if(btn){btn.disabled=false;btn.textContent='हाँ, रद्द करें';} return; } }
+            if (orderData.user_id && orderData.user_id !== currentUser.id) { showToast('❌ अनधिकृत कार्रवाई', true); closeCancelModal(); isCancelling=false; if(btn){btn.disabled=false;btn.textContent='हाँ, रद्द करें';} return; }
+            await safeFetch(function() { return sb.from('orders').update({ status: 'cancelled', cancelled_at: new Date().toISOString() }).eq('id', orderData.id).eq('user_id', currentUser.id); });
+            orderData.status = 'cancelled'; Cache.set('order_detail_'+orderId, orderData, 1800000); closeCancelModal(); renderOrder(); showToast('❌ ऑर्डर रद्द कर दिया गया');
+        } catch(e) { showToast('❌ रद्द करने में विफल', true); }
+        isCancelling = false; if (btn) { btn.disabled = false; btn.textContent = 'हाँ, रद्द करें'; }
+    };
+    
+    window.handleBackPress = function() { goBack(); return true; };
+    
+    async function init() {
+        if (!(await checkUser())) {
+            var mc = safeGetElement('mainContent');
+            if (mc) mc.innerHTML = '<div class="error-state"><i class="fas fa-user-lock"></i><h3>लॉगिन आवश्यक</h3><p>ऑर्डर विवरण देखने के लिए कृपया लॉगिन करें</p><button class="btn-orange" onclick="(function(){try{localStorage.setItem(\'zatpat_redirect_after_login\',\'order-details.html?id='+(orderId||'')+'\');}catch(e){}window.location.href=\'index.html#login\';})()">🔐 लॉगिन / रजिस्टर करें</button></div>';
+            showApp(); initComplete = true; return;
+        }
+        await loadOrder(); showApp(); initComplete = true;
+    }
+    
+    document.addEventListener('DOMContentLoaded', init);
+    window.goBack = goBack; window.loadOrder = loadOrder;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ऑर्डर ट्रैक करें - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="Zymart - अपने ऑर्डर को रियल-टाइम ट्रैक करें">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-green-light: #0F6E3B; --brand-green-dark: #083D21;
+            --brand-orange: #F59E0B; --brand-orange-dark: #E8890A; --brand-orange-light: #FFB020;
+            --brand-white: #F5F5F5;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A;
+            --danger: #EF4444; --danger-bg: #FEF2F2; --success: #22C55E;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-xl: 22px; --radius-full: 9999px;
+            --ease-fast: cubic-bezier(0.4,0,0.2,1); --ease-smooth: cubic-bezier(0.45,0,0.15,1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--neutral-bg); color: var(--neutral-dark);
+            padding-bottom: 40px; -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased; min-height: 100vh;
+            overflow-x: hidden; width: 100%; max-width: 100%;
+        }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--neutral-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; transition: opacity 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; }
+        .loader-zy { color: var(--brand-green); }
+        .loader-mart { color: var(--brand-orange); }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulse { 0%,100%{opacity:1; box-shadow: 0 0 0 0 rgba(11,90,49,0.4);} 50%{opacity:0.8; box-shadow: 0 0 0 8px rgba(11,90,49,0);} }
+        @keyframes pulse-red { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
+        
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; outline: none; transition: all 0.15s ease; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { font-family: 'Poppins', sans-serif; flex: 1; font-size: 16px; font-weight: 700; color: var(--brand-white); }
+        
+        .main-content { padding-top: 62px; max-width: 600px; margin: 0 auto; min-height: 70vh; }
+        
+        .search-section { background: var(--neutral-white); margin: 12px 14px; padding: 24px 16px; border-radius: var(--radius-xl); border: 1px solid var(--neutral-border); box-shadow: var(--shadow-sm); text-align: center; animation: slideUp 0.3s ease; }
+        .search-section .search-icon { font-size: 44px; color: var(--brand-green); margin-bottom: 12px; display: block; }
+        .search-section h3 { font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+        .search-section p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 16px; }
+        .search-input { width: 100%; padding: 13px 16px; border: 2px solid var(--neutral-border); border-radius: var(--radius-full); font-size: 14px; font-family: 'Inter', sans-serif; outline: none; text-align: center; text-transform: uppercase; letter-spacing: 2px; transition: all 0.2s ease; background: var(--neutral-bg); }
+        .search-input:focus { border-color: var(--brand-orange); background: white; box-shadow: 0 0 0 3px rgba(245,158,11,0.10); }
+        .search-input::placeholder { text-transform: none; letter-spacing: normal; font-size: 12px; }
+        .track-btn { width: 100%; padding: 13px; background: var(--brand-green); color: white; border: none; border-radius: var(--radius-full); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; outline: none; transition: all 0.15s ease; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .track-btn:active { background: var(--brand-green-dark); transform: scale(0.97); }
+        .track-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .search-hint { font-size: 11px; color: #9CA3AF; margin-top: 10px; }
+        
+        .tracking-card { background: var(--neutral-white); margin: 12px 14px; padding: 20px 16px; border-radius: var(--radius-xl); border: 1px solid var(--neutral-border); box-shadow: var(--shadow-sm); animation: slideUp 0.3s ease; }
+        .order-id-display { text-align: center; font-size: 14px; font-weight: 700; margin-bottom: 6px; padding: 8px 16px; background: #EDF7F1; border-radius: var(--radius-full); display: inline-block; color: var(--brand-green-dark); font-family: 'SF Mono', 'Courier New', monospace; letter-spacing: 0.5px; }
+        .order-date { text-align: center; font-size: 12px; color: var(--neutral-gray); margin-bottom: 22px; }
+        
+        .cancelled-banner { text-align: center; padding: 20px 10px; }
+        .cancelled-icon { font-size: 48px; color: #EF4444; margin-bottom: 10px; display: block; animation: pulse-red 2s infinite; }
+        .cancelled-title { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: #DC2626; margin-bottom: 4px; }
+        .cancelled-subtitle { font-size: 12px; color: var(--neutral-gray); margin-bottom: 2px; }
+        
+        .steps-container { position: relative; padding-left: 4px; }
+        .step { display: flex; gap: 14px; padding-bottom: 22px; position: relative; }
+        .step:last-child { padding-bottom: 0; }
+        .step-line { position: absolute; left: 19px; top: 42px; width: 2px; height: calc(100% - 20px); background: var(--neutral-border); border-radius: 1px; }
+        .step.completed .step-line { background: var(--brand-green); }
+        .step.current .step-line { background: linear-gradient(to bottom, var(--brand-green), var(--neutral-border)); }
+        .step.cancelled-step .step-line { background: #FECACA; }
+        .step-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 1; font-size: 16px; border: 3px solid var(--neutral-border); background: white; color: #D1D5DB; transition: all 0.3s ease; }
+        .step.completed .step-icon { border-color: var(--brand-green); background: var(--brand-green); color: white; }
+        .step.current .step-icon { border-color: var(--brand-green); background: white; color: var(--brand-green); animation: pulse 2s infinite; }
+        .step.cancelled-step .step-icon { border-color: #EF4444; background: #FEE2E2; color: #EF4444; }
+        .step-content { flex: 1; padding-top: 7px; }
+        .step-title { font-size: 14px; font-weight: 700; transition: color 0.3s; }
+        .step.completed .step-title, .step.current .step-title { color: var(--brand-green); }
+        .step.pending .step-title { color: var(--neutral-gray); }
+        .step.cancelled-step .step-title { color: #DC2626; }
+        .step-desc { font-size: 11px; color: var(--neutral-gray); margin-top: 2px; }
+        .step-time { font-size: 10px; color: #9CA3AF; margin-top: 2px; font-weight: 500; }
+        
+        .summary-card { background: var(--neutral-white); margin: 12px 14px; padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--neutral-border); box-shadow: var(--shadow-sm); animation: slideUp 0.35s ease; }
+        .summary-title { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .summary-title i { color: var(--brand-green); }
+        .summary-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; color: var(--neutral-gray); border-bottom: 1px solid var(--neutral-border); }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-row.total { font-size: 16px; font-weight: 800; color: var(--neutral-dark); border-top: 2px solid var(--neutral-dark); padding-top: 12px; margin-top: 6px; }
+        .free-tag { color: var(--success); font-weight: 700; }
+        
+        .action-buttons { display: flex; gap: 10px; padding: 0 14px; margin-top: 14px; }
+        .action-btn { flex: 1; padding: 12px 10px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; border: none; outline: none; transition: all 0.15s ease; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-outline { background: var(--neutral-bg); color: var(--neutral-dark); border: 1px solid var(--neutral-border); }
+        .btn-outline:active { background: var(--neutral-border); }
+        .btn-primary { background: var(--brand-green); color: white; }
+        .btn-primary:active { background: var(--brand-green-dark); transform: scale(0.96); }
+        .btn-whatsapp { background: #25D366; color: white; }
+        .btn-whatsapp:active { background: #1DA851; transform: scale(0.96); }
+        
+        .reset-link { text-align: center; padding: 14px; }
+        .reset-link button { background: none; border: none; color: var(--brand-green); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        .multiple-results { background: var(--neutral-white); margin: 12px 14px; padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--neutral-border); box-shadow: var(--shadow-sm); animation: slideUp 0.3s ease; }
+        .multiple-results h4 { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+        .result-item { padding: 10px 12px; border: 1px solid var(--neutral-border); border-radius: var(--radius-md); margin-bottom: 8px; cursor: pointer; transition: all 0.15s ease; display: flex; justify-content: space-between; align-items: center; }
+        .result-item:active { background: #EDF7F1; }
+        .result-item:last-child { margin-bottom: 0; }
+        .result-id { font-size: 13px; font-weight: 600; font-family: 'SF Mono', 'Courier New', monospace; }
+        .result-date { font-size: 11px; color: var(--neutral-gray); }
+        .result-status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: var(--radius-full); }
+        
+        .error-detail { background: #FEF2F2; border: 1px solid #FECACA; border-radius: var(--radius-md); padding: 12px; margin-top: 12px; font-size: 11px; color: #991B1B; word-break: break-word; font-family: 'SF Mono', 'Courier New', monospace; }
+        
+        .empty-state { text-align: center; padding: 50px 20px; animation: slideUp 0.3s ease; }
+        .empty-state i { font-size: 48px; color: #D1D5DB; display: block; margin-bottom: 12px; }
+        .empty-state h3 { font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .empty-state p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 14px; }
+        .empty-state button { background: var(--brand-green); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        .invite-banner { margin: 12px 14px; padding: 14px; background: #FFF8EB; border: 1px solid #FDE68A; border-radius: var(--radius-md); text-align: center; animation: slideUp 0.35s ease; }
+        .invite-banner .invite-title { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; color: #92400E; margin-bottom: 3px; }
+        .invite-banner .invite-subtitle { font-size: 11px; color: #A16207; margin-bottom: 10px; }
+        .btn-invite { background: var(--brand-orange); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; box-shadow: 0 4px 14px rgba(245,158,11,0.22); }
+        .btn-invite:active { background: var(--brand-orange-dark); transform: scale(0.96); }
+        
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-lg); transition: all 0.3s ease; }
+        .toast.show { opacity: 1; visibility: visible; }
+        
+        @media (max-width: 380px) {
+            .search-section { padding: 18px 12px; }
+            .tracking-card { padding: 16px 12px; }
+            .step { gap: 10px; }
+            .action-btn { font-size: 11px; padding: 10px 8px; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">mart</span></div></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()" aria-label="वापस"><i class="fas fa-arrow-left"></i></button>
+        <span class="top-title">ऑर्डर ट्रैक करें</span>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="search-section" id="searchSection">
+            <i class="fas fa-truck-fast search-icon"></i>
+            <h3>अपना ऑर्डर ट्रैक करें</h3>
+            <p>ऑर्डर ID का कम से कम 4 अक्षर डालें</p>
+            <input type="text" id="orderIdInput" class="search-input" placeholder="जैसे: 14BB4AFB" maxlength="50" autocomplete="off">
+            <button class="track-btn" id="trackBtn" onclick="trackOrder()"><i class="fas fa-search"></i> ऑर्डर ट्रैक करें</button>
+            <p class="search-hint"><i class="fas fa-info-circle" style="color:var(--brand-orange);margin-right:4px;"></i> ऑर्डर ID कन्फर्मेशन SMS/ईमेल में है</p>
+        </div>
+        <div id="trackingResult"></div>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    window.addEventListener('error', function(e) { try { console.error('[Zymart Crash]', e.message); } catch(ex) {} });
+    window.addEventListener('unhandledrejection', function(e) { try { console.error('[Zymart Promise Crash]', e.reason); } catch(ex) {} e.preventDefault(); });
+    function safeJSONParse(s, f) { try { return s ? JSON.parse(s) : f; } catch(e) { return f; } }
+    function safeGetElement(id) { try { return document.getElementById(id); } catch(e) { return null; } }
+    function escapeHTML(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+    
+    var sb = null;
+    try { sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'); }
+    catch(e) { sb = { auth: { getSession: function() { return Promise.resolve({ data: { session: null } }); } } }; }
+    
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    var currentUser = null, isTracking = false, initComplete = false;
+    
+    function getFullUrl(u) { if (!u || typeof u !== 'string') return ''; if (u.indexOf('http')===0 || u.indexOf('data:')===0) return u; return SUPABASE_URL + '/storage/v1/object/public/' + u; }
+    function formatOrderId(fid) { if (!fid) return ''; if (fid.length <= 12) return '#' + fid.toUpperCase(); return '#' + fid.substring(0,8).toUpperCase() + '...' + fid.substring(fid.length-4).toUpperCase(); }
+    function sanitizeOrderId(raw) { if (!raw) return ''; return raw.replace(/[^a-zA-Z0-9\-_]/g, '').substring(0, 50); }
+    
+    function showApp() { var l = safeGetElement('simpleLoader'), a = safeGetElement('mainApp'); if (a) a.style.display = ''; if (l) { l.classList.add('fade-out'); setTimeout(function() { if (l && l.parentNode) l.parentNode.removeChild(l); }, 350); } }
+    function showToast(m, e) { try { var t = safeGetElement('toastMsg'); if (!t) return; t.textContent = m; t.style.background = e ? '#EF4444' : '#1A1A1A'; t.classList.add('show'); clearTimeout(t._timer); t._timer = setTimeout(function() { t.classList.remove('show'); }, 2500); } catch(ex) {} }
+    
+    var Cache = { set:function(k,d,t){try{localStorage.setItem('zm_'+k,JSON.stringify({d:d,e:Date.now()+(t||600000)}));}catch(e){}}, get:function(k){try{var c=localStorage.getItem('zm_'+k);if(!c)return null;var p=JSON.parse(c);return Date.now()>p.e?(localStorage.removeItem('zm_'+k),null):p.d;}catch(e){return null;}} };
+    
+    async function safeFetch(fn, r) { r=r||2; for(var i=0;i<r;i++){try{var res=await fn();if(res&&res.error){if(i===r-1)throw new Error(res.error.message);await new Promise(function(x){setTimeout(x,500*(i+1));});continue;}return res||{data:null};}catch(e){if(i===r-1)throw e;await new Promise(function(x){setTimeout(x,500*(i+1));});}} throw new Error('Fetch failed'); }
+    
+    window.addEventListener('online', function() { showToast('✅ इंटरनेट बहाल!'); });
+    window.addEventListener('offline', function() { showToast('⚠️ ऑफलाइन', true); });
+    
+    function goBack() { try { if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) { window.history.back(); return; } } catch(e) {} window.location.href = 'orders.html'; }
+    window.fastNavigate = function(url) { window.location.href = url; };
+    
+    async function checkUser() { try { var res = await sb.auth.getSession(); if (res && res.data && res.data.session) { currentUser = res.data.session.user; return true; } } catch(e) {} currentUser = null; return false; }
+    
+    function getStatusBadge(status) { var m = {'pending':'background:#FFF8EB;color:#D97706;','confirmed':'background:#EFF6FF;color:#2563EB;','delivered':'background:#EDF7F1;color:#059669;','cancelled':'background:#FEF2F2;color:#DC2626;','shipped':'background:#E0E7FF;color:#4F46E5;'}; return m[status]||'background:#F3F5F4;color:#6B7280;'; }
+    function getStatusText(status) { var m = {'pending':'लंबित','confirmed':'कन्फर्म','delivered':'डिलीवर','cancelled':'रद्द','shipped':'शिप'}; return m[status]||status; }
+    
+    var trackingSteps = [
+        { key:'pending', icon:'fa-clock', title:'ऑर्डर प्लेस हुआ', desc:'आपका ऑर्डर प्राप्त हो गया' },
+        { key:'confirmed', icon:'fa-check-circle', title:'ऑर्डर कन्फर्म', desc:'दुकान ने कन्फर्म किया' },
+        { key:'processed', icon:'fa-box', title:'प्रोसेस हो रहा', desc:'आइटम पैक किए जा रहे' },
+        { key:'shipped', icon:'fa-truck', title:'डिलीवरी के लिए निकला', desc:'डिलीवरी पार्टनर रास्ते में' },
+        { key:'delivered', icon:'fa-box-check', title:'डिलीवर हो गया', desc:'सफलतापूर्वक डिलीवर' }
+    ];
+    
+    async function findOrder(orderId) {
+        if (orderId.length >= 32) { try { var exact = await sb.from('orders').select('*').eq('id', orderId).single(); if (exact.data) return { order: exact.data, multiple: false }; } catch(e) {} }
+        if (orderId.length >= 4) {
+            try { var funcResult = await sb.rpc('search_orders_by_partial_id', { search_term: orderId }); if (funcResult.data?.length === 1) return { order: funcResult.data[0], multiple: false }; if (funcResult.data?.length > 1) return { orders: funcResult.data, multiple: true }; } catch(e) {}
+        }
+        return null;
+    }
+    
+    window.trackOrder = async function() {
+        if (isTracking) return;
+        var rawId = (safeGetElement('orderIdInput')?.value || '').trim(), orderId = sanitizeOrderId(rawId);
+        if (!orderId || orderId.length < 4) { showToast('⚠️ कम से कम 4 अक्षर डालें', true); return; }
+        isTracking = true;
+        var rc = safeGetElement('trackingResult'), tb = safeGetElement('trackBtn');
+        if (rc) rc.innerHTML = '<div style="text-align:center;padding:30px;"><div class="spinner" style="width:28px;height:28px;border:2.5px solid #E5E7EB;border-top-color:#F59E0B;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 10px;"></div><p style="font-size:12px;color:#6B7280;">खोज रहे हैं...</p></div>';
+        if (tb) { tb.disabled = true; tb.innerHTML = '<i class="fas fa-spinner fa-spin"></i> खोज रहे...'; }
+        
+        try {
+            var cached = Cache.get('tracking_' + orderId), sr = cached ? { order: cached, multiple: false } : await findOrder(orderId);
+            if (!cached && sr && !sr.multiple && sr.order) Cache.set('tracking_' + orderId, sr.order, 600000);
+            
+            if (!sr) { if (rc) rc.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>ऑर्डर नहीं मिला</h3><p>"'+escapeHTML(orderId)+'" से कोई ऑर्डर नहीं</p><button onclick="resetSearch()">🔄 दोबारा प्रयास</button></div>'; }
+            else if (sr.multiple) { renderMultipleResults(sr.orders); }
+            else { renderTracking(sr.order); }
+        } catch(e) { if (rc) rc.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="color:#EF4444;"></i><h3>त्रुटि</h3><div class="error-detail">'+escapeHTML(e.message||'Unknown')+'</div><button onclick="resetSearch()">🔄 पुनः प्रयास</button></div>'; }
+        
+        if (tb) { tb.disabled = false; tb.innerHTML = '<i class="fas fa-search"></i> ऑर्डर ट्रैक करें'; }
+        isTracking = false;
+    };
+    
+    function renderMultipleResults(orders) {
+        var rc = safeGetElement('trackingResult'), html = '<div class="multiple-results"><h4>🔍 ' + orders.length + ' ऑर्डर मिले</h4>';
+        for (var i=0;i<orders.length;i++) { var o=orders[i]; html += '<div class="result-item" onclick="selectOrder(\''+o.id+'\')"><div><div class="result-id">'+formatOrderId(o.id)+'</div><div class="result-date">'+(o.created_at?new Date(o.created_at).toLocaleDateString('hi-IN',{day:'numeric',month:'short'}):'')+' • ₹'+(parseFloat(o.total_amount)||0).toLocaleString('en-IN')+'</div></div><span class="result-status" style="'+getStatusBadge(o.status)+'">'+getStatusText(o.status)+'</span></div>'; }
+        html += '</div><div class="reset-link"><button onclick="resetSearch()"><i class="fas fa-arrow-left"></i> दूसरा ऑर्डर खोजें</button></div>';
+        var ss = safeGetElement('searchSection'); if (ss) ss.style.display = 'none';
+        if (rc) rc.innerHTML = html;
+    }
+    
+    window.selectOrder = function(fullOrderId) { var inp = safeGetElement('orderIdInput'); if (inp) inp.value = fullOrderId; trackOrder(); };
+    
+    function renderTracking(order) {
+        var status = order.status || 'pending', isCancelled = status === 'cancelled';
+        var csi = trackingSteps.findIndex(function(s){return s.key===status;}); if (csi<0) csi=0;
+        var oid = formatOrderId(order.id), date = order.created_at ? new Date(order.created_at).toLocaleDateString('hi-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+        
+        var ss = safeGetElement('searchSection'); if (ss) ss.style.display = 'none';
+        
+        var html = '<div class="tracking-card"><div style="text-align:center;"><span class="order-id-display" style="'+(isCancelled?'background:#FEF2F2;color:#DC2626;':'')+'">📦 '+oid+(isCancelled?' ❌':'')+'</span></div><div class="order-date">📅 '+escapeHTML(date)+'</div>';
+        
+        if (isCancelled) {
+            html += '<div class="cancelled-banner"><i class="fas fa-times-circle cancelled-icon"></i><div class="cancelled-title">यह ऑर्डर रद्द है</div><div class="cancelled-subtitle">यह ऑर्डर प्रोसेस नहीं होगा</div></div>';
+            html += '<div class="steps-container">';
+            for (var i=0;i<trackingSteps.length;i++) { var step=trackingSteps[i], cls=i<=csi?'completed':'pending'; if(i===csi)cls='cancelled-step'; html += '<div class="step '+cls+'">'+(i<trackingSteps.length-1?'<div class="step-line"></div>':'')+'<div class="step-icon"><i class="fas '+(cls==='completed'?'fa-check':cls==='cancelled-step'?'fa-times':step.icon)+'"></i></div><div class="step-content"><div class="step-title">'+step.title+'</div><div class="step-desc">'+(cls==='cancelled-step'?'इस चरण पर रद्द':step.desc)+'</div></div></div>'; }
+            html += '</div>';
+        } else {
+            html += '<div class="steps-container">';
+            for (var i=0;i<trackingSteps.length;i++) { var step=trackingSteps[i], cls=i<csi?'completed':i===csi?'current':'pending'; html += '<div class="step '+cls+'">'+(i<trackingSteps.length-1?'<div class="step-line"></div>':'')+'<div class="step-icon"><i class="fas '+(cls==='completed'?'fa-check':step.icon)+'"></i></div><div class="step-content"><div class="step-title">'+step.title+'</div><div class="step-desc">'+step.desc+'</div>'+(cls==='current'?'<div class="step-time" style="color:#0B5A31;font-weight:700;">⚡ प्रगति में...</div>':'')+(cls==='completed'?'<div class="step-time" style="color:#0B5A31;">✓ पूर्ण</div>':'')+'</div></div>'; }
+            html += '</div>';
+        }
+        html += '</div>';
+        
+        var items = order.items || [], subtotal = parseFloat(order.subtotal)||0, df = parseFloat(order.delivery_fee)||0, total = parseFloat(order.total_amount)||(subtotal+df);
+        html += '<div class="summary-card"><div class="summary-title"><i class="fas fa-receipt"></i> ऑर्डर सारांश</div><div class="summary-row"><span>कुल आइटम</span><span>'+items.length+'</span></div><div class="summary-row"><span>सबटोटल</span><span>₹'+subtotal.toLocaleString('en-IN')+'</span></div><div class="summary-row"><span>डिलीवरी</span><span class="'+(df===0?'free-tag':'')+'">'+(df===0?'🎉 मुफ़्त':'₹'+df.toLocaleString('en-IN'))+'</span></div><div class="summary-row total"><span>कुल</span><span>₹'+total.toLocaleString('en-IN')+'</span></div></div>';
+        
+        html += '<div class="action-buttons"><button class="action-btn btn-outline" onclick="fastNavigate(\'order-details.html?id='+order.id+'\')"><i class="fas fa-info-circle"></i> विवरण</button>';
+        if (!isCancelled) html += '<button class="action-btn btn-whatsapp" onclick="window.open(\'https://wa.me/918600252238?text=Order%20'+encodeURIComponent(order.id)+'\',\'_blank\')"><i class="fab fa-whatsapp"></i> सहायता</button>';
+        html += '</div>';
+        
+        if (!isCancelled && status === 'delivered') { html += '<div class="invite-banner"><div class="invite-title">🎁 दोस्तों को इन्वाइट करें</div><div class="invite-subtitle">हर दोस्त के पहले ऑर्डर पर ₹50 पाएं</div><button class="btn-invite" onclick="fastNavigate(\'invite-earn.html\')"><i class="fas fa-gift"></i> अभी इन्वाइट करें</button></div>'; }
+        
+        html += '<div class="reset-link"><button onclick="resetSearch()"><i class="fas fa-arrow-left"></i> दूसरा ऑर्डर ट्रैक करें</button></div>';
+        
+        var rc = safeGetElement('trackingResult'); if (rc) rc.innerHTML = html;
+    }
+    
+    window.resetSearch = function() { var ss = safeGetElement('searchSection'), rc = safeGetElement('trackingResult'), inp = safeGetElement('orderIdInput'); if (ss) ss.style.display = 'block'; if (rc) rc.innerHTML = ''; if (inp) { inp.value = ''; inp.focus(); } window.scrollTo({top:0,behavior:'smooth'}); };
+    
+    window.handleBackPress = function() { goBack(); return true; };
+    
+    async function init() {
+        await checkUser();
+        var inp = safeGetElement('orderIdInput'); if (inp) inp.addEventListener('keydown', function(e) { if (e.key==='Enter') trackOrder(); });
+        try { var p=new URLSearchParams(window.location.search), aid=p.get('id')||p.get('order_id'); if (aid) { var s=sanitizeOrderId(aid); if (s) { if (inp) inp.value = s; trackOrder(); } } } catch(e) {}
+        showApp(); initComplete = true;
+    }
+    
+    document.addEventListener('DOMContentLoaded', init);
+    window.goBack = goBack; window.trackOrder = trackOrder; window.resetSearch = resetSearch;
+})();
+</script>
+</body>
+</html>

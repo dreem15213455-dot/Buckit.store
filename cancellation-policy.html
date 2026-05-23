@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>कैंसलेशन नीति - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="Zymart - ऑर्डर कैंसलेशन और रिफंड नीति">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-green-light: #0F6E3B; --brand-green-dark: #083D21;
+            --brand-orange: #F59E0B; --brand-orange-dark: #E8890A;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A;
+            --danger: #EF4444; --danger-bg: #FEF2F2; --success: #22C55E;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); --shadow-md: 0 2px 16px rgba(11,90,49,0.3);
+            --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-xl: 22px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
+            background: var(--neutral-bg); color: var(--neutral-dark);
+            min-height: 100vh; -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .top-bar { background: var(--brand-green); padding: 12px 14px; display: flex; align-items: center; gap: 10px; position: fixed; top: 0; left: 0; width: 100%; z-index: 100; box-shadow: var(--shadow-md); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; transition: all 0.15s ease; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { font-family: 'Poppins', sans-serif; flex: 1; font-size: 16px; font-weight: 700; color: white; }
+        
+        .content { padding: 66px 14px 40px; max-width: 800px; margin: 0 auto; }
+        
+        .section { background: var(--neutral-white); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 14px; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-sm); }
+        h2 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--brand-green); display: flex; align-items: center; gap: 8px; }
+        h2 i { color: var(--danger); }
+        h3 { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; margin: 16px 0 8px; color: var(--neutral-dark); }
+        p { font-size: 14px; color: var(--neutral-gray); line-height: 1.7; margin-bottom: 10px; }
+        ul, ol { margin: 8px 0 12px 20px; }
+        li { font-size: 14px; color: var(--neutral-gray); line-height: 1.7; margin-bottom: 6px; }
+        a { color: var(--brand-orange); font-weight: 600; text-decoration: none; }
+        
+        .highlight { background: var(--danger-bg); padding: 14px; border-radius: var(--radius-sm); border-left: 4px solid var(--danger); margin: 14px 0; }
+        .highlight strong { color: #DC2626; }
+        
+        .steps { background: #EDF7F1; padding: 14px; border-radius: var(--radius-sm); margin: 12px 0; border: 1px solid #C8E6C9; }
+        .steps ol { margin: 8px 0 0 20px; }
+        .steps li { color: var(--brand-green); font-weight: 500; }
+        
+        .contact { background: #EDF7F1; padding: 14px; border-radius: var(--radius-sm); margin-top: 16px; text-align: center; border: 1px solid #C8E6C9; }
+        .contact strong { color: var(--brand-green); }
+        .contact a { color: var(--brand-green); font-weight: 700; }
+        .contact .whatsapp-link { color: #25D366; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()" aria-label="वापस"><i class="fas fa-arrow-left"></i></button>
+        <span class="top-title">कैंसलेशन नीति</span>
+    </div>
+    
+    <div class="content">
+        <div class="section">
+            <h2><i class="fas fa-times-circle"></i> ऑर्डर कैंसलेशन नीति</h2>
+            <p><strong>अंतिम अपडेट:</strong> 20 मई 2026</p>
+
+            <div class="highlight">
+                <strong>⚠️ ध्यान दें:</strong> GPS वेरिफाइड लोकेशन पर ही डिलीवरी होगी। गलत या फर्जी लोकेशन देने पर ऑर्डर तुरंत रद्द किया जा सकता है और रिफंड नहीं मिलेगा।
+            </div>
+
+            <h3>1. ग्राहक द्वारा कैंसलेशन</h3>
+            <p>आप निम्नलिखित स्थितियों में अपना ऑर्डर रद्द कर सकते हैं:</p>
+            <div class="steps">
+                <ol>
+                    <li><strong>ऑर्डर देने के तुरंत बाद:</strong> "मेरे ऑर्डर" में जाकर "रद्द करें" बटन दबाएं।</li>
+                    <li><strong>शॉप द्वारा स्वीकार करने से पहले:</strong> 100% रिफंड, कोई कटौती नहीं।</li>
+                    <li><strong>शॉप स्वीकार करने के बाद (प्रोसेसिंग में):</strong> 100% रिफंड।</li>
+                    <li><strong>डिलीवरी शुरू होने के बाद:</strong> कैंसलेशन संभव नहीं है।</li>
+                </ol>
+            </div>
+
+            <h3>2. Zymart द्वारा कैंसलेशन</h3>
+            <p>निम्न स्थितियों में Zymart आपका ऑर्डर रद्द कर सकता है:</p>
+            <ul>
+                <li>शॉप बंद हो या आवश्यक आइटम्स स्टॉक में न हों।</li>
+                <li>GPS लोकेशन वेरिफिकेशन विफल हो (फर्जी या गलत पता)।</li>
+                <li>आपका डिलीवरी एरिया सेवा क्षेत्र में न हो।</li>
+                <li>पेमेंट वेरिफिकेशन विफल हो।</li>
+                <li>तकनीकी खराबी, सर्वर डाउन, या प्राकृतिक आपदा।</li>
+                <li>ग्राहक लगातार 3 बार से अधिक कैंसल करे।</li>
+            </ul>
+
+            <h3>3. कैंसलेशन शुल्क</h3>
+            <ul>
+                <li><strong>डिलीवरी शुरू होने से पहले:</strong> कोई शुल्क नहीं।</li>
+                <li><strong>डिलीवरी शुरू होने के बाद:</strong> कैंसलेशन संभव नहीं।</li>
+                <li><strong>बार-बार कैंसलेशन:</strong> लगातार 3 से अधिक बार कैंसल करने पर अकाउंट अस्थायी रूप से ब्लॉक किया जा सकता है।</li>
+            </ul>
+
+            <h3>4. रिफंड समय-सीमा</h3>
+            <ul>
+                <li><strong>UPI/ऑनलाइन पेमेंट:</strong> 3-5 कार्यदिवस में मूल स्रोत पर वापस।</li>
+                <li><strong>कैश ऑन डिलीवरी:</strong> Zymart Wallet में क्रेडिट (24-48 घंटे)।</li>
+            </ul>
+
+            <h3>5. कैंसल कैसे करें?</h3>
+            <ul>
+                <li><strong>Zymart ऐप:</strong> मेरे ऑर्डर → ऑर्डर चुनें → "रद्द करें" बटन</li>
+                <li><strong>WhatsApp:</strong> <a href="https://wa.me/918600252238" class="whatsapp-link">+91 8600252238 पर मैसेज करें</a></li>
+                <li><strong>ईमेल:</strong> <a href="mailto:sk12shaikh@gmail.com">sk12shaikh@gmail.com</a></li>
+                <li><strong>फ़ोन:</strong> <a href="tel:8600252238">8600252238</a> (सुबह 9:00 - रात 9:00)</li>
+            </ul>
+
+            <div class="contact">
+                <strong>📞 किसी भी समस्या के लिए संपर्क करें:</strong><br>
+                📞 <a href="tel:8600252238">8600252238</a> | 
+                📧 <a href="mailto:sk12shaikh@gmail.com">sk12shaikh@gmail.com</a><br>
+                💬 <a href="https://wa.me/918600252238" class="whatsapp-link">WhatsApp पर तुरंत चैट करें</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            try { if (document.referrer && document.referrer.indexOf(window.location.host) > -1) { window.history.back(); return; } } catch(e) {}
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

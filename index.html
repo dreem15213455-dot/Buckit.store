@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, target-densitydpi=device-dpi">
+    <title>Zymart - Your Local Market, 10 Min Delivery</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="Zymart - Your Local Market. 10-Minute Grocery Delivery.">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+    
+    <style>
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        body { -webkit-text-size-adjust: none; text-size-adjust: none; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        @media (max-width: 380px) { html { font-size: 14px; } }
+        @media (max-width: 320px) { html { font-size: 12px; } }
+        
+        :root {
+            --brand-green: #0B5A31;
+            --brand-green-light: #0F6E3B;
+            --brand-green-dark: #083D21;
+            --brand-orange: #F59E0B;
+            --brand-orange-dark: #E8890A;
+            --brand-orange-light: #FFB020;
+            --brand-white: #F5F5F5;
+            --neutral-white: #FFFFFF;
+            --neutral-bg: #F9FAFB;
+            --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280;
+            --neutral-light-gray: #9CA3AF;
+            --neutral-dark: #1A1A1A;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 14px rgba(0,0,0,0.06);
+            --shadow-xl: 0 16px 48px rgba(0,0,0,0.10);
+            --shadow-bottom-sheet: 0 -6px 30px rgba(0,0,0,0.15);
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --radius-xl: 22px;
+            --radius-2xl: 28px;
+            --radius-full: 9999px;
+            --ease-fast: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-smooth: cubic-bezier(0.45, 0, 0.15, 1);
+            --ease-spring: cubic-bezier(0.34, 1.15, 0.64, 1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--neutral-bg);
+            color: var(--neutral-dark);
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+            padding-bottom: 85px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.01em;
+            line-height: 1.5;
+        }
+        
+        /* ============ SPLASH ============ */
+        #simpleLoader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--brand-green-dark);
+            z-index: 10002;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 6px;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .splash-logo { font-family: 'Poppins', sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -1px; display: flex; align-items: baseline; margin-bottom: 2px; }
+        .splash-zy { color: var(--brand-white); }
+        .splash-mart { color: var(--brand-orange); }
+        .splash-spinner { width: 30px; height: 30px; border: 2.5px solid rgba(255,255,255,0.12); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 14px 0; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .splash-tagline { font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; color: var(--brand-white); letter-spacing: 0.3px; text-align: center; line-height: 1.5; opacity: 0.9; }
+        .splash-tagline span { display: block; font-size: 10px; font-weight: 400; color: var(--brand-orange-light); letter-spacing: 0.5px; margin-top: 2px; }
+        
+        /* ============ BOTTOM SHEET (UPAR) ============ */
+        .bottom-sheet-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(8, 61, 33, 0.75);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            z-index: 10000; display: flex; align-items: flex-end; justify-content: center;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+        .bottom-sheet-overlay.show { opacity: 1; visibility: visible; }
+        .bottom-sheet {
+            background: #FFFFFF;
+            border-radius: 24px 24px 0 0;
+            width: 100%; max-width: 480px; max-height: 65vh;
+            overflow-y: auto; padding: 8px 0 28px;
+            box-shadow: var(--shadow-bottom-sheet);
+            transform: translateY(100%);
+            transition: transform 0.45s var(--ease-spring);
+            will-change: transform;
+            margin-bottom: 20%;
+        }
+        .bottom-sheet-overlay.show .bottom-sheet { transform: translateY(0); }
+        .sheet-handle { width: 32px; height: 4px; background: #E5E7EB; border-radius: 2px; margin: 0 auto 14px; }
+        .sheet-content { padding: 0 24px; }
+        .sheet-icon { width: 60px; height: 60px; border-radius: 50%; background: #F9FAFB; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 28px; }
+        .sheet-title { font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 700; color: #1A1A1A; text-align: center; margin-bottom: 4px; }
+        .sheet-subtitle { font-size: 12px; color: #6B7280; text-align: center; margin-bottom: 18px; line-height: 1.4; }
+        
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border-radius: 14px; font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; outline: none; transition: all 0.18s ease; }
+        .btn:active { transform: scale(0.975); }
+        .btn-primary { background: var(--brand-orange); color: #FFFFFF; box-shadow: 0 4px 14px rgba(245,158,11,0.22); }
+        .btn-primary:active { background: var(--brand-orange-dark); }
+        .btn-secondary { background: #F3F5F4; color: #374151; font-weight: 500; }
+        .btn-secondary:active { background: #E5E7EB; }
+        .btn-google { background: #FFFFFF; color: #3C4043; border: 1px solid #E5E7EB; box-shadow: var(--shadow-xs); font-weight: 500; }
+        .btn-google:active { background: #F9FAFB; }
+        .btn-google img { width: 18px; height: 18px; }
+        .btn-outline { background: transparent; color: #374151; border: 1px solid #E5E7EB; font-weight: 500; }
+        .btn-row { display: flex; flex-direction: column; gap: 8px; }
+        .btn-divider { display: flex; align-items: center; gap: 10px; margin: 4px 0; color: #9CA3AF; font-size: 11px; }
+        .btn-divider::before, .btn-divider::after { content: ''; flex: 1; height: 1px; background: #E5E7EB; }
+        
+        .loading-container { display: flex; flex-direction: column; align-items: center; padding: 22px 0; gap: 10px; }
+        .loading-spinner { width: 34px; height: 34px; border: 3px solid #E5E7EB; border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loading-text { font-size: 12px; font-weight: 500; color: #6B7280; }
+        
+        .input-field { width: 100%; padding: 12px 14px; border: 1.5px solid #E5E7EB; border-radius: 12px; font-size: 14px; font-family: 'Inter', sans-serif; color: #1A1A1A; background: #F9FAFB; transition: all 0.2s ease; outline: none; }
+        .input-field:focus { border-color: var(--brand-orange); background: #FFFFFF; box-shadow: 0 0 0 3px rgba(245,158,11,0.07); }
+        .input-label { font-size: 11px; font-weight: 600; color: #374151; margin-bottom: 4px; display: block; }
+        
+        #pageProgress { position: fixed; top: 0; left: 0; width: 0%; height: 2.5px; background: var(--brand-orange); z-index: 10001; border-radius: 0 2px 2px 0; transition: width 0.25s ease; }
+        #pageProgress.loading { width: 85%; transition: width 1.8s ease; }
+        #pageProgress.complete { width: 100%; opacity: 0; transition: opacity 0.4s ease; }
+        
+        .skeleton-category-circle { width: 85px; height: 105px; border-radius: 24px; background: linear-gradient(90deg,#f0f4f2 25%,#e4ebe7 50%,#f0f4f2 75%); background-size: 200% 100%; animation: skel 1.3s infinite; flex-shrink: 0; }
+        .skeleton-text { height: 10px; border-radius: 4px; background: linear-gradient(90deg,#f0f4f2 25%,#e4ebe7 50%,#f0f4f2 75%); background-size: 200% 100%; animation: skel 1.3s infinite; }
+        .skeleton-text-sm { width: 50%; height: 8px; }
+        .skeleton-text-md { width: 70%; height: 10px; }
+        .skeleton-img { width: 100%; aspect-ratio: 1/1; background: linear-gradient(90deg,#f0f4f2 25%,#e4ebe7 50%,#f0f4f2 75%); background-size: 200% 100%; animation: skel 1.3s infinite; border-radius: var(--radius-sm); }
+        .skeleton-featured-card { min-width: 142px; width: 142px; flex-shrink: 0; }
+        @keyframes skel { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        
+        /* TOP BAR */
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px 8px; box-shadow: 0 2px 20px rgba(11,90,49,0.35); }
+        .top-row-1 { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+        .left-group { display: flex; align-items: center; gap: 10px; }
+        .menu-btn { width: 34px; height: 34px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; outline: none; }
+        .menu-btn:active { background: rgba(255,255,255,0.20); transform: scale(0.93); }
+        .menu-btn i { color: white; font-size: 14px; }
+        .brand-name { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.4px; display: flex; align-items: baseline; }
+        .brand-zy { color: var(--brand-white); }
+        .brand-mart { color: var(--brand-orange); }
+        .right-group { display: flex; align-items: center; gap: 8px; }
+        .location-header { display: flex; align-items: center; gap: 4px; padding: 6px 10px; background: rgba(255,255,255,0.10); border-radius: var(--radius-full); cursor: pointer; border: none; max-width: 130px; }
+        .location-header:active { background: rgba(255,255,255,0.20); }
+        .location-header i { color: var(--brand-orange); font-size: 9px; }
+        .location-header span { font-size: 10px; font-weight: 500; color: white; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .wishlist-header-btn, .notification-btn { width: 34px; height: 34px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; position: relative; }
+        .wishlist-header-btn:active, .notification-btn:active { background: rgba(255,255,255,0.20); transform: scale(0.93); }
+        .wishlist-header-btn i, .notification-btn i { color: white; font-size: 13px; }
+        .search-box { background: #FFFFFF; border-radius: var(--radius-full); display: flex; align-items: center; padding: 9px 14px; gap: 8px; border: 1px solid rgba(0,0,0,0.04); width: 100%; transition: all 0.25s ease; box-shadow: var(--shadow-xs); }
+        .search-box:focus-within { border-color: var(--brand-orange); box-shadow: 0 0 0 3px rgba(245,158,11,0.07); }
+        .search-box i { color: #9CA3AF; font-size: 13px; }
+        .search-box input { flex: 1; border: none; outline: none; background: transparent; font-size: 12px; font-family: 'Inter', sans-serif; color: #1A1A1A; }
+        .search-box input::placeholder { color: #B0B8B4; }
+        
+        /* MENU */
+        #menuOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8,61,33,0.5); backdrop-filter: blur(4px); z-index: 1001; opacity: 0; visibility: hidden; transition: all 0.25s ease; }
+        #menuOverlay.show { opacity: 1; visibility: visible; }
+        #menuDropdown { position: fixed; top: 12px; left: 8px; background: #FFFFFF; border-radius: 20px; box-shadow: var(--shadow-xl); z-index: 1002; min-width: 280px; max-width: calc(100vw - 20px); overflow-y: auto; max-height: calc(100vh - 90px); opacity: 0; visibility: hidden; transform: translateY(-8px) scale(0.97); transition: all 0.28s var(--ease-spring); padding: 6px 0; }
+        #menuDropdown.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .menu-header { padding: 12px 16px 8px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #F3F5F4; margin-bottom: 2px; }
+        .menu-avatar { width: 40px; height: 40px; border-radius: 50%; background: #EDF7F1; display: flex; align-items: center; justify-content: center; }
+        .menu-avatar i { font-size: 18px; color: var(--brand-green); }
+        .menu-user-info { flex: 1; }
+        .menu-user-name { font-size: 14px; font-weight: 600; }
+        .menu-user-sub { font-size: 10px; color: #6B7280; }
+        .menu-login-btn { padding: 7px 14px; background: var(--brand-orange); color: white; border: none; border-radius: 18px; font-size: 11px; font-weight: 600; cursor: pointer; }
+        #menuDropdown ul { list-style: none; padding: 0; }
+        #menuDropdown li { padding: 11px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; color: #1A1A1A; margin: 1px 5px; border-radius: 10px; }
+        #menuDropdown li:active { background: #F3F5F4; }
+        #menuDropdown li .menu-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .menu-icon-green { background: #EDF7F1; color: #0B5A31; }
+        .menu-icon-red { background: #FEF2F2; color: #EF4444; }
+        .menu-icon-blue { background: #EFF6FF; color: #3B82F6; }
+        .menu-icon-gray { background: #F9FAFB; color: #6B7280; }
+        .menu-icon-amber { background: #FFF8EB; color: #F59E0B; }
+        .menu-divider { height: 1px; background: #F3F5F4; margin: 2px 12px; }
+        .menu-section-label { padding: 6px 16px 2px; font-size: 9px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.7px; }
+        
+        /* MAIN CONTENT - TIGHT SPACING */
+        .main-content { padding-top: 106px; overflow-x: hidden; width: 100%; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 14px; margin-bottom: 4px; }
+        .section-header h2, .section-header h3 { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; color: #1A1A1A; }
+        .view-all { color: var(--brand-green); font-size: 11px; font-weight: 600; cursor: pointer; padding: 3px 8px; border-radius: var(--radius-full); border: none; background: transparent; }
+        .view-all:active { background: #EDF7F1; }
+        
+        .categories-section { background: white; padding: 5px 0 2px; }
+        .categories-section .section-header { padding: 2px 14px 2px; }
+        .categories-scroll-wrapper { padding-left: 14px; }
+        .categories-scroll { display: flex; gap: 10px; overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 2px 14px 2px 0; }
+        .categories-scroll::-webkit-scrollbar { display: none; }
+        .category-circle-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; flex-shrink: 0; width: 78px; }
+        .category-circle-item:active { transform: scale(0.91); }
+        .category-circle { width: 78px; height: 94px; border-radius: 20px; background: white; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; overflow: hidden; box-shadow: 0 4px 16px rgba(11,90,49,0.05); border: 1px solid rgba(11,90,49,0.05); }
+        .category-circle img { width: 56px; height: 56px; object-fit: cover; border-radius: 12px; }
+        .category-circle i { font-size: 26px; color: var(--brand-green); }
+        .category-circle-name { font-size: 10px; font-weight: 600; color: #1A1A1A; text-align: center; width: 78px; line-height: 1.2; }
+        
+        .offers-section { background: white; padding: 4px 0; }
+        .offers-section .section-header { padding: 2px 14px 2px; }
+        .offers-slider-container { padding: 0 14px; }
+        .offers-track { display: flex; gap: 8px; overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 1px 0 2px; }
+        .offers-track::-webkit-scrollbar { display: none; }
+        .offer-card { min-width: 140px; width: 140px; height: 165px; flex-shrink: 0; position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-sm); background: linear-gradient(140deg, var(--brand-green), var(--brand-green-light)); }
+        .offer-card:active { transform: scale(0.955); }
+        .offer-card-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .offer-card-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px 10px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); }
+        .offer-content h4 { font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; color: white; margin-bottom: 4px; }
+        .offer-btn { background: var(--brand-orange); color: #FFFFFF; border: none; padding: 3px 9px; border-radius: 14px; font-size: 9px; font-weight: 700; }
+        
+        .featured-section { margin-bottom: 2px; }
+        .featured-section .section-header { padding: 2px 14px 2px; }
+        .featured-scroll-wrapper { padding-left: 12px; }
+        .featured-scroll { display: flex; gap: 8px; overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 2px 12px 2px 0; }
+        .featured-scroll::-webkit-scrollbar { display: none; }
+        .featured-product-card { min-width: 135px; width: 135px; background: white; border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-xs); border: 1px solid var(--neutral-border); cursor: pointer; flex-shrink: 0; }
+        .featured-product-card:active { transform: scale(0.965); }
+        .featured-product-img { width: 100%; aspect-ratio: 1/1; overflow: hidden; background: #F9FAFB; display: flex; align-items: center; justify-content: center; }
+        .featured-product-img img { width: 100%; height: 100%; object-fit: cover; }
+        .featured-discount-tag { position: absolute; top: 5px; left: 5px; background: var(--brand-orange); color: white; font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: var(--radius-full); }
+        .featured-product-info { padding: 7px 9px; }
+        .featured-product-name { font-size: 10px; font-weight: 600; color: #1A1A1A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .featured-product-price-row { display: flex; align-items: center; gap: 3px; margin-bottom: 5px; }
+        .featured-product-price { font-size: 12px; font-weight: 700; }
+        .featured-original-price { font-size: 9px; color: #9CA3AF; text-decoration: line-through; }
+        .featured-add-btn { background: var(--brand-green); color: white; border: none; border-radius: var(--radius-full); padding: 5px 0; font-size: 9px; font-weight: 600; width: 100%; cursor: pointer; }
+        .featured-add-btn:active { background: var(--brand-green-dark); transform: scale(0.97); }
+        
+        .hero-section { margin: 4px 0 2px; }
+        .hero-slider { border-radius: var(--radius-lg); overflow: hidden; margin: 0 12px; box-shadow: var(--shadow-sm); }
+        .hero-slide { position: relative; height: 155px; border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; background: #EDF7F1; }
+        .hero-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); }
+        .hero-title { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; color: white; }
+        
+        .trending-section { margin-bottom: 2px; }
+        .trending-section .section-header { padding: 2px 14px 2px; }
+        .products-scroll { padding: 0 14px; }
+        .products-scroll-content { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .product-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-xs); cursor: pointer; }
+        .product-card:active { transform: scale(0.965); }
+        .product-img { width: 100%; aspect-ratio: 1/1; position: relative; overflow: hidden; background: #F9FAFB; display: flex; align-items: center; justify-content: center; padding: 8px; }
+        .product-img img { width: 80%; height: 80%; object-fit: contain; }
+        .discount-tag { position: absolute; top: 5px; left: 5px; background: var(--brand-orange); color: white; font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+        .product-info { padding: 7px 8px 6px; }
+        .product-name { font-size: 10px; font-weight: 600; color: #1A1A1A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+        .original-price { font-size: 9px; color: #9CA3AF; text-decoration: line-through; }
+        .add-cart { background: var(--brand-green); color: white; border: none; border-radius: 8px; padding: 5px 0; font-size: 9px; font-weight: 600; width: 100%; cursor: pointer; }
+        .add-cart:active { background: var(--brand-green-dark); transform: scale(0.97); }
+        
+        .bottom-nav { background: white; position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 4px 10px 10px; box-shadow: 0 -4px 16px rgba(0,0,0,0.03); z-index: 1000; border-top: 1px solid var(--neutral-border); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 9px; font-weight: 500; color: #6B7280; cursor: pointer; padding: 3px 8px; border-radius: var(--radius-full); border: none; background: transparent; }
+        .nav-item:active { background: #EDF7F1; }
+        .nav-item.active { color: var(--brand-green); font-weight: 600; }
+        .nav-item i { font-size: 18px; margin-bottom: 1px; }
+        .cart-count { position: absolute; top: -4px; right: -6px; background: var(--brand-orange); color: white; border-radius: 50%; width: 14px; height: 14px; font-size: 8px; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+        
+        .toast-notification { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #1A1A1A; color: white; padding: 9px 18px; border-radius: var(--radius-full); font-size: 12px; z-index: 10050; opacity: 0; visibility: hidden; transition: all 0.3s ease; box-shadow: var(--shadow-md); }
+        .toast-notification.show { opacity: 1; visibility: visible; }
+        .error-state { text-align: center; padding: 24px 16px; color: #6B7280; font-size: 11px; }
+        .empty-state { text-align: center; padding: 14px; color: #6B7280; font-size: 11px; }
+        
+        @media (max-width:480px) { .brand-name{font-size:20px} .hero-slide{height:135px} .featured-product-card{min-width:122px;width:122px} .category-circle-item{width:68px} .category-circle{width:68px;height:82px} .offer-card{min-width:128px;width:128px;height:150px} #menuDropdown{min-width:260px} }
+        @media (max-width:380px) { .featured-product-card{min-width:108px;width:108px} .category-circle-item{width:60px} .category-circle{width:60px;height:72px} .offer-card{min-width:115px;width:115px;height:135px} #menuDropdown{min-width:240px;left:4px} }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="simpleLoader">
+    <div class="splash-logo"><span class="splash-zy">Zy</span><span class="splash-mart">mart</span></div>
+    <div class="splash-spinner"></div>
+    <div class="splash-tagline">Your Local Market<span>10-Minute Delivery</span></div>
+</div>
+<div id="pageProgress"></div>
+
+<!-- LOCATION SHEET -->
+<div class="bottom-sheet-overlay" id="locationSheet"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-content" id="locationSheetContent"></div></div></div>
+<!-- LOGIN SHEET -->
+<div class="bottom-sheet-overlay" id="loginSheet"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-content" id="loginSheetContent"></div></div></div>
+
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+<div id="menuOverlay" onclick="closeMenu()"></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <div class="top-row-1">
+            <div class="left-group">
+                <button class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+                <div class="brand-name"><span class="brand-zy">Zy</span><span class="brand-mart">mart</span></div>
+            </div>
+            <div class="right-group">
+                <button class="location-header" id="locationHeaderBtn" onclick="handleLocationButtonClick()"><i class="fas fa-map-pin"></i><span id="currentLocation">लोड हो रहा...</span></button>
+                <button class="wishlist-header-btn" onclick="fastNavigate('wishlist.html')"><i class="fas fa-heart"></i></button>
+                <button class="notification-btn" onclick="showNotifications()"><i class="far fa-bell"></i></button>
+            </div>
+        </div>
+        <div class="top-row-2"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="प्रोडक्ट्स, दुकान खोजें..." autocomplete="off"></div></div>
+    </div>
+
+    <div id="menuDropdown">
+        <div class="menu-header"><div class="menu-avatar"><i class="fas fa-user"></i></div><div class="menu-user-info"><div class="menu-user-name" id="menuUserName">अतिथि</div><div class="menu-user-sub" id="menuUserSub">लॉगिन करें</div></div><button class="menu-login-btn" id="menuLoginBtn" onclick="showLoginSheet()">लॉगिन</button></div>
+        <ul>
+            <li onclick="fastNavigate('orders.html')"><span class="menu-icon menu-icon-green"><i class="fas fa-clipboard-list"></i></span> मेरे ऑर्डर</li>
+            <li onclick="fastNavigate('wishlist.html')"><span class="menu-icon menu-icon-red"><i class="fas fa-heart"></i></span> विशलिस्ट</li>
+            <li onclick="fastNavigate('invite-earn.html')"><span class="menu-icon menu-icon-amber"><i class="fas fa-gift"></i></span> इन्वाइट और कमाएं</li>
+            <div class="menu-divider"></div>
+            <div class="menu-section-label">दुकानें</div>
+            <li onclick="fastNavigate('all-shops.html')"><span class="menu-icon menu-icon-blue"><i class="fas fa-store"></i></span> सभी दुकानें</li>
+            <li onclick="fastNavigate('shop-categories.html')"><span class="menu-icon menu-icon-blue"><i class="fas fa-tags"></i></span> दुकान श्रेणियाँ</li>
+            <li onclick="fastNavigate('shop-register.html')"><span class="menu-icon menu-icon-green"><i class="fas fa-store-alt"></i></span> दुकान रजिस्टर करें</li>
+            <div class="menu-divider"></div>
+            <div class="menu-section-label">सहायता</div>
+            <li onclick="showHelpModal()"><span class="menu-icon menu-icon-blue"><i class="fas fa-headset"></i></span> सहायता</li>
+            <li onclick="window.open('https://wa.me/918600252238','_blank')"><span class="menu-icon menu-icon-green"><i class="fab fa-whatsapp"></i></span> WhatsApp</li>
+            <div class="menu-divider"></div>
+            <div class="menu-section-label">नीतियाँ</div>
+            <li onclick="fastNavigate('cancellation-policy.html')"><span class="menu-icon menu-icon-red"><i class="fas fa-times-circle"></i></span> कैंसलेशन / रिफंड</li>
+            <li onclick="fastNavigate('privacy-policy.html')"><span class="menu-icon menu-icon-gray"><i class="fas fa-shield-alt"></i></span> गोपनीयता नीति</li>
+            <li onclick="fastNavigate('terms.html')"><span class="menu-icon menu-icon-gray"><i class="fas fa-file-contract"></i></span> नियम और शर्तें</li>
+            <li onclick="showAboutUs()"><span class="menu-icon menu-icon-gray"><i class="fas fa-info-circle"></i></span> Zymart के बारे में</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="categories-section"><div class="section-header"><h2>श्रेणियाँ</h2><button class="view-all" onclick="fastNavigate('shop-categories.html')">सभी देखें →</button></div><div class="categories-scroll-wrapper"><div class="categories-scroll" id="categoriesScroll"></div></div></div>
+        <div class="offers-section"><div class="section-header"><h3>धमाकेदार ऑफर</h3><button class="view-all" onclick="fastNavigate('offers.html')">सभी देखें →</button></div><div class="offers-slider-container"><div class="offers-track" id="offersTrack"></div></div></div>
+        <div class="featured-section"><div class="section-header"><h3>खास प्रोडक्ट्स</h3><button class="view-all" onclick="fastNavigate('products.html')">सभी देखें →</button></div><div class="featured-scroll-wrapper"><div class="featured-scroll" id="featuredContainer"></div></div></div>
+        <div class="hero-section"><div class="swiper hero-slider" id="heroSwiper"><div class="swiper-wrapper" id="heroContainer"></div><div class="swiper-pagination"></div></div></div>
+        <div class="trending-section"><div class="section-header"><h3>अभी ट्रेंडिंग</h3><button class="view-all" onclick="fastNavigate('products.html')">सभी देखें →</button></div><div class="products-scroll"><div class="products-scroll-content" id="trendingContainer"></div></div></div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="fastNavigate('index.html')"><i class="fas fa-home"></i><span>होम</span></button>
+        <button class="nav-item" onclick="fastNavigate('products.html')"><i class="fas fa-box"></i><span>खोजें</span></button>
+        <button class="nav-item" onclick="fastNavigate('cart.html')"><i class="fas fa-shopping-cart"></i><span>कार्ट</span><span class="cart-count" id="cartCount">0</span></button>
+        <button class="nav-item" onclick="fastNavigate('profile.html')"><i class="fas fa-user"></i><span>प्रोफाइल</span></button>
+        <button class="nav-item" onclick="fastNavigate('orders.html')"><i class="fas fa-receipt"></i><span>ऑर्डर</span></button>
+    </nav>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    
+    // ============ CRASH-PROOF LAYER 1: Global Error Handlers ============
+    window.addEventListener('error', function(e) {
+        try { console.error('[Zymart Crash]', e.message, e.filename, e.lineno); } catch(ex) {}
+        var app = document.getElementById('mainApp');
+        if (app && app.style.display === 'none') {
+            try { showMainApp(); } catch(ex) {}
+        }
+    });
+    
+    window.addEventListener('unhandledrejection', function(e) {
+        try { console.error('[Zymart Promise Crash]', e.reason); } catch(ex) {}
+        e.preventDefault();
+    });
+    
+    // ============ CRASH-PROOF LAYER 2: Safe Utilities ============
+    function safeJSONParse(str, fallback) {
+        try { return str ? JSON.parse(str) : fallback; }
+        catch(e) { return fallback; }
+    }
+    
+    function safeGetElement(id) {
+        try { return document.getElementById(id); }
+        catch(e) { return null; }
+    }
+    
+    function safeSetText(id, text) {
+        try { var el = document.getElementById(id); if (el) el.textContent = text; }
+        catch(e) {}
+    }
+    
+    function safeLog(m, d) { try { console.log('[Zymart]', m, d || ''); } catch(e) {} }
+    
+    // ============ CONFIG ============
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1',
+        DEFAULT_LOCATION: { lat: 19.8762, lng: 75.3433, city: 'Aurangabad', state: 'Maharashtra', shortName: 'Aurangabad' },
+        LOCATION_TIMEOUT: 10000,
+        CACHE_DURATION: { CATEGORIES: 7200000, PRODUCTS: 1200000, OFFERS: 3600000, SLIDERS: 3600000 }
+    };
+    
+    var zatpatDB = null;
+    try {
+        zatpatDB = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    } catch(e) {
+        safeLog('❌ Supabase init failed');
+        zatpatDB = { auth: { getSession: function() { return Promise.resolve({ data: { session: null } }); } } };
+    }
+    
+    var SUPABASE_URL = CONFIG.SUPABASE_URL;
+    var currentUser = null, heroSwiper = null, offersInterval = null, otpTimerInterval = null, currentOtpEmail = null;
+    var userCity = null, locationShortName = null, locationResolved = false, locationTimeoutHandle = null;
+    var isRequestingLocation = false, userLocationLat = null, userLocationLng = null;
+    var LOCATION_LOAD_TIMEOUT = null;
+    
+    function getFullUrl(u) {
+        if (!u) return '';
+        if (typeof u !== 'string') return '';
+        if (u.indexOf('http') === 0 || u.indexOf('data:') === 0) return u;
+        return SUPABASE_URL + '/storage/v1/object/public/' + u;
+    }
+    
+    async function safeFetch(fn, r) {
+        r = r || 2;
+        var lastError = null;
+        for (var i = 0; i < r; i++) {
+            try {
+                var res = await fn();
+                if (res && res.error) {
+                    lastError = new Error(res.error.message || 'DB Error');
+                    if (i === r - 1) throw lastError;
+                    await new Promise(function(x) { setTimeout(x, 600 * (i + 1)); });
+                    continue;
+                }
+                return res || { data: [] };
+            } catch (err) {
+                lastError = err;
+                if (i < r - 1) await new Promise(function(x) { setTimeout(x, 600 * (i + 1)); });
+            }
+        }
+        safeLog('⚠️ safeFetch failed after retries');
+        return { data: [] };
+    }
+    
+    function showToast(m, e) {
+        try {
+            var t = safeGetElement('toastMsg'), s = safeGetElement('toastText');
+            if (!t || !s) return;
+            s.textContent = m;
+            t.style.background = e ? '#EF4444' : '#1A1A1A';
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(function() { t.classList.remove('show'); }, 2200);
+        } catch(ex) {}
+    }
+    
+    function startProgress() {
+        try {
+            var b = safeGetElement('pageProgress');
+            if (b) { b.style.width = '0%'; b.classList.add('loading'); requestAnimationFrame(function() { b.style.width = '85%'; }); }
+        } catch(e) {}
+    }
+    
+    function completeProgress() {
+        try {
+            var b = safeGetElement('pageProgress');
+            if (b) { b.classList.remove('loading'); b.classList.add('complete'); setTimeout(function() { b.style.width = '0%'; b.classList.remove('complete'); }, 350); }
+        } catch(e) {}
+    }
+    
+    function showMainApp() {
+        try {
+            var l = safeGetElement('simpleLoader'), a = safeGetElement('mainApp');
+            if (a) { a.style.opacity = '0'; a.style.display = ''; requestAnimationFrame(function() { a.style.transition = 'opacity 0.35s ease'; a.style.opacity = '1'; }); }
+            if (l) { l.classList.add('fade-out'); setTimeout(function() { if (l && l.parentNode) l.parentNode.removeChild(l); }, 400); }
+        } catch(e) {}
+    }
+    
+    // ============ BOTTOM SHEETS ============
+    var _sheetHistory = [];
+    function openBottomSheet(id) {
+        try {
+            var s = safeGetElement(id);
+            if (!s) return;
+            s.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            _sheetHistory.push(id);
+            try { history.pushState({ sheet: id }, '', window.location.href); } catch(e) {}
+        } catch(e) {}
+    }
+    function closeBottomSheet(id) {
+        try {
+            var s = safeGetElement(id);
+            if (!s) return;
+            s.classList.remove('show');
+            document.body.style.overflow = '';
+            _sheetHistory = _sheetHistory.filter(function(x) { return x !== id; });
+        } catch(e) {}
+    }
+    
+    function showLocationSheet(type, message) {
+        try {
+            var content = safeGetElement('locationSheetContent');
+            if (!content) return;
+            var html = '';
+            if (type === 'loading') {
+                html = '<div class="sheet-icon" style="font-size:32px;">📍</div><div class="sheet-title">लोकेशन ढूंढ रहे हैं...</div><div class="sheet-subtitle">सटीक डिलीवरी के लिए GPS चालू रखें</div><div class="loading-container"><div class="loading-spinner"></div><div class="loading-text">GPS प्रतीक्षा...</div></div>';
+            } else if (type === 'request') {
+                html = '<div class="sheet-icon" style="font-size:32px;">🗺️</div><div class="sheet-title">लोकेशन एक्सेस करें</div><div class="sheet-subtitle">' + (message || 'आपके आस-पास की दुकानों के लिए लोकेशन जरूरी है') + '</div><div class="btn-row"><button class="btn btn-primary" onclick="requestLocationFromAndroid()"><i class="fas fa-map-marker-alt"></i> लोकेशन दें</button><button class="btn btn-secondary" onclick="skipLocation()">बाद में</button></div>';
+            } else if (type === 'settings') {
+                html = '<div class="sheet-icon" style="font-size:32px;">⚙️</div><div class="sheet-title">GPS बंद है</div><div class="sheet-subtitle">कृपया सेटिंग्स में जाकर Location/GPS चालू करें</div><div class="btn-row"><button class="btn btn-primary" onclick="openLocationSettings()">⚙️ सेटिंग्स खोलें</button><button class="btn btn-secondary" onclick="retryLocationCheck()">🔄 पुनः प्रयास करें</button></div>';
+            }
+            content.innerHTML = html;
+            openBottomSheet('locationSheet');
+        } catch(e) { safeLog('❌ showLocationSheet error', e); }
+    }
+    
+    function hideLocationSheet() { closeBottomSheet('locationSheet'); }
+    
+    function showLoginSheet() {
+        try {
+            var content = safeGetElement('loginSheetContent');
+            if (!content) return;
+            content.innerHTML = '<div class="sheet-icon">🔐</div><div class="sheet-title">Zymart में शामिल हों</div><div class="sheet-subtitle">ऑर्डर और ऑफर के लिए लॉगिन करें</div><div class="btn-row"><button class="btn btn-google" onclick="handleGoogleLogin()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" style="width:18px;height:18px;"> Google से जारी रखें</button><div class="btn-divider">या ईमेल से</div><div style="text-align:left;"><label class="input-label">ईमेल एड्रेस</label><input type="email" id="loginEmail" class="input-field" placeholder="example@email.com"></div><button class="btn btn-primary" onclick="sendLoginOTP()"><i class="fas fa-envelope"></i> OTP भेजें</button></div><p style="text-align:center;margin-top:10px;font-size:11px;color:#6B7280;">नए हैं? <a href="javascript:void(0)" onclick="showSignUpSheet()" style="color:#F59E0B;font-weight:600;">अकाउंट बनाएं</a></p>';
+            openBottomSheet('loginSheet');
+            closeMenu();
+        } catch(e) { safeLog('❌ showLoginSheet error', e); }
+    }
+    
+    function hideLoginSheet() { closeBottomSheet('loginSheet'); }
+    
+    function showSignUpSheet() {
+        try {
+            var content = safeGetElement('loginSheetContent');
+            if (!content) return;
+            content.innerHTML = '<div class="sheet-icon">✨</div><div class="sheet-title">नया अकाउंट बनाएं</div><div class="sheet-subtitle">कुछ ही सेकंड में जुड़ें</div><div class="btn-row"><button class="btn btn-google" onclick="handleGoogleLogin()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" style="width:18px;height:18px;"> Google से साइन अप</button><div class="btn-divider">या</div><div style="text-align:left;"><label class="input-label">पूरा नाम</label><input type="text" id="signupName" class="input-field" placeholder="आपका नाम"></div><div style="text-align:left;"><label class="input-label">ईमेल एड्रेस</label><input type="email" id="signupEmail" class="input-field" placeholder="example@email.com"></div><button class="btn btn-primary" onclick="sendSignUpOTP()"><i class="fas fa-envelope"></i> OTP भेजें</button></div><p style="text-align:center;margin-top:10px;font-size:11px;color:#6B7280;">अकाउंट है? <a href="javascript:void(0)" onclick="showLoginSheet()" style="color:#F59E0B;font-weight:600;">लॉगिन करें</a></p>';
+            openBottomSheet('loginSheet');
+        } catch(e) { safeLog('❌ showSignUpSheet error', e); }
+    }
+    
+    // ============ AUTH ============
+    async function handleGoogleLogin() {
+        try {
+            var btn = document.querySelector('.btn-google');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></div>'; }
+            var result = await zatpatDB.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/index.html' } });
+            if (result && result.error) { showToast('Google लॉगिन विफल', true); if (btn) { btn.disabled = false; btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px;"> Google से जारी रखें'; } return; }
+            hideLoginSheet();
+            showToast('लॉगिन सफल!');
+            setTimeout(async function() { await checkLoggedInUser(); }, 500);
+        } catch(e) { safeLog('❌ Google login error', e); showToast('कुछ गलत हुआ', true); }
+    }
+    
+    async function sendLoginOTP() {
+        try {
+            var emailEl = safeGetElement('loginEmail');
+            var e = emailEl ? emailEl.value.trim() : '';
+            if (!e) { showToast('ईमेल दर्ज करें', true); return; }
+            var btn = document.querySelector('#loginSheetContent .btn-primary');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></div>'; }
+            var r = await zatpatDB.auth.signInWithOtp({ email: e, options: { shouldCreateUser: true, data: { role: 3 } } });
+            if (r && r.error) { showToast(r.error.message || 'विफल', true); if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-envelope"></i> OTP भेजें'; } return; }
+            currentOtpEmail = e;
+            showOTPInput();
+        } catch(ex) { safeLog('❌ sendLoginOTP error', ex); showToast('एरर', true); }
+    }
+    
+    async function sendSignUpOTP() {
+        try {
+            var nameEl = safeGetElement('signupName'), emailEl = safeGetElement('signupEmail');
+            var n = nameEl ? nameEl.value.trim() : '', e = emailEl ? emailEl.value.trim() : '';
+            if (!n || !e) { showToast('नाम और ईमेल दर्ज करें', true); return; }
+            var btn = document.querySelector('#loginSheetContent .btn-primary');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></div>'; }
+            var r = await zatpatDB.auth.signInWithOtp({ email: e, options: { shouldCreateUser: true, data: { name: n, role: 3 } } });
+            if (r && r.error) { showToast(r.error.message || 'विफल', true); if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-envelope"></i> OTP भेजें'; } return; }
+            currentOtpEmail = e;
+            showOTPInput();
+        } catch(ex) { safeLog('❌ sendSignUpOTP error', ex); showToast('एरर', true); }
+    }
+    
+    function showOTPInput() {
+        try {
+            var content = safeGetElement('loginSheetContent');
+            if (!content) return;
+            content.innerHTML = '<div class="sheet-icon">📧</div><div class="sheet-title">OTP सत्यापित करें</div><div class="sheet-subtitle">हमने <strong>' + (currentOtpEmail || '') + '</strong> पर OTP भेजा है</div><div style="text-align:left;"><label class="input-label">OTP</label><input type="text" id="loginOtp" class="input-field" placeholder="6-अंक OTP" maxlength="6" inputmode="numeric" style="text-align:center;font-size:16px;letter-spacing:5px;"></div><div class="btn-row" style="margin-top:16px;"><button class="btn btn-primary" onclick="verifyLoginOTP()">सत्यापित करें</button><button class="btn btn-secondary" id="resendOtpBtn" onclick="resendLoginOTP()">OTP पुनः भेजें</button></div><button class="btn btn-outline" style="margin-top:5px;" onclick="showLoginSheet()">← वापस</button>';
+            startResendTimer();
+        } catch(e) { safeLog('❌ showOTPInput error', e); }
+    }
+    
+    async function verifyLoginOTP() {
+        try {
+            var otpEl = safeGetElement('loginOtp');
+            var o = otpEl ? otpEl.value.trim() : '';
+            if (!o || o.length < 4) { showToast('OTP दर्ज करें', true); return; }
+            if (!currentOtpEmail) { showToast('सत्र समाप्त', true); showLoginSheet(); return; }
+            var btn = document.querySelector('#loginSheetContent .btn-primary');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></div>'; }
+            var r = await zatpatDB.auth.verifyOtp({ email: currentOtpEmail, token: o, type: 'email' });
+            if (r && r.error) { showToast('गलत OTP', true); if (btn) { btn.disabled = false; btn.innerHTML = 'सत्यापित करें'; } return; }
+            showToast('लॉगिन सफल!');
+            currentOtpEmail = null;
+            hideLoginSheet();
+            if (otpTimerInterval) clearInterval(otpTimerInterval);
+            setTimeout(async function() { await checkLoggedInUser(); }, 300);
+        } catch(e) { safeLog('❌ verifyLoginOTP error', e); showToast('विफल', true); }
+    }
+    
+    async function resendLoginOTP() {
+        if (!currentOtpEmail) { showLoginSheet(); return; }
+        try {
+            await zatpatDB.auth.signInWithOtp({ email: currentOtpEmail, options: { shouldCreateUser: true } });
+            startResendTimer();
+            showToast('नया OTP भेजा!');
+        } catch(e) { safeLog('❌ resendLoginOTP error', e); showToast('विफल', true); }
+    }
+    
+    function startResendTimer() {
+        try {
+            var s = 60, b = safeGetElement('resendOtpBtn');
+            if (!b) return;
+            if (otpTimerInterval) clearInterval(otpTimerInterval);
+            b.disabled = true;
+            otpTimerInterval = setInterval(function() {
+                s--;
+                try { b.textContent = 'पुनः (' + s + 's)'; } catch(e) {}
+                if (s <= 0) { clearInterval(otpTimerInterval); b.disabled = false; try { b.textContent = 'OTP पुनः भेजें'; } catch(e) {} }
+            }, 1000);
+        } catch(e) {}
+    }
+    
+    // ============ LOCATION ============
+    function requestLocationFromAndroid() {
+        try {
+            if (isRequestingLocation) return;
+            isRequestingLocation = true;
+            try { localStorage.setItem('location_permission_asked', 'true'); } catch(e) {}
+            if (window.Android && typeof window.Android.requestLocation === 'function') {
+                window.Android.requestLocation();
+                showLocationSheet('loading');
+                locationTimeoutHandle = setTimeout(function() {
+                    if (!locationResolved && isRequestingLocation) handleLocationFallback();
+                }, CONFIG.LOCATION_TIMEOUT);
+            } else {
+                handleLocationFallback();
+            }
+        } catch(e) { handleLocationFallback(); }
+    }
+    
+    window.setLocationFromAndroid = function(lat, lng, address, city) {
+        try {
+            var plat = parseFloat(lat), plng = parseFloat(lng);
+            if (city && address) processLocationDataWithAddress(plat, plng, address, city);
+            else processLocationData(plat, plng);
+        } catch(e) { handleLocationFallback(); }
+    };
+    
+    window.onLocationError = function(msg) {
+        try {
+            if (msg === 'GPS_DISABLED' || msg === 'LOCATION_OFF') showLocationSheet('settings');
+            else if (msg === 'PERMISSION_DENIED') showLocationSheet('request');
+            else handleLocationFallback();
+            isRequestingLocation = false;
+        } catch(e) {}
+    };
+    
+    async function processLocationData(lat, lng) {
+        try {
+            if (!lat || !lng || isNaN(lat) || isNaN(lng)) { handleLocationFallback(); return; }
+            userLocationLat = lat; userLocationLng = lng;
+            try { localStorage.setItem('user_lat', lat.toString()); localStorage.setItem('user_lng', lng.toString()); localStorage.setItem('location_timestamp', Date.now().toString()); } catch(e) {}
+            var r = await getCityName(lat, lng);
+            userCity = r.city; locationShortName = r.shortName;
+            try { localStorage.setItem('user_city', userCity); localStorage.setItem('location_short', locationShortName); } catch(e) {}
+            updateLocationDisplay();
+            hideLocationSheet();
+            isRequestingLocation = false;
+            if (locationTimeoutHandle) { clearTimeout(locationTimeoutHandle); locationTimeoutHandle = null; }
+            if (!locationResolved) resolveLocation();
+        } catch(e) { handleLocationFallback(); }
+    }
+    
+    function processLocationDataWithAddress(lat, lng, address, city) {
+        try {
+            userLocationLat = lat; userLocationLng = lng; userCity = city; locationShortName = city;
+            try { localStorage.setItem('user_lat', lat.toString()); localStorage.setItem('user_lng', lng.toString()); localStorage.setItem('user_city', city); localStorage.setItem('location_short', city); localStorage.setItem('location_timestamp', Date.now().toString()); } catch(e) {}
+            updateLocationDisplay();
+            hideLocationSheet();
+            isRequestingLocation = false;
+            if (locationTimeoutHandle) { clearTimeout(locationTimeoutHandle); locationTimeoutHandle = null; }
+            resolveLocation();
+        } catch(e) { handleLocationFallback(); }
+    }
+    
+    function handleLocationFallback() {
+        try {
+            var cl = null, clng = null, ct = null;
+            try { cl = localStorage.getItem('user_lat'); clng = localStorage.getItem('user_lng'); ct = localStorage.getItem('location_timestamp'); } catch(e) {}
+            if (cl && clng && ct && (Date.now() - parseInt(ct)) < CONFIG.LOCATION_CACHE_TIME * 2) {
+                processLocationData(parseFloat(cl), parseFloat(clng));
+                return;
+            }
+            hideLocationSheet();
+            useDefaultLocation();
+            resolveLocation();
+        } catch(e) { useDefaultLocation(); resolveLocation(); }
+    }
+    
+    function useDefaultLocation() {
+        userCity = CONFIG.DEFAULT_LOCATION.city;
+        locationShortName = CONFIG.DEFAULT_LOCATION.shortName;
+        userLocationLat = CONFIG.DEFAULT_LOCATION.lat;
+        userLocationLng = CONFIG.DEFAULT_LOCATION.lng;
+        updateLocationDisplay();
+    }
+    
+    async function getCityName(lat, lng) {
+        try {
+            var c = new AbortController(), t = setTimeout(function() { try { c.abort(); } catch(e) {} }, 5000);
+            var r = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1', { headers: { 'Accept': 'application/json', 'User-Agent': 'ZymartApp/6.0' }, signal: c.signal });
+            clearTimeout(t);
+            var d = await r.json(), a = d.address || {};
+            var city = a.city || a.town || a.municipality || CONFIG.DEFAULT_LOCATION.city;
+            return { city: city, state: a.state || '', shortName: city, fullAddress: d.display_name || '' };
+        } catch(e) {
+            return { city: CONFIG.DEFAULT_LOCATION.city, state: '', shortName: CONFIG.DEFAULT_LOCATION.shortName, fullAddress: '' };
+        }
+    }
+    
+    function openLocationSettings() {
+        try {
+            if (window.Android && typeof window.Android.openLocationSettings === 'function') window.Android.openLocationSettings();
+            else showToast('सेटिंग्स से GPS चालू करें', true);
+        } catch(e) { showToast('सेटिंग्स से GPS चालू करें', true); }
+    }
+    
+    function retryLocationCheck() { hideLocationSheet(); requestLocationFromAndroid(); }
+    function skipLocation() { hideLocationSheet(); useDefaultLocation(); resolveLocation(); showToast('डिफ़ॉल्ट लोकेशन'); }
+    function handleLocationButtonClick() { if (locationResolved && locationShortName) showToast('📍 ' + locationShortName); else requestLocationFromAndroid(); }
+    function updateLocationDisplay() { safeSetText('currentLocation', locationShortName || 'लोड हो रहा...'); }
+    
+    function resolveLocation() {
+        if (locationResolved) return;
+        locationResolved = true;
+        isRequestingLocation = false;
+        if (locationTimeoutHandle) { clearTimeout(locationTimeoutHandle); locationTimeoutHandle = null; }
+        if (LOCATION_LOAD_TIMEOUT) { clearTimeout(LOCATION_LOAD_TIMEOUT); LOCATION_LOAD_TIMEOUT = null; }
+        if (!userCity) useDefaultLocation();
+        loadAllData();
+    }
+    
+    function initLocation() {
+        try {
+            var sc = null, slat = null, slng = null;
+            try { sc = localStorage.getItem('user_city'); slat = localStorage.getItem('user_lat'); slng = localStorage.getItem('user_lng'); } catch(e) {}
+            if (sc && slat && slng) {
+                userCity = sc;
+                locationShortName = (function() { try { return localStorage.getItem('location_short'); } catch(e) { return sc; } })() || sc;
+                userLocationLat = parseFloat(slat);
+                userLocationLng = parseFloat(slng);
+                resolveLocation();
+            } else {
+                useDefaultLocation();
+                LOCATION_LOAD_TIMEOUT = setTimeout(function() {
+                    if (!locationResolved) { safeLog('⏰ Timeout'); useDefaultLocation(); resolveLocation(); showMainApp(); }
+                }, 6000);
+            }
+            updateLocationDisplay();
+        } catch(e) { useDefaultLocation(); resolveLocation(); }
+    }
+    
+    // ============ MENU ============
+    function updateMenuHeader() {
+        try {
+            if (currentUser) {
+                safeSetText('menuUserName', (currentUser.user_metadata && currentUser.user_metadata.name) || currentUser.email || 'उपयोगकर्ता');
+                safeSetText('menuUserSub', currentUser.email || '');
+                var btn = safeGetElement('menuLoginBtn');
+                if (btn) { btn.textContent = 'लॉगआउट'; btn.setAttribute('onclick', 'handleLogout()'); }
+            } else {
+                safeSetText('menuUserName', 'अतिथि');
+                safeSetText('menuUserSub', 'लॉगिन करें');
+                var btn = safeGetElement('menuLoginBtn');
+                if (btn) { btn.textContent = 'लॉगिन'; btn.setAttribute('onclick', 'showLoginSheet()'); }
+            }
+        } catch(e) {}
+    }
+    
+    // ============ DATA LOADING ============
+    async function loadAllData() {
+        if (window._dataLoading) return;
+        window._dataLoading = true;
+        startProgress();
+        showCategorySkeleton();
+        showFeaturedSkeleton();
+        showProductsSkeleton('trendingContainer');
+        try {
+            loadCategoriesInternal().catch(function() {});
+            await Promise.allSettled([loadOffersInternal(), loadHeroSliderInternal(), loadFeaturedProductsInternal(), loadTrendingProductsInternal()]);
+            completeProgress();
+            showMainApp();
+        } catch(e) {
+            completeProgress();
+            showMainApp();
+        } finally {
+            window._dataLoading = false;
+        }
+    }
+    
+    async function loadCategoriesInternal() {
+        var c = safeGetElement('categoriesScroll');
+        if (!c) return;
+        var cached = Cache.get('categories');
+        if (cached && cached.length > 0) { renderCategories(cached); return; }
+        showCategorySkeleton();
+        try {
+            var r = await safeFetch(function() { return zatpatDB.from('categories').select('id,name,image_url').eq('is_active', true).order('priority'); });
+            if (r.data && r.data.length > 0) { Cache.set('categories', r.data, CONFIG.CACHE_DURATION.CATEGORIES); renderCategories(r.data); }
+        } catch(e) { safeLog('❌ loadCategories error', e); }
+    }
+    
+    function renderCategories(d) {
+        var c = safeGetElement('categoriesScroll');
+        if (!c || !d || !d.length) return;
+        try {
+            c.innerHTML = d.map(function(cat) {
+                var iu = getFullUrl(cat.image_url);
+                var name = (cat.name || '').replace(/'/g, "\\'");
+                if (cat.image_url) {
+                    return '<div class="category-circle-item" onclick="filterByCategory(\'' + cat.id + '\',\'' + name + '\')"><div class="category-circle"><img src="' + iu + '" loading="lazy" onerror="this.style.display=\'none\'"><i class="fas fa-store" style="display:none;"></i></div><div class="category-circle-name">' + cat.name + '</div></div>';
+                }
+                return '<div class="category-circle-item" onclick="filterByCategory(\'' + cat.id + '\',\'' + name + '\')"><div class="category-circle"><i class="fas fa-store"></i></div><div class="category-circle-name">' + cat.name + '</div></div>';
+            }).join('');
+        } catch(e) { safeLog('❌ renderCategories error', e); }
+    }
+    
+    async function loadHeroSliderInternal() {
+        var c = safeGetElement('heroContainer');
+        if (!c) return;
+        try {
+            var r = await safeFetch(function() { return zatpatDB.from('sliders').select('*').eq('is_active', true).order('display_order'); });
+            if (r.data && r.data.length > 0) renderHeroSlider(r.data);
+        } catch(e) {}
+    }
+    
+    function renderHeroSlider(s) {
+        var c = safeGetElement('heroContainer');
+        if (!c || !s || !s.length) return;
+        try {
+            c.innerHTML = s.map(function(sl) { return '<div class="swiper-slide hero-slide" onclick="fastNavigate(\'' + (sl.link || '#') + '\')"><img src="' + getFullUrl(sl.image_url) + '" loading="lazy" onerror="this.parentElement.style.background=\'#EDF7F1\'"><div class="hero-overlay"><div class="hero-title">' + (sl.title || '') + '</div></div></div>'; }).join('');
+            if (heroSwiper) { try { heroSwiper.destroy(true, true); } catch(e) {} }
+            try { heroSwiper = new Swiper('#heroSwiper', { loop: s.length > 1, autoplay: s.length > 1 ? { delay: 3500 } : false, pagination: { el: '.swiper-pagination', clickable: true } }); } catch(e) {}
+        } catch(e) {}
+    }
+    
+    async function loadOffersInternal() {
+        var t = safeGetElement('offersTrack');
+        if (!t) return;
+        try {
+            var r = await safeFetch(function() { return zatpatDB.from('offers').select('*').eq('is_active', true).order('priority').limit(6); });
+            if (r.data && r.data.length > 0) renderOffers(r.data);
+        } catch(e) {}
+    }
+    
+    function renderOffers(o) {
+        var t = safeGetElement('offersTrack');
+        if (!t || !o || !o.length) return;
+        try {
+            t.innerHTML = o.map(function(of) { return '<div class="offer-card" onclick="fastNavigate(\'' + (of.link || 'offers.html') + '\')">' + (of.image_url ? '<img src="' + getFullUrl(of.image_url) + '" class="offer-card-image" loading="lazy" onerror="this.parentElement.style.background=\'linear-gradient(140deg, #0B5A31, #0F6E3B)\'">' : '') + '<div class="offer-card-overlay"><div class="offer-content"><h4>' + (of.title || '') + '</h4><button class="offer-btn">' + of.discount_value + (of.discount_type === 'percentage' ? '% OFF' : '₹ OFF') + '</button></div></div></div>'; }).join('');
+        } catch(e) {}
+    }
+    
+    async function loadFeaturedProductsInternal() {
+        var c = safeGetElement('featuredContainer');
+        if (!c) return;
+        showFeaturedSkeleton();
+        try {
+            var fp = [];
+            if (userCity) {
+                var sr = await safeFetch(function() { return zatpatDB.from('shops').select('id').eq('city', userCity).eq('status', 'approved'); });
+                var ls = (sr.data || []).map(function(s) { return s.id; });
+                if (ls.length > 0) {
+                    var lr = await safeFetch(function() { return zatpatDB.from('products').select('*').in('shop_id', ls).eq('is_featured', true).eq('is_active', true).limit(10); });
+                    if (lr.data) fp = lr.data;
+                }
+            }
+            if (fp.length < 10) {
+                var gr = await safeFetch(function() { return zatpatDB.from('products').select('*').eq('is_featured', true).eq('is_active', true).limit(10); });
+                if (gr.data) fp = gr.data;
+            }
+            if (fp.length) renderFeaturedProducts(fp);
+            else c.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>कोई नहीं</p></div>';
+        } catch(e) { c.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>कोई नहीं</p></div>'; }
+    }
+    
+    function renderFeaturedProducts(d) {
+        var c = safeGetElement('featuredContainer');
+        if (!c || !d || !d.length) return;
+        try {
+            c.innerHTML = d.map(function(pr) {
+                var img = getFullUrl((pr.images && pr.images[0]) || pr.image_url || '');
+                var dis = pr.offer_price ? Math.round((1 - pr.offer_price / pr.price) * 100) : 0;
+                var name = (pr.name || '').replace(/'/g, "\\'");
+                return '<div class="featured-product-card" onclick="openProductDetails(\'' + pr.id + '\')"><div class="featured-product-img">' + (dis > 0 ? '<div class="featured-discount-tag">' + dis + '% OFF</div>' : '') + (img ? '<img src="' + img + '" loading="lazy" onerror="this.style.display=\'none\'">' : '') + '</div><div class="featured-product-info"><div class="featured-product-name">' + pr.name + '</div><div class="featured-product-price-row"><span class="featured-product-price">₹' + (pr.offer_price || pr.price) + '</span>' + (pr.offer_price ? '<span class="featured-original-price">₹' + pr.price + '</span>' : '') + '</div><button class="featured-add-btn" onclick="event.stopPropagation();addToCart(\'' + pr.id + '\',\'' + name + '\',' + (pr.offer_price || pr.price) + ',\'' + img + '\')">जोड़ें</button></div></div>';
+            }).join('');
+        } catch(e) {}
+    }
+    
+    async function loadTrendingProductsInternal() {
+        var c = safeGetElement('trendingContainer');
+        if (!c) return;
+        showProductsSkeleton('trendingContainer');
+        try {
+            var r = await safeFetch(function() { return zatpatDB.from('products').select('*').eq('is_active', true).order('created_at', { ascending: false }).limit(6); });
+            if (r.data && r.data.length > 0) renderProducts('trendingContainer', r.data);
+            else c.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>कोई नहीं</p></div>';
+        } catch(e) { c.innerHTML = '<div class="error-state"><i class="fas fa-exclamation-circle"></i><p>लोड विफल</p></div>'; }
+    }
+    
+    function renderProducts(cid, p) {
+        var c = safeGetElement(cid);
+        if (!c || !p || !p.length) return;
+        try {
+            c.innerHTML = p.map(function(pr) {
+                var img = getFullUrl((pr.images && pr.images[0]) || pr.image_url || '');
+                var dis = pr.offer_price ? Math.round((1 - pr.offer_price / pr.price) * 100) : 0;
+                var name = (pr.name || '').replace(/'/g, "\\'");
+                return '<div class="product-card" onclick="openProductDetails(\'' + pr.id + '\')"><div class="product-img">' + (dis > 0 ? '<div class="discount-tag">' + dis + '% OFF</div>' : '') + (img ? '<img src="' + img + '" loading="lazy" onerror="this.style.display=\'none\'">' : '') + '</div><div class="product-info"><div class="product-name">' + pr.name + '</div><div class="product-price">₹' + (pr.offer_price || pr.price) + (pr.offer_price ? '<span class="original-price">₹' + pr.price + '</span>' : '') + '</div><button class="add-cart" onclick="event.stopPropagation();addToCart(\'' + pr.id + '\',\'' + name + '\',' + (pr.offer_price || pr.price) + ',\'' + img + '\')">जोड़ें</button></div></div>';
+            }).join('');
+        } catch(e) {}
+    }
+    
+    function addToCart(id, n, p, img) {
+        try {
+            var cart = safeJSONParse(localStorage.getItem('zatpat_cart'), []);
+            var ex = cart.find(function(i) { return i.id === id; });
+            if (ex) ex.quantity = (ex.quantity || 1) + 1;
+            else cart.push({ id: id, name: n, price: p, image: img, quantity: 1 });
+            try { localStorage.setItem('zatpat_cart', JSON.stringify(cart)); } catch(e) {}
+            var count = cart.reduce(function(s, i) { return s + (i.quantity || 1); }, 0);
+            safeSetText('cartCount', count);
+            showToast('🛒 ' + n + ' जोड़ा');
+            if (navigator.vibrate) navigator.vibrate(8);
+        } catch(e) { showToast('विफल', true); }
+    }
+    
+    function showCategorySkeleton() { var c = safeGetElement('categoriesScroll'); if (!c) return; try { c.innerHTML = Array(6).fill(0).map(function() { return '<div class="category-circle-item"><div class="skeleton-category-circle"></div><div class="skeleton-text skeleton-text-sm" style="width:44px;margin:3px auto 0;"></div></div>'; }).join(''); } catch(e) {} }
+    function showFeaturedSkeleton() { var c = safeGetElement('featuredContainer'); if (!c) return; try { c.innerHTML = Array(4).fill(0).map(function() { return '<div class="skeleton-featured-card"><div class="skeleton-img"></div><div class="skeleton-text skeleton-text-md" style="margin:5px;"></div></div>'; }).join(''); } catch(e) {} }
+    function showProductsSkeleton(id) { var c = safeGetElement(id); if (!c) return; try { c.innerHTML = Array(6).fill(0).map(function() { return '<div class="product-card" style="pointer-events:none;"><div class="skeleton-img"></div><div class="skeleton-text skeleton-text-md" style="margin:5px;"></div></div>'; }).join(''); } catch(e) {} }
+    
+    // ============ UI HELPERS ============
+    function toggleMenu() { try { var m = safeGetElement('menuDropdown'), o = safeGetElement('menuOverlay'); if (!m || !o) return; if (m.classList.contains('show')) closeMenu(); else { o.classList.add('show'); requestAnimationFrame(function() { m.classList.add('show'); }); } } catch(e) {} }
+    function closeMenu() { try { var m = safeGetElement('menuDropdown'), o = safeGetElement('menuOverlay'); if (m) m.classList.remove('show'); if (o) o.classList.remove('show'); } catch(e) {} }
+    function showHelpModal() { showToast('📞 8600252238 | 📧 sk12shaikh@gmail.com'); closeMenu(); }
+    function showAboutUs() { showToast('Zymart v6.0 | Solutions SK'); closeMenu(); }
+    function showNotifications() { showToast('कोई नई सूचना नहीं'); }
+    function openProductDetails(id) { if (id) fastNavigate('product-detail.html?id=' + id); }
+    function filterByCategory(cid, cn) { if (cid) fastNavigate('products.html?category_id=' + cid + '&category_name=' + encodeURIComponent(cn)); }
+    
+    async function handleLogout() {
+        try {
+            if (confirm('लॉगआउट करें?')) {
+                await zatpatDB.auth.signOut();
+                try { localStorage.removeItem('zatpat_cart'); } catch(e) {}
+                window.location.href = 'index.html';
+            }
+        } catch(e) {}
+    }
+    
+    window.fastNavigate = function(url) {
+        try { closeMenu(); } catch(e) {}
+        window.location.href = url;
+    };
+    
+    async function checkLoggedInUser() {
+        try {
+            var sr = await zatpatDB.auth.getSession();
+            if (sr && sr.data && sr.data.session) {
+                currentUser = sr.data.session.user;
+                // Role check
+                try {
+                    var pr = await zatpatDB.from('users').select('role').eq('id', currentUser.id).maybeSingle();
+                    var role = (pr && pr.data) ? pr.data.role : null;
+                    if (!role || role === 3 || role === '3') {
+                        var sc = await zatpatDB.from('shops').select('id, status').eq('owner_email', currentUser.email).maybeSingle();
+                        if (sc && sc.data && sc.data.status === 'approved') {
+                            role = 2;
+                            await zatpatDB.from('users').upsert({ id: currentUser.id, email: currentUser.email, role: 2 });
+                        }
+                    }
+                    if (role === 1 || role === '1' || role === 'admin') { window.location.href = 'admin-panel.html'; return false; }
+                    if (role === 2 || role === '2' || role === 'shop_owner') { window.location.href = 'shop-dashboard.html'; return false; }
+                } catch(e) {}
+            } else {
+                currentUser = null;
+            }
+            updateMenuHeader();
+            return true;
+        } catch(e) { updateMenuHeader(); return true; }
+    }
+    
+    function handleBackPress() {
+        try {
+            var menu = safeGetElement('menuDropdown');
+            if (menu && menu.classList.contains('show')) { closeMenu(); return true; }
+            var loginSheet = safeGetElement('loginSheet');
+            if (loginSheet && loginSheet.classList.contains('show')) { hideLoginSheet(); return true; }
+            var locSheet = safeGetElement('locationSheet');
+            if (locSheet && locSheet.classList.contains('show')) { skipLocation(); return true; }
+        } catch(e) {}
+        return false;
+    }
+    
+    window.onAndroidBackPressed = function() { return handleBackPress(); };
+    
+    // ============ CACHE ============
+    var Cache = {
+        set: function(k, d, t) { try { localStorage.setItem('zm_' + k, JSON.stringify({ d: d, e: Date.now() + (t || CONFIG.CACHE_DURATION.PRODUCTS) })); } catch(e) {} },
+        get: function(k) { try { var c = localStorage.getItem('zm_' + k); if (!c) return null; var p = JSON.parse(c); if (Date.now() > p.e) { localStorage.removeItem('zm_' + k); return null; } return p.d; } catch(e) { return null; } }
+    };
+    
+    // ============ EVENT LISTENERS ============
+    window.addEventListener('popstate', function(e) { if (_sheetHistory.length > 0) { var id = _sheetHistory[_sheetHistory.length - 1]; closeBottomSheet(id); } });
+    window.addEventListener('online', function() { showToast('इंटरनेट बहाल!'); loadAllData(); });
+    window.addEventListener('offline', function() { showToast('इंटरनेट नहीं है', true); });
+    window.addEventListener('beforeunload', function() { if (offersInterval) clearInterval(offersInterval); if (otpTimerInterval) clearInterval(otpTimerInterval); });
+    
+    // ============ INIT ============
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            await checkLoggedInUser();
+            initLocation();
+            
+            var cart = safeJSONParse(localStorage.getItem('zatpat_cart'), []);
+            var cc = cart.reduce(function(s, i) { return s + (i.quantity || 1); }, 0);
+            safeSetText('cartCount', cc);
+            
+            var slat = null, slng = null, pa = null;
+            try { slat = localStorage.getItem('user_lat'); slng = localStorage.getItem('user_lng'); pa = localStorage.getItem('location_permission_asked'); } catch(e) {}
+            
+            if (slat && slng && !locationResolved) {
+                processLocationData(parseFloat(slat), parseFloat(slng));
+            } else if (!pa && !locationResolved) {
+                setTimeout(function() { if (!locationResolved) showLocationSheet('request', 'Zymart में आपका स्वागत है!'); }, 800);
+            }
+            
+            var searchInput = safeGetElement('searchInput');
+            if (searchInput) {
+                var st;
+                searchInput.addEventListener('input', function(e) {
+                    clearTimeout(st);
+                    st = setTimeout(function() {
+                        var val = e.target ? e.target.value.trim() : '';
+                        if (val.length > 2) fastNavigate('products.html?search=' + encodeURIComponent(val));
+                    }, 400);
+                });
+            }
+            
+            if (window.Android && typeof window.Android.pageReady === 'function') {
+                try { window.Android.pageReady(); } catch(e) {}
+            }
+            
+            if (!locationResolved && window.Android && typeof window.Android.requestLocation === 'function') {
+                setTimeout(function() { if (!locationResolved) { try { window.Android.requestLocation(); } catch(e) {} } }, 500);
+            }
+        } catch(e) {
+            safeLog('❌ DOMContentLoaded error', e);
+            useDefaultLocation();
+            resolveLocation();
+        }
+    });
+    
+    // ============ EXPOSE TO WINDOW ============
+    window.requestLocationFromAndroid = requestLocationFromAndroid;
+    window.openLocationSettings = openLocationSettings;
+    window.retryLocationCheck = retryLocationCheck;
+    window.skipLocation = skipLocation;
+    window.handleLocationButtonClick = handleLocationButtonClick;
+    window.showLoginSheet = showLoginSheet;
+    window.hideLoginSheet = hideLoginSheet;
+    window.showSignUpSheet = showSignUpSheet;
+    window.sendSignUpOTP = sendSignUpOTP;
+    window.handleGoogleLogin = handleGoogleLogin;
+    window.sendLoginOTP = sendLoginOTP;
+    window.verifyLoginOTP = verifyLoginOTP;
+    window.resendLoginOTP = resendLoginOTP;
+    window.toggleMenu = toggleMenu;
+    window.closeMenu = closeMenu;
+    window.handleLogout = handleLogout;
+    window.addToCart = addToCart;
+    window.openProductDetails = openProductDetails;
+    window.filterByCategory = filterByCategory;
+    window.handleBackPress = handleBackPress;
+    window.showHelpModal = showHelpModal;
+    window.showAboutUs = showAboutUs;
+    window.showNotifications = showNotifications;
+    window.loadCategories = loadCategoriesInternal;
+    window.loadFeaturedProducts = loadFeaturedProductsInternal;
+    window.loadTrendingProducts = loadTrendingProductsInternal;
+    window.loadOffers = loadOffersInternal;
+    window.loadHeroSlider = loadHeroSliderInternal;
+    
+})();
+</script>
+</body>
+</html>
