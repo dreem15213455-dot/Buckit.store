@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, target-densitydpi=device-dpi">
+    <title>चेकआउट - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="Zymart - अपना ऑर्डर पूरा करें">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-orange: #F59E0B; --brand-orange-dark: #E8890A;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A;
+            --danger: #EF4444; --success: #22C55E;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter',-apple-system,sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); padding-bottom: 100px; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+        @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(11,90,49,0.4)} 50%{box-shadow:0 0 0 10px rgba(11,90,49,0)} }
+        
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 100; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; transition: all 0.15s ease; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { font-family: 'Poppins',sans-serif; flex: 1; font-size: 16px; font-weight: 700; color: white; }
+        .main-content { padding-top: 62px; max-width: 600px; margin: 0 auto; }
+        
+        .section { background: var(--neutral-white); margin: 10px 14px; border-radius: var(--radius-lg); padding: 16px; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-sm); animation: slideUp 0.3s ease; }
+        .section-title { font-family: 'Poppins',sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: var(--brand-green); }
+        
+        .gps-section { background: #EDF7F1; border: 2px solid var(--brand-green); border-radius: var(--radius-lg); padding: 16px; margin: 10px 14px; }
+        .gps-btn { width: 100%; padding: 14px; background: var(--brand-green); color: white; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Inter',sans-serif; animation: pulse 2s infinite; }
+        .gps-btn:active { background: #083D21; transform: scale(0.97); }
+        .gps-btn.success { background: var(--success); animation: none; }
+        .gps-address-display { margin-top: 12px; padding: 12px; background: white; border-radius: var(--radius-md); border: 1.5px solid var(--brand-green); display: none; }
+        .gps-address-display.show { display: block; }
+        .gps-coords { font-size: 10px; color: var(--neutral-gray); margin-top: 4px; font-family: monospace; }
+        .gps-retry-btn { margin-top: 8px; padding: 8px 16px; background: white; color: var(--brand-green); border: 1.5px solid var(--brand-green); border-radius: var(--radius-full); font-size: 11px; font-weight: 600; cursor: pointer; display: none; }
+        .gps-retry-btn.show { display: inline-block; }
+        
+        .input-group { display: flex; align-items: center; gap: 10px; background: white; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-md); padding: 0 14px; }
+        .input-group:focus-within { border-color: var(--brand-orange); }
+        .input-group .prefix { font-weight: 700; font-size: 14px; border-right: 1px solid var(--neutral-border); padding-right: 10px; }
+        .input-group input { flex: 1; border: none; outline: none; padding: 12px 0; font-size: 14px; font-family: 'Inter',sans-serif; background: transparent; }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-label { font-size: 11px; font-weight: 600; color: var(--neutral-gray); margin-bottom: 4px; display: block; }
+        .form-control { width: 100%; padding: 11px 14px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-md); font-size: 13px; font-family: 'Inter',sans-serif; outline: none; background: white; }
+        .form-control:focus { border-color: var(--brand-orange); }
+        textarea.form-control { resize: vertical; min-height: 50px; }
+        .row { display: flex; gap: 10px; } .col-half { flex: 1; }
+        
+        .order-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--neutral-border); align-items: center; }
+        .order-item:last-child { border-bottom: none; }
+        .order-item-img { width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--neutral-bg); flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .order-item-img img { width: 100%; height: 100%; object-fit: cover; }
+        .order-item-img i { font-size: 20px; color: #D1D5DB; }
+        .order-item-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .order-item-qty { font-size: 10px; color: var(--neutral-gray); }
+        .order-item-price { font-size: 13px; font-weight: 700; text-align: right; white-space: nowrap; }
+        
+        .total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: var(--neutral-gray); }
+        .total-row.grand { border-top: 2px solid var(--neutral-dark); padding-top: 10px; margin-top: 4px; font-size: 16px; font-weight: 800; color: var(--neutral-dark); }
+        .free-tag { color: var(--success); font-weight: 700; }
+        
+        .payment-option { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 2px solid var(--brand-green); border-radius: var(--radius-md); background: #EDF7F1; font-weight: 500; }
+        .payment-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--brand-green); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .payment-radio-inner { width: 10px; height: 10px; border-radius: 50%; background: var(--brand-green); }
+        
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 12px 16px; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); z-index: 100; border-top: 1px solid var(--neutral-border); display: flex; align-items: center; gap: 12px; }
+        .total-info { flex: 1; } .total-amount { font-family: 'Poppins',sans-serif; font-size: 18px; font-weight: 700; }
+        .item-count { font-size: 10px; color: var(--neutral-gray); }
+        .place-order-btn { background: var(--brand-orange); color: white; border: none; padding: 14px 28px; border-radius: var(--radius-full); font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: 'Inter',sans-serif; box-shadow: 0 4px 14px rgba(245,158,11,0.25); transition: all 0.15s ease; }
+        .place-order-btn:active { background: var(--brand-orange-dark); transform: scale(0.97); }
+        .place-order-btn:disabled { background: #D1D5DB; color: #9CA3AF; cursor: not-allowed; box-shadow: none; }
+        
+        .toast { position: fixed; bottom: 95px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 200; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-md); transition: all 0.3s ease; }
+        .toast.show { opacity: 1; visibility: visible; } .toast.error { background: var(--danger); }
+        
+        .login-prompt { text-align: center; padding: 60px 20px; }
+        .login-prompt i { font-size: 52px; color: #D1D5DB; margin-bottom: 12px; display: block; }
+        .login-prompt h3 { font-family: 'Poppins',sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .login-prompt p { color: var(--neutral-gray); font-size: 13px; margin-bottom: 16px; }
+        .login-prompt .btn-orange { background: var(--brand-orange); color: white; border: none; padding: 12px 28px; border-radius: var(--radius-full); font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter',sans-serif; transition: all 0.15s ease; }
+        .login-prompt .btn-orange:active { background: var(--brand-orange-dark); transform: scale(0.96); }
+        
+        .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8,61,33,0.75); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .success-overlay.show { display: flex; }
+        .success-card { background: white; border-radius: 22px; padding: 28px 24px; text-align: center; width: 90%; max-width: 350px; animation: slideUp 0.4s ease; }
+        .success-icon { font-size: 52px; color: var(--success); margin-bottom: 12px; }
+        .success-card h3 { font-family: 'Poppins',sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .success-card p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 16px; }
+        .success-card button { background: var(--brand-green); color: white; border: none; padding: 12px 24px; border-radius: var(--radius-full); font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 8px; font-family: 'Inter',sans-serif; transition: all 0.15s ease; }
+        .success-card button:active { background: #083D21; transform: scale(0.97); }
+        .success-card button.ghost { background: transparent; color: var(--brand-green); border: 1px solid var(--brand-green); }
+        .success-card button.ghost:active { background: #EDF7F1; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="back-btn" onclick="goBack()" aria-label="वापस"><i class="fas fa-arrow-left"></i></button>
+    <span class="top-title">चेकआउट</span>
+</div>
+
+<div class="main-content" id="mainContent">
+    <div style="text-align:center;padding:40px;"><div style="width:34px;height:34px;border:2.5px solid #E5E7EB;border-top-color:#F59E0B;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 8px;"></div><p style="color:#6B7280;font-size:13px;">लोड हो रहा है...</p></div>
+</div>
+
+<div class="bottom-bar" id="bottomBar" style="display:none;">
+    <div class="total-info"><div class="total-amount" id="finalTotal">₹0</div><div class="item-count" id="finalCount">0 आइटम</div></div>
+    <button class="place-order-btn" id="placeOrderBtn" onclick="window.placeOrder()">ऑर्डर करें ✓</button>
+</div>
+
+<div class="success-overlay" id="successOverlay">
+    <div class="success-card"><div class="success-icon"><i class="fas fa-check-circle"></i></div><h3>ऑर्डर सफल! 🎉</h3><p id="successMsg">आपका ऑर्डर सफलतापूर्वक प्लेस हो गया</p><button onclick="window.location.href='orders.html'">ऑर्डर देखें</button><button class="ghost" onclick="window.location.href='index.html'">खरीदारी जारी रखें</button></div>
+</div>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    // ============ CRASH PROTECTION ============
+    window.addEventListener('error', function(e) { console.error('[Zymart Checkout]', e.message); });
+    window.addEventListener('unhandledrejection', function(e) { console.error('[Zymart Checkout Promise]', e.reason); e.preventDefault(); });
+    
+    // ============ HELPERS ============
+    function $(id) { return document.getElementById(id); }
+    function esc(str) { if (!str) return ''; var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+    function safeJSON(s, f) { try { return s ? JSON.parse(s) : f; } catch(e) { return f; } }
+    
+    // ============ SUPABASE ============
+    var sb = null;
+    try { sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'); }
+    catch(e) { sb = { auth: { getSession: function() { return Promise.resolve({ data: { session: null } }); } } }; }
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    
+    // 🔥 FIX #1: getFullUrl helper for Supabase storage images
+    function getFullUrl(u) { 
+        if (!u || typeof u !== 'string') return ''; 
+        if (u.indexOf('http')===0 || u.indexOf('data:')===0) return u; 
+        return SUPABASE_URL + '/storage/v1/object/public/' + u; 
+    }
+    
+    // ============ STATE ============
+    var cart = [], currentUser = null, gpsLat = null, gpsLng = null, gpsAddr = null, gpsOk = false;
+    
+    // ============ TOAST ============
+    function showToast(m, e) { 
+        var t = $('toastMsg'); if (!t) return; 
+        t.textContent = m; t.className = 'toast' + (e ? ' error' : ''); 
+        t.classList.add('show'); 
+        clearTimeout(t._timer); 
+        t._timer = setTimeout(function() { t.classList.remove('show'); }, 2500); 
+    }
+    
+    // ============ NAVIGATION ============
+    function goBack() { 
+        try { if (document.referrer && document.referrer.indexOf(window.location.host) > -1) { window.history.back(); return; } } catch(e) {} 
+        window.location.href = 'cart.html'; 
+    }
+    
+    // ============ CART ============
+    function loadCart() { 
+        cart = safeJSON(localStorage.getItem('zatpat_cart'), []); 
+        return cart; 
+    }
+    
+    function calcTotals() { 
+        var s = cart.reduce(function(a, i) { return a + ((i.price || 0) * (i.quantity || 1)); }, 0); 
+        var d = s >= 299 ? 0 : 40; 
+        return { subtotal: s, deliveryFee: d, total: s + d }; 
+    }
+    
+    // ============ AUTH ============
+    async function checkLogin() { 
+        try { 
+            var r = await sb.auth.getSession(); 
+            currentUser = (r && r.data && r.data.session) ? r.data.session.user : null; 
+        } catch(e) { currentUser = null; } 
+        return !!currentUser; 
+    }
+    
+    // ============ GPS ============
+    function loadGPS() {
+        try {
+            var lat = parseFloat(localStorage.getItem('user_lat') || '0') || null;
+            var lng = parseFloat(localStorage.getItem('user_lng') || '0') || null;
+            var ts = parseInt(localStorage.getItem('location_timestamp') || '0');
+            if (lat && lng && ts && (Date.now() - ts) < 1800000) { 
+                gpsLat = lat; gpsLng = lng; 
+                gpsAddr = localStorage.getItem('user_full_address') || null; 
+                gpsOk = true; return true; 
+            }
+        } catch(e) {}
+        return false;
+    }
+    
+    function requestGPS() {
+        var btn = $('gpsLocationBtn'); 
+        if (btn) { btn.textContent = '📍 GPS ले रहे...'; btn.style.opacity = '0.7'; btn.disabled = true; }
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(p) {
+                gpsLat = p.coords.latitude; gpsLng = p.coords.longitude;
+                try {
+                    localStorage.setItem('user_lat', String(gpsLat)); 
+                    localStorage.setItem('user_lng', String(gpsLng));
+                    localStorage.setItem('location_timestamp', String(Date.now()));
+                } catch(e) {}
+                fetchAddr(gpsLat, gpsLng);
+            }, function(err) {
+                var msg = 'GPS नहीं मिला';
+                if (err.code === 1) msg = '📍 लोकेशन अनुमति नहीं दी गई';
+                else if (err.code === 2) msg = '📍 GPS सिग्नल नहीं मिला';
+                else if (err.code === 3) msg = '📍 GPS समय समाप्त';
+                showToast(msg, true); 
+                if (btn) { btn.textContent = '📍 अपनी लोकेशन लें'; btn.style.opacity = '1'; btn.disabled = false; }
+            }, { timeout: 10000, maximumAge: 300000 });
+        } else { 
+            showToast('GPS आपके ब्राउज़र में सपोर्ट नहीं है', true); 
+            if (btn) { btn.textContent = '📍 अपनी लोकेशन लें'; btn.style.opacity = '1'; btn.disabled = false; }
+        }
+    }
+    
+    async function fetchAddr(lat, lng) {
+        try {
+            var c = new AbortController(); 
+            var t = setTimeout(function() { c.abort(); }, 5000);
+            var r = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1', { 
+                headers: { 'Accept': 'application/json', 'User-Agent': 'ZymartApp/7.0' }, 
+                signal: c.signal 
+            });
+            clearTimeout(t); 
+            var d = await r.json();
+            gpsAddr = d.display_name || 'पता उपलब्ध नहीं'; 
+            gpsOk = true;
+            try { localStorage.setItem('user_full_address', gpsAddr); } catch(e) {}
+            updateGPSUI(); 
+            showToast('✅ लोकेशन मिल गई!');
+            
+            if (d.address) { 
+                var city = d.address.city || d.address.town || d.address.municipality || ''; 
+                var pin = d.address.postcode || ''; 
+                if (city) { var ci = $('custCity'); if (ci && !ci.value) ci.value = city; } 
+                if (pin) { var pi = $('custPincode'); if (pi && !pi.value) pi.value = pin; } 
+            }
+        } catch(e) { 
+            gpsAddr = lat.toFixed(6) + ', ' + lng.toFixed(6); 
+            gpsOk = true; 
+            updateGPSUI(); 
+            showToast('⚠️ पता लोड नहीं हो पाया, निर्देशांक सहेजे गए'); 
+        }
+    }
+    
+    function updateGPSUI() {
+        var btn = $('gpsLocationBtn'), disp = $('gpsAddressDisplay'), 
+            at = $('gpsAddressText'), ct = $('gpsCoords'), retry = $('gpsRetryBtn');
+        if (btn) { btn.textContent = '✅ लोकेशन मिल गई!'; btn.style.opacity = '1'; btn.classList.add('success'); btn.disabled = false; }
+        if (disp) disp.classList.add('show');
+        if (at && gpsAddr) at.textContent = gpsAddr;
+        if (ct && gpsLat) ct.textContent = '📍 ' + gpsLat.toFixed(6) + ', ' + gpsLng.toFixed(6);
+        if (retry) retry.classList.add('show');
+    }
+    
+    function retryGPS() { 
+        gpsOk = false; gpsLat = null; gpsLng = null; gpsAddr = null; 
+        var d = $('gpsAddressDisplay'); if (d) d.classList.remove('show'); 
+        var b = $('gpsLocationBtn'); if (b) { b.textContent = '📍 अपनी लोकेशन लें'; b.classList.remove('success'); b.disabled = false; } 
+        requestGPS(); 
+    }
+    
+    // ============ VALIDATION ============
+    function validate() {
+        if (!gpsOk || !gpsLat) { showToast('⚠️ पहले GPS लोकेशन लें!', true); return false; }
+        var phone = ($('custPhone')?.value || '').trim();
+        if (!phone || phone.length !== 10 || !/^\d{10}$/.test(phone)) { showToast('⚠️ कृपया सही 10 अंक मोबाइल नंबर दर्ज करें', true); return false; }
+        var name = ($('custName')?.value || '').trim();
+        if (!name || name.length < 2) { showToast('⚠️ कृपया अपना पूरा नाम दर्ज करें', true); return false; }
+        var addr = ($('custAddress')?.value || '').trim();
+        if (!addr || addr.length < 5) { showToast('⚠️ कृपया पूरा पता दर्ज करें', true); return false; }
+        var city = ($('custCity')?.value || '').trim();
+        if (!city) { showToast('⚠️ कृपया शहर दर्ज करें', true); return false; }
+        var pin = ($('custPincode')?.value || '').trim();
+        if (!pin || pin.length !== 6 || !/^\d{6}$/.test(pin)) { showToast('⚠️ कृपया सही 6 अंक पिनकोड दर्ज करें', true); return false; }
+        return true;
+    }
+    
+    // ============ RENDER ============
+    function render() {
+        loadCart(); 
+        loadGPS();
+        
+        if (!cart.length) { 
+            $('mainContent').innerHTML = '<div style="text-align:center;padding:60px;"><i class="fas fa-shopping-cart" style="font-size:52px;color:#D1D5DB;display:block;margin-bottom:14px;"></i><h3 style="font-family:Poppins,sans-serif;font-size:17px;margin-bottom:6px;">कार्ट खाली है</h3><p style="color:#6B7280;font-size:12px;margin-bottom:16px;">कृपया पहले कुछ प्रोडक्ट्स जोड़ें</p><button onclick="window.location.href=\'products.html\'" style="background:var(--brand-green);color:white;border:none;padding:12px 24px;border-radius:var(--radius-full);font-weight:600;font-size:13px;cursor:pointer;font-family:Inter,sans-serif;">🛍️ खरीदारी करें</button></div>'; 
+            $('bottomBar').style.display = 'none'; 
+            return; 
+        }
+        
+        var totals = calcTotals();
+        var count = cart.reduce(function(s, i) { return s + (i.quantity || 1); }, 0);
+        $('finalTotal').textContent = '₹' + totals.total.toLocaleString('en-IN');
+        $('finalCount').textContent = count + ' आइटम';
+        
+        var itemsHtml = '';
+        for (var i = 0; i < cart.length; i++) { 
+            var item = cart[i]; 
+            // 🔥 FIX #1: Use getFullUrl for proper image URL
+            var imgUrl = getFullUrl(item.image || '');
+            itemsHtml += '<div class="order-item"><div class="order-item-img">' + (imgUrl ? '<img src="' + imgUrl + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';" alt=""><i class="fas fa-box-open" style="display:none;"></i>' : '<i class="fas fa-box-open"></i>') + '</div><div style="flex:1;min-width:0;"><div class="order-item-name">' + esc(item.name || 'प्रोडक्ट') + '</div><div class="order-item-qty">' + (item.quantity || 1) + ' × ₹' + (item.price || 0) + '</div></div><span class="order-item-price">₹' + ((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN') + '</span></div>'; 
+        }
+        
+        var gpsHtml = '<div class="gps-section"><div class="section-title"><i class="fas fa-map-marker-alt"></i> 📍 डिलीवरी लोकेशन</div>';
+        if (!gpsOk) { 
+            gpsHtml += '<button class="gps-btn" id="gpsLocationBtn" onclick="requestGPS()"><i class="fas fa-map-marker-alt"></i> 📍 अपनी लोकेशन लें</button><p style="text-align:center;font-size:11px;color:#6B7280;margin-top:8px;">सटीक डिलीवरी के लिए GPS बटन दबाएं</p><div class="gps-address-display" id="gpsAddressDisplay"><div style="font-size:10px;font-weight:700;color:#0B5A31;">📍 GPS Verified</div><div id="gpsAddressText" style="font-size:13px;"></div><div class="gps-coords" id="gpsCoords"></div></div><button class="gps-retry-btn" id="gpsRetryBtn" onclick="retryGPS()"><i class="fas fa-redo"></i> फिर से लें</button>'; 
+        } else { 
+            gpsHtml += '<div class="gps-address-display show" id="gpsAddressDisplay"><div style="font-size:10px;font-weight:700;color:#22C55E;">✅ GPS Verified</div><div id="gpsAddressText" style="font-size:13px;">' + (gpsAddr || '') + '</div><div class="gps-coords" id="gpsCoords">📍 ' + (gpsLat ? gpsLat.toFixed(6) : '') + ', ' + (gpsLng ? gpsLng.toFixed(6) : '') + '</div></div><button class="gps-retry-btn show" id="gpsRetryBtn" onclick="retryGPS()"><i class="fas fa-redo"></i> फिर से लें</button>'; 
+        }
+        gpsHtml += '</div>';
+        
+        var html = '<div class="section" style="background:#EDF7F1;border-color:#C8E6C9;"><div class="section-title"><i class="fas fa-user-check"></i> लॉगिन: <strong>' + (currentUser ? esc(currentUser.email || currentUser.phone || 'यूजर') : 'लॉगिन नहीं') + '</strong></div></div>';
+        html += gpsHtml;
+        html += '<div class="section"><div class="section-title"><i class="fas fa-phone"></i> 📱 मोबाइल नंबर</div><div class="input-group"><span class="prefix">+91</span><input type="tel" id="custPhone" placeholder="10 अंक मोबाइल" maxlength="10" inputmode="numeric" autocomplete="tel"></div></div>';
+        html += '<div class="section"><div class="section-title"><i class="fas fa-address-book"></i> डिलीवरी पता</div>';
+        html += '<div class="form-group"><label class="form-label">पूरा नाम *</label><input type="text" id="custName" class="form-control" placeholder="अपना नाम" autocomplete="name"></div>';
+        html += '<div class="form-group"><label class="form-label">पूरा पता *</label><textarea id="custAddress" class="form-control" rows="2" placeholder="भवन, गली, क्षेत्र" autocomplete="street-address"></textarea></div>';
+        html += '<div class="row"><div class="col-half"><div class="form-group"><label class="form-label">शहर *</label><input type="text" id="custCity" class="form-control" placeholder="शहर" autocomplete="address-level2"></div></div><div class="col-half"><div class="form-group"><label class="form-label">पिनकोड *</label><input type="text" id="custPincode" class="form-control" placeholder="6 अंक" maxlength="6" inputmode="numeric" autocomplete="postal-code"></div></div></div>';
+        html += '</div>';
+        html += '<div class="section"><div class="section-title"><i class="fas fa-receipt"></i> ऑर्डर सारांश</div>' + itemsHtml + '<div class="total-row"><span>सबटोटल</span><span>₹' + totals.subtotal.toLocaleString('en-IN') + '</span></div><div class="total-row"><span>डिलीवरी</span><span class="' + (totals.deliveryFee === 0 ? 'free-tag' : '') + '">' + (totals.deliveryFee === 0 ? '🎉 मुफ़्त' : '₹' + totals.deliveryFee) + '</span></div><div class="total-row grand"><span>कुल</span><span>₹' + totals.total.toLocaleString('en-IN') + '</span></div></div>';
+        html += '<div class="section"><div class="section-title"><i class="fas fa-credit-card"></i> भुगतान</div><div class="payment-option"><div class="payment-radio"><div class="payment-radio-inner"></div></div><span>💵</span><div><strong>कैश ऑन डिलीवरी</strong><br><small style="color:#6B7280;">सामान मिलने पर भुगतान करें</small></div></div></div>';
+        
+        $('mainContent').innerHTML = html;
+        $('bottomBar').style.display = 'flex';
+        if (gpsOk) updateGPSUI();
+    }
+    
+    // ============ PLACE ORDER (PRODUCTION-READY) ============
+    window.placeOrder = async function() {
+        if (!currentUser) { 
+            showToast('⚠️ कृपया पहले लॉगिन करें', true); 
+            try { sessionStorage.setItem('zatpat_redirect_after_login', 'checkout.html'); } catch(e) {} 
+            setTimeout(function() { window.location.href = 'index.html?action=login'; }, 500); 
+            return; 
+        }
+        if (!validate()) return;
+        
+        var phone = ($('custPhone')?.value || '').trim();
+        var name = ($('custName')?.value || '').trim();
+        var addr = ($('custAddress')?.value || '').trim();
+        var city = ($('custCity')?.value || '').trim();
+        var pin = ($('custPincode')?.value || '').trim();
+        var totals = calcTotals();
+        var btn = $('placeOrderBtn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ऑर्डर हो रहा...'; }
+        
+        var oi = cart.map(function(item) { 
+            return { 
+                product_id: item.id, 
+                product_name: item.name || 'प्रोडक्ट', 
+                price: item.price || 0, 
+                quantity: item.quantity || 1, 
+                image: getFullUrl(item.image || '')
+            }; 
+        });
+        
+        var orderData = {
+            user_id: currentUser.id,
+            customer_name: name,
+            customer_phone: phone,
+            customer_address: addr,
+            customer_city: city,
+            customer_pincode: pin,
+            items: oi,
+            subtotal: totals.subtotal,
+            delivery_fee: totals.deliveryFee,
+            total_amount: totals.total,
+            payment_method: 'cod',
+            status: 'pending',
+            gps_latitude: gpsLat,
+            gps_longitude: gpsLng,
+            gps_address: gpsAddr,
+            location_verified: true,
+            created_at: new Date().toISOString()
+        };
+        
+        try {
+            var result = await sb.from('orders').insert([orderData]).select();
+            
+            if (result.error) {
+                var errMsg = result.error.message || '';
+                if (errMsg.includes('duplicate') || errMsg.includes('unique')) {
+                    throw new Error('यह ऑर्डर पहले से मौजूद है');
+                } else if (errMsg.includes('permission') || errMsg.includes('policy') || errMsg.includes('violates')) {
+                    throw new Error('ऑर्डर करने की अनुमति नहीं है। कृपया पुनः लॉगिन करें');
+                } else if (errMsg.includes('network') || errMsg.includes('fetch') || errMsg.includes('timeout')) {
+                    throw new Error('नेटवर्क समस्या। कृपया इंटरनेट जांचें और पुनः प्रयास करें');
+                }
+                throw new Error(result.error.message || 'ऑर्डर सेव नहीं हो पाया');
+            }
+            
+            if (!result.data || result.data.length === 0) {
+                throw new Error('ऑर्डर सेव नहीं हुआ — कृपया पुनः प्रयास करें');
+            }
+            
+            // ✅ Success
+            try { localStorage.removeItem('zatpat_cart'); } catch(e) {}
+            var orderId = result.data[0].id || '';
+            var shortId = orderId.slice(0, 8).toUpperCase();
+            var sm = $('successMsg'); 
+            if (sm) sm.textContent = 'आपका ऑर्डर #' + shortId + ' सफलतापूर्वक प्लेस हो गया है!';
+            var so = $('successOverlay'); 
+            if (so) so.classList.add('show');
+            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            
+        } catch(e) {
+            showToast('❌ ' + (e.message || 'ऑर्डर विफल, कृपया पुनः प्रयास करें'), true);
+            if (btn) { btn.disabled = false; btn.innerHTML = 'ऑर्डर करें ✓'; }
+        }
+    };
+    
+    // ============ INIT ============
+    document.addEventListener('DOMContentLoaded', async function() {
+        var loggedIn = await checkLogin();
+        if (loggedIn) { 
+            loadGPS(); 
+            render(); 
+        } else { 
+            $('mainContent').innerHTML = '<div class="login-prompt"><i class="fas fa-lock"></i><h3>लॉगिन आवश्यक</h3><p>चेकआउट करने के लिए कृपया लॉगिन करें</p><button class="btn-orange" onclick="(function(){try{sessionStorage.setItem(\'zatpat_redirect_after_login\',\'checkout.html\');}catch(e){}window.location.href=\'index.html?action=login\';})()">🔐 लॉगिन / रजिस्टर करें</button></div>'; 
+            $('bottomBar').style.display = 'none'; 
+        }
+    });
+    
+    // ============ AUTH LISTENER ============
+    sb.auth.onAuthStateChange(function(event, session) {
+        if (event === 'SIGNED_IN' && session) { 
+            currentUser = session.user; 
+            loadGPS(); 
+            render();
+            showToast('✅ लॉगिन सफल!');
+        }
+        if (event === 'SIGNED_OUT') { 
+            currentUser = null; 
+            $('mainContent').innerHTML = '<div class="login-prompt"><i class="fas fa-lock"></i><h3>लॉगिन आवश्यक</h3><p>चेकआउट करने के लिए कृपया लॉगिन करें</p><button class="btn-orange" onclick="(function(){try{sessionStorage.setItem(\'zatpat_redirect_after_login\',\'checkout.html\');}catch(e){}window.location.href=\'index.html?action=login\';})()">🔐 लॉगिन / रजिस्टर करें</button></div>'; 
+            $('bottomBar').style.display = 'none'; 
+        }
+    });
+    
+    // ============ GLOBAL EXPORTS ============
+    window.requestGPS = requestGPS;
+    window.retryGPS = retryGPS;
+    window.goBack = goBack;
+})();
+</script>
+</body>
+</html>
