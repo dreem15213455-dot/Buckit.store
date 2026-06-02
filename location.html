@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Set Location - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <style>
+        :root { --green: #0B5A31; --orange: #F59E0B; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #0B5A31; min-height: 100vh; color: white; overflow: hidden; }
+        .container { display: flex; flex-direction: column; height: 100vh; }
+        .top-section { padding: 50px 24px 20px; text-align: center; flex-shrink: 0; }
+        .logo { font-family: 'Poppins', sans-serif; font-size: 38px; font-weight: 700; }
+        .logo-zy { color: white; } .logo-mart { color: #F59E0B; }
+        .title { font-size: 22px; font-weight: 700; margin-top: 16px; }
+        .subtitle { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+        .map-section { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 150px; }
+        .map-container { position: relative; width: 140px; height: 140px; }
+        .pin { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; background: #F59E0B; border-radius: 50% 50% 50% 0; transform: translate(-50%, -50%) rotate(-45deg); animation: bounce 2s infinite; z-index: 3; }
+        .pin::after { content: ''; position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; background: white; border-radius: 50%; transform: translate(-50%, -50%) rotate(45deg); }
+        .pulse { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 50%; border: 2px solid rgba(245,158,11,0.3); animation: pulseAnim 2s ease-out infinite; }
+        .pulse:nth-child(2) { width: 60px; height: 60px; } .pulse:nth-child(3) { width: 100px; height: 100px; animation-delay: 0.6s; }
+        @keyframes bounce { 0%,100%{transform:translate(-50%,-50%) rotate(-45deg) translateY(0);} 50%{transform:translate(-50%,-50%) rotate(-45deg) translateY(-10px);} }
+        @keyframes pulseAnim { 0%{transform:translate(-50%,-50%) scale(0.4);opacity:1;} 100%{transform:translate(-50%,-50%) scale(1.3);opacity:0;} }
+        .bottom-card { background: white; border-radius: 24px 24px 0 0; padding: 24px 20px 35px; color: #1A1A1A; flex-shrink: 0; box-shadow: 0 -5px 30px rgba(0,0,0,0.1); }
+        .status-box { display: flex; align-items: center; gap: 12px; padding: 14px; background: #F9FAFB; border-radius: 14px; margin-bottom: 14px; }
+        .status-box.success { background: #EDF7F1; border: 1.5px solid #0B5A31; }
+        .status-box.error { background: #FEF2F2; border: 1.5px solid #EF4444; }
+        .status-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .status-icon.detecting { background: #FFF8EB; color: #F59E0B; }
+        .status-icon.success { background: #EDF7F1; color: #0B5A31; }
+        .status-icon.error { background: #FEF2F2; color: #EF4444; }
+        .status-icon.prompt { background: #EFF6FF; color: #3B82F6; font-size: 24px; }
+        .status-title { font-size: 13px; font-weight: 600; }
+        .status-detail { font-size: 11px; color: #6B7280; }
+        .btn { width: 100%; padding: 15px; border-radius: 14px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; font-family: 'Inter', sans-serif; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn:active { transform: scale(0.97); }
+        .btn-detect { background: #0B5A31; color: white; }
+        .btn-detect:disabled { background: #9CA3AF; }
+        .btn-settings { background: #F59E0B; color: #1A1A1A; font-weight: 700; display: none; }
+        .btn-continue { background: #F59E0B; color: #1A1A1A; font-weight: 700; display: none; }
+        .btn-retry { background: #0B5A31; color: white; display: none; }
+        .btn-outline { background: white; color: #374151; border: 1.5px solid #E5E7EB; }
+        .districts { display: none; margin-top: 4px; }
+        .districts.show { display: block; }
+        .districts-label { font-size: 11px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .d-btn { display: flex; align-items: center; gap: 10px; padding: 13px 14px; background: #F9FAFB; border: 1.5px solid #E5E7EB; border-radius: 12px; cursor: pointer; font-size: 13px; font-weight: 500; font-family: 'Inter', sans-serif; margin-bottom: 6px; width: 100%; text-align: left; }
+        .d-btn:active { background: #EDF7F1; border-color: #0B5A31; }
+        .d-dot { width: 8px; height: 8px; border-radius: 50%; background: #F59E0B; flex-shrink: 0; }
+        .d-name { font-weight: 600; flex: 1; } .d-count { font-size: 10px; color: #6B7280; }
+        .skip { text-align: center; margin-top: 8px; font-size: 12px; color: #9CA3AF; cursor: pointer; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader { display: inline-block; width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <div class="top-section">
+        <div class="logo"><span class="logo-zy">Zy</span><span class="logo-mart">mart</span></div>
+        <div class="title">Find stores near you</div>
+        <div class="subtitle">We need your location to show nearby stores</div>
+    </div>
+    
+    <div class="map-section">
+        <div class="map-container">
+            <div class="pulse"></div>
+            <div class="pulse"></div>
+            <div class="pin"></div>
+        </div>
+    </div>
+    
+    <div class="bottom-card">
+        <div class="status-box" id="statusBox">
+            <div class="status-icon prompt" id="statusIcon">📍</div>
+            <div>
+                <div class="status-title" id="statusTitle">Allow location access</div>
+                <div class="status-detail" id="statusDetail">Tap the button below and allow location permission</div>
+            </div>
+        </div>
+        
+        <button class="btn btn-detect" id="detectBtn" onclick="startDetection()">
+            📍 Detect Automatically
+        </button>
+        
+        <button class="btn btn-settings" id="settingsBtn" onclick="openSettings()">
+            ⚙️ Open GPS Settings
+        </button>
+        
+        <button class="btn btn-continue" id="continueBtn" onclick="goHome()" style="display:none;">
+            🛒 Continue Shopping →
+        </button>
+        
+        <button class="btn btn-retry" id="retryBtn" onclick="startDetection()" style="display:none;">
+            🔄 Try Again
+        </button>
+        
+        <button class="btn btn-outline" id="manualBtn" onclick="toggleDistricts()">
+            📋 Select District Manually
+        </button>
+        
+        <div class="districts" id="districtsList">
+            <div class="districts-label">Select Your District</div>
+            <button class="d-btn" onclick="selectDistrict('aurangabad')"><span class="d-dot"></span><span class="d-name">Aurangabad District</span><span class="d-count">9 Talukas</span></button>
+            <button class="d-btn" onclick="selectDistrict('jalna')"><span class="d-dot"></span><span class="d-name">Jalna District</span><span class="d-count">8 Talukas</span></button>
+            <button class="d-btn" onclick="selectDistrict('jalgaon')"><span class="d-dot"></span><span class="d-name">Jalgaon District</span><span class="d-count">11 Talukas</span></button>
+        </div>
+        
+        <div class="skip" onclick="goHome()">Skip & Browse All Stores →</div>
+    </div>
+</div>
+
+<script>
+    var detected = false;
+
+    function $(id) { return document.getElementById(id); }
+
+    function updateStatus(type, title, detail) {
+        var box = $('statusBox'), icon = $('statusIcon');
+        box.className = 'status-box'; icon.className = 'status-icon';
+        icon.textContent = '📍';
+        if (type === 'detecting') { icon.classList.add('detecting'); }
+        else if (type === 'success') { box.classList.add('success'); icon.classList.add('success'); icon.textContent = '✅'; }
+        else if (type === 'error') { box.classList.add('error'); icon.classList.add('error'); icon.textContent = '❌'; }
+        else if (type === 'prompt') { icon.classList.add('prompt'); icon.textContent = '📡'; }
+        $('statusTitle').textContent = title;
+        $('statusDetail').textContent = detail;
+    }
+
+    function hideAllButtons() {
+        $('detectBtn').style.display = 'none';
+        $('settingsBtn').style.display = 'none';
+        $('continueBtn').style.display = 'none';
+        $('retryBtn').style.display = 'none';
+    }
+
+    function showDetecting() {
+        hideAllButtons();
+        $('detectBtn').style.display = 'flex';
+        $('detectBtn').disabled = true;
+        $('detectBtn').innerHTML = '<span class="loader"></span> Detecting...';
+        $('manualBtn').style.display = 'block';
+        $('districtsList').classList.remove('show');
+        $('manualBtn').textContent = '📋 Select District Manually';
+    }
+
+    function showGPSOff() {
+        hideAllButtons();
+        $('settingsBtn').style.display = 'flex';
+        $('retryBtn').style.display = 'flex';
+        $('manualBtn').style.display = 'block';
+        $('districtsList').classList.add('show');
+        $('manualBtn').textContent = '🔼 Hide Districts';
+    }
+
+    function showDenied() {
+        hideAllButtons();
+        $('retryBtn').style.display = 'flex';
+        $('manualBtn').style.display = 'block';
+        $('districtsList').classList.add('show');
+        $('manualBtn').textContent = '🔼 Hide Districts';
+    }
+
+    function showSuccess() {
+        hideAllButtons();
+        $('manualBtn').style.display = 'none';
+        $('districtsList').classList.remove('show');
+        document.querySelector('.skip').style.display = 'none';
+        // 🔥 AUTO REDIRECT - No continue button
+        updateStatus('success', 'Location found! 🎉', 'Redirecting to homepage...');
+        setTimeout(function() { goHome(); }, 1500);
+    }
+
+    function startDetection() {
+        if (detected) return;
+        
+        updateStatus('detecting', 'Detecting...', 'Allow location permission in the popup');
+        showDetecting();
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    handleSuccess(position.coords.latitude, position.coords.longitude);
+                },
+                function(error) {
+                    if (error.code === 1) {
+                        updateStatus('error', 'Permission denied', 'You blocked location. Select district manually or try again.');
+                        showDenied();
+                    } else if (error.code === 2) {
+                        updateStatus('error', 'GPS is off', 'Turn on GPS from device settings');
+                        showGPSOff();
+                    } else {
+                        updateStatus('error', 'Timeout', 'Try again or select district');
+                        showDenied();
+                    }
+                },
+                { timeout: 10000, maximumAge: 0, enableHighAccuracy: true }
+            );
+        } else {
+            updateStatus('error', 'Not supported', 'Select district manually');
+            showDenied();
+        }
+    }
+
+    async function handleSuccess(lat, lng) {
+        detected = true;
+        try {
+            var resp = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18&addressdetails=1');
+            var data = await resp.json();
+            var addr = data.address || {};
+            var pincode = addr.postcode || '';
+            var city = addr.city || addr.town || '';
+            var road = addr.road || addr.neighbourhood || '';
+            var district = addr.state_district || '';
+            var displayParts = [];
+            if (road) displayParts.push(road);
+            if (city) displayParts.push(city);
+            var displayName = displayParts.join(', ') || city || 'Your Area';
+            
+            localStorage.setItem('user_lat', lat.toString());
+            localStorage.setItem('user_lng', lng.toString());
+            localStorage.setItem('user_pincode', pincode);
+            localStorage.setItem('user_city', city || district || '');
+            localStorage.setItem('user_area', road);
+            localStorage.setItem('user_district', district || '');
+            localStorage.setItem('location_short', displayName);
+            localStorage.setItem('location_timestamp', Date.now().toString());
+            sessionStorage.setItem('location_set_done', 'true');
+            
+            // 🔥 AUTO REDIRECT
+            showSuccess();
+        } catch(e) {
+            localStorage.setItem('user_lat', lat.toString());
+            localStorage.setItem('user_lng', lng.toString());
+            localStorage.setItem('location_short', 'Your Area');
+            localStorage.setItem('location_timestamp', Date.now().toString());
+            sessionStorage.setItem('location_set_done', 'true');
+            showSuccess();
+        }
+    }
+
+    function openSettings() {
+        if (window.Android && typeof window.Android.openLocationSettings === 'function') {
+            window.Android.openLocationSettings();
+        } else {
+            alert('Open Settings → Location → Turn ON GPS\nThen come back and tap Try Again');
+        }
+    }
+
+    function toggleDistricts() {
+        var list = $('districtsList');
+        list.classList.toggle('show');
+        $('manualBtn').textContent = list.classList.contains('show') ? '🔼 Hide' : '📋 Select District Manually';
+    }
+
+    function selectDistrict(key) {
+        var districts = { 'aurangabad': 'Aurangabad District', 'jalna': 'Jalna District', 'jalgaon': 'Jalgaon District' };
+        var name = districts[key] || 'Aurangabad District';
+        detected = true;
+        localStorage.setItem('user_city', key.charAt(0).toUpperCase() + key.slice(1));
+        localStorage.setItem('location_short', name);
+        sessionStorage.setItem('location_set_done', 'true');
+        // 🔥 AUTO REDIRECT for district select too
+        updateStatus('success', 'Selected!', name);
+        setTimeout(function() { goHome(); }, 1000);
+    }
+
+    function goHome() { window.location.href = 'index.html'; }
+
+    // 🔥 CHECK PERMISSION STATUS FIRST
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            if (navigator.permissions) {
+                navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+                    if (result.state === 'denied') {
+                        updateStatus('error', 'Location blocked', 'You previously blocked location. Please unblock or select district.');
+                        showDenied();
+                    } else if (result.state === 'granted') {
+                        startDetection();
+                    } else {
+                        updateStatus('prompt', 'Allow location access', 'Tap below to allow location permission');
+                    }
+                });
+            } else {
+                startDetection();
+            }
+        }, 500);
+    });
+</script>
+</body>
+</html>
