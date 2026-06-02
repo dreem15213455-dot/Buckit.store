@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Zymart - Your Local Market</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+    <style>
+        :root{--green:#0B5A31;--orange:#F59E0B;--white:#FFF;--bg:#F9FAFB;--border:#E5E7EB;--gray:#6B7280;--dark:#1A1A1A;--shadow:0 1px 4px rgba(0,0,0,.06);--r-sm:10px;--r-md:14px;--r-full:9999px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--dark);padding-bottom:85px;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+        
+        #simpleLoader{position:fixed;top:0;left:0;width:100%;height:100%;background:#083D21;z-index:10002;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:opacity .4s}
+        #simpleLoader.fade-out{opacity:0;visibility:hidden;pointer-events:none}
+        .splash-logo{font-family:'Poppins',sans-serif;font-size:38px;font-weight:700;display:flex;align-items:baseline}
+        .splash-zy{color:#FFF}.splash-mart{color:#F59E0B}
+        .splash-spinner{width:28px;height:28px;border:2px solid rgba(255,255,255,.12);border-top-color:#F59E0B;border-radius:50%;animation:spin .7s linear infinite;margin:14px 0}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .splash-tagline{font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,.8)}
+        
+        /* 🔥 PREMIUM POPUP — Order time pe dikhega */
+        .premium-popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);z-index:10003;display:none;align-items:flex-end;justify-content:center}
+        .premium-popup.show{display:flex}
+        .premium-card{background:#FFF;border-radius:24px 24px 0 0;width:100%;max-width:420px;padding:8px 24px 32px;text-align:center;animation:slideUp .4s cubic-bezier(.16,1,.3,1);box-shadow:0 -10px 40px rgba(0,0,0,.2)}
+        @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+        .p-handle{width:36px;height:4px;background:#D1D5DB;border-radius:2px;margin:12px auto 20px}
+        .p-icon{font-size:52px;margin-bottom:10px}
+        .p-title{font-family:'Poppins',sans-serif;font-size:21px;font-weight:700;color:#1A1A1A;margin-bottom:6px}
+        .p-sub{font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:18px;padding:0 8px}
+        .p-available{background:#EDF7F1;border-radius:14px;padding:14px;margin-bottom:20px}
+        .p-available p{font-size:12px;font-weight:600;color:#0B5A31;margin-bottom:8px}
+        .p-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+        .p-chips span{background:#0B5A31;color:#FFF;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600}
+        .p-btn{width:100%;padding:14px;background:#0B5A31;color:#FFF;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px}
+        .p-btn-ghost{width:100%;padding:12px;background:transparent;color:#6B7280;border:none;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif}
+        
+        .bottom-sheet-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(8,61,33,.8);backdrop-filter:blur(20px);z-index:10000;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:.3s}
+        .bottom-sheet-overlay.show{opacity:1;visibility:visible}
+        .bottom-sheet{background:#FFF;border-radius:28px 28px 0 0;width:100%;max-width:480px;max-height:70vh;overflow-y:auto;padding:10px 0 32px;box-shadow:0 -10px 50px rgba(0,0,0,.2);transform:translateY(100%);transition:.45s cubic-bezier(.32,.72,0,1)}
+        .bottom-sheet-overlay.show .bottom-sheet{transform:translateY(0)}
+        .sheet-handle{width:40px;height:5px;background:#D1D5DB;border-radius:3px;margin:0 auto 16px}
+        .sheet-content{padding:0 24px}
+        
+        .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 20px;border-radius:12px;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;border:none;transition:.2s}
+        .btn:active{transform:scale(.97)}
+        .btn-primary{background:var(--green);color:#FFF}
+        .btn-google{background:#FFF;color:#3C4043;border:1.5px solid #E5E7EB}
+        
+        #pageProgress{position:fixed;top:0;left:0;width:0;height:2.5px;background:var(--orange);z-index:10001;transition:width .25s}
+        
+        @keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        .skeleton{background:linear-gradient(90deg,#f0f4f2 25%,#e4ebe7 50%,#f0f4f2 75%);background-size:200% 100%;animation:skel 1.3s infinite;border-radius:8px}
+        
+        .top-bar{background:var(--green);position:fixed;top:0;left:0;width:100%;z-index:1000;padding:8px 12px;box-shadow:0 2px 16px rgba(11,90,49,.3)}
+        .top-row-1{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+        .left-group{display:flex;align-items:center;gap:8px}
+        .menu-btn{width:34px;height:34px;background:rgba(255,255,255,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:#FFF;font-size:14px}
+        .brand-name{font-family:'Poppins',sans-serif;font-size:20px;font-weight:700;display:flex;align-items:baseline}
+        .brand-zy{color:#FFF}.brand-mart{color:#F59E0B}
+        .right-group{display:flex;align-items:center;gap:6px}
+        .location-header{display:flex;align-items:center;gap:5px;padding:6px 12px;background:rgba(255,255,255,.12);border-radius:var(--r-full);cursor:pointer;border:none;max-width:140px}
+        .location-header i{color:#4ADE80;font-size:10px}
+        .location-header span{font-size:10px;font-weight:500;color:#FFF;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .search-box{background:#FFF;border-radius:var(--r-full);display:flex;align-items:center;padding:8px 14px;gap:8px;width:100%}
+        .search-box i{color:#9CA3AF;font-size:13px}
+        .search-box input{flex:1;border:none;outline:none;font-size:12px;font-family:'Inter',sans-serif}
+        
+        #menuOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1001;opacity:0;visibility:hidden;transition:.25s}
+        #menuOverlay.show{opacity:1;visibility:visible}
+        #menuDropdown{position:fixed;top:12px;left:8px;background:#FFF;border-radius:20px;box-shadow:0 16px 48px rgba(0,0,0,.1);z-index:1002;min-width:280px;max-height:calc(100vh-100px);overflow-y:auto;opacity:0;visibility:hidden;transform:translateY(-8px) scale(.97);transition:.28s;padding:6px 0 12px}
+        #menuDropdown.show{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+        .menu-header{padding:12px 16px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F3F5F4;position:sticky;top:0;background:#FFF;z-index:2}
+        .menu-avatar{width:40px;height:40px;border-radius:50%;background:#EDF7F1;display:flex;align-items:center;justify-content:center}
+        .menu-avatar i{font-size:18px;color:var(--green)}
+        .menu-user-info{flex:1}.menu-user-name{font-size:14px;font-weight:600}.menu-user-sub{font-size:10px;color:#6B7280}
+        .menu-login-btn{padding:7px 14px;background:var(--orange);color:#FFF;border:none;border-radius:18px;font-size:11px;font-weight:600;cursor:pointer}
+        #menuDropdown ul{list-style:none;padding:0}
+        #menuDropdown li{padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;margin:1px 5px;border-radius:10px}
+        #menuDropdown li:active{background:#F3F5F4}
+        .mi{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px}
+        .mi-g{background:#EDF7F1;color:#0B5A31}.mi-r{background:#FEF2F2;color:#EF4444}.mi-b{background:#EFF6FF;color:#3B82F6}.mi-a{background:#FFF8EB;color:#F59E0B}
+        .menu-divider{height:1px;background:#F3F5F4;margin:2px 12px}
+        .menu-section-label{padding:6px 16px 2px;font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.7px}
+        
+        .main-content{padding-top:100px}
+        .section-header{display:flex;justify-content:space-between;align-items:center;padding:0 14px;margin-bottom:4px}
+        .section-header h2,.section-header h3{font-family:'Poppins',sans-serif;font-size:15px;font-weight:700}
+        .view-all{color:var(--green);font-size:11px;font-weight:600;cursor:pointer;background:none;border:none}
+        
+        .categories-scroll,.featured-scroll,.offers-track{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 14px}
+        .categories-scroll::-webkit-scrollbar,.featured-scroll::-webkit-scrollbar,.offers-track::-webkit-scrollbar{display:none}
+        
+        .cat-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;flex-shrink:0;width:72px}
+        .cat-item:active{transform:scale(.9)}
+        .cat-circle{width:72px;height:88px;border-radius:18px;background:#FFF;display:flex;align-items:center;justify-content:center;margin-bottom:4px;box-shadow:0 4px 16px rgba(11,90,49,.05);border:1px solid rgba(11,90,49,.05);overflow:hidden}
+        .cat-circle img{width:50px;height:50px;object-fit:cover;border-radius:12px}
+        .cat-circle i{font-size:24px;color:var(--green)}
+        .cat-name{font-size:10px;font-weight:600;text-align:center}
+        
+        .offer-card{min-width:140px;width:140px;height:160px;flex-shrink:0;border-radius:16px;overflow:hidden;cursor:pointer;position:relative;background:linear-gradient(140deg,#0B5A31,#0F6E3B)}
+        .offer-card:active{transform:scale(.95)}
+        .offer-card img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+        .offer-overlay{position:absolute;bottom:0;left:0;right:0;padding:12px 10px;background:linear-gradient(to top,rgba(0,0,0,.7),transparent)}
+        .offer-overlay h4{font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;color:#FFF;margin-bottom:4px}
+        .offer-tag{background:var(--orange);color:#FFF;border:none;padding:3px 9px;border-radius:14px;font-size:9px;font-weight:700}
+        
+        .feat-card{min-width:135px;width:135px;background:#FFF;border-radius:var(--r-sm);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border);cursor:pointer;flex-shrink:0}
+        .feat-card:active{transform:scale(.96)}
+        .feat-img{width:100%;aspect-ratio:1;background:#F9FAFB;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+        .feat-img img{width:100%;height:100%;object-fit:cover}
+        .feat-discount{position:absolute;top:5px;left:5px;background:var(--orange);color:#FFF;font-size:8px;font-weight:700;padding:2px 6px;border-radius:var(--r-full);z-index:1}
+        .feat-info{padding:7px 9px}
+        .feat-name{font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .feat-price-row{display:flex;align-items:center;gap:3px;margin-bottom:5px}
+        .feat-price{font-size:12px;font-weight:700}.feat-old{font-size:9px;color:#9CA3AF;text-decoration:line-through}
+        .feat-add{background:var(--green);color:#FFF;border:none;border-radius:var(--r-full);padding:5px 0;font-size:9px;font-weight:600;width:100%;cursor:pointer}
+        
+        .hero-slider{border-radius:var(--r-md);overflow:hidden;margin:4px 12px}
+        .hero-slide{height:140px;border-radius:var(--r-md);overflow:hidden;cursor:pointer;background:#EDF7F1}
+        .hero-slide img{width:100%;height:100%;object-fit:cover}
+        .hero-overlay{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top,rgba(0,0,0,.6),transparent)}
+        .hero-title{font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:#FFF}
+        
+        .bottom-nav{background:#FFF;position:fixed;bottom:0;left:0;width:100%;display:flex;justify-content:space-around;padding:4px 10px 10px;box-shadow:0 -4px 16px rgba(0,0,0,.03);z-index:1000;border-top:1px solid var(--border)}
+        .nav-item{display:flex;flex-direction:column;align-items:center;font-size:9px;font-weight:500;color:#6B7280;cursor:pointer;padding:3px 8px;border-radius:var(--r-full);border:none;background:transparent;position:relative}
+        .nav-item:active{background:#EDF7F1}.nav-item.active{color:var(--green);font-weight:600}
+        .nav-item i{font-size:18px;margin-bottom:1px}
+        .cart-count{position:absolute;top:-4px;right:-6px;background:var(--orange);color:#FFF;border-radius:50%;width:14px;height:14px;font-size:8px;display:flex;align-items:center;justify-content:center;border:2px solid #FFF}
+        
+        .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#FFF;padding:9px 18px;border-radius:var(--r-full);font-size:12px;z-index:10050;opacity:0;visibility:hidden;transition:.3s;box-shadow:0 4px 16px rgba(0,0,0,.08);white-space:nowrap}
+        .toast.show{opacity:1;visibility:visible}
+        .empty-state{text-align:center;padding:24px;color:#6B7280;font-size:12px}
+        
+        @media(max-width:480px){.brand-name{font-size:18px}.hero-slide{height:130px}.feat-card{min-width:122px;width:122px}.cat-item{width:64px}.cat-circle{width:64px;height:78px}.offer-card{min-width:128px;width:128px;height:145px}}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="splash-logo"><span class="splash-zy">Zy</span><span class="splash-mart">mart</span></div><div class="splash-spinner"></div><div class="splash-tagline">Your Local Market</div></div>
+<div id="pageProgress"></div>
+
+<!-- 🔥 PREMIUM NO-SERVICE POPUP -->
+<div class="premium-popup" id="noServicePopup">
+    <div class="premium-card">
+        <div class="p-handle"></div>
+        <div class="p-icon">📍</div>
+        <div class="p-title">अभी यहाँ डिलीवरी नहीं है</div>
+        <div class="p-sub">आप जिस क्षेत्र में हैं, वहाँ अभी Zymart की सेवा उपलब्ध नहीं है। आप दूसरा शहर चुन सकते हैं।</div>
+        <div class="p-available">
+            <p>✅ जहाँ सेवा उपलब्ध है:</p>
+            <div class="p-chips"><span>Aurangabad</span><span>Jalna</span><span>Jalgaon</span><span>Sillod</span><span>Paithan</span></div>
+        </div>
+        <button class="p-btn" onclick="showLocationSheet('picker');closeNoServicePopup();">📋 शहर चुनें</button>
+        <button class="p-btn-ghost" onclick="closeNoServicePopup()">बाद में देखें</button>
+    </div>
+</div>
+
+<div class="bottom-sheet-overlay" id="locationSheet"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-content" id="locationSheetContent"></div></div></div>
+<div class="bottom-sheet-overlay" id="loginSheet"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-content" id="loginSheetContent"></div></div></div>
+
+<div id="toastMsg" class="toast"><span id="toastText"></span></div>
+<div id="menuOverlay" onclick="closeMenu()"></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <div class="top-row-1">
+            <div class="left-group">
+                <button class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+                <div class="brand-name"><span class="brand-zy">Zy</span><span class="brand-mart">mart</span></div>
+            </div>
+            <div class="right-group">
+                <button class="location-header" id="locBtn" onclick="handleLocationClick()"><i class="fas fa-map-pin"></i><span id="locText">लोकेशन...</span></button>
+                <button class="menu-btn" onclick="fastNavigate('wishlist.html')"><i class="fas fa-heart" style="font-size:13px;"></i></button>
+            </div>
+        </div>
+        <div class="top-row-2"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="प्रोडक्ट्स, दुकान खोजें..." autocomplete="off"></div></div>
+    </div>
+    
+    <div id="menuDropdown">
+        <div class="menu-header">
+            <div class="menu-avatar"><i class="fas fa-user"></i></div>
+            <div class="menu-user-info"><div class="menu-user-name" id="menuUserName">अतिथि</div><div class="menu-user-sub" id="menuUserSub">लॉगिन करें</div></div>
+            <button class="menu-login-btn" id="menuLoginBtn" onclick="showLoginSheet()">लॉगिन / साइन अप</button>
+        </div>
+        <ul>
+            <div class="menu-section-label">अकाउंट</div>
+            <li onclick="showLoginSheet()"><span class="mi mi-a"><i class="fas fa-user-plus"></i></span> लॉगिन / साइन अप</li>
+            <div class="menu-divider"></div>
+            <li onclick="fastNavigate('orders.html')"><span class="mi mi-g"><i class="fas fa-clipboard-list"></i></span> मेरे ऑर्डर</li>
+            <li onclick="fastNavigate('wishlist.html')"><span class="mi mi-r"><i class="fas fa-heart"></i></span> विशलिस्ट</li>
+            <div class="menu-divider"></div>
+            <div class="menu-section-label">दुकानें</div>
+            <li onclick="fastNavigate('shop-categories.html')"><span class="mi mi-b"><i class="fas fa-tags"></i></span> दुकान श्रेणियाँ</li>
+            <li onclick="fastNavigate('shop-register.html')"><span class="mi mi-g"><i class="fas fa-store-alt"></i></span> दुकान रजिस्टर करें</li>
+            <div class="menu-divider"></div>
+            <li onclick="fastNavigate('cancellation-policy.html')"><span class="mi mi-r"><i class="fas fa-times-circle"></i></span> रिफंड पॉलिसी</li>
+            <li onclick="fastNavigate('privacy-policy.html')"><span class="mi mi-b"><i class="fas fa-shield-alt"></i></span> प्राइवेसी पॉलिसी</li>
+            <li onclick="fastNavigate('terms.html')"><span class="mi mi-b"><i class="fas fa-file-contract"></i></span> नियम और शर्तें</li>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <div class="categories-section"><div class="section-header"><h2>श्रेणियाँ</h2><button class="view-all" onclick="fastNavigate('shop-categories.html')">सभी →</button></div><div class="categories-scroll" id="catScroll"></div></div>
+        <div style="margin-top:8px"><div class="section-header"><h3>धमाकेदार ऑफर</h3></div><div class="offers-track" id="offTrack"></div></div>
+        <div style="margin-top:8px"><div class="section-header"><h3>खास प्रोडक्ट्स</h3></div><div class="featured-scroll" id="featContainer"></div></div>
+        <div class="hero-slider" style="margin:6px 12px"><div class="swiper" id="heroSwiper"><div class="swiper-wrapper" id="heroWrap"></div><div class="swiper-pagination"></div></div></div>
+        <div style="margin-top:8px"><div class="section-header"><h3>ट्रेंडिंग</h3></div><div style="padding:0 14px" id="trendContainer"></div></div>
+    </div>
+    
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="fastNavigate('index.html')"><i class="fas fa-home"></i><span>होम</span></button>
+        <button class="nav-item" onclick="fastNavigate('products.html')"><i class="fas fa-box"></i><span>खोजें</span></button>
+        <button class="nav-item" onclick="handleCartClick()"><i class="fas fa-shopping-cart"></i><span>कार्ट</span><span class="cart-count" id="cartCount">0</span></button>
+        <button class="nav-item" onclick="fastNavigate('profile.html')"><i class="fas fa-user"></i><span>प्रोफाइल</span></button>
+        <button class="nav-item" onclick="fastNavigate('orders.html')"><i class="fas fa-receipt"></i><span>ऑर्डर</span></button>
+    </nav>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    window.addEventListener('error',function(e){console.error(e.message)});
+    window.addEventListener('unhandledrejection',function(e){console.error(e.reason);e.preventDefault()});
+    
+    function $(id){return document.getElementById(id)}
+    function st(id,t){var el=$(id);if(el)el.textContent=t}
+    function sj(s,f){try{return s?JSON.parse(s):f}catch(e){return f}}
+    
+    var C={SUPABASE_URL:'https://zwajyovemwdqtkecipeb.supabase.co',SUPABASE_KEY:'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'};
+    var db=null;
+    try{db=supabase.createClient(C.SUPABASE_URL,C.SUPABASE_KEY)}catch(e){db={auth:{getSession:function(){return Promise.resolve({data:{session:null}})}}}}
+    var SU=C.SUPABASE_URL;
+    
+    var user=null,heroSwiper=null,otpTimer=null,otpEmail=null;
+    var city=null,locName=null,locDone=false,reqLoc=false,lat=null,lng=null,hubKey=null,svcAvail=true;
+    var areas={},areasLoaded=false;
+    
+    var HUBS={
+        'sillod_main':{name:'Sillod Market',lat:20.305,lng:75.6536,radius:5,city:'Sillod'},
+        'sillod_dahigaon':{name:'Dahigaon Road',lat:20.31,lng:75.67,radius:3,city:'Sillod'},
+        'aurangabad_cidco':{name:'CIDCO',lat:19.9,lng:75.32,radius:5,city:'Aurangabad'},
+        'aurangabad_civil':{name:'Civil Lines',lat:19.87,lng:75.34,radius:4,city:'Aurangabad'},
+        'paithan_main':{name:'Paithan',lat:19.48,lng:75.38,radius:5,city:'Paithan'},
+        'gangapur_main':{name:'Gangapur',lat:19.7,lng:75.02,radius:5,city:'Gangapur'},
+        'jalna_main':{name:'Jalna City',lat:19.841,lng:75.8864,radius:5,city:'Jalna'},
+        'partur_main':{name:'Partur',lat:19.6,lng:76.22,radius:4,city:'Partur'},
+        'jalgaon_main':{name:'Jalgaon City',lat:21.01,lng:75.56,radius:5,city:'Jalgaon'},
+        'bhusawal_main':{name:'Bhusawal',lat:21.05,lng:75.78,radius:5,city:'Bhusawal'}
+    };
+    
+    function gfu(u){if(!u||typeof u!=='string')return'';if(u.indexOf('http')===0||u.indexOf('data:')===0)return u;return SU+'/storage/v1/object/public/'+u}
+    async function sf(fn,r){r=r||2;for(var i=0;i<r;i++){try{var res=await fn();if(res&&res.error)throw new Error(res.error.message);return res||{data:[]}}catch(e){if(i===r-1)throw e;await new Promise(function(x){setTimeout(x,600*(i+1))})}}return{data:[]}}
+    function toast(m,e){var t=$('toastMsg'),s=$('toastText');if(!t||!s)return;s.textContent=m;t.style.background=e?'#EF4444':'#1A1A1A';t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show')},2200)}
+    
+    function showApp(){
+        var l=$('simpleLoader'),a=$('mainApp');
+        var al=null;try{al=sessionStorage.getItem('app_loaded')}catch(e){}
+        if(al){if(l&&l.parentNode)l.parentNode.removeChild(l);if(a){a.style.display='';a.style.opacity='1'}}
+        else{try{sessionStorage.setItem('app_loaded','true')}catch(e){}if(a){a.style.opacity='0';a.style.display='';requestAnimationFrame(function(){a.style.transition='opacity .35s';a.style.opacity='1'})}if(l){l.classList.add('fade-out');setTimeout(function(){if(l&&l.parentNode)l.parentNode.removeChild(l)},400)}}
+    }
+    
+    var sh=[];
+    function obs(id){var s=$(id);if(!s)return;s.classList.add('show');document.body.style.overflow='hidden';sh.push(id)}
+    function cbs(id){var s=$(id);if(!s)return;s.classList.remove('show');document.body.style.overflow=''}
+    
+    function showNoServicePopup(){$('noServicePopup').classList.add('show')}
+    window.closeNoServicePopup=function(){$('noServicePopup').classList.remove('show')}
+    
+    function dist(lat1,ln1,lat2,ln2){var R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(ln2-ln1)*Math.PI/180,a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))}
+    function nearHub(la,ln){var n=null,md=Infinity;for(var k in HUBS){var h=HUBS[k],d=dist(la,ln,h.lat,h.lng);if(d<=h.radius&&d<md){md=d;n={key:k,name:h.name,city:h.city,distKm:d,distM:Math.round(d*1000)}}}return n}
+    
+    async function areaName(la,ln){
+        try{var c=new AbortController();var t=setTimeout(function(){c.abort()},5000);var r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+la+'&lon='+ln+'&zoom=18&addressdetails=1',{headers:{'Accept':'application/json','User-Agent':'Zymart'},signal:c.signal});clearTimeout(t);var d=await r.json();if(d&&d.address)return{road:d.address.road||d.address.street||'',nbh:d.address.neighbourhood||d.address.suburb||'',city:d.address.city||d.address.town||'',pin:d.address.postcode||''}}catch(e){}
+        return{road:'',nbh:'',city:'',pin:''}
+    }
+    
+    // 🔥 PROCESS LOCATION — Homepage hamesha khulega
+    async function processLoc(la,ln){
+        try{
+            if(!la||!ln||isNaN(la)||isNaN(ln)){fallback();return}
+            lat=la;lng=ln;
+            try{localStorage.setItem('user_lat',la.toString());localStorage.setItem('user_lng',ln.toString());localStorage.setItem('loc_ts',Date.now().toString())}catch(e){}
+            
+            var hub=nearHub(la,ln);
+            var ai=await areaName(la,ln);
+            
+            if(hub){
+                svcAvail=true;
+                if(ai.road&&ai.road.length>0)locName=ai.road;
+                else if(ai.nbh&&ai.nbh.length>0)locName=ai.nbh;
+                else locName=hub.name;
+                city=hub.city;hubKey=hub.key;
+                try{localStorage.setItem('user_city',city);localStorage.setItem('loc_short',locName);localStorage.setItem('hub_key',hub.key)}catch(e){}
+                updLoc();cbs('locationSheet');reqLoc=false;if(!locDone)resolve();
+                toast('📍 '+locName+' ✅');
+            }else{
+                // 🔥 BLINKIT STYLE: Homepage khulega, bas service unavailable
+                svcAvail=false;
+                locName='लोकेशन सेट करें';
+                city=null;hubKey=null;
+                updLoc();cbs('locationSheet');reqLoc=false;
+                if(!locDone)resolve(); // Homepage load hoga
+                toast('⚠️ सेवा उपलब्ध नहीं');
+            }
+        }catch(e){fallback()}
+    }
+    
+    function fallback(){
+        var cl=null,cln=null,ct=null;
+        try{cl=localStorage.getItem('user_lat');cln=localStorage.getItem('user_lng');ct=localStorage.getItem('loc_ts')}catch(e){}
+        if(cl&&cln&&ct&&(Date.now()-parseInt(ct))<600000){processLoc(parseFloat(cl),parseFloat(cln));return}
+        cbs('locationSheet');svcAvail=true;locName='लोकेशन सेट करें';updLoc();resolve();
+    }
+    
+    function updLoc(){st('locText',locName||'लोकेशन सेट करें')}
+    
+    function showLocSheet(type){
+        var c=$('locationSheetContent');if(!c)return;var h='';
+        if(type==='loading'){h='<div style="text-align:center;padding:20px"><div style="width:34px;height:34px;border:2.5px solid #E5E7EB;border-top-color:#F59E0B;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px"></div><p style="font-weight:600">लोकेशन ढूंढ रहे हैं...</p></div>'}
+        else if(type==='picker'){
+            h='<div style="text-align:center;padding:8px 0 16px"><div style="font-size:36px">📍</div><h3 style="font-family:Poppins,sans-serif;font-size:18px">डिलीवरी शहर चुनें</h3><p style="font-size:12px;color:#6B7280">हम इन जिलों में डिलीवरी करते हैं</p></div>';
+            var ar=areasLoaded?areas:FALLBACK;
+            for(var k in ar){var a=ar[k];h+='<button class="btn" style="background:#F3F5F4;margin-bottom:8px;justify-content:flex-start" onclick="selectCity(\''+k+'\')"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;flex-shrink:0"></span><div style="text-align:left"><div style="font-weight:600">'+a.fullName+'</div><div style="font-size:10px;color:#6B7280">'+(a.talukas?a.talukas.length:0)+' तालुका</div></div></button>'}
+            h+='<button class="btn" style="background:transparent;border:1px solid #E5E7EB;color:#6B7280;margin-top:4px" onclick="tryAuto()"><i class="fas fa-location-arrow"></i> ऑटो-डिटेक्ट</button>';
+        }
+        c.innerHTML=h;obs('locationSheet')
+    }
+    
+    window.selectCity=function(key){
+        var ar=areasLoaded?areas:FALLBACK;var a=ar[key];if(!a)return;
+        city=a.name;locName=a.name;hubKey=key;svcAvail=true;
+        try{localStorage.setItem('user_city',city);localStorage.setItem('loc_short',locName)}catch(e){}
+        updLoc();cbs('locationSheet');closeNoServicePopup();
+        if(!locDone)resolve();reloadProds({key:key,city:a.name});toast('📍 '+a.fullName)
+    };
+    
+    function tryAuto(){
+        if(window.Android&&typeof window.Android.requestLocation==='function'){try{window.Android.requestLocation()}catch(e){}showLocSheet('loading');setTimeout(function(){if(!locDone)selectCity('aurangabad')},5000)}
+        else if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){var la=p.coords.latitude;if(la>=20.5&&la<=21.5)selectCity('jalgaon');else if(la>=19.5&&la<=20.3)selectCity('jalna');else selectCity('aurangabad')},function(){selectCity('aurangabad')},{timeout:5000})}
+        else{selectCity('aurangabad')}
+    }
+    
+    function handleLocationClick(){showLocSheet('picker')}
+    
+    function reqLocFromAndroid(){
+        if(reqLoc)return;reqLoc=true;
+        if(window.Android&&typeof window.Android.requestLocation==='function'){window.Android.requestLocation();showLocSheet('loading');setTimeout(function(){if(!locDone)fallback()},10000)}
+        else{fallback()}
+    }
+    window.setLocationFromAndroid=function(la,ln){processLoc(parseFloat(la),parseFloat(ln))};
+    window.onLocationError=function(m){fallback();reqLoc=false};
+    
+    function freshLoc(s,f){
+        if(navigator.geolocation){var to=false;var ti=setTimeout(function(){to=true;if(f)f()},5000);navigator.geolocation.getCurrentPosition(function(p){if(to)return;clearTimeout(ti);s(p.coords.latitude,p.coords.longitude)},function(e){if(to)return;clearTimeout(ti);if(f)f()},{timeout:5000,maximumAge:0,enableHighAccuracy:true})}
+        else{if(f)f()}
+    }
+    
+    function initLoc(){
+        var sc=null,sl=null,sn=null,ts=null,sa=null,shk=null;
+        try{sc=localStorage.getItem('user_city');sl=localStorage.getItem('user_lat');sn=localStorage.getItem('user_lng');ts=localStorage.getItem('loc_ts');sa=localStorage.getItem('loc_short');shk=localStorage.getItem('hub_key')}catch(e){}
+        var hc=sc&&sl&&sn&&ts;
+        var cv=hc&&(Date.now()-parseInt(ts))<300000;
+        if(cv){city=sc;locName=sa||sc;lat=parseFloat(sl);lng=parseFloat(sn);hubKey=shk;svcAvail=true;updLoc();resolve();setTimeout(function(){freshLoc(function(nl,nn){var d=dist(parseFloat(sl),parseFloat(sn),nl,nn);if(d>1)processLoc(nl,nn)})},1000)}
+        else if(hc){lat=parseFloat(sl);lng=parseFloat(sn);locName=sa||'लोकेशन...';city=sc;hubKey=shk;svcAvail=true;updLoc();freshLoc(function(nl,nn){processLoc(nl,nn)},function(){city=sc;locName=sa||sc;updLoc();resolve()})}
+        else{updLoc();freshLoc(function(nl,nn){processLoc(nl,nn)},function(){fallback()})}
+    }
+    
+    function resolve(){if(locDone)return;locDone=true;reqLoc=false;loadAll()}
+    
+    async function reloadProds(hub){skCat();skFeat();skTrend();await Promise.all([lc(),lo(),lhs(),lfp(),ltp()]);uc()}
+    
+    async function loadAll(){if(window._dl||!svcAvail){window._dl=false;return}window._dl=true;skCat();skFeat();skTrend();try{await Promise.allSettled([lc(),lo(),lhs(),lfp(),ltp()])}catch(e){}showApp();window._dl=false}
+    
+    async function lc(){var c=$('catScroll');if(!c)return;skCat();try{var r=await sf(function(){return db.from('categories').select('id,name,image_url').eq('is_active',true).order('priority')});if(r.data&&r.data.length>0){var h='';for(var i=0;i<r.data.length;i++){var ct=r.data[i],iu=gfu(ct.image_url);h+='<div class="cat-item" onclick="filterCat(\''+ct.id+'\',\''+(ct.name||'').replace(/'/g,"\\'")+'\')"><div class="cat-circle">'+(iu?'<img src="'+iu+'" loading="lazy" onerror="this.style.display=\'none\'">':'')+'<i class="fas fa-store"'+(iu?' style="display:none"':'')+'></i></div><div class="cat-name">'+ct.name+'</div></div>'}c.innerHTML=h}}catch(e){}}
+    
+    async function lhs(){var c=$('heroWrap');if(!c)return;try{var r=await sf(function(){return db.from('sliders').select('*').eq('is_active',true).order('display_order')});if(r.data&&r.data.length>0){c.innerHTML=r.data.map(function(s){return'<div class="swiper-slide hero-slide" onclick="fastNav(\''+(s.link||'#')+'\')"><img src="'+gfu(s.image_url)+'" loading="lazy"><div class="hero-overlay"><div class="hero-title">'+(s.title||'')+'</div></div></div>'}).join('');if(heroSwiper)try{heroSwiper.destroy()}catch(e){}heroSwiper=new Swiper('#heroSwiper',{loop:r.data.length>1,autoplay:r.data.length>1?{delay:3500}:false,pagination:{el:'.swiper-pagination',clickable:true}})}}catch(e){}}
+    
+    async function lo(){var t=$('offTrack');if(!t)return;try{var r=await sf(function(){return db.from('offers').select('*').eq('is_active',true).order('priority').limit(6)});if(r.data&&r.data.length>0){t.innerHTML=r.data.map(function(o){return'<div class="offer-card" onclick="fastNav(\''+(o.link||'offers.html')+'\')">'+(o.image_url?'<img src="'+gfu(o.image_url)+'" loading="lazy">':'')+'<div class="offer-overlay"><h4>'+(o.title||'')+'</h4><button class="offer-tag">'+o.discount_value+(o.discount_type==='percentage'?'% OFF':'₹ OFF')+'</button></div></div>'}).join('')}}catch(e){}}
+    
+    // 🔥 FEATURED — Local first, then all
+    async function lfp(){
+        var c=$('featContainer');if(!c)return;skFeat();
+        try{
+            var q=db.from('products').select('*').eq('is_featured',true).eq('is_active',true);
+            if(city&&hubKey){q=q.or('city.ilike.%'+city+'%,hub_key.eq.'+hubKey)}
+            q=q.limit(20);var fr=await sf(function(){return q},3);
+            if(!fr.data||fr.data.length===0){fr=await sf(function(){return db.from('products').select('*').eq('is_featured',true).eq('is_active',true).limit(20)},3)}
+            if(fr.data&&fr.data.length>0){c.innerHTML=fr.data.map(function(p){var im=gfu((p.images&&p.images[0])||p.image_url||''),ds=p.offer_price?Math.round((1-p.offer_price/p.price)*100):0;return'<div class="feat-card" onclick="openProd(\''+p.id+'\')"><div class="feat-img">'+(ds>0?'<div class="feat-discount">'+ds+'% OFF</div>':'')+(im?'<img src="'+im+'" loading="lazy">':'')+'</div><div class="feat-info"><div class="feat-name">'+p.name+'</div><div class="feat-price-row"><span class="feat-price">₹'+(p.offer_price||p.price)+'</span>'+(p.offer_price?'<span class="feat-old">₹'+p.price+'</span>':'')+'</div><button class="feat-add" onclick="event.stopPropagation();addCart(\''+p.id+'\',\''+(p.name||'').replace(/'/g,"\\'")+'\','+(p.offer_price||p.price)+',\''+im+'\')">जोड़ें</button></div></div>'}).join('')}else{c.innerHTML='<div class="empty-state">कोई प्रोडक्ट नहीं</div>'}
+        }catch(e){c.innerHTML='<div class="empty-state">लोड विफल</div>'}
+    }
+    
+    // 🔥 TRENDING — Local first, then all
+    async function ltp(){
+        var c=$('trendContainer');if(!c)return;skTrend();
+        try{
+            var q=db.from('products').select('*').eq('is_active',true);
+            if(city&&hubKey){q=q.or('city.ilike.%'+city+'%,hub_key.eq.'+hubKey)}
+            q=q.order('created_at',{ascending:false}).limit(30);var r=await sf(function(){return q},3);
+            if(!r.data||r.data.length===0){r=await sf(function(){return db.from('products').select('*').eq('is_active',true).order('created_at',{ascending:false}).limit(30)},3)}
+            if(r.data&&r.data.length>0){var h='';for(var i=0;i<r.data.length;i+=3){h+='<div style="display:flex;gap:8px;margin-bottom:8px">';if(r.data[i]){var p=r.data[i],im=gfu((p.images&&p.images[0])||p.image_url||''),ds=p.offer_price?Math.round((1-p.offer_price/p.price)*100):0,nm=(p.name||'').replace(/'/g,"\\'");h+='<div style="width:60%;background:#FFF;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid #E5E7EB;cursor:pointer" onclick="openProd(\''+p.id+'\')"><div style="aspect-ratio:1;background:#F9FAFB;display:flex;align-items:center;justify-content:center;position:relative">'+(ds>0?'<div style="position:absolute;top:8px;left:8px;background:#F59E0B;color:#FFF;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;z-index:1">'+ds+'% OFF</div>':'')+(im?'<img src="'+im+'" loading="lazy" style="width:100%;height:100%;object-fit:cover">':'')+'</div><div style="padding:10px 12px"><div style="font-size:13px;font-weight:600">'+p.name+'</div><div style="font-size:15px;font-weight:700;color:#0B5A31">₹'+(p.offer_price||p.price)+'</div><button style="margin-top:6px;background:#0B5A31;color:#FFF;border:none;padding:8px 0;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;width:100%" onclick="event.stopPropagation();addCart(\''+p.id+'\',\''+nm+'\','+(p.offer_price||p.price)+',\''+im+'\')">जोड़ें +</button></div></div>'}h+='<div style="width:40%;display:flex;flex-direction:column;gap:8px">';for(var j=1;j<=2;j++){var idx=i+j;if(r.data[idx]){var sp=r.data[idx],si=gfu((sp.images&&sp.images[0])||sp.image_url||''),sd=sp.offer_price?Math.round((1-sp.offer_price/sp.price)*100):0;h+='<div style="flex:1;background:#FFF;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04);border:1px solid #E5E7EB;cursor:pointer" onclick="openProd(\''+sp.id+'\')"><div style="aspect-ratio:1;background:#F9FAFB;display:flex;align-items:center;justify-content:center;position:relative">'+(sd>0?'<div style="position:absolute;top:5px;left:5px;background:#F59E0B;color:#FFF;font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;z-index:1">'+sd+'% OFF</div>':'')+(si?'<img src="'+si+'" loading="lazy" style="width:100%;height:100%;object-fit:cover">':'')+'</div><div style="padding:6px 8px"><div style="font-size:10px;font-weight:600">'+sp.name+'</div><div style="font-size:12px;font-weight:700;color:#0B5A31">₹'+(sp.offer_price||sp.price)+'</div></div></div>'}}h+='</div></div>'}c.innerHTML=h}else{c.innerHTML='<div class="empty-state">कोई प्रोडक्ट नहीं</div>'}
+        }catch(e){c.innerHTML='<div class="empty-state">लोड विफल</div>'}
+    }
+    
+    function addCart(id,n,p,im){try{var c=sj(localStorage.getItem('zatpat_cart'),[]);var ex=c.find(function(i){return i.id===id});if(ex)ex.quantity++;else c.push({id:id,name:n,price:p,image:im,quantity:1});try{localStorage.setItem('zatpat_cart',JSON.stringify(c))}catch(e){}var cnt=c.reduce(function(s,i){return s+(i.quantity||1)},0);st('cartCount',cnt);toast('🛒 '+n+' जोड़ा')}catch(e){}}
+    
+    function skCat(){var c=$('catScroll');if(c)c.innerHTML=Array(6).fill(0).map(function(){return'<div class="cat-item"><div class="cat-circle skeleton" style="width:72px;height:88px"></div><div class="skeleton" style="width:44px;height:8px;margin-top:4px"></div></div>'}).join('')}
+    function skFeat(){var c=$('featContainer');if(c)c.innerHTML=Array(4).fill(0).map(function(){return'<div class="feat-card"><div class="skeleton" style="width:100%;aspect-ratio:1"></div><div class="skeleton" style="width:70%;height:10px;margin:5px"></div></div>'}).join('')}
+    function skTrend(){var c=$('trendContainer');if(c)c.innerHTML=Array(3).fill(0).map(function(){return'<div style="display:flex;gap:8px;margin-bottom:8px"><div class="skeleton" style="width:60%;aspect-ratio:1"></div><div style="width:40%;display:flex;flex-direction:column;gap:8px"><div class="skeleton" style="flex:1"></div><div class="skeleton" style="flex:1"></div></div></div>'}).join('')}
+    
+    function toggleMenu(){var m=$('menuDropdown'),o=$('menuOverlay');if(!m||!o)return;if(m.classList.contains('show'))closeMenu();else{o.classList.add('show');requestAnimationFrame(function(){m.classList.add('show')})}}
+    function closeMenu(){var m=$('menuDropdown'),o=$('menuOverlay');if(m)m.classList.remove('show');if(o)o.classList.remove('show')}
+    function openProd(id){if(id)fastNav('product-detail.html?id='+id)}
+    function filterCat(cid,cn){if(cid)fastNav('products.html?category_id='+cid+'&category_name='+encodeURIComponent(cn))}
+    function handleCartClick(){fastNav('cart.html')}
+    
+    // 🔥 LOGIN SHEET
+    function showLoginSheet(){
+        var c=$('loginSheetContent');if(!c)return;
+        c.innerHTML='<div style="text-align:center;padding:8px 0 16px"><div style="font-size:36px">🔐</div><h3 style="font-family:Poppins,sans-serif">Zymart में शामिल हों</h3><p style="font-size:12px;color:#6B7280">लॉगिन करें या नया अकाउंट बनाएं</p></div>'+
+        '<button class="btn btn-google" onclick="googleLogin()" style="margin-bottom:12px"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:20px;height:20px"> Google से जारी रखें</button>'+
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="flex:1;height:1px;background:#E5E7EB"></div><span style="font-size:11px;color:#9CA3AF">या</span><div style="flex:1;height:1px;background:#E5E7EB"></div></div>'+
+        '<input type="email" id="loginEmail" placeholder="ईमेल एड्रेस" style="width:100%;padding:14px;border:1.5px solid #E5E7EB;border-radius:12px;font-size:15px;font-family:Inter,sans-serif;outline:none;margin-bottom:10px">'+
+        '<button class="btn btn-primary" onclick="sendOTP()" style="margin-bottom:16px">OTP भेजें / लॉगिन करें</button>'+
+        '<button class="btn" style="background:#F59E0B;color:#FFF" onclick="showSignUp()">नया अकाउंट बनाएं (साइन अप)</button>';
+        obs('loginSheet');closeMenu();setTimeout(function(){var el=$('loginEmail');if(el)el.focus()},400)
+    }
+    function showSignUp(){
+        var c=$('loginSheetContent');if(!c)return;
+        c.innerHTML='<div style="text-align:center;padding:8px 0 16px"><div style="font-size:36px">✨</div><h3 style="font-family:Poppins,sans-serif">नया अकाउंट बनाएं</h3></div>'+
+        '<input type="text" id="signupName" placeholder="पूरा नाम" style="width:100%;padding:14px;border:1.5px solid #E5E7EB;border-radius:12px;font-size:15px;font-family:Inter,sans-serif;outline:none;margin-bottom:10px">'+
+        '<input type="email" id="signupEmail" placeholder="ईमेल एड्रेस" style="width:100%;padding:14px;border:1.5px solid #E5E7EB;border-radius:12px;font-size:15px;font-family:Inter,sans-serif;outline:none;margin-bottom:14px">'+
+        '<button class="btn" style="background:#F59E0B;color:#FFF" onclick="sendSignOTP()">OTP भेजें और साइन अप</button>'+
+        '<p style="text-align:center;margin-top:12px;font-size:12px;color:#6B7280">पहले से अकाउंट है? <a href="javascript:void(0)" onclick="showLoginSheet()" style="color:#0B5A31;font-weight:700">लॉगिन करें</a></p>';
+        obs('loginSheet')
+    }
+    
+    async function googleLogin(){try{localStorage.setItem('arp','true');var r=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname}});if(r&&r.error)toast('Google लॉगिन विफल',true);else{cbs('loginSheet');toast('Google लॉगिन...')}}catch(e){}}
+    async function sendOTP(){var e=($('loginEmail')?.value||'').trim().toLowerCase();if(!e){toast('ईमेल दर्ज करें',true);return}try{await db.auth.signInWithOtp({email:e,options:{shouldCreateUser:true}});otpEmail=e;showOTP();toast('OTP भेजा! 📧')}catch(ex){toast('कुछ गलत हुआ',true)}}
+    async function sendSignOTP(){var n=($('signupName')?.value||'').trim(),e=($('signupEmail')?.value||'').trim();if(!n||!e){toast('नाम और ईमेल दर्ज करें',true);return}try{await db.auth.signInWithOtp({email:e,options:{shouldCreateUser:true,data:{name:n}}});otpEmail=e;showOTP();toast('OTP भेजा! 📧')}catch(ex){toast('एरर',true)}}
+    
+    function showOTP(){
+        var c=$('loginSheetContent');if(!c)return;
+        c.innerHTML='<div style="text-align:center;padding:8px 0 16px"><div style="font-size:36px">📧</div><h3 style="font-family:Poppins,sans-serif">OTP सत्यापित करें</h3><p style="font-size:12px;color:#6B7280">'+(otpEmail||'')+' पर OTP भेजा</p></div>'+
+        '<input type="text" id="loginOtp" placeholder="6-अंक OTP" maxlength="6" inputmode="numeric" style="width:100%;padding:14px;border:1.5px solid #E5E7EB;border-radius:12px;font-size:18px;text-align:center;letter-spacing:8px;font-family:Inter,sans-serif;outline:none;margin-bottom:12px">'+
+        '<button class="btn btn-primary" onclick="verifyOTP()">सत्यापित करें</button>'+
+        '<button id="resendOtpBtn" class="btn" style="background:transparent;border:1px solid #E5E7EB;margin-top:8px" onclick="resendOTP()">OTP पुनः भेजें</button>';
+        startOtpTimer()
+    }
+    
+    async function verifyOTP(){var o=($('loginOtp')?.value||'').trim();if(!o||o.length<4){toast('पूरा OTP दर्ज करें',true);return}try{var r=await db.auth.verifyOtp({email:otpEmail,token:o,type:'email'});if(r&&r.error){toast('गलत OTP',true);return}if(r&&r.data&&r.data.user){user=r.data.user;try{await db.from('users').upsert({id:user.id,email:user.email,role:'3',name:user.user_metadata?.name||''},{onConflict:'id'})}catch(e){}toast('✅ लॉगिन सफल!');otpEmail=null;cbs('loginSheet');if(otpTimer)clearInterval(otpTimer);updMenu();uc();redir()}}catch(e){toast('कुछ गलत हुआ',true)}}
+    async function resendOTP(){if(!otpEmail){showLoginSheet();return}try{await db.auth.signInWithOtp({email:otpEmail,options:{shouldCreateUser:true}});toast('नया OTP भेजा!');startOtpTimer()}catch(e){}}
+    function startOtpTimer(){var s=60,b=$('resendOtpBtn');if(!b)return;if(otpTimer)clearInterval(otpTimer);b.disabled=true;otpTimer=setInterval(function(){s--;b.textContent='पुनः ('+s+'s)';if(s<=0){clearInterval(otpTimer);b.disabled=false;b.textContent='OTP पुनः भेजें'}},1000)}
+    
+    function redir(){var rd=null,sr=null;try{rd=new URLSearchParams(window.location.search).get('redirect')}catch(e){}try{sr=sessionStorage.getItem('zatpat_redirect_after_login')}catch(e){}if(rd==='checkout'||sr==='checkout.html'){try{sessionStorage.removeItem('zatpat_redirect_after_login')}catch(e){}setTimeout(function(){window.location.href='checkout.html'},500)}}
+    
+    function updMenu(){if(user){st('menuUserName',user.user_metadata?.name||user.email||'उपयोगकर्ता');st('menuUserSub',user.email||'');var b=$('menuLoginBtn');if(b){b.textContent='लॉगआउट';b.setAttribute('onclick','handleLogout()');b.style.background='#EF4444'}}else{st('menuUserName','अतिथि');st('menuUserSub','लॉगिन करें');var b=$('menuLoginBtn');if(b){b.textContent='लॉगिन / साइन अप';b.setAttribute('onclick','showLoginSheet()');b.style.background='#F59E0B'}}}
+    function uc(){var c=sj(localStorage.getItem('zatpat_cart'),[]);var cn=c.reduce(function(s,i){return s+(i.quantity||1)},0);st('cartCount',cn)}
+    
+    async function handleLogout(){if(!confirm('लॉगआउट करें?'))return;try{await db.auth.signOut()}catch(e){}try{localStorage.removeItem('zatpat_cart')}catch(e){}user=null;updMenu();st('cartCount','0');toast('लॉगआउट');setTimeout(function(){window.location.href='index.html'},300)}
+    
+    window.fastNav=function(url){try{closeMenu()}catch(e){}if(!url)return;if(url.indexOf('http')===0||url.indexOf('file://')===0){window.location.href=url;return}var b=window.location.href;var ls=b.lastIndexOf('/');if(ls>0)b=b.substring(0,ls+1);window.location.href=b+url}
+    window.fastNavigate=window.fastNav;
+    
+    async function checkUser(){try{var s=await db.auth.getSession();if(s&&s.data&&s.data.session){user=s.data.session.user;try{localStorage.removeItem('arp')}catch(e){}try{var eu=await db.from('users').select('id,role').eq('id',user.id).maybeSingle();if(!eu.data){await db.from('users').upsert({id:user.id,email:user.email,role:'3',name:user.user_metadata?.name||''},{onConflict:'id'})}else{var rl=eu.data.role;if(rl==='1'||rl==='admin'){window.location.href='admin-panel.html';return false}if(rl==='2'){window.location.href='shop-dashboard.html';return false}}}catch(e){}redir()}else{user=null;var pn=null;try{pn=localStorage.getItem('arp')}catch(e){}if(pn){try{localStorage.removeItem('arp')}catch(e){}await new Promise(function(r){setTimeout(r,1500)});var rt=await db.auth.getSession();if(rt&&rt.data&&rt.data.session){user=rt.data.session.user;toast('✅ लॉगिन सफल!');redir()}}}updMenu();uc();return true}catch(e){updMenu();return true}}
+    
+    function handleBack(){try{var m=$('menuDropdown');if(m&&m.classList.contains('show')){closeMenu();return true}var l=$('loginSheet');if(l&&l.classList.contains('show')){cbs('loginSheet');return true}var loc=$('locationSheet');if(loc&&loc.classList.contains('show')){cbs('locationSheet');return true}}catch(e){}return false}
+    window.onAndroidBackPressed=function(){return handleBack()}
+    
+    var FALLBACK={aurangabad:{name:'Aurangabad',fullName:'Aurangabad District',talukas:['City','Paithan','Gangapur','Sillod']},jalna:{name:'Jalna',fullName:'Jalna District',talukas:['Jalna City','Partur']},jalgaon:{name:'Jalgaon',fullName:'Jalgaon District',talukas:['Jalgaon City','Bhusawal']}};
+    
+    async function loadAreas(){if(areasLoaded)return;try{var d=await db.from('service_areas').select('id,name,full_name').eq('is_active',true).order('id');if(d.error||!d.data)throw new Error('No data');var t=await db.from('talukas').select('id,service_area_id,name').eq('is_active',true).order('id');var at=(t&&t.data)?t.data:[];areas={};for(var i=0;i<d.data.length;i++){var dd=d.data[i],k=dd.name.toLowerCase().replace(/ district$/,'').replace(/\s+/g,''),tl=[];for(var j=0;j<at.length;j++){if(at[j].service_area_id===dd.id)tl.push(at[j].name)}areas[k]={name:dd.name,fullName:dd.full_name,talukas:tl}}areasLoaded=true}catch(e){areas=FALLBACK;areasLoaded=true}}
+    
+    document.addEventListener('DOMContentLoaded',async function(){
+        await loadAreas();await checkUser();initLoc();
+        var c=sj(localStorage.getItem('zatpat_cart'),[]);var cn=c.reduce(function(s,i){return s+(i.quantity||1)},0);st('cartCount',cn);
+        var si=$('searchInput');if(si){var stt;si.addEventListener('input',function(e){clearTimeout(stt);stt=setTimeout(function(){var v=e.target?e.target.value.trim():'';if(v.length>2)fastNav('products.html?search='+encodeURIComponent(v))},400)})}
+        if(window.Android&&typeof window.Android.pageReady==='function'){try{window.Android.pageReady()}catch(e){}}
+    });
+    
+    window.selectCity=selectCity;window.tryAuto=tryAuto;window.handleLocationClick=handleLocationClick;
+    window.showLoginSheet=showLoginSheet;window.showSignUp=showSignUp;window.sendSignOTP=sendSignOTP;
+    window.googleLogin=googleLogin;window.sendOTP=sendOTP;window.verifyOTP=verifyOTP;window.resendOTP=resendOTP;
+    window.toggleMenu=toggleMenu;window.closeMenu=closeMenu;window.handleLogout=handleLogout;
+    window.addCart=addCart;window.openProd=openProd;window.filterCat=filterCat;window.handleCartClick=handleCartClick;
+    window.showLocSheet=showLocSheet;window.handleBack=handleBack;window.closeNoServicePopup=closeNoServicePopup;
+    window.reqLocFromAndroid=reqLocFromAndroid;
+})();
+</script>
+</body>
+</html>
