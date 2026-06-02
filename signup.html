@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Zymart</title>
+    <style>
+        :root { --brand-green: #0B5A31; --brand-orange: #F59E0B; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0B5A31, #083D21); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .signup-container { background: white; border-radius: 24px; padding: 32px 24px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .logo { text-align: center; margin-bottom: 8px; }
+        .logo span { font-family: 'Poppins', sans-serif; font-size: 32px; font-weight: 700; }
+        .logo .zy { color: #0B5A31; } .logo .mart { color: #F59E0B; }
+        .title { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 6px; color: #1a1a1a; }
+        .subtitle { font-size: 13px; color: #6B7280; text-align: center; margin-bottom: 24px; }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        .input-group input { width: 100%; padding: 14px 16px; border: 1.5px solid #E5E7EB; border-radius: 12px; font-size: 15px; font-family: 'Inter', sans-serif; outline: none; }
+        .input-group input:focus { border-color: #F59E0B; box-shadow: 0 0 0 4px rgba(245,158,11,0.1); }
+        .btn { width: 100%; padding: 15px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; border: none; font-family: 'Inter', sans-serif; margin-bottom: 10px; }
+        .btn-signup { background: #F59E0B; color: #1a1a1a; }
+        .btn-signup:active { background: #E8890A; }
+        .btn-google { background: white; color: #3C4043; border: 1.5px solid #E5E7EB; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-google img { width: 20px; }
+        .divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; color: #9CA3AF; font-size: 12px; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #E5E7EB; }
+        .login-link { text-align: center; font-size: 13px; color: #6B7280; margin-top: 16px; }
+        .login-link a { color: #0B5A31; font-weight: 700; text-decoration: none; }
+        .back-link { display: block; text-align: center; margin-bottom: 16px; color: #0B5A31; font-weight: 600; text-decoration: none; font-size: 14px; }
+        .error-msg { color: #EF4444; font-size: 12px; margin-top: 4px; display: none; }
+        .otp-section { display: none; text-align: center; padding-top: 10px; }
+        .otp-section input { width: 100%; padding: 14px; border: 1.5px solid #E5E7EB; border-radius: 12px; font-size: 20px; text-align: center; letter-spacing: 8px; font-family: 'Inter', sans-serif; }
+        .terms { font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 12px; }
+        .terms a { color: #6B7280; }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        <div class="logo"><span class="zy">Zy</span><span class="mart">mart</span></div>
+        <h1 class="title">Create Account</h1>
+        <p class="subtitle">Join Zymart for fast delivery</p>
+
+        <div id="formSection">
+            <button class="btn btn-google" onclick="signupWithGoogle()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> Continue with Google
+            </button>
+            <div class="divider">or sign up with email</div>
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="fullName" placeholder="Enter your full name">
+                <div class="error-msg" id="nameError">Please enter your name</div>
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="example@email.com">
+                <div class="error-msg" id="emailError">Please enter a valid email</div>
+            </div>
+            <button class="btn btn-signup" onclick="sendOTP()">Send OTP →</button>
+        </div>
+
+        <div id="otpSection" class="otp-section">
+            <p style="margin-bottom:16px;color:#374151;">OTP sent to <strong id="otpEmail"></strong></p>
+            <input type="text" id="otpInput" placeholder="000000" maxlength="6" inputmode="numeric">
+            <button class="btn btn-signup" style="margin-top:16px;" onclick="verifyOTP()">Verify & Sign Up</button>
+            <button class="btn" style="background:#F3F5F4;color:#374151;margin-top:8px;" onclick="resendOTP()">Resend OTP</button>
+            <button class="btn" style="background:transparent;color:#6B7280;font-size:14px;margin-top:4px;" onclick="goBack()">← Change Email</button>
+        </div>
+
+        <p class="login-link">Already have an account? <a href="login.html">Login</a></p>
+        <p class="terms">By signing up, you agree to our <a href="terms.html">Terms</a> and <a href="privacy-policy.html">Privacy Policy</a></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        var zatpatDB = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+        var currentEmail = null;
+
+        function signupWithGoogle() {
+            zatpatDB.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/index.html' } });
+        }
+
+        async function sendOTP() {
+            var name = document.getElementById('fullName').value.trim();
+            var email = document.getElementById('email').value.trim();
+            
+            if (!name) { document.getElementById('nameError').style.display = 'block'; return; }
+            if (!email || !email.includes('@')) { document.getElementById('emailError').style.display = 'block'; return; }
+            
+            document.getElementById('nameError').style.display = 'none';
+            document.getElementById('emailError').style.display = 'none';
+            
+            try {
+                var result = await zatpatDB.auth.signInWithOtp({ 
+                    email: email, 
+                    options: { shouldCreateUser: true, data: { name: name } } 
+                });
+                if (result.error) { alert('Error sending OTP. Try again.'); return; }
+                currentEmail = email;
+                document.getElementById('otpEmail').textContent = email;
+                document.getElementById('formSection').style.display = 'none';
+                document.getElementById('otpSection').style.display = 'block';
+                document.querySelector('.title').textContent = 'Verify OTP';
+                document.querySelector('.subtitle').textContent = 'Enter the 6-digit code';
+            } catch(e) { alert('Error. Please try again.'); }
+        }
+
+        async function verifyOTP() {
+            var otp = document.getElementById('otpInput').value.trim();
+            if (!otp || otp.length < 4) { alert('Please enter valid OTP'); return; }
+            try {
+                var result = await zatpatDB.auth.verifyOtp({ email: currentEmail, token: otp, type: 'email' });
+                if (result.error) { alert('Invalid OTP. Try again.'); return; }
+                if (result.data && result.data.session) {
+                    await zatpatDB.from('users').upsert({ 
+                        id: result.data.session.user.id, 
+                        email: currentEmail, 
+                        role: '3', 
+                        name: result.data.session.user.user_metadata?.name || '' 
+                    }, { onConflict: 'id' });
+                    alert('✅ Sign Up Successful!');
+                    window.location.href = 'index.html';
+                }
+            } catch(e) { alert('Error. Please try again.'); }
+        }
+
+        async function resendOTP() {
+            if (!currentEmail) return;
+            await zatpatDB.auth.signInWithOtp({ email: currentEmail, options: { shouldCreateUser: true } });
+            alert('OTP resent!');
+        }
+
+        function goBack() {
+            document.getElementById('formSection').style.display = 'block';
+            document.getElementById('otpSection').style.display = 'none';
+            document.querySelector('.title').textContent = 'Create Account';
+            document.querySelector('.subtitle').textContent = 'Join Zymart for fast delivery';
+        }
+    </script>
+</body>
+</html>

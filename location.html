@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Set Location - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31;
+            --brand-orange: #F59E0B;
+            --brand-green-dark: #083D21;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #FFFFFF;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Top Section */
+        .location-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: linear-gradient(180deg, #0B5A31 0%, #0B5A31 55%, #FFFFFF 55%);
+        }
+        
+        /* Header Area */
+        .location-header {
+            padding: 50px 24px 30px;
+            text-align: center;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .location-logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            margin-bottom: 12px;
+            animation: fadeInDown 0.6s ease;
+        }
+        
+        .location-logo .zy { color: #FFFFFF; }
+        .location-logo .mart { color: #F59E0B; }
+        
+        .location-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            animation: fadeInUp 0.6s ease 0.2s both;
+        }
+        
+        .location-subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.85);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+        
+        /* Map Animation Area */
+        .location-visual {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 200px;
+        }
+        
+        .map-pulse-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+        }
+        
+        .map-pin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: #F59E0B;
+            border-radius: 50% 50% 50% 0;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            box-shadow: 0 8px 30px rgba(245,158,11,0.4);
+            z-index: 3;
+            animation: bounce 2s infinite;
+        }
+        
+        .map-pin::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid rgba(245,158,11,0.4);
+            animation: pulseRing 2s ease-out infinite;
+            z-index: 2;
+        }
+        
+        .pulse-ring:nth-child(2) { animation-delay: 0s; width: 80px; height: 80px; }
+        .pulse-ring:nth-child(3) { animation-delay: 0.6s; width: 120px; height: 120px; }
+        .pulse-ring:nth-child(4) { animation-delay: 1.2s; width: 160px; height: 160px; }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translate(-50%, -50%) rotate(-45deg) translateY(0); }
+            50% { transform: translate(-50%, -50%) rotate(-45deg) translateY(-15px); }
+        }
+        
+        @keyframes pulseRing {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Bottom Card */
+        .location-bottom {
+            background: white;
+            border-radius: 28px 28px 0 0;
+            padding: 28px 24px 40px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.08);
+            animation: slideUp 0.5s ease 0.4s both;
+            flex-shrink: 0;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .detect-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: #F9FAFB;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .detect-status.success {
+            background: #EDF7F1;
+            border: 1px solid #0B5A31;
+        }
+        
+        .detect-status.error {
+            background: #FEF2F2;
+            border: 1px solid #EF4444;
+        }
+        
+        .status-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .status-icon.detecting {
+            background: #FFF8EB;
+            color: #F59E0B;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .status-icon.found {
+            background: #EDF7F1;
+            color: #0B5A31;
+        }
+        
+        .status-icon.not-found {
+            background: #FEF2F2;
+            color: #EF4444;
+        }
+        
+        .status-text {
+            flex: 1;
+        }
+        
+        .status-text .status-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 2px;
+        }
+        
+        .status-text .status-detail {
+            font-size: 11px;
+            color: #6B7280;
+            line-height: 1.4;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            margin-bottom: 10px;
+        }
+        
+        .btn:active {
+            transform: scale(0.97);
+        }
+        
+        .btn-primary {
+            background: #0B5A31;
+            color: white;
+            box-shadow: 0 6px 24px rgba(11,90,49,0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: #9CA3AF;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #374151;
+            border: 1.5px solid #E5E7EB;
+        }
+        
+        .btn-orange {
+            background: #F59E0B;
+            color: #1A1A1A;
+            box-shadow: 0 6px 24px rgba(245,158,11,0.3);
+            font-weight: 700;
+        }
+        
+        .district-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .district-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: #F9FAFB;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            width: 100%;
+        }
+        
+        .district-btn:active {
+            background: #EDF7F1;
+            border-color: #0B5A31;
+        }
+        
+        .district-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #F59E0B;
+            flex-shrink: 0;
+        }
+        
+        .district-name {
+            font-weight: 600;
+            flex: 1;
+            text-align: left;
+        }
+        
+        .district-count {
+            font-size: 11px;
+            color: #6B7280;
+        }
+        
+        .manual-section {
+            display: none;
+            animation: fadeInUp 0.4s ease;
+        }
+        
+        .manual-section.show {
+            display: block;
+        }
+        
+        .skip-link {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #9CA3AF;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .skip-link:hover {
+            color: #6B7280;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="location-container">
+    <!-- Header -->
+    <div class="location-header">
+        <div class="location-logo">
+            <span class="zy">Zy</span><span class="mart">mart</span>
+        </div>
+        <h1 class="location-title">Find stores near you</h1>
+        <p class="location-subtitle">We'll detect your location for faster delivery</p>
+    </div>
+    
+    <!-- Map Visual -->
+    <div class="location-visual">
+        <div class="map-pulse-container">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+            <div class="map-pin"></div>
+        </div>
+    </div>
+    
+    <!-- Bottom Card -->
+    <div class="location-bottom">
+        <!-- Status Indicator -->
+        <div class="detect-status" id="statusBox">
+            <div class="status-icon detecting" id="statusIcon">
+                <i class="fas fa-location-dot"></i>
+            </div>
+            <div class="status-text">
+                <div class="status-title" id="statusTitle">Detecting your location...</div>
+                <div class="status-detail" id="statusDetail">Please wait while we find stores near you</div>
+            </div>
+        </div>
+        
+        <!-- Auto Detect Button -->
+        <button class="btn btn-primary" id="detectBtn" onclick="startDetection()">
+            <i class="fas fa-location-arrow"></i>
+            <span id="detectBtnText">Detect Automatically</span>
+        </button>
+        
+        <!-- Continue Button (After detection) -->
+        <button class="btn btn-orange" id="continueBtn" style="display:none;" onclick="continueToHome()">
+            <i class="fas fa-shopping-bag"></i>
+            Continue Shopping
+        </button>
+        
+        <!-- Manual Select Toggle -->
+        <button class="btn btn-outline" id="manualBtn" onclick="toggleManualSelect()">
+            <i class="fas fa-list"></i>
+            Select District Manually
+        </button>
+        
+        <!-- District List -->
+        <div class="manual-section" id="manualSection">
+            <div class="district-list">
+                <button class="district-btn" onclick="selectDistrict('aurangabad')">
+                    <span class="district-dot"></span>
+                    <span class="district-name">Aurangabad District</span>
+                    <span class="district-count">9 Talukas</span>
+                </button>
+                <button class="district-btn" onclick="selectDistrict('jalna')">
+                    <span class="district-dot"></span>
+                    <span class="district-name">Jalna District</span>
+                    <span class="district-count">8 Talukas</span>
+                </button>
+                <button class="district-btn" onclick="selectDistrict('jalgaon')">
+                    <span class="district-dot"></span>
+                    <span class="district-name">Jalgaon District</span>
+                    <span class="district-count">11 Talukas</span>
+                </button>
+            </div>
+        </div>
+        
+        <p class="skip-link" onclick="skipLocation()">Skip & Browse All Stores →</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+<script>
+    // Supabase Init
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    var SUPABASE_KEY = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+    var zatpatDB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    var locationDetected = false;
+    var detectedArea = null;
+    var detectedPincode = null;
+    var detectionTimeout = null;
+    var shopsFound = 0;
+    
+    // Start auto-detection on page load
+    window.addEventListener('load', function() {
+        setTimeout(startDetection, 800);
+    });
+    
+    function updateStatus(type, title, detail) {
+        var box = document.getElementById('statusBox');
+        var icon = document.getElementById('statusIcon');
+        var titleEl = document.getElementById('statusTitle');
+        var detailEl = document.getElementById('statusDetail');
+        
+        box.className = 'detect-status';
+        icon.className = 'status-icon';
+        
+        if (type === 'detecting') {
+            icon.classList.add('detecting');
+            icon.innerHTML = '<i class="fas fa-location-dot"></i>';
+        } else if (type === 'success') {
+            box.classList.add('success');
+            icon.classList.add('found');
+            icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+        } else if (type === 'error') {
+            box.classList.add('error');
+            icon.classList.add('not-found');
+            icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+        }
+        
+        titleEl.textContent = title;
+        detailEl.textContent = detail;
+    }
+    
+    function startDetection() {
+        if (locationDetected) return;
+        
+        updateStatus('detecting', 'Detecting your location...', 'Please wait while we find stores near you');
+        
+        var detectBtn = document.getElementById('detectBtn');
+        var detectBtnText = document.getElementById('detectBtnText');
+        detectBtn.disabled = true;
+        detectBtnText.innerHTML = '<span class="loading-spinner"></span> Detecting...';
+        
+        // Try Android native first
+        if (window.Android && typeof window.Android.requestLocation === 'function') {
+            try {
+                window.Android.requestLocation();
+                // Wait for callback
+                detectionTimeout = setTimeout(function() {
+                    fallbackToBrowserGPS();
+                }, 8000);
+                return;
+            } catch(e) {
+                fallbackToBrowserGPS();
+            }
+        } else {
+            fallbackToBrowserGPS();
+        }
+    }
+    
+    function fallbackToBrowserGPS() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    clearTimeout(detectionTimeout);
+                    handleLocationSuccess(pos.coords.latitude, pos.coords.longitude);
+                },
+                function(err) {
+                    clearTimeout(detectionTimeout);
+                    handleLocationError();
+                },
+                {
+                    timeout: 8000,
+                    maximumAge: 0,
+                    enableHighAccuracy: true
+                }
+            );
+        } else {
+            handleLocationError();
+        }
+    }
+    
+    // Android callback
+    window.setLocationFromAndroid = function(lat, lng) {
+        clearTimeout(detectionTimeout);
+        handleLocationSuccess(parseFloat(lat), parseFloat(lng));
+    };
+    
+    window.onLocationError = function(msg) {
+        clearTimeout(detectionTimeout);
+        handleLocationError();
+    };
+    
+    async function handleLocationSuccess(lat, lng) {
+        try {
+            // Get area details
+            var areaInfo = await getAreaDetails(lat, lng);
+            
+            if (areaInfo.pincode) {
+                // Check if shops available
+                var shops = await checkShopsForPincode(areaInfo.pincode);
+                
+                if (shops.length > 0) {
+                    // SUCCESS - Shops found!
+                    locationDetected = true;
+                    detectedArea = areaInfo;
+                    detectedPincode = areaInfo.pincode;
+                    shopsFound = shops.length;
+                    
+                    // Save to localStorage
+                    saveLocationData(lat, lng, areaInfo, shops);
+                    
+                    // Update UI
+                    updateStatus('success', 
+                        shopsFound + ' stores found!', 
+                        areaInfo.displayName || areaInfo.city
+                    );
+                    
+                    showContinueButton();
+                    
+                } else {
+                    // No shops in this area
+                    updateStatus('error',
+                        'No stores in your area',
+                        'We\'re not available in ' + (areaInfo.displayName || 'your location') + ' yet'
+                    );
+                    
+                    resetDetectButton();
+                    document.getElementById('manualSection').classList.add('show');
+                }
+            } else {
+                handleLocationError();
+            }
+        } catch(e) {
+            handleLocationError();
+        }
+    }
+    
+    function handleLocationError() {
+        updateStatus('error',
+            'Couldn\'t detect location',
+            'Please select your district manually'
+        );
+        
+        resetDetectButton();
+        document.getElementById('manualSection').classList.add('show');
+    }
+    
+    function resetDetectButton() {
+        var detectBtn = document.getElementById('detectBtn');
+        var detectBtnText = document.getElementById('detectBtnText');
+        detectBtn.disabled = false;
+        detectBtnText.innerHTML = '<i class="fas fa-location-arrow"></i> Try Again';
+    }
+    
+    function showContinueButton() {
+        document.getElementById('detectBtn').style.display = 'none';
+        document.getElementById('continueBtn').style.display = 'flex';
+        document.getElementById('manualBtn').style.display = 'none';
+        document.getElementById('manualSection').classList.remove('show');
+        document.querySelector('.skip-link').style.display = 'none';
+    }
+    
+    function continueToHome() {
+        // Save that location was set from this page
+        try { sessionStorage.setItem('location_set_done', 'true'); } catch(e) {}
+        
+        // Redirect to homepage
+        window.location.href = 'index.html';
+    }
+    
+    function toggleManualSelect() {
+        var section = document.getElementById('manualSection');
+        section.classList.toggle('show');
+        
+        var btn = document.getElementById('manualBtn');
+        if (section.classList.contains('show')) {
+            btn.innerHTML = '<i class="fas fa-times"></i> Hide Districts';
+        } else {
+            btn.innerHTML = '<i class="fas fa-list"></i> Select District Manually';
+        }
+    }
+    
+    function selectDistrict(districtKey) {
+        var districts = {
+            'aurangabad': { name: 'Aurangabad', fullName: 'Aurangabad District' },
+            'jalna': { name: 'Jalna', fullName: 'Jalna District' },
+            'jalgaon': { name: 'Jalgaon', fullName: 'Jalgaon District' }
+        };
+        
+        var district = districts[districtKey];
+        if (!district) return;
+        
+        // Save district selection
+        try {
+            localStorage.setItem('user_city', district.name);
+            localStorage.setItem('location_short', district.fullName);
+            localStorage.removeItem('user_pincode');
+            sessionStorage.setItem('location_set_done', 'true');
+        } catch(e) {}
+        
+        locationDetected = true;
+        detectedArea = { city: district.name, displayName: district.fullName };
+        
+        updateStatus('success',
+            'District selected!',
+            district.fullName
+        );
+        
+        showContinueButton();
+    }
+    
+    function skipLocation() {
+        try { sessionStorage.setItem('location_set_done', 'true'); } catch(e) {}
+        window.location.href = 'index.html';
+    }
+    
+    async function getAreaDetails(lat, lng) {
+        try {
+            var controller = new AbortController();
+            var timeout = setTimeout(function() { controller.abort(); }, 5000);
+            
+            var response = await fetch(
+                'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1',
+                {
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'ZymartApp/15.0'
+                    },
+                    signal: controller.signal
+                }
+            );
+            
+            clearTimeout(timeout);
+            var data = await response.json();
+            
+            if (data && data.address) {
+                var area = data.address;
+                var road = area.road || area.neighbourhood || area.suburb || '';
+                var city = area.city || area.town || area.municipality || '';
+                var district = area.state_district || area.county || '';
+                var pincode = area.postcode || '';
+                
+                var displayParts = [];
+                if (road) displayParts.push(road);
+                if (city) displayParts.push(city);
+                if (district && district !== city) displayParts.push(district);
+                
+                return {
+                    road: road,
+                    city: city,
+                    district: district,
+                    pincode: pincode,
+                    displayName: displayParts.join(', ') || city
+                };
+            }
+        } catch(e) {}
+        
+        return { road: '', city: '', district: '', pincode: '', displayName: '' };
+    }
+    
+    async function checkShopsForPincode(pincode) {
+        try {
+            var result = await zatpatDB.from('shops')
+                .select('id')
+                .eq('status', 'approved')
+                .eq('is_open', true)
+                .eq('pincode', pincode);
+            
+            if (!result.error && result.data) {
+                return result.data;
+            }
+            
+            // Try area pincode match (first 3 digits)
+            if (pincode.length >= 3) {
+                var areaCode = pincode.substring(0, 3);
+                var allShops = await zatpatDB.from('shops')
+                    .select('id, pincode')
+                    .eq('status', 'approved')
+                    .eq('is_open', true);
+                
+                if (!allShops.error && allShops.data) {
+                    return allShops.data.filter(function(shop) {
+                        return shop.pincode && shop.pincode.substring(0, 3) === areaCode;
+                    });
+                }
+            }
+        } catch(e) {}
+        
+        return [];
+    }
+    
+    function saveLocationData(lat, lng, areaInfo, shops) {
+        try {
+            localStorage.setItem('user_lat', lat.toString());
+            localStorage.setItem('user_lng', lng.toString());
+            localStorage.setItem('user_pincode', areaInfo.pincode);
+            localStorage.setItem('user_city', areaInfo.city);
+            localStorage.setItem('user_area', areaInfo.road);
+            localStorage.setItem('user_district', areaInfo.district);
+            localStorage.setItem('location_short', areaInfo.displayName);
+            localStorage.setItem('location_timestamp', Date.now().toString());
+            localStorage.setItem('valid_shop_count', shops.length.toString());
+            sessionStorage.setItem('location_set_done', 'true');
+        } catch(e) {}
+    }
+</script>
+
+</body>
+</html>
