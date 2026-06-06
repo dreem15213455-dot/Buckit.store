@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>सभी प्रोडक्ट्स - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --brand-green: #0B5A31; --brand-orange: #F59E0B; --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB; --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-full: 9999px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter',-apple-system,sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); padding-bottom: 85px; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .top-bar { background: var(--brand-green); position: sticky; top: 0; width: 100%; z-index: 100; padding: 8px 12px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .top-row { display: flex; align-items: center; gap: 10px; }
+        .back-btn { width: 40px; height: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; }
+        .search-box { flex: 1; background: white; border-radius: var(--radius-full); display: flex; align-items: center; padding: 0 14px; gap: 8px; }
+        .search-box input { flex: 1; border: none; outline: none; padding: 10px 0; font-size: 13px; font-family: 'Inter',sans-serif; }
+        .cart-btn { width: 38px; height: 38px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; position: relative; }
+        .cart-badge { position: absolute; top: -4px; right: -4px; background: var(--brand-orange); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--brand-green); font-weight: 700; }
+        
+        .location-bar { display: flex; align-items: center; gap: 6px; padding: 6px 14px; background: #EDF7F1; border-bottom: 1px solid #C8E6C9; font-size: 11px; color: #0B5A31; cursor: pointer; position: sticky; top: 56px; z-index: 99; }
+        .location-bar span { font-weight: 600; }
+        .nearby-badge { display: inline-block; background: #0B5A31; color: white; font-size: 9px; padding: 2px 8px; border-radius: 9999px; font-weight: 600; }
+        
+        .filter-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: white; border-bottom: 1px solid var(--neutral-border); position: sticky; top: 54px; z-index: 98; }
+        .filter-bar.with-location { top: 82px; }
+        .category-title { font-family: 'Poppins',sans-serif; font-size: 14px; font-weight: 700; }
+        .sort-btn { padding: 7px 14px; background: var(--neutral-bg); border-radius: var(--radius-full); font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-border); font-family: 'Inter',sans-serif; }
+        
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; padding: 10px 12px; }
+        .product-card { background: white; border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-xs); border: 1px solid var(--neutral-border); cursor: pointer; animation: fadeIn 0.3s ease; position: relative; }
+        .product-card:active { transform: scale(0.97); }
+        .product-card.nearby { border: 2px solid #0B5A31; }
+        .product-img { width: 100%; aspect-ratio: 1/1; position: relative; overflow: hidden; background: var(--neutral-bg); display: flex; align-items: center; justify-content: center; }
+        .product-img img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+        .discount-tag { position: absolute; top: 7px; left: 7px; background: var(--brand-orange); color: white; font-size: 8px; font-weight: 700; padding: 2px 7px; border-radius: var(--radius-full); z-index: 1; }
+        .weight-tag { position: absolute; bottom: 7px; right: 7px; background: rgba(11,90,49,0.85); color: white; font-size: 8px; font-weight: 600; padding: 2px 7px; border-radius: var(--radius-full); z-index: 1; }
+        .out-of-stock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 2; }
+        .out-of-stock-overlay span { background: rgba(0,0,0,0.5); color: white; padding: 5px 12px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; }
+        .product-info { padding: 9px; }
+        .product-name { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-shop { font-size: 9px; color: var(--brand-green); font-weight: 500; }
+        .product-distance { font-size: 8px; color: #0B5A31; font-weight: 600; }
+        .product-weight { font-size: 9px; color: var(--neutral-gray); }
+        .product-price-row { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+        .product-price { font-size: 14px; font-weight: 700; }
+        .original-price { font-size: 10px; color: var(--neutral-gray); text-decoration: line-through; }
+        .add-btn { background: #EDF7F1; color: var(--brand-green); border: 1.5px solid var(--brand-green); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; }
+        .add-btn:active { background: var(--brand-green); color: white; }
+        .add-btn.disabled { background: #F3F4F6; color: #9CA3AF; border-color: var(--neutral-border); cursor: not-allowed; }
+        .qty-controls { display: flex; align-items: center; gap: 5px; }
+        .qty-btn { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--neutral-border); background: white; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--brand-green); }
+        .qty-btn:active { background: #EDF7F1; }
+        .qty-count { font-size: 12px; font-weight: 700; min-width: 18px; text-align: center; }
+        
+        .load-more { text-align: center; padding: 16px; }
+        .load-more-btn { background: white; color: var(--brand-green); border: 1.5px solid var(--brand-green); padding: 9px 24px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter',sans-serif; }
+        .empty-state { text-align: center; padding: 50px 20px; }
+        .empty-state i { font-size: 48px; color: #D1D5DB; display: block; margin-bottom: 14px; }
+        .empty-state h3 { font-family: 'Poppins',sans-serif; font-size: 16px; font-weight: 700; }
+        .btn-primary { background: var(--brand-green); color: white; border: none; padding: 9px 22px; border-radius: var(--radius-full); font-weight: 600; font-size: 12px; cursor: pointer; font-family: 'Inter',sans-serif; display: inline-block; }
+        .btn-orange { background: var(--brand-orange); color: white; border: none; padding: 9px 22px; border-radius: var(--radius-full); font-weight: 600; font-size: 12px; cursor: pointer; font-family: 'Inter',sans-serif; }
+        
+        .bottom-nav { background: white; position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 5px 14px 10px; box-shadow: 0 -4px 16px rgba(0,0,0,0.03); z-index: 100; border-top: 1px solid var(--neutral-border); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 9px; font-weight: 500; color: var(--neutral-gray); cursor: pointer; padding: 3px 10px; border-radius: var(--radius-full); border: none; background: transparent; font-family: 'Inter',sans-serif; text-decoration: none; }
+        .nav-item.active { color: var(--brand-green); font-weight: 600; }
+        .nav-item i { font-size: 18px; margin-bottom: 1px; }
+        .cart-count { position: absolute; top: -4px; right: -5px; background: var(--brand-orange); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 8px; display: flex; align-items: center; justify-content: center; border: 2px solid white; font-weight: 700; }
+        
+        .toast-notification { position: fixed; bottom: 95px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 9px 18px; border-radius: var(--radius-full); font-size: 11px; z-index: 200; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-md); transition: all 0.3s ease; }
+        .toast-notification.show { opacity: 1; visibility: visible; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="mainApp">
+    <div class="top-bar">
+        <div class="top-row">
+            <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i></button>
+            <div class="search-box"><i class="fas fa-search" style="color:#9CA3AF;font-size:13px;"></i><input type="text" id="searchInput" placeholder="प्रोडक्ट्स खोजें..." autocomplete="off"></div>
+            <button class="cart-btn" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-bag"></i><span class="cart-badge" id="cartBadge">0</span></button>
+        </div>
+    </div>
+    
+    <div class="location-bar" id="locationBar" style="display:none;" onclick="window.location.href='location.html'">
+        <i class="fas fa-map-marker-alt"></i>
+        <span id="locationText">📍 Set Location</span>
+    </div>
+    
+    <div class="filter-bar" id="filterBar">
+        <span class="category-title"><i class="fas fa-box" style="color:var(--brand-green);margin-right:6px;"></i>सभी प्रोडक्ट्स</span>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+    <div class="load-more" id="loadMoreContainer" style="display:none;"><button class="load-more-btn" onclick="loadMore()">और लोड करें</button></div>
+    
+    <nav class="bottom-nav">
+        <a class="nav-item" href="index.html"><i class="fas fa-home"></i><span>होम</span></a>
+        <a class="nav-item" href="more.html"><i class="fas fa-ellipsis-h"></i><span>More</span></a>
+        <a class="nav-item" href="cart.html"><i class="fas fa-shopping-cart"></i><span>कार्ट</span><span class="cart-count" id="cartCount">0</span></a>
+        <a class="nav-item" href="profile.html"><i class="fas fa-user"></i><span>प्रोफाइल</span></a>
+        <a class="nav-item" href="orders.html"><i class="fas fa-receipt"></i><span>ऑर्डर</span></a>
+    </nav>
+</div>
+
+<div class="toast-notification" id="toastMsg"><span id="toastText"></span></div>
+
+<script>
+(function() {
+    'use strict';
+    window.addEventListener('error', function(e) { console.error('[Products]', e.message); });
+    
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    var products = [], page = 0, hasMore = true, loading = false;
+    var userLat = null, userLng = null, nearbyShopIds = [];
+    var shopDistances = {};
+    var locationChecked = false;
+    var initialLoadDone = false;
+    
+    function getEl(id) { return document.getElementById(id); }
+    function getFullUrl(u) { if(!u)return''; if(u.indexOf('http')===0)return u; return SUPABASE_URL+'/storage/v1/object/public/'+u; }
+    function esc(s) { if(!s)return''; var d=document.createElement('div');d.textContent=s;return d.innerHTML; }
+    function showToast(m) { var t=getEl('toastMsg'),s=getEl('toastText'); if(!t||!s)return; s.textContent=m; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2000); }
+    function getCart() { try { return JSON.parse(localStorage.getItem('zatpat_cart')||'[]'); } catch(e) { return []; } }
+    function saveCart(c) { try { localStorage.setItem('zatpat_cart', JSON.stringify(c)); } catch(e) {} }
+    function updateCartBadge() { var c=getCart(),n=c.reduce(function(a,i){return a+(i.quantity||1);},0); var b=getEl('cartBadge'),cc=getEl('cartCount'); if(b)b.textContent=n; if(cc)cc.textContent=n; return n; }
+    
+    function fmtWeight(w,u) { if(!w)return''; if(u==='gram'||u==='g')return w>=1000?(w/1000).toFixed(1).replace(/\.0$/,'')+' kg':w+' g'; if(u==='kg')return w+' kg'; if(u==='liter')return w+' L'; if(u==='ml')return w+' ml'; return w+' '+(u||'pcs'); }
+    
+    function calculateDistance(lat1, lng1, lat2, lng2) {
+        var R = 6371;
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLng = (lng2 - lng1) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLng/2) * Math.sin(dLng/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+    
+    async function initPage() {
+        if (initialLoadDone) return;
+        initialLoadDone = true;
+        
+        var lat = parseFloat(localStorage.getItem('user_lat') || '0') || null;
+        var lng = parseFloat(localStorage.getItem('user_lng') || '0') || null;
+        var ts = parseInt(localStorage.getItem('location_timestamp') || '0');
+        var hasValidLocation = lat && lng && (Date.now() - ts) < 1800000;
+        
+        if (hasValidLocation) {
+            userLat = lat;
+            userLng = lng;
+            var locShort = localStorage.getItem('location_short') || '';
+            var locBar = getEl('locationBar');
+            var locText = getEl('locationText');
+            var filBar = getEl('filterBar');
+            if (locBar && locText && locShort) {
+                locBar.style.display = 'flex';
+                locText.textContent = '📍 ' + locShort;
+                if (filBar) filBar.classList.add('with-location');
+            }
+            
+            await findNearbyShops();
+        }
+        
+        locationChecked = true;
+        loadProducts();
+    }
+    
+    async function findNearbyShops() {
+        if (!userLat || !userLng) return;
+        try {
+            var result = await sb.from('shops').select('id,latitude,longitude,delivery_radius_km').eq('status','approved').eq('is_open',true);
+            if (!result.data || !result.data.length) return;
+            
+            nearbyShopIds = [];
+            shopDistances = {};
+            
+            for (var i = 0; i < result.data.length; i++) {
+                var shop = result.data[i];
+                if (!shop.latitude || !shop.longitude) continue;
+                var dist = calculateDistance(userLat, userLng, shop.latitude, shop.longitude);
+                var radius = shop.delivery_radius_km || 10;
+                if (dist <= radius) {
+                    nearbyShopIds.push(shop.id);
+                    shopDistances[shop.id] = Math.round(dist * 10) / 10;
+                }
+            }
+            
+            var locText = getEl('locationText');
+            if (nearbyShopIds.length > 0 && locText) {
+                var locShort = localStorage.getItem('location_short') || '';
+                locText.innerHTML = '📍 ' + locShort + ' <span class="nearby-badge">' + nearbyShopIds.length + ' shops nearby</span>';
+            }
+        } catch(e) {
+            console.error('[Products] Nearby error:', e);
+        }
+    }
+    
+    async function loadProducts() {
+        if (loading || !hasMore) return;
+        loading = true;
+        try {
+            var q = sb.from('products').select('*', { count: 'exact' }).eq('is_active', true);
+            
+            if (locationChecked && nearbyShopIds.length > 0) {
+                q = q.in('shop_id', nearbyShopIds);
+            }
+            
+            q = q.order('created_at', { ascending: false }).range(page * 12, (page + 1) * 12 - 1);
+            var r = await q;
+            
+            if (r.data && r.data.length) {
+                var newProducts = r.data;
+                
+                if (newProducts.length === 0 && nearbyShopIds.length > 0 && page === 0) {
+                    console.log('🔄 [Products] Nearby empty, loading All India');
+                    nearbyShopIds = [];
+                    loading = false;
+                    loadProducts();
+                    return;
+                }
+                
+                products = products.concat(newProducts);
+                page++;
+                hasMore = products.length < (r.count || 0);
+                
+                if (nearbyShopIds.length > 0) {
+                    products.sort(function(a, b) {
+                        var aNearby = nearbyShopIds.indexOf(a.shop_id) !== -1;
+                        var bNearby = nearbyShopIds.indexOf(b.shop_id) !== -1;
+                        if (aNearby && !bNearby) return -1;
+                        if (!aNearby && bNearby) return 1;
+                        return 0;
+                    });
+                }
+                
+                renderProducts();
+            } else {
+                hasMore = false;
+                if (!products.length) {
+                    getEl('productsGrid').innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><h3>कोई प्रोडक्ट नहीं</h3><a href="index.html" class="btn-orange"><i class="fas fa-home"></i> होम पेज पर जाएं</a></div>';
+                }
+            }
+            getEl('loadMoreContainer').style.display = hasMore ? 'block' : 'none';
+        } catch(e) {
+            if (!products.length) {
+                getEl('productsGrid').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>लोड विफल</h3><button class="btn-primary" onclick="location.reload()">पुनः प्रयास</button></div>';
+            }
+        }
+        loading = false;
+    }
+    
+    window.addToCart = function(id, name, price, image, unit, stock) {
+        stock = stock || 0;
+        if (stock <= 0) return;
+        var cart = getCart();
+        var ex = cart.find(function(x) { return x.id === id; });
+        var currentQty = ex ? (ex.quantity || 1) : 0;
+        if (currentQty >= stock) { showToast('⚠️ स्टॉक खत्म!'); return; }
+        if (ex) ex.quantity += 1;
+        else cart.push({ id: id, name: name, price: price, image: image, quantity: 1, unit: unit || 'piece', stock: stock });
+        saveCart(cart);
+        updateCartBadge();
+        updateProductUI(id, (ex ? ex.quantity : 1));
+        showToast('🛒 ' + (name || 'आइटम') + ' जोड़ा!');
+    };
+    
+    window.updateQty = function(id, delta, stock) {
+        stock = stock || 0;
+        var cart = getCart();
+        var it = cart.find(function(x) { return x.id === id; });
+        if (!it) return;
+        var nq = (it.quantity || 1) + delta;
+        if (nq <= 0) { cart = cart.filter(function(x) { return x.id !== id; }); saveCart(cart); updateProductUI(id, 0); updateCartBadge(); return; }
+        if (nq > stock) { showToast('⚠️ सिर्फ ' + stock + ' उपलब्ध!'); return; }
+        it.quantity = nq;
+        saveCart(cart);
+        updateProductUI(id, nq);
+        updateCartBadge();
+    };
+    
+    function updateProductUI(pid, qty) {
+        var ctls = document.querySelectorAll('.qty-controls[data-pid="' + pid + '"]');
+        var adds = document.querySelectorAll('.add-btn[data-pid="' + pid + '"]');
+        var cnts = document.querySelectorAll('.qty-count[data-pid="' + pid + '"]');
+        for (var i = 0; i < ctls.length; i++) ctls[i].style.display = qty > 0 ? 'flex' : 'none';
+        for (var j = 0; j < adds.length; j++) adds[j].style.display = qty > 0 ? 'none' : 'flex';
+        for (var k = 0; k < cnts.length; k++) cnts[k].textContent = qty;
+    }
+    
+    function renderProducts() {
+        var cart = getCart(), h = '';
+        for (var i = 0; i < products.length; i++) {
+            var p = products[i], 
+                img = getFullUrl((p.images && p.images[0]) || p.image_url || ''),
+                op = p.offer_price && p.offer_price < p.price ? p.offer_price : p.price,
+                dp = p.offer_price && p.offer_price < p.price ? Math.round((1 - p.offer_price / p.price) * 100) : 0,
+                wd = fmtWeight(p.weight, p.weight_unit || p.unit),
+                sn = p.shop_name || '',
+                stock = p.stock || 0,
+                isOut = stock <= 0,
+                ci = cart.find(function(x) { return x.id === p.id; }),
+                cq = ci ? (ci.quantity || 1) : 0,
+                pn = esc(p.name || ''),
+                pnSafe = pn.replace(/'/g, "\\'"),
+                isNearby = nearbyShopIds.indexOf(p.shop_id) !== -1,
+                shopDist = shopDistances[p.shop_id] || null;
+            
+            h += '<div class="product-card' + (isNearby ? ' nearby' : '') + '" onclick="window.location.href=\'product-detail.html?id=' + p.id + '\'">';
+            h += '<div class="product-img">';
+            if (dp > 0) h += '<div class="discount-tag">' + dp + '%</div>';
+            if (wd) h += '<div class="weight-tag">' + wd + '</div>';
+            if (isOut) h += '<div class="out-of-stock-overlay"><span>स्टॉक खत्म</span></div>';
+            if (img) h += '<img src="' + img + '" loading="lazy" onerror="this.style.display=\'none\'">';
+            h += '</div>';
+            
+            h += '<div class="product-info">';
+            h += '<div class="product-name">' + pn + '</div>';
+            if (sn) h += '<div class="product-shop">🏪 ' + esc(sn) + (shopDist ? ' • ' + shopDist + 'km' : '') + '</div>';
+            if (wd) h += '<div class="product-weight">⚖️ ' + wd + '</div>';
+            
+            h += '<div class="product-price-row">';
+            h += '<div><span class="product-price">₹' + op + '</span>';
+            if (dp > 0) h += '<span class="original-price">₹' + (p.price || 0) + '</span>';
+            h += '</div>';
+            
+            if (isOut) {
+                h += '<button class="add-btn disabled"><i class="fas fa-ban"></i></button>';
+            } else {
+                h += '<div class="qty-controls" data-pid="' + p.id + '" style="display:' + (cq > 0 ? 'flex' : 'none') + '">';
+                h += '<button class="qty-btn" onclick="event.stopPropagation();updateQty(\'' + p.id + '\',-1,' + stock + ')">−</button>';
+                h += '<span class="qty-count" data-pid="' + p.id + '">' + cq + '</span>';
+                h += '<button class="qty-btn" onclick="event.stopPropagation();updateQty(\'' + p.id + '\',1,' + stock + ')">+</button>';
+                h += '</div>';
+                h += '<button class="add-btn" data-pid="' + p.id + '" onclick="event.stopPropagation();addToCart(\'' + p.id + '\',\'' + pnSafe + '\',' + op + ',\'' + img + '\',\'' + (p.unit||'piece') + '\',' + stock + ')" style="display:' + (cq > 0 ? 'none' : 'flex') + '"><i class="fas fa-plus"></i></button>';
+            }
+            h += '</div></div></div>';
+        }
+        getEl('productsGrid').innerHTML = h;
+    }
+    
+    window.loadMore = function() { loadProducts(); };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartBadge();
+        initPage();
+        
+        var si = getEl('searchInput');
+        if (si) {
+            var t;
+            si.addEventListener('input', function() {
+                clearTimeout(t);
+                t = setTimeout(function() {
+                    var v = si.value.trim();
+                    if (v.length > 2) window.location.href = 'products.html?search=' + encodeURIComponent(v);
+                }, 500);
+            });
+        }
+    });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>दुकान रजिस्टर करें - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="Zymart पर अपनी दुकान रजिस्टर करें - सिर्फ ₹299/साल">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-green-light: #0F6E3B; --brand-green-dark: #083D21;
+            --brand-orange: #F59E0B; --brand-orange-dark: #E8890A; --brand-orange-light: #FFB020;
+            --brand-white: #F5F5F5;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A;
+            --danger: #EF4444; --danger-bg: #FEF2F2; --success: #22C55E; --success-bg: #EDF7F1;
+            --warning: #F59E0B; --warning-bg: #FFF8EB;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --shadow-xl: 0 20px 50px rgba(0,0,0,0.15);
+            --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-xl: 22px; --radius-2xl: 28px;
+            --radius-full: 9999px;
+            --ease-fast: cubic-bezier(0.4,0,0.2,1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--neutral-bg); color: var(--neutral-dark);
+            -webkit-tap-highlight-color: transparent; min-height: 100vh; padding-bottom: 30px;
+            overflow-x: hidden; width: 100%; max-width: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--neutral-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; transition: opacity 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; }
+        .loader-zy { color: var(--brand-green); } .loader-mart { color: var(--brand-orange); }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(11,90,49,0.4)} 50%{box-shadow:0 0 0 10px rgba(11,90,49,0)} }
+        @keyframes skel { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        
+        .skeleton-block { background: linear-gradient(90deg,#e5e5e5 25%,#d4d4d4 50%,#e5e5e5 75%); background-size:200% 100%; animation:skel 1.3s infinite; border-radius:var(--radius-md); }
+        .skeleton-hero { height: 200px; border-radius: var(--radius-2xl); margin: 12px 14px; }
+        .skeleton-card { background: white; margin: 0 14px 20px; border-radius: var(--radius-2xl); padding: 22px; }
+        .skeleton-line { height: 14px; margin-bottom: 14px; width: 100%; }
+        .skeleton-line-sm { height: 14px; margin-bottom: 14px; width: 60%; }
+        .skeleton-btn { height: 48px; border-radius: var(--radius-full); width: 100%; }
+        
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; outline: none; transition: all 0.15s ease; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .brand-name { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; display: flex; align-items: baseline; }
+        .brand-zy { color: var(--brand-white); } .brand-mart { color: var(--brand-orange); }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 14px; color: white; }
+        .main-content { padding-top: 60px; padding-bottom: 40px; max-width: 600px; margin: 0 auto; }
+        
+        .hero-section { background: linear-gradient(135deg, var(--brand-green), var(--brand-green-dark)); margin: 12px 14px; padding: 0; border-radius: var(--radius-2xl); animation: fadeInUp 0.4s ease; overflow: hidden; position: relative; min-height: 200px; display: flex; flex-direction: column; }
+        .hero-banner-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 0; }
+        .hero-spacer { flex: 1; position: relative; z-index: 1; }
+        .hero-bottom-strip { position: relative; z-index: 1; background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 70%, transparent 100%); padding: 20px 18px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .hero-text-group { display: flex; flex-direction: column; gap: 2px; }
+        .hero-main-text { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.4); line-height: 1.2; }
+        .hero-sub-text { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 500; }
+        .fee-badge { background: rgba(255,255,255,0.15); display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px; border-radius: var(--radius-full); font-weight: 700; font-size: 14px; border: 1px solid rgba(255,255,255,0.25); backdrop-filter: blur(4px); color: white; white-space: nowrap; flex-shrink: 0; }
+        .hero-section.no-photo { background: linear-gradient(135deg, var(--brand-green), var(--brand-green-dark)); }
+        .hero-section.no-photo .hero-spacer { display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; color: white; padding: 20px; }
+        .hero-section.no-photo .hero-spacer .default-icon { font-size: 44px; margin-bottom: 8px; }
+        .hero-section.no-photo .hero-spacer .default-title { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; }
+        
+        .form-card { background: white; margin: 0 14px 20px; border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; animation: fadeInUp 0.4s ease; }
+        .form-header { padding: 18px 22px; border-bottom: 1px solid var(--neutral-border); background: #EDF7F1; display: flex; align-items: center; gap: 8px; }
+        .form-header i { color: var(--brand-green); font-size: 18px; }
+        .form-header h2 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; color: var(--brand-green-dark); }
+        .form-body { padding: 22px; }
+        
+        .form-group { margin-bottom: 14px; }
+        .form-label { font-weight: 600; font-size: 12px; margin-bottom: 4px; display: block; color: var(--neutral-dark); }
+        .form-label i { color: var(--brand-green); width: 16px; margin-right: 3px; }
+        .form-label .required { color: var(--danger); }
+        .form-control { width: 100%; padding: 11px 14px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; background: white; transition: all 0.15s ease; }
+        .form-control:focus { border-color: var(--brand-orange); box-shadow: 0 0 0 3px rgba(245,158,11,0.08); }
+        .form-control.error { border-color: var(--danger); background: #FEF2F2; }
+        .form-control.valid { border-color: var(--success); }
+        select.form-control { -webkit-appearance: none; padding-right: 32px; }
+        textarea.form-control { resize: vertical; min-height: 60px; }
+        
+        .image-upload-area { border: 2px dashed var(--brand-green); border-radius: var(--radius-sm); padding: 16px; text-align: center; cursor: pointer; background: #EDF7F1; transition: all 0.15s ease; }
+        .image-upload-area:active { background: #C8E6C9; }
+        .image-upload-area i { font-size: 24px; color: var(--brand-green); margin-bottom: 4px; }
+        .image-upload-area p { font-size: 11px; color: var(--brand-green); font-weight: 500; }
+        .image-preview { max-width: 100%; max-height: 120px; margin-top: 8px; border-radius: var(--radius-sm); display: none; }
+        .compress-info { font-size: 10px; color: var(--brand-green); margin-top: 4px; display: none; }
+        .upload-progress { width: 100%; height: 4px; background: var(--neutral-border); border-radius: 2px; margin-top: 8px; display: none; overflow: hidden; }
+        .upload-progress-bar { height: 100%; background: var(--brand-green); border-radius: 2px; width: 0%; transition: width 0.3s ease; }
+        
+        .location-btn { width: 100%; padding: 14px; background: #EDF7F1; border: 2px solid var(--brand-green); border-radius: var(--radius-sm); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--brand-green); transition: all 0.2s ease; font-family: 'Inter', sans-serif; animation: pulse 2s infinite; box-shadow: 0 4px 15px rgba(11,90,49,0.2); }
+        .location-btn:active { background: #C8E6C9; transform: scale(0.97); }
+        .location-btn:disabled { opacity: 0.7; cursor: not-allowed; animation: none; box-shadow: none; }
+        .location-btn.success { background: #22C55E; color: white; border-color: #22C55E; animation: none; box-shadow: none; }
+        .location-btn.loading { background: #9CA3AF; color: white; border-color: #9CA3AF; animation: none; box-shadow: none; }
+        
+        .location-status { font-size: 11px; padding: 10px 12px; border-radius: var(--radius-sm); background: #F3F5F4; margin-top: 10px; display: flex; align-items: center; gap: 6px; }
+        .location-status.success { color: #059669; background: #EDF7F1; border: 1px solid #A7F3D0; }
+        .location-status.error { color: var(--danger); background: #FEF2F2; border: 1px solid #FECACA; }
+        .location-status.loading { color: #D97706; background: #FFF8EB; border: 1px solid #FCD34D; }
+        .gps-coords-display { font-size: 11px; color: var(--brand-green); font-weight: 600; margin-top: 6px; font-family: monospace; word-break: break-all; display: none; }
+        .gps-coords-display.show { display: block; }
+        .gps-address-display { font-size: 10px; color: var(--neutral-gray); margin-top: 4px; display: none; line-height: 1.3; }
+        .gps-address-display.show { display: block; }
+        
+        .pay-btn { background: var(--brand-orange); color: white; border: none; padding: 14px; border-radius: var(--radius-full); font-weight: 600; font-size: 14px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s ease; box-shadow: 0 4px 14px rgba(245,158,11,0.25); font-family: 'Inter', sans-serif; margin-bottom: 8px; }
+        .pay-btn:active { background: var(--brand-orange-dark); transform: scale(0.97); }
+        .pay-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .fee-summary { background: #F3F5F4; border-radius: var(--radius-lg); padding: 12px 14px; margin-bottom: 18px; border: 1px solid var(--neutral-border); }
+        .fee-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+        .fee-row.total { border-top: 1px solid var(--neutral-border); padding-top: 8px; font-weight: 700; font-size: 14px; }
+        
+        .text-muted { color: var(--neutral-gray); font-size: 11px; text-align: center; margin-top: 10px; }
+        
+        .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-lg); transition: all 0.3s ease; }
+        .toast-notification.show { opacity: 1; visibility: visible; }
+        
+        .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8,61,33,0.7); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 9990; }
+        .alert-modal.show { display: flex; }
+        .alert-content { background: white; border-radius: var(--radius-xl); padding: 24px; max-width: 340px; width: 90%; text-align: center; animation: fadeInUp 0.3s ease; }
+        .alert-content i { font-size: 40px; display: block; margin-bottom: 10px; }
+        .alert-content h3 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .alert-content p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 14px; line-height: 1.5; white-space: pre-line; }
+        .alert-btn { background: var(--brand-green); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; width: 100%; font-size: 13px; font-family: 'Inter', sans-serif; }
+        
+        @media (max-width: 380px) { .hero-section { min-height: 170px; } .hero-main-text { font-size: 14px; } .fee-badge { font-size: 12px; padding: 6px 12px; } .form-body { padding: 16px; } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">mart</span></div></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()" aria-label="वापस"><i class="fas fa-arrow-left"></i></button>
+        <div class="brand-name"><span class="brand-zy">Zy</span><span class="brand-mart">mart</span></div>
+        <div class="page-title">दुकान रजिस्टर करें</div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="skeleton-hero skeleton-block"></div>
+        <div class="skeleton-card">
+            <div class="skeleton-block skeleton-line"></div>
+            <div class="skeleton-block skeleton-line-sm"></div>
+            <div class="skeleton-block skeleton-line"></div>
+            <div class="skeleton-block skeleton-line"></div>
+            <div class="skeleton-block skeleton-line-sm"></div>
+            <div class="skeleton-block skeleton-line"></div>
+            <div class="skeleton-block skeleton-btn"></div>
+        </div>
+    </div>
+</div>
+
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<div id="customAlert" class="alert-modal">
+    <div class="alert-content">
+        <i id="alertIcon" class="fas fa-info-circle" style="color:var(--warning);"></i>
+        <h3 id="alertTitle">सूचना</h3>
+        <p id="alertMessage"></p>
+        <button class="alert-btn" onclick="closeAlert()">ठीक है</button>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    
+    // ============ CRASH PROTECTION ============
+    window.addEventListener('error', function(e) { console.error('[Zymart Shop Register]', e.message); });
+    window.addEventListener('unhandledrejection', function(e) { console.error('[Zymart Shop Register]', e.reason); e.preventDefault(); });
+    
+    function $(id) { return document.getElementById(id); }
+    function esc(str) { if (!str) return ''; var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+    
+    // ============ SUPABASE ============
+    var sb = null;
+    try { sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'); }
+    catch(e) { sb = { from: function() { return { select: function() { return { eq: function() { return { maybeSingle: function() { return Promise.resolve({ data: null }); } }; } }; } }; } }; }
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    
+    // ============ STATE ============
+    var categories = [], selectedImageFile = null, selectedQrFile = null, isProcessing = false;
+    var isCapturingLocation = false, registrationFee = 299, heroBannerUrl = null;
+    var gpsRetryCount = 0, maxGpsRetries = 2, paymentDone = false;
+    var RAZORPAY_KEY_ID = 'rzp_live_SZqH2di86Njggl';
+    
+    // ============ HELPERS ============
+    function showApp() { var l = $('simpleLoader'), a = $('mainApp'); if (a) a.style.display = ''; if (l) { l.classList.add('fade-out'); setTimeout(function() { if (l && l.parentNode) l.parentNode.removeChild(l); }, 300); } }
+    function getFullUrl(u) { if (!u || typeof u !== 'string') return ''; if (u.indexOf('http')===0 || u.indexOf('data:')===0) return u; return SUPABASE_URL + '/storage/v1/object/public/' + u; }
+    function showToast(m, e) { var t = $('toastMsg'), s = $('toastText'); if (!t||!s) return; s.textContent = m; t.style.background = e ? '#EF4444' : '#1A1A1A'; t.classList.add('show'); clearTimeout(t._timer); t._timer = setTimeout(function() { t.classList.remove('show'); }, 3000); }
+    function showAlert(msg, title, icon) {
+        title = title || 'सूचना'; icon = icon || 'warning';
+        var msgEl = $('alertMessage'), titleEl = $('alertTitle'), iconEl = $('alertIcon'), modal = $('customAlert');
+        if (msgEl) msgEl.textContent = msg;
+        if (titleEl) titleEl.textContent = title;
+        if (iconEl) { iconEl.style.color = icon==='success'?'#22C55E':icon==='error'?'#EF4444':'#F59E0B'; iconEl.className = 'fas ' + (icon==='success'?'fa-check-circle':icon==='error'?'fa-exclamation-circle':'fa-info-circle'); }
+        if (modal) modal.classList.add('show');
+    }
+    function closeAlert() { var m = $('customAlert'); if (m) m.classList.remove('show'); }
+    function goBack() { try { if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) { window.history.back(); return; } } catch(e) {} window.location.href = 'index.html'; }
+    window.fastNavigate = function(url) { window.location.href = url; };
+    
+    // ============ FORM DATA PERSISTENCE ============
+    function saveFormData() {
+        var data = {}, fields = ['ownerName','ownerEmail','ownerPhone','ownerWhatsapp','shopName','shopCategory','shopPhone','shopAddress','shopCity','shopPincode','shopDesc','shopLatitude','shopLongitude'];
+        for (var i = 0; i < fields.length; i++) { var el = $(fields[i]); if (el) data[fields[i]] = el.value; }
+        try { localStorage.setItem('zm_shop_draft', JSON.stringify(data)); } catch(e) {}
+    }
+    function loadFormData() {
+        try { var raw = localStorage.getItem('zm_shop_draft'); if (!raw) return; var data = JSON.parse(raw); for (var key in data) { if (!data.hasOwnProperty(key)) continue; var el = $(key); if (el && data[key]) el.value = data[key]; } } catch(e) {}
+    }
+    function clearFormData() { try { localStorage.removeItem('zm_shop_draft'); } catch(e) {} }
+    
+    // ============ FETCH CONFIG ============
+    async function fetchRegistrationFee() {
+        try { var r = await sb.from('app_settings').select('value').eq('key','registration_fee').maybeSingle(); if (r && r.data && r.data.value) registrationFee = parseInt(r.data.value) || 299; } catch(e) { registrationFee = 299; }
+    }
+    async function fetchHeroBanner() {
+        try { var r = await sb.from('app_settings').select('value').eq('key','shop_register_banner').maybeSingle(); if (r && r.data && r.data.value) heroBannerUrl = getFullUrl(r.data.value); } catch(e) { heroBannerUrl = null; }
+    }
+    async function loadCategories() {
+        try { var r = await sb.from('categories').select('id,name').eq('is_active',true).order('name'); categories = (r && r.data) ? r.data : []; } catch(e) { categories = []; }
+    }
+    
+    // ============ IMAGE COMPRESSION ============
+    async function compressImage(file) {
+        if (!file || !file.type || file.type.indexOf('image/')!==0) return file;
+        if (file.size < 150*1024) return file;
+        return new Promise(function(resolve) {
+            var reader = new FileReader(); reader.readAsDataURL(file);
+            reader.onload = function(e) { var img = new Image(); img.src = e.target.result;
+                img.onload = function() { var w=img.width, h=img.height, maxDim=800;
+                    if (w>maxDim||h>maxDim) { if(w>h){h=Math.round((h*maxDim)/w);w=maxDim;}else{w=Math.round((w*maxDim)/h);h=maxDim;} }
+                    var canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+                    canvas.getContext('2d').drawImage(img,0,0,w,h);
+                    canvas.toBlob(function(blob){resolve(new File([blob],file.name.replace(/\.[^.]+$/,'.jpg'),{type:'image/jpeg'}));},'image/jpeg',0.6);
+                };
+            };
+        });
+    }
+    
+    async function uploadImage(file, folder) {
+        if (!file) return null;
+        var compressed = await compressImage(file);
+        var fn = Date.now()+'_'+Math.random().toString(36).substr(2,6)+'.jpg';
+        var uploadResult = await sb.storage.from('shop-images').upload(folder+'/'+fn, compressed, { cacheControl: '3600', upsert: true });
+        if (uploadResult.error) throw new Error('Upload failed');
+        return sb.storage.from('shop-images').getPublicUrl(folder+'/'+fn).data.publicUrl;
+    }
+    
+    // ============ GPS (FIXED — SPINNER GUARANTEED REMOVAL) ============
+    function updateLocationButton(state) {
+        var btn = $('locationBtn');
+        if (!btn) return;
+        if (state === 'loading') { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GPS ले रहे हैं...'; btn.className = 'location-btn loading'; btn.disabled = true; }
+        else if (state === 'success') { btn.innerHTML = '<i class="fas fa-check-circle"></i> ✅ लोकेशन मिल गई!'; btn.className = 'location-btn success'; btn.disabled = false; }
+        else if (state === 'retry') { btn.innerHTML = '<i class="fas fa-redo"></i> फिर से GPS लें'; btn.className = 'location-btn'; btn.disabled = false; }
+        else { btn.innerHTML = '<i class="fas fa-location-dot"></i> 📍 GPS से लोकेशन लें'; btn.className = 'location-btn'; btn.disabled = false; }
+    }
+    
+    function captureShopLocation() {
+        if (isCapturingLocation) { showToast('⚠️ GPS पहले से खोज रहे हैं...', true); return; }
+        
+        if (window.Android && typeof window.Android.requestLocation === 'function') {
+            isCapturingLocation = true;
+            gpsRetryCount = 0;
+            updateLocationButton('loading');
+            var statusDiv = $('locationStatus');
+            if (statusDiv) { statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Android GPS से लोकेशन ले रहे हैं...'; statusDiv.className = 'location-status loading'; }
+            window.Android.requestLocation();
+            // ✅ GUARANTEED FALLBACK — 12 seconds max
+            window._gpsShopTimeout = setTimeout(function() {
+                if (isCapturingLocation) { console.warn('⏰ Android GPS timeout'); tryBrowserGPS(); }
+            }, 12000);
+            return;
+        }
+        tryBrowserGPS();
+    }
+    
+    function tryBrowserGPS() {
+        if (window._gpsShopTimeout) { clearTimeout(window._gpsShopTimeout); }
+        if (!navigator.geolocation) { 
+            isCapturingLocation = false; 
+            updateLocationButton('retry'); 
+            showAlert('GPS सपोर्ट नहीं', 'त्रुटि', 'error'); 
+            return; 
+        }
+        updateLocationButton('loading');
+        navigator.geolocation.getCurrentPosition(
+            function(pos) {
+                if (window._gpsShopTimeout) { clearTimeout(window._gpsShopTimeout); }
+                isCapturingLocation = false;
+                setLocationData(pos.coords.latitude, pos.coords.longitude);
+            },
+            function(err) {
+                gpsRetryCount++;
+                if (gpsRetryCount < maxGpsRetries) { setTimeout(tryBrowserGPS, 1000); return; }
+                // ✅ Guaranteed reset
+                isCapturingLocation = false;
+                updateLocationButton('retry');
+                showAlert('GPS नहीं मिला। खुली जगह पर जाएं और पुनः प्रयास करें।', 'GPS विफल', 'error');
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+        );
+    }
+    
+    window.setLocationFromAndroid = function(lat, lng, address) {
+        if (!lat || !lng || isNaN(lat) || isNaN(lng) || lat===0 || lng===0) return;
+        if (window._gpsShopTimeout) { clearTimeout(window._gpsShopTimeout); }
+        setLocationData(parseFloat(lat), parseFloat(lng), address);
+    };
+    
+    window.onLocationError = function(errorMsg) {
+        // ✅ TURANT spinner hatao
+        isCapturingLocation = false;
+        if (window._gpsShopTimeout) { clearTimeout(window._gpsShopTimeout); }
+        var statusDiv = $('locationStatus');
+        if (errorMsg === 'GPS_DISABLED' || errorMsg === 'LOCATION_OFF') {
+            updateLocationButton('retry');
+            if (statusDiv) { statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ⚠️ GPS बंद है। सेटिंग्स से चालू करें।'; statusDiv.className = 'location-status error'; }
+            showAlert('GPS बंद है। कृपया फ़ोन सेटिंग्स > Location में जाकर GPS चालू करें।', 'GPS बंद है', 'error');
+        } else {
+            updateLocationButton('retry');
+        }
+    };
+    
+    function setLocationData(lat, lng, address) {
+        // ✅ TURANT spinner hatao
+        isCapturingLocation = false;
+        if (window._gpsShopTimeout) { clearTimeout(window._gpsShopTimeout); }
+        
+        var latEl = $('shopLatitude'), lngEl = $('shopLongitude');
+        if (latEl) latEl.value = lat;
+        if (lngEl) lngEl.value = lng;
+        
+        var coordsEl = $('locationCoords');
+        if (coordsEl) { coordsEl.textContent = '📍 ' + Number(lat).toFixed(6) + ', ' + Number(lng).toFixed(6); coordsEl.style.display = 'block'; }
+        
+        updateLocationButton('success');
+        var statusDiv = $('locationStatus');
+        if (statusDiv) { statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ GPS लोकेशन कैप्चर!'; statusDiv.className = 'location-status success'; }
+        
+        if (address) {
+            var addrEl = $('locationAddress');
+            if (addrEl) { addrEl.innerHTML = '<i class="fas fa-map-pin"></i> ' + (address||'').substring(0, 120); addrEl.style.display = 'block'; }
+            autoFillCityFromAddress(address);
+        } else {
+            fetchAddressFromCoords(lat, lng);
+        }
+        saveFormData();
+        showToast('📍 GPS लोकेशन कैप्चर!');
+    }
+    
+    async function fetchAddressFromCoords(lat, lng) {
+        try {
+            var controller = new AbortController();
+            var timeout = setTimeout(function() { controller.abort(); }, 5000);
+            var resp = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18', { headers: { 'User-Agent': 'ZymartApp/7.0' }, signal: controller.signal });
+            clearTimeout(timeout);
+            var data = await resp.json();
+            var address = data.display_name || '';
+            var addrEl = $('locationAddress');
+            if (addrEl && address) { addrEl.innerHTML = '<i class="fas fa-map-pin"></i> ' + address.substring(0, 120); addrEl.style.display = 'block'; }
+            autoFillCityFromAddress(address, data.address || null);
+        } catch(e) {}
+    }
+    
+    function autoFillCityFromAddress(displayName, addressObj) {
+        var cityInput = $('shopCity');
+        if (!cityInput || cityInput.value) return;
+        var city = '';
+        if (addressObj) { city = addressObj.city || addressObj.town || addressObj.municipality || addressObj.village || addressObj.state_district || ''; }
+        if (!city && displayName) { 
+            var parts = displayName.split(','); 
+            for (var i=0;i<parts.length;i++) { 
+                var part = parts[i].trim(); 
+                if (part && part.length>2 && part.length<30 && part.indexOf('Maharashtra')===-1 && part.indexOf('India')===-1) { city = part; break; } 
+            } 
+        }
+        if (city && !cityInput.value) { cityInput.value = city; showToast('🏙️ शहर: ' + city); saveFormData(); }
+    }
+    
+    // ============ VALIDATION ============
+    function validateForm() {
+        var ownerName = ($('ownerName')?.value||'').trim();
+        var ownerEmail = ($('ownerEmail')?.value||'').trim();
+        var ownerPhone = ($('ownerPhone')?.value||'').trim();
+        var shopName = ($('shopName')?.value||'').trim();
+        var category = $('shopCategory')?.value||'';
+        var shopPhone = ($('shopPhone')?.value||'').trim();
+        var address = ($('shopAddress')?.value||'').trim();
+        var city = ($('shopCity')?.value||'').trim();
+        var pincode = ($('shopPincode')?.value||'').trim();
+        var lat = $('shopLatitude')?.value||'';
+        var lng = $('shopLongitude')?.value||'';
+        
+        if (!ownerName||ownerName.length<2) { showAlert('पूरा नाम दर्ज करें।', 'नाम ज़रूरी', 'error'); return false; }
+        if (!ownerEmail||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ownerEmail)) { showAlert('मान्य ईमेल दर्ज करें।', 'ईमेल ज़रूरी', 'error'); return false; }
+        if (!ownerPhone||!/^\d{10}$/.test(ownerPhone)) { showAlert('10 अंक मोबाइल नंबर।', 'फ़ोन ज़रूरी', 'error'); return false; }
+        if (!shopName) { showAlert('दुकान का नाम दर्ज करें।', 'नाम ज़रूरी', 'error'); return false; }
+        if (!category) { showAlert('श्रेणी चुनें।', 'श्रेणी ज़रूरी', 'error'); return false; }
+        if (!shopPhone||!/^\d{10}$/.test(shopPhone)) { showAlert('दुकान का 10 अंक फ़ोन।', 'फ़ोन ज़रूरी', 'error'); return false; }
+        if (!address) { showAlert('पूरा पता दर्ज करें।', 'पता ज़रूरी', 'error'); return false; }
+        if (!city) { showAlert('शहर दर्ज करें।', 'शहर ज़रूरी', 'error'); return false; }
+        if (!pincode||!/^\d{6}$/.test(pincode)) { showAlert('6 अंक पिनकोड।', 'पिनकोड ज़रूरी', 'error'); return false; }
+        if (!lat||!lng) { showAlert('📍 कृपया GPS लोकेशन बटन दबाएं! यह ज़रूरी है।', 'GPS ज़रूरी', 'error'); return false; }
+        return true;
+    }
+    
+    // ============ RAZORPAY ============
+    function startRazorpayPayment() {
+        if (!validateForm()) return;
+        if (paymentDone) { showToast('✅ पेमेंट पहले ही हो चुका!'); return; }
+        
+        var ownerName = ($('ownerName')?.value||'').trim();
+        var ownerEmail = ($('ownerEmail')?.value||'').trim();
+        var ownerPhone = ($('ownerPhone')?.value||'').trim();
+        
+        var options = {
+            key: RAZORPAY_KEY_ID, amount: registrationFee * 100, currency: 'INR',
+            name: 'Zymart', description: 'दुकान रजिस्ट्रेशन - ₹' + registrationFee + '/साल',
+            prefill: { name: ownerName, email: ownerEmail, contact: ownerPhone },
+            theme: { color: '#0B5A31' },
+            handler: function(response) { paymentDone = true; showToast('✅ ₹' + registrationFee + ' पेमेंट सफल!'); registerShopAfterPayment(response); },
+            modal: { ondismiss: function() { showToast('⚠️ पेमेंट पूरा नहीं हुआ', true); } }
+        };
+        
+        try {
+            var rzp = new Razorpay(options);
+            rzp.on('payment.failed', function(response) {
+                showAlert('पेमेंट विफल: ' + (response.error.description || 'पुनः प्रयास करें') + '\n\nकोई राशि नहीं कटी।', 'पेमेंट विफल', 'error');
+            });
+            rzp.open();
+        } catch(e) { showAlert('पेमेंट गेटवे खोलने में विफल।', 'त्रुटि', 'error'); }
+    }
+    
+    async function registerShopAfterPayment(paymentResponse) {
+        isProcessing = true;
+        var btn = $('payBtn');
+        if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> रजिस्टर हो रहा...'; btn.disabled = true; }
+        
+        var ownerName = ($('ownerName')?.value||'').trim();
+        var ownerEmail = ($('ownerEmail')?.value||'').trim();
+        var ownerPhone = ($('ownerPhone')?.value||'').trim();
+        var ownerWhatsapp = ($('ownerWhatsapp')?.value||'').trim();
+        var shopName = ($('shopName')?.value||'').trim();
+        var category = $('shopCategory')?.value||'';
+        var shopPhone = ($('shopPhone')?.value||'').trim();
+        var address = ($('shopAddress')?.value||'').trim();
+        var city = ($('shopCity')?.value||'').trim();
+        var pincode = ($('shopPincode')?.value||'').trim();
+        var desc = ($('shopDesc')?.value||'').trim();
+        var lat = $('shopLatitude')?.value||'';
+        var lng = $('shopLongitude')?.value||'';
+        
+        try {
+            var emailExists = await checkEmailExists(ownerEmail);
+            if (emailExists) { 
+                isProcessing = false; 
+                if (btn) { btn.innerHTML = '<i class="fas fa-rupee-sign"></i> ₹' + registrationFee + ' का भुगतान करें'; btn.disabled = false; } 
+                showAlert('यह ईमेल पहले से रजिस्टर है!', 'ईमेल पहले से रजिस्टर', 'error'); 
+                return; 
+            }
+            
+            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> इमेज अपलोड...';
+            var shopImageUrl = null, qrImageUrl = null;
+            if (selectedImageFile) { try { shopImageUrl = await uploadImage(selectedImageFile, 'shops'); } catch(e) { 
+                isProcessing = false; 
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-rupee-sign"></i> ₹' + registrationFee + ' का भुगतान करें'; } 
+                showAlert('इमेज अपलोड विफल', 'त्रुटि', 'error'); 
+                return; 
+            } }
+            if (selectedQrFile) { try { qrImageUrl = await uploadImage(selectedQrFile, 'qrcodes'); } catch(e) {} }
+            
+            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> सेव हो रहा...';
+            
+            await sb.from('shops').insert([{
+                owner_email: ownerEmail, owner_name: ownerName, owner_phone: ownerPhone,
+                owner_whatsapp: ownerWhatsapp || ownerPhone, name: shopName, category: category,
+                phone: shopPhone, whatsapp: shopPhone, address: address, city: city,
+                pincode: pincode, description: desc || null, latitude: parseFloat(lat),
+                longitude: parseFloat(lng), image_url: shopImageUrl, qr_code_url: qrImageUrl,
+                status: 'pending', is_open: false, rating: 0, location_verified: true,
+                payment_id: paymentResponse.razorpay_payment_id,
+                payment_order_id: paymentResponse.razorpay_order_id,
+                payment_amount: registrationFee, payment_status: 'paid',
+                created_at: new Date().toISOString()
+            }]);
+            
+            clearFormData();
+            showAlert('✅ आपकी दुकान सफलतापूर्वक रजिस्टर हो गई!\n\n💰 भुगतान: ₹' + registrationFee + ' (सफल)\n📍 GPS लोकेशन सत्यापित\n📧 एडमिन 24 घंटे में समीक्षा करेगा।\nलॉगिन: ' + ownerEmail, 'सफल 🎉', 'success');
+            if (btn) btn.innerHTML = '<i class="fas fa-check-circle"></i> जमा हो गया!';
+            setTimeout(function() { window.location.href = 'index.html?registered=1'; }, 4000);
+        } catch(e) {
+            isProcessing = false;
+            if (btn) { btn.innerHTML = '<i class="fas fa-rupee-sign"></i> ₹' + registrationFee + ' का भुगतान करें'; btn.disabled = false; }
+            showAlert('रजिस्ट्रेशन विफल: ' + (e.message || 'पुनः प्रयास करें') + '\n\nपेमेंट सफल था, सपोर्ट से संपर्क करें।', 'त्रुटि', 'error');
+        }
+    }
+    
+    async function checkEmailExists(email) {
+        try { 
+            var shopCheck = await sb.from('shops').select('id').eq('owner_email', email).maybeSingle(); 
+            if (shopCheck && shopCheck.data) return true; 
+            var userCheck = await sb.from('users').select('id').eq('email', email).maybeSingle(); 
+            if (userCheck && userCheck.data) return true; 
+        } catch(e) {}
+        return false;
+    }
+    
+    // ============ REAL-TIME VALIDATION ============
+    function setupRealTimeValidation() {
+        var validators = { 
+            ownerEmail: { regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, msg: 'अमान्य' }, 
+            ownerPhone: { regex: /^\d{10}$/, msg: '10 अंक' }, 
+            shopPhone: { regex: /^\d{10}$/, msg: '10 अंक' }, 
+            shopPincode: { regex: /^\d{6}$/, msg: '6 अंक' }, 
+            ownerWhatsapp: { regex: /^$|^\d{10}$/, msg: '10 अंक' } 
+        };
+        for (var id in validators) {
+            if (!validators.hasOwnProperty(id)) continue;
+            var el = $(id); if (!el) continue;
+            el.addEventListener('input', function() {
+                var val = el.value.trim();
+                if (!val) { el.classList.remove('error','valid'); return; }
+                if (validators[id].regex.test(val)) { el.classList.remove('error'); el.classList.add('valid'); }
+                else { el.classList.remove('valid'); el.classList.add('error'); }
+            });
+            el.addEventListener('change', saveFormData);
+        }
+        var allInputs = document.querySelectorAll('input, textarea, select');
+        for (var i = 0; i < allInputs.length; i++) { allInputs[i].addEventListener('change', saveFormData); }
+    }
+    
+    // ============ IMAGE UPLOAD SETUP ============
+    function setupImageUpload(areaId, inputId, previewId, compressId, fileVar) {
+        var area = $(areaId), input = $(inputId), preview = $(previewId);
+        if (!area || !input) return;
+        area.onclick = function() { input.click(); };
+        input.onchange = async function(e) {
+            var file = e.target.files[0]; if (!file) return;
+            if (file.size > 5*1024*1024) { showAlert('इमेज बहुत बड़ी! अधिकतम 5MB।', 'बड़ी फ़ाइल', 'error'); return; }
+            var origSize = (file.size/1024).toFixed(0);
+            var compEl = $(compressId);
+            if (compEl) { compEl.style.display = 'block'; compEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> कंप्रेस...'; }
+            var compressed = await compressImage(file);
+            var compSize = (compressed.size/1024).toFixed(0);
+            if (fileVar === 'selectedImageFile') selectedImageFile = compressed;
+            else if (fileVar === 'selectedQrFile') selectedQrFile = compressed;
+            if (compEl) { compEl.innerHTML = '<i class="fas fa-check-circle"></i> ' + compSize + 'KB'; setTimeout(function() { compEl.style.display = 'none'; }, 3000); }
+            var reader = new FileReader();
+            reader.onload = function(ev) { if (preview) { preview.src = ev.target.result; preview.style.display = 'block'; } };
+            reader.readAsDataURL(compressed);
+            if (origSize !== compSize) showToast('📸 ' + origSize + 'KB → ' + compSize + 'KB');
+        };
+    }
+    
+    // ============ RENDER ============
+    async function renderForm() {
+        await fetchRegistrationFee();
+        await loadCategories();
+        await fetchHeroBanner();
+        
+        var catOpts = '<option value="">श्रेणी चुनें</option>';
+        for (var i = 0; i < categories.length; i++) { catOpts += '<option value="' + esc(categories[i].name) + '">' + esc(categories[i].name) + '</option>'; }
+        
+        var heroHTML = '';
+        if (heroBannerUrl) {
+            heroHTML = '<div class="hero-section"><img src="' + heroBannerUrl + '" class="hero-banner-img" alt="Banner" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'no-photo\');"><div class="hero-spacer"></div><div class="hero-bottom-strip"><div class="hero-text-group"><div class="hero-main-text">Zymart से जुड़ें, व्यवसाय बढ़ाएं</div><div class="hero-sub-text">स्थानीय ग्राहकों तक पहुंचें • सिर्फ ₹' + registrationFee + '/साल</div></div><div class="fee-badge"><i class="fas fa-tag"></i> ₹' + registrationFee + '</div></div></div>';
+        } else {
+            heroHTML = '<div class="hero-section no-photo"><div class="hero-spacer"><div class="default-icon"><i class="fas fa-store-alt"></i></div><div class="default-title">अपना व्यवसाय Zymart पर शुरू करें</div></div><div class="hero-bottom-strip"><div class="hero-text-group"><div class="hero-main-text">Zymart से जुड़ें, व्यवसाय बढ़ाएं</div></div><div class="fee-badge"><i class="fas fa-tag"></i> ₹' + registrationFee + '/साल</div></div></div>';
+        }
+        
+        var container = $('mainContent');
+        if (!container) return;
+        
+        container.innerHTML = heroHTML +
+            '<div class="form-card"><div class="form-header"><i class="fas fa-clipboard-list"></i><h2>दुकान रजिस्ट्रेशन</h2></div><div class="form-body">' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-user"></i> मालिक का पूरा नाम <span class="required">*</span></label><input type="text" id="ownerName" class="form-control" placeholder="अपना पूरा नाम" autocomplete="name"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-envelope"></i> मालिक का ईमेल <span class="required">*</span></label><input type="email" id="ownerEmail" class="form-control" placeholder="आपका@ईमेल.com" autocomplete="email"><small style="color:#6B7280;font-size:10px;">📧 स्वीकृति के बाद इसी ईमेल से लॉगिन करें</small></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-phone"></i> मालिक का फ़ोन <span class="required">*</span></label><input type="tel" id="ownerPhone" class="form-control" placeholder="10 अंक मोबाइल" maxlength="10" autocomplete="tel"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fab fa-whatsapp"></i> WhatsApp</label><input type="tel" id="ownerWhatsapp" class="form-control" placeholder="WhatsApp नंबर" maxlength="10"></div>' +
+            '<hr style="margin:18px 0;border:none;border-top:1px dashed var(--neutral-border);">' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-camera"></i> दुकान की फोटो</label><div class="image-upload-area" id="imageUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>टैप करें (ऑटो-कंप्रेस)</p><input type="file" id="shopImageInput" accept="image/*" style="display:none"><img id="imagePreview" class="image-preview"><div id="imageCompressInfo" class="compress-info"></div></div></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-store"></i> दुकान का नाम <span class="required">*</span></label><input type="text" id="shopName" class="form-control" placeholder="दुकान का नाम"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-tags"></i> श्रेणी <span class="required">*</span></label><select id="shopCategory" class="form-control">' + catOpts + '</select></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-phone"></i> दुकान का फ़ोन <span class="required">*</span></label><input type="tel" id="shopPhone" class="form-control" placeholder="दुकान का संपर्क नंबर" maxlength="10"></div>' +
+            '<div class="form-group" style="background:#EDF7F1;padding:14px;border-radius:var(--radius-sm);border:2px dashed var(--brand-green);">' +
+            '<label class="form-label" style="font-size:14px;"><i class="fas fa-map-marker-alt" style="color:var(--brand-green);"></i> 📍 दुकान की लोकेशन <span class="required">*</span></label>' +
+            '<p style="font-size:10px;color:var(--neutral-gray);margin-bottom:10px;">नीचे दिया गया बटन दबाकर GPS लोकेशन कैप्चर करें</p>' +
+            '<button type="button" class="location-btn" id="locationBtn" onclick="captureShopLocation()"><i class="fas fa-location-dot"></i> 📍 GPS से लोकेशन लें</button>' +
+            '<div id="locationStatus" class="location-status"><i class="fas fa-info-circle"></i> कृपया GPS बटन दबाएं — यह ज़रूरी है</div>' +
+            '<div id="locationCoords" class="gps-coords-display"></div>' +
+            '<div id="locationAddress" class="gps-address-display"></div>' +
+            '<input type="hidden" id="shopLatitude"><input type="hidden" id="shopLongitude"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-address-card"></i> पता <span class="required">*</span></label><textarea id="shopAddress" class="form-control" rows="2" placeholder="पूरा पता: भवन, गली, क्षेत्र"></textarea></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-city"></i> शहर <span class="required">*</span></label><input type="text" id="shopCity" class="form-control" placeholder="GPS से ऑटो-डिटेक्ट होगा"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-map-pin"></i> पिनकोड <span class="required">*</span></label><input type="text" id="shopPincode" class="form-control" placeholder="6 अंक" maxlength="6"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-align-left"></i> विवरण</label><textarea id="shopDesc" class="form-control" rows="2" placeholder="दुकान के बारे में (वैकल्पिक)"></textarea></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-qrcode"></i> QR कोड (UPI/Paytm)</label><div class="image-upload-area" id="qrUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>पेमेंट QR अपलोड करें</p><input type="file" id="qrImageInput" accept="image/*" style="display:none"><img id="qrPreview" class="image-preview"><div id="qrCompressInfo" class="compress-info"></div></div></div>' +
+            '<div class="fee-summary"><div class="fee-row"><span>रजिस्ट्रेशन शुल्क</span><span style="font-weight:700;">₹' + registrationFee + '/साल</span></div><div class="fee-row total"><span>कुल देय</span><span style="color:var(--brand-green);">₹' + registrationFee + '</span></div></div>' +
+            '<button class="pay-btn" id="payBtn" onclick="startRazorpayPayment()"><i class="fas fa-rupee-sign"></i> ₹' + registrationFee + ' का भुगतान करें और रजिस्टर करें</button>' +
+            '<p class="text-muted"><i class="fas fa-lock"></i> Razorpay द्वारा सुरक्षित भुगतान</p>' +
+            '<p class="text-muted"><i class="fas fa-clock"></i> एडमिन 24 घंटे में समीक्षा करेगा</p>' +
+            '</div></div>';
+        
+        setupImageUpload('imageUploadArea', 'shopImageInput', 'imagePreview', 'imageCompressInfo', 'selectedImageFile');
+        setupImageUpload('qrUploadArea', 'qrImageInput', 'qrPreview', 'qrCompressInfo', 'selectedQrFile');
+        setupRealTimeValidation();
+        loadFormData();
+    }
+    
+    // ============ INIT ============
+    document.addEventListener('DOMContentLoaded', function() { renderForm(); showApp(); });
+    
+    window.startRazorpayPayment = startRazorpayPayment;
+    window.captureShopLocation = captureShopLocation;
+    window.goBack = goBack;
+    window.closeAlert = closeAlert;
+    window.handleBackPress = function() { goBack(); return true; };
+})();
+</script>
+</body>
+</html>

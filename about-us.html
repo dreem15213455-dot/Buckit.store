@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>About Us - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --brand-green: #0B5A31; --brand-orange: #F59E0B; --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB; --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 2px 16px rgba(11,90,49,0.3); --radius-lg: 18px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); min-height: 100vh; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; padding-bottom: 40px; }
+        .top-bar { background: var(--brand-green); padding: 12px 14px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-md); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { font-family: 'Poppins', sans-serif; flex: 1; font-size: 16px; font-weight: 700; color: white; }
+        .content { padding: 20px 14px; max-width: 800px; margin: 0 auto; text-align: center; }
+        .section { background: var(--neutral-white); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 14px; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-xs); }
+        h2 { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 10px; color: var(--brand-green); }
+        h3 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; margin: 18px 0 10px; color: var(--neutral-dark); }
+        p, li { font-size: 14px; color: var(--neutral-gray); line-height: 1.8; margin-bottom: 8px; }
+        ul { list-style: none; padding: 0; margin: 8px 0 12px; }
+        a { color: var(--brand-orange); font-weight: 600; text-decoration: none; }
+        .logo { font-family: 'Poppins', sans-serif; font-size: 42px; font-weight: 700; margin-bottom: 10px; }
+        .logo-zy { color: var(--brand-green); } .logo-mart { color: var(--brand-orange); }
+        .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
+        .feature-card { background: #EDF7F1; padding: 16px; border-radius: var(--radius-lg); text-align: center; }
+        .feature-card i { font-size: 28px; color: var(--brand-green); margin-bottom: 8px; }
+        .feature-card h4 { font-size: 13px; font-weight: 700; color: var(--brand-green); }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+        .stat-item { text-align: center; }
+        .stat-number { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; color: var(--brand-green); }
+        .stat-label { font-size: 11px; color: var(--neutral-gray); }
+        .contact-box { background: #EDF7F1; padding: 16px; border-radius: var(--radius-lg); text-align: center; border: 1px solid #C8E6C9; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i></button>
+    <span class="top-title">About Zymart</span>
+</div>
+
+<div class="content">
+    <div class="section">
+        <div class="logo"><span class="logo-zy">Zy</span><span class="logo-mart">mart</span></div>
+        <h2>Your Local Market, Delivered in Minutes</h2>
+        <p>Zymart connects you with your neighborhood shops for lightning-fast delivery. From fresh groceries to daily essentials — everything you need, right at your doorstep.</p>
+
+        <div class="feature-grid">
+            <div class="feature-card"><i class="fas fa-bolt"></i><h4>10-Minute Delivery</h4></div>
+            <div class="feature-card"><i class="fas fa-store"></i><h4>Local Shops</h4></div>
+            <div class="feature-card"><i class="fas fa-tags"></i><h4>Best Prices</h4></div>
+            <div class="feature-card"><i class="fas fa-headset"></i><h4>24/7 Support</h4></div>
+        </div>
+
+        <h3>Our Mission</h3>
+        <p>To empower local businesses by bringing them online and providing customers with the fastest, most reliable delivery experience in India.</p>
+
+        <h3>Why Choose Zymart?</h3>
+        <ul>
+            <li>⚡ <strong>Blazing Fast:</strong> Average delivery time of 10-15 minutes</li>
+            <li>🏪 <strong>Support Local:</strong> Every order supports a neighborhood shop</li>
+            <li>📍 <strong>GPS Verified:</strong> Accurate delivery to your exact location</li>
+            <li>💰 <strong>Affordable:</strong> Free delivery on orders above ₹299</li>
+            <li>🔒 <strong>Secure Payments:</strong> Powered by Razorpay</li>
+        </ul>
+
+        <h3>Our Reach</h3>
+        <div class="stats-grid">
+            <div class="stat-item"><div class="stat-number">3+</div><div class="stat-label">Districts</div></div>
+            <div class="stat-item"><div class="stat-number">28+</div><div class="stat-label">Talukas</div></div>
+            <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-label">Support</div></div>
+        </div>
+
+        <p><strong>Currently serving:</strong> Aurangabad, Jalna, and Jalgaon districts of Maharashtra.</p>
+        <p><strong>Expanding soon</strong> across Maharashtra and Gujarat!</p>
+
+        <div class="contact-box">
+            <strong>📞 Get In Touch</strong><br>
+            📧 <a href="mailto:sk12shaikh@gmail.com">sk12shaikh@gmail.com</a> | 
+            📞 <a href="tel:8600252238">8600252238</a><br>
+            💬 <a href="https://wa.me/918600252238" style="color:#25D366;">Chat on WhatsApp</a><br><br>
+            <strong>Solutions SK</strong><br>
+            Maharashtra, India<br>
+            <small style="color:var(--neutral-gray);">© 2026 Zymart. All rights reserved.</small>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
