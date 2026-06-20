@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Register Shop - ZyMart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="Register your shop on ZyMart - Starting at just ₹299/year">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root{--brand-green:#0B5A31;--brand-green-dark:#083D21;--brand-orange:#F59E0B;--brand-orange-dark:#E8890A;--neutral-white:#FFFFFF;--neutral-bg:#F9FAFB;--neutral-border:#E5E7EB;--neutral-gray:#6B7280;--neutral-dark:#1A1A1A;--danger:#EF4444;--success:#22C55E;--warning:#F59E0B;--shadow-xs:0 1px 2px rgba(0,0,0,0.04);--shadow-sm:0 1px 4px rgba(0,0,0,0.06);--shadow-md:0 4px 16px rgba(0,0,0,0.08);--shadow-lg:0 8px 30px rgba(0,0,0,0.12);--radius-sm:10px;--radius-md:14px;--radius-lg:18px;--radius-xl:22px;--radius-2xl:28px;--radius-full:9999px;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--neutral-bg);color:var(--neutral-dark);-webkit-tap-highlight-color:transparent;min-height:100vh;padding-bottom:30px;overflow-x:hidden;width:100%;max-width:100%;-webkit-font-smoothing:antialiased;}
+        #simpleLoader{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--neutral-white);z-index:10002;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity 0.3s ease;}
+        #simpleLoader.fade-out{opacity:0;visibility:hidden;pointer-events:none;}
+        .simple-spinner{width:34px;height:34px;border:2.5px solid var(--neutral-border);border-top-color:var(--brand-orange);border-radius:50%;animation:spin 0.7s linear infinite;}
+        .loader-logo{font-family:'Poppins',sans-serif;font-size:24px;font-weight:700;}
+        .loader-zy{color:#A3E635;}.loader-mart{color:#FDE047;}
+        @keyframes spin{to{transform:rotate(360deg);}}@keyframes fadeInUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(11,90,49,0.4)}50%{box-shadow:0 0 0 10px rgba(11,90,49,0)}}@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        .skeleton-block{background:linear-gradient(90deg,#e5e5e5 25%,#d4d4d4 50%,#e5e5e5 75%);background-size:200% 100%;animation:skel 1.3s infinite;border-radius:var(--radius-md);}
+        .skeleton-hero{height:200px;border-radius:var(--radius-2xl);margin:12px 14px;}
+        .skeleton-card{background:white;margin:0 14px 20px;border-radius:var(--radius-2xl);padding:22px;}
+        .skeleton-line{height:14px;margin-bottom:14px;width:100%;}
+        .skeleton-line-sm{height:14px;margin-bottom:14px;width:60%;}
+        .skeleton-btn{height:48px;border-radius:var(--radius-full);width:100%;}
+        .top-bar{background:var(--brand-green);position:fixed;top:0;left:0;width:100%;z-index:1000;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 16px rgba(11,90,49,0.3);}
+        .back-btn{width:40px;height:40px;min-width:40px;background:rgba(255,255,255,0.10);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:white;font-size:15px;text-decoration:none;}
+        .back-btn:active{background:rgba(255,255,255,0.22);transform:scale(0.93);}
+        .brand-name{font-family:'Poppins',sans-serif;font-size:20px;font-weight:700;display:flex;align-items:baseline;}
+        .brand-zy{color:#A3E635;}.brand-mart{color:#FDE047;}
+        .page-title{flex:1;text-align:center;font-weight:600;font-size:14px;color:white;}
+        .main-content{padding-top:60px;padding-bottom:40px;max-width:600px;margin:0 auto;}
+        .hero-section{background:linear-gradient(135deg,var(--brand-green),var(--brand-green-dark));margin:12px 14px;padding:0;border-radius:var(--radius-2xl);animation:fadeInUp 0.4s ease;overflow:hidden;position:relative;min-height:200px;display:flex;flex-direction:column;}
+        .hero-banner-img{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:0;}
+        .hero-spacer{flex:1;position:relative;z-index:1;}
+        .hero-bottom-strip{position:relative;z-index:1;background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.3) 70%,transparent 100%);padding:20px 18px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+        .hero-text-group{display:flex;flex-direction:column;gap:2px;}
+        .hero-main-text{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);line-height:1.2;}
+        .hero-sub-text{font-size:11px;color:rgba(255,255,255,0.85);font-weight:500;}
+        .fee-badge{background:rgba(255,255,255,0.15);display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:var(--radius-full);font-weight:700;font-size:14px;border:1px solid rgba(255,255,255,0.25);backdrop-filter:blur(4px);color:white;white-space:nowrap;flex-shrink:0;}
+        .hero-section.no-photo{background:linear-gradient(135deg,var(--brand-green),var(--brand-green-dark));}
+        .hero-section.no-photo .hero-spacer{display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:white;padding:20px;}
+        .form-card{background:white;margin:0 14px 20px;border-radius:var(--radius-2xl);box-shadow:var(--shadow-md);overflow:hidden;animation:fadeInUp 0.4s ease;}
+        .form-header{padding:18px 22px;border-bottom:1px solid var(--neutral-border);background:#EDF7F1;display:flex;align-items:center;gap:8px;}
+        .form-header i{color:var(--brand-green);font-size:18px;}
+        .form-header h2{font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;color:var(--brand-green-dark);}
+        .form-body{padding:22px;}
+        .form-group{margin-bottom:14px;}
+        .form-label{font-weight:600;font-size:12px;margin-bottom:4px;display:block;color:var(--neutral-dark);}
+        .form-label i{color:var(--brand-green);width:16px;margin-right:3px;}
+        .form-label .required{color:var(--danger);}
+        .form-control{width:100%;padding:11px 14px;border:1.5px solid var(--neutral-border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;outline:none;background:white;transition:all 0.15s ease;}
+        .form-control:focus{border-color:var(--brand-orange);box-shadow:0 0 0 3px rgba(245,158,11,0.08);}
+        .form-control.error{border-color:var(--danger);background:#FEF2F2;}
+        .form-control.valid{border-color:var(--success);}
+        select.form-control{-webkit-appearance:none;padding-right:32px;}
+        textarea.form-control{resize:vertical;min-height:60px;}
+        .image-upload-area{border:2px dashed var(--brand-green);border-radius:var(--radius-sm);padding:16px;text-align:center;cursor:pointer;background:#EDF7F1;transition:all 0.15s ease;}
+        .image-upload-area:active{background:#C8E6C9;}
+        .image-upload-area i{font-size:24px;color:var(--brand-green);margin-bottom:4px;}
+        .image-upload-area p{font-size:11px;color:var(--brand-green);font-weight:500;}
+        .image-preview{max-width:100%;max-height:120px;margin-top:8px;border-radius:var(--radius-sm);display:none;}
+        .compress-info{font-size:10px;color:var(--brand-green);margin-top:4px;display:none;}
+        .location-btn{width:100%;padding:14px;background:#EDF7F1;border:2px solid var(--brand-green);border-radius:var(--radius-sm);font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--brand-green);transition:all 0.2s ease;font-family:'Inter',sans-serif;animation:pulse 2s infinite;box-shadow:0 4px 15px rgba(11,90,49,0.2);}
+        .location-btn:active{background:#C8E6C9;transform:scale(0.97);}
+        .location-btn:disabled{opacity:0.7;cursor:not-allowed;animation:none;box-shadow:none;}
+        .location-btn.success{background:#22C55E;color:white;border-color:#22C55E;animation:none;box-shadow:none;}
+        .location-btn.loading{background:#9CA3AF;color:white;border-color:#9CA3AF;animation:none;box-shadow:none;}
+        .location-status{font-size:11px;padding:10px 12px;border-radius:var(--radius-sm);background:#F3F5F4;margin-top:10px;display:flex;align-items:center;gap:6px;}
+        .location-status.success{color:#059669;background:#EDF7F1;border:1px solid #A7F3D0;}
+        .location-status.error{color:var(--danger);background:#FEF2F2;border:1px solid #FECACA;}
+        .gps-coords-display{font-size:11px;color:var(--brand-green);font-weight:600;margin-top:6px;font-family:monospace;word-break:break-all;display:none;}
+        .gps-coords-display.show{display:block;}
+        .gps-address-display{font-size:10px;color:var(--neutral-gray);margin-top:4px;display:none;line-height:1.3;}
+        .gps-address-display.show{display:block;}
+        .pay-btn{background:var(--brand-orange);color:white;border:none;padding:14px;border-radius:var(--radius-full);font-weight:600;font-size:14px;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.15s ease;box-shadow:0 4px 14px rgba(245,158,11,0.25);font-family:'Inter',sans-serif;margin-bottom:8px;}
+        .pay-btn:active{background:var(--brand-orange-dark);transform:scale(0.97);}
+        .pay-btn:disabled{opacity:0.6;cursor:not-allowed;}
+        .fee-summary{background:#F3F5F4;border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:18px;border:1px solid var(--neutral-border);}
+        .fee-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;}
+        .fee-row.total{border-top:1px solid var(--neutral-border);padding-top:8px;font-weight:700;font-size:14px;}
+        .text-muted{color:var(--neutral-gray);font-size:11px;text-align:center;margin-top:10px;}
+        .toast-notification{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--neutral-dark);color:white;padding:10px 20px;border-radius:var(--radius-full);font-size:12px;z-index:10050;opacity:0;visibility:hidden;white-space:nowrap;box-shadow:var(--shadow-lg);transition:all 0.3s ease;}
+        .toast-notification.show{opacity:1;visibility:visible;}
+        .alert-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(8,61,33,0.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:9990;}
+        .alert-modal.show{display:flex;}
+        .alert-content{background:white;border-radius:var(--radius-xl);padding:24px;max-width:340px;width:90%;text-align:center;animation:fadeInUp 0.3s ease;}
+        .alert-content i{font-size:40px;display:block;margin-bottom:10px;}
+        .alert-content h3{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;}
+        .alert-content p{font-size:13px;color:var(--neutral-gray);margin-bottom:14px;line-height:1.5;white-space:pre-line;}
+        .alert-btn{background:var(--brand-green);color:white;border:none;padding:10px 20px;border-radius:var(--radius-full);font-weight:600;cursor:pointer;width:100%;font-size:13px;font-family:'Inter',sans-serif;}
+        @media(max-width:380px){.hero-section{min-height:170px;}.hero-main-text{font-size:14px;}.fee-badge{font-size:12px;padding:6px 12px;}.form-body{padding:16px;}}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <a href="index.html" class="back-btn" aria-label="Back"><i class="fas fa-arrow-left"></i></a>
+        <div class="brand-name"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span></div>
+        <div class="page-title">Register Shop</div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="skeleton-hero skeleton-block"></div>
+        <div class="skeleton-card">
+            <div class="skeleton-block skeleton-line"></div>
+            <div class="skeleton-block skeleton-line-sm"></div>
+            <div class="skeleton-block skeleton-line"></div>
+            <div class="skeleton-block skeleton-btn"></div>
+        </div>
+    </div>
+</div>
+
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<div id="customAlert" class="alert-modal">
+    <div class="alert-content">
+        <i id="alertIcon" class="fas fa-info-circle" style="color:var(--warning);"></i>
+        <h3 id="alertTitle">Notice</h3>
+        <p id="alertMessage"></p>
+        <button class="alert-btn" onclick="closeAlert()">OK</button>
+    </div>
+</div>
+
+<script>
+(function(){'use strict';
+window.addEventListener('error',function(e){console.error('[Shop Register]',e.message);});
+window.addEventListener('unhandledrejection',function(e){console.error('[Shop Register]',e.reason);e.preventDefault();});
+
+function $(id){return document.getElementById(id);}
+function esc(s){if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+var sb=supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+var SUPABASE_URL='https://zwajyovemwdqtkecipeb.supabase.co';
+var categories=[],selectedImageFile=null,selectedQrFile=null,isProcessing=false;
+var isCapturingLocation=false,registrationFee=299,heroBannerUrl=null;
+var gpsRetryCount=0,maxGpsRetries=2,paymentDone=false;
+var RAZORPAY_KEY_ID='rzp_live_SZqH2di86Njggl';
+
+function showApp(){var l=$('simpleLoader'),a=$('mainApp');if(a)a.style.display='';if(l){l.classList.add('fade-out');setTimeout(function(){if(l&&l.parentNode)l.parentNode.removeChild(l);},300);}}
+function getFullUrl(u){if(!u||typeof u!=='string')return'';if(u.indexOf('http')===0||u.indexOf('data:')===0)return u;return SUPABASE_URL+'/storage/v1/object/public/'+u;}
+function showToast(m,e){var t=$('toastMsg'),s=$('toastText');if(!t||!s)return;s.textContent=m;t.style.background=e?'#EF4444':'#1A1A1A';t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},3000);}
+function showAlert(msg,title,icon){title=title||'Notice';icon=icon||'warning';var me=$('alertMessage'),te=$('alertTitle'),ie=$('alertIcon'),mo=$('customAlert');if(me)me.textContent=msg;if(te)te.textContent=title;if(ie){ie.style.color=icon==='success'?'#22C55E':icon==='error'?'#EF4444':'#F59E0B';ie.className='fas '+(icon==='success'?'fa-check-circle':icon==='error'?'fa-exclamation-circle':'fa-info-circle');}if(mo)mo.classList.add('show');}
+function closeAlert(){var m=$('customAlert');if(m)m.classList.remove('show');}
+
+function saveFormData(){var data={},fields=['ownerName','ownerEmail','ownerPhone','ownerWhatsapp','shopName','shopCategory','shopPhone','shopAddress','shopCity','shopPincode','shopDesc','shopLatitude','shopLongitude'];for(var i=0;i<fields.length;i++){var el=$(fields[i]);if(el)data[fields[i]]=el.value;}try{localStorage.setItem('zm_shop_draft',JSON.stringify(data));}catch(e){}}
+function loadFormData(){try{var raw=localStorage.getItem('zm_shop_draft');if(!raw)return;var data=JSON.parse(raw);for(var key in data){if(!data.hasOwnProperty(key))continue;var el=$(key);if(el&&data[key])el.value=data[key];}}catch(e){}}
+function clearFormData(){try{localStorage.removeItem('zm_shop_draft');}catch(e){}}
+
+async function fetchRegistrationFee(){try{var r=await sb.from('app_settings').select('value').eq('key','registration_fee').maybeSingle();if(r&&r.data&&r.data.value)registrationFee=parseInt(r.data.value)||299;}catch(e){registrationFee=299;}}
+async function fetchHeroBanner(){try{var r=await sb.from('app_settings').select('value').eq('key','shop_register_banner').maybeSingle();if(r&&r.data&&r.data.value)heroBannerUrl=getFullUrl(r.data.value);}catch(e){heroBannerUrl=null;}}
+async function loadCategories(){try{var r=await sb.from('categories').select('id,name').eq('is_active',true).order('name');categories=(r&&r.data)?r.data:[];}catch(e){categories=[];}}
+
+// 🔥 AUTO COMPRESS — 80-159KB target
+async function compressImage(file){
+if(!file||!file.type||file.type.indexOf('image/')!==0)return file;
+if(file.size<80*1024)return file;
+return new Promise(function(resolve){
+var reader=new FileReader();reader.readAsDataURL(file);
+reader.onload=function(e){var img=new Image();img.src=e.target.result;
+img.onload=function(){var w=img.width,h=img.height,maxDim=800;
+if(w>maxDim||h>maxDim){if(w>h){h=Math.round((h*maxDim)/w);w=maxDim;}else{w=Math.round((w*maxDim)/h);h=maxDim;}}
+var canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+canvas.getContext('2d').drawImage(img,0,0,w,h);
+canvas.toBlob(function(blob){resolve(new File([blob],file.name.replace(/\.[^.]+$/,'.jpg'),{type:'image/jpeg'}));},'image/jpeg',0.55);
+};};});}
+
+async function uploadImage(file,folder){
+if(!file)return null;
+var compressed=await compressImage(file);
+var fn=Date.now()+'_'+Math.random().toString(36).substr(2,6)+'.jpg';
+var uploadResult=await sb.storage.from('shop-images').upload(folder+'/'+fn,compressed,{cacheControl:'3600',upsert:true});
+if(uploadResult.error)throw new Error('Upload failed');
+return sb.storage.from('shop-images').getPublicUrl(folder+'/'+fn).data.publicUrl;}
+
+// ============ GPS ============
+function updateLocationButton(state){var btn=$('locationBtn');if(!btn)return;if(state==='loading'){btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Detecting GPS...';btn.className='location-btn loading';btn.disabled=true;}else if(state==='success'){btn.innerHTML='<i class="fas fa-check-circle"></i> ✅ Location Captured!';btn.className='location-btn success';btn.disabled=false;}else if(state==='retry'){btn.innerHTML='<i class="fas fa-redo"></i> Retry GPS';btn.className='location-btn';btn.disabled=false;}else{btn.innerHTML='<i class="fas fa-location-dot"></i> 📍 Capture GPS Location';btn.className='location-btn';btn.disabled=false;}}
+
+function captureShopLocation(){if(isCapturingLocation){showToast('⚠️ GPS already searching...',true);return;}
+if(window.Android&&typeof window.Android.requestLocation==='function'){isCapturingLocation=true;gpsRetryCount=0;updateLocationButton('loading');var sd=$('locationStatus');if(sd){sd.innerHTML='<i class="fas fa-spinner fa-spin"></i> Getting location via Android GPS...';sd.className='location-status';}window.Android.requestLocation();window._gpsShopTimeout=setTimeout(function(){if(isCapturingLocation){console.warn('⏰ Android GPS timeout');tryBrowserGPS();}},12000);return;}tryBrowserGPS();}
+
+function tryBrowserGPS(){if(window._gpsShopTimeout){clearTimeout(window._gpsShopTimeout);}if(!navigator.geolocation){isCapturingLocation=false;updateLocationButton('retry');showAlert('GPS not supported','Error','error');return;}updateLocationButton('loading');navigator.geolocation.getCurrentPosition(function(pos){if(window._gpsShopTimeout)clearTimeout(window._gpsShopTimeout);isCapturingLocation=false;setLocationData(pos.coords.latitude,pos.coords.longitude);},function(err){gpsRetryCount++;if(gpsRetryCount<maxGpsRetries){setTimeout(tryBrowserGPS,1000);return;}isCapturingLocation=false;updateLocationButton('retry');showAlert('GPS not found. Move to open area and try again.','GPS Failed','error');},{enableHighAccuracy:true,timeout:15000,maximumAge:60000});}
+
+window.setLocationFromAndroid=function(lat,lng,address){if(!lat||!lng||isNaN(lat)||isNaN(lng)||lat===0||lng===0)return;if(window._gpsShopTimeout)clearTimeout(window._gpsShopTimeout);setLocationData(parseFloat(lat),parseFloat(lng),address);};
+window.onLocationError=function(errorMsg){isCapturingLocation=false;if(window._gpsShopTimeout)clearTimeout(window._gpsShopTimeout);var sd=$('locationStatus');if(errorMsg==='GPS_DISABLED'||errorMsg==='LOCATION_OFF'){updateLocationButton('retry');if(sd){sd.innerHTML='<i class="fas fa-exclamation-triangle"></i> ⚠️ GPS is off. Enable in Settings.';sd.className='location-status error';}showAlert('GPS is off. Please go to Settings > Location and enable GPS.','GPS Off','error');}else{updateLocationButton('retry');}};
+
+function setLocationData(lat,lng,address){isCapturingLocation=false;if(window._gpsShopTimeout)clearTimeout(window._gpsShopTimeout);var le=$('shopLatitude'),ne=$('shopLongitude');if(le)le.value=lat;if(ne)ne.value=lng;var ce=$('locationCoords');if(ce){ce.textContent='📍 '+Number(lat).toFixed(6)+', '+Number(lng).toFixed(6);ce.style.display='block';}updateLocationButton('success');var sd=$('locationStatus');if(sd){sd.innerHTML='<i class="fas fa-check-circle"></i> ✅ GPS Location Captured!';sd.className='location-status success';}if(address){var ae=$('locationAddress');if(ae){ae.innerHTML='<i class="fas fa-map-pin"></i> '+(address||'').substring(0,120);ae.style.display='block';}autoFillCityFromAddress(address);}else{fetchAddressFromCoords(lat,lng);}saveFormData();showToast('📍 GPS Location Captured!');}
+
+async function fetchAddressFromCoords(lat,lng){try{var c=new AbortController();var t=setTimeout(function(){c.abort();},5000);var r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=18',{headers:{'User-Agent':'ZyMartApp/7.0'},signal:c.signal});clearTimeout(t);var d=await r.json();var addr=d.display_name||'';var ae=$('locationAddress');if(ae&&addr){ae.innerHTML='<i class="fas fa-map-pin"></i> '+addr.substring(0,120);ae.style.display='block';}autoFillCityFromAddress(addr,d.address||null);}catch(e){}}
+
+function autoFillCityFromAddress(displayName,addressObj){var ci=$('shopCity');if(!ci||ci.value)return;var city='';if(addressObj){city=addressObj.city||addressObj.town||addressObj.municipality||addressObj.village||addressObj.state_district||'';}if(!city&&displayName){var parts=displayName.split(',');for(var i=0;i<parts.length;i++){var part=parts[i].trim();if(part&&part.length>2&&part.length<30&&part.indexOf('Maharashtra')===-1&&part.indexOf('India')===-1){city=part;break;}}}if(city&&!ci.value){ci.value=city;showToast('🏙️ City: '+city);saveFormData();}}
+
+// ============ VALIDATION ============
+function validateForm(){var on=$('ownerName')?.value.trim(),oe=$('ownerEmail')?.value.trim(),op=$('ownerPhone')?.value.trim(),sn=$('shopName')?.value.trim(),cat=$('shopCategory')?.value||'',sp=$('shopPhone')?.value.trim(),ad=$('shopAddress')?.value.trim(),ci=$('shopCity')?.value.trim(),pi=$('shopPincode')?.value.trim(),lat=$('shopLatitude')?.value||'',lng=$('shopLongitude')?.value||'';if(!on||on.length<2){showAlert('Enter your full name.','Name Required','error');return false;}if(!oe||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(oe)){showAlert('Enter a valid email.','Email Required','error');return false;}if(!op||!/^\d{10}$/.test(op)){showAlert('Enter 10-digit mobile number.','Phone Required','error');return false;}if(!sn){showAlert('Enter shop name.','Name Required','error');return false;}if(!cat){showAlert('Select a category.','Category Required','error');return false;}if(!sp||!/^\d{10}$/.test(sp)){showAlert('Enter 10-digit shop phone.','Phone Required','error');return false;}if(!ad){showAlert('Enter full address.','Address Required','error');return false;}if(!ci){showAlert('Enter city name.','City Required','error');return false;}if(!pi||!/^\d{6}$/.test(pi)){showAlert('Enter 6-digit pincode.','Pincode Required','error');return false;}if(!lat||!lng){showAlert('📍 Please press GPS button to capture location! This is mandatory.','GPS Required','error');return false;}return true;}
+
+// ============ RAZORPAY ============
+function startRazorpayPayment(){if(!validateForm())return;if(paymentDone){showToast('✅ Payment already done!');return;}var on=$('ownerName')?.value.trim(),oe=$('ownerEmail')?.value.trim(),op=$('ownerPhone')?.value.trim();var options={key:RAZORPAY_KEY_ID,amount:registrationFee*100,currency:'INR',name:'ZyMart',description:'Shop Registration - ₹'+registrationFee+'/year',prefill:{name:on,email:oe,contact:op},theme:{color:'#0B5A31'},handler:function(r){paymentDone=true;showToast('✅ ₹'+registrationFee+' Payment Successful!');registerShopAfterPayment(r);},modal:{ondismiss:function(){showToast('⚠️ Payment incomplete',true);}}};try{var rzp=new Razorpay(options);rzp.on('payment.failed',function(r){showAlert('Payment Failed: '+(r.error.description||'Try again')+'\n\nNo amount deducted.','Payment Failed','error');});rzp.open();}catch(e){showAlert('Failed to open payment gateway.','Error','error');}}
+
+async function registerShopAfterPayment(pr){isProcessing=true;var btn=$('payBtn');if(btn){btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Registering...';btn.disabled=true;}
+var on=$('ownerName')?.value.trim(),oe=$('ownerEmail')?.value.trim(),op=$('ownerPhone')?.value.trim(),ow=$('ownerWhatsapp')?.value.trim(),sn=$('shopName')?.value.trim(),cat=$('shopCategory')?.value||'',sp=$('shopPhone')?.value.trim(),ad=$('shopAddress')?.value.trim(),ci=$('shopCity')?.value.trim(),pi=$('shopPincode')?.value.trim(),desc=$('shopDesc')?.value.trim(),lat=$('shopLatitude')?.value||'',lng=$('shopLongitude')?.value||'';
+try{var ee=await checkEmailExists(oe);if(ee){isProcessing=false;if(btn){btn.innerHTML='<i class="fas fa-rupee-sign"></i> Pay ₹'+registrationFee;btn.disabled=false;}showAlert('This email is already registered!','Email Exists','error');return;}
+if(btn)btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Uploading images...';
+var shopImageUrl=null,qrImageUrl=null;
+if(selectedImageFile){try{shopImageUrl=await uploadImage(selectedImageFile,'shops');}catch(e){isProcessing=false;if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-rupee-sign"></i> Pay ₹'+registrationFee;}showAlert('Image upload failed','Error','error');return;}}
+if(selectedQrFile){try{qrImageUrl=await uploadImage(selectedQrFile,'qrcodes');}catch(e){}}
+if(btn)btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Saving...';
+await sb.from('shops').insert([{owner_email:oe,owner_name:on,owner_phone:op,owner_whatsapp:ow||op,name:sn,category:cat,phone:sp,whatsapp:sp,address:ad,city:ci,pincode:pi,description:desc||null,latitude:parseFloat(lat),longitude:parseFloat(lng),image_url:shopImageUrl,qr_code_url:qrImageUrl,status:'pending',is_open:false,rating:0,location_verified:true,payment_id:pr.razorpay_payment_id,payment_order_id:pr.razorpay_order_id,payment_amount:registrationFee,payment_status:'paid',created_at:new Date().toISOString()}]);
+clearFormData();
+showAlert('✅ Your shop has been registered successfully!\n\n💰 Payment: ₹'+registrationFee+' (Paid)\n📍 GPS Location Verified\n📧 Admin will review within 24 hours.\nLogin email: '+oe,'Success 🎉','success');
+if(btn)btn.innerHTML='<i class="fas fa-check-circle"></i> Submitted!';
+setTimeout(function(){window.location.href='index.html?registered=1';},4000);
+}catch(e){isProcessing=false;if(btn){btn.innerHTML='<i class="fas fa-rupee-sign"></i> Pay ₹'+registrationFee;btn.disabled=false;}showAlert('Registration failed: '+(e.message||'Try again')+'\n\nPayment was successful, contact support.','Error','error');}}
+
+async function checkEmailExists(email){try{var sc=await sb.from('shops').select('id').eq('owner_email',email).maybeSingle();if(sc&&sc.data)return true;var uc=await sb.from('users').select('id').eq('email',email).maybeSingle();if(uc&&uc.data)return true;}catch(e){}return false;}
+
+// ============ REAL-TIME VALIDATION ============
+function setupRealTimeValidation(){var v={ownerEmail:{regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/,msg:'Invalid'},ownerPhone:{regex:/^\d{10}$/,msg:'10 digits'},shopPhone:{regex:/^\d{10}$/,msg:'10 digits'},shopPincode:{regex:/^\d{6}$/,msg:'6 digits'},ownerWhatsapp:{regex:/^$|^\d{10}$/,msg:'10 digits'}};for(var id in v){if(!v.hasOwnProperty(id))continue;var el=$(id);if(!el)continue;el.addEventListener('input',function(){var val=el.value.trim();if(!val){el.classList.remove('error','valid');return;}if(v[id].regex.test(val)){el.classList.remove('error');el.classList.add('valid');}else{el.classList.remove('valid');el.classList.add('error');}});el.addEventListener('change',saveFormData);}
+var all=document.querySelectorAll('input, textarea, select');for(var i=0;i<all.length;i++){all[i].addEventListener('change',saveFormData);}}
+
+function setupImageUpload(ai,ii,pi,ci,fv){var a=$(ai),inp=$(ii),pre=$(pi);if(!a||!inp)return;a.onclick=function(){inp.click();};inp.onchange=async function(e){var file=e.target.files[0];if(!file)return;if(file.size>5*1024*1024){showAlert('Image too large! Max 5MB.','File Too Large','error');return;}var os=(file.size/1024).toFixed(0);var ce=$(ci);if(ce){ce.style.display='block';ce.innerHTML='<i class="fas fa-spinner fa-spin"></i> Compressing...';}var compressed=await compressImage(file);var cs=(compressed.size/1024).toFixed(0);if(fv==='selectedImageFile')selectedImageFile=compressed;else if(fv==='selectedQrFile')selectedQrFile=compressed;if(ce){ce.innerHTML='<i class="fas fa-check-circle"></i> '+cs+'KB';setTimeout(function(){ce.style.display='none';},3000);}var reader=new FileReader();reader.onload=function(ev){if(pre){pre.src=ev.target.result;pre.style.display='block';}};reader.readAsDataURL(compressed);if(os!==cs)showToast('📸 '+os+'KB → '+cs+'KB');};}
+
+async function renderForm(){await fetchRegistrationFee();await loadCategories();await fetchHeroBanner();
+var co='<option value="">Select Category</option>';for(var i=0;i<categories.length;i++){co+='<option value="'+esc(categories[i].name)+'">'+esc(categories[i].name)+'</option>';}
+var hh='';
+if(heroBannerUrl){hh='<div class="hero-section"><img src="'+heroBannerUrl+'" class="hero-banner-img" alt="Banner"><div class="hero-spacer"></div><div class="hero-bottom-strip"><div class="hero-text-group"><div class="hero-main-text">Join ZyMart, Grow Your Business</div><div class="hero-sub-text">Reach local customers • Only ₹'+registrationFee+'/year</div></div><div class="fee-badge"><i class="fas fa-tag"></i> ₹'+registrationFee+'</div></div></div>';}else{hh='<div class="hero-section no-photo"><div class="hero-spacer"><div class="default-icon"><i class="fas fa-store-alt"></i></div><div class="default-title">Start Your Business on ZyMart</div></div><div class="hero-bottom-strip"><div class="hero-text-group"><div class="hero-main-text">Join ZyMart, Grow Your Business</div></div><div class="fee-badge"><i class="fas fa-tag"></i> ₹'+registrationFee+'</div></div></div>';}
+var c=$('mainContent');if(!c)return;
+c.innerHTML=hh+'<div class="form-card"><div class="form-header"><i class="fas fa-clipboard-list"></i><h2>Shop Registration</h2></div><div class="form-body">'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-user"></i> Owner Full Name <span class="required">*</span></label><input type="text" id="ownerName" class="form-control" placeholder="Your full name" autocomplete="name"></div>'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-envelope"></i> Owner Email <span class="required">*</span></label><input type="email" id="ownerEmail" class="form-control" placeholder="your@email.com" autocomplete="email"><small style="color:#6B7280;font-size:10px;">📧 Use this email to login after approval</small></div>'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-phone"></i> Owner Phone <span class="required">*</span></label><input type="tel" id="ownerPhone" class="form-control" placeholder="10-digit mobile" maxlength="10" autocomplete="tel"></div>'+
+'<div class="form-group"><label class="form-label"><i class="fab fa-whatsapp"></i> WhatsApp</label><input type="tel" id="ownerWhatsapp" class="form-control" placeholder="WhatsApp number" maxlength="10"></div>'+
+'<hr style="margin:18px 0;border:none;border-top:1px dashed var(--neutral-border);">'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-camera"></i> Shop Photo</label><div class="image-upload-area" id="imageUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Tap to upload (Auto-compress)</p><input type="file" id="shopImageInput" accept="image/*" style="display:none"><img id="imagePreview" class="image-preview"><div id="imageCompressInfo" class="compress-info"></div></div></div>'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-store"></i> Shop Name <span class="required">*</span></label><input type="text" id="shopName" class="form-control" placeholder="Your shop name"></div>'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-tags"></i> Category <span class="required">*</span></label><select id="shopCategory" class="form-control">'+co+'</select></div>'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-phone"></i> Shop Phone <span class="required">*</span></label><input type="tel" id="shopPhone" class="form-control" placeholder="Shop contact number" maxlength="10"></div>'+
+'<div class="form-group" style="background:#EDF7F1;padding:14px;border-radius:var(--radius-sm);border:2px dashed var(--brand-green);">'+
+'<label class="form-label" style="font-size:14px;"><i class="fas fa-map-marker-alt" style="color:var(--brand-green);"></i> 📍 Shop Location <span class="required">*</span></label>'+
+'<p style="font-size:10px;color:var(--neutral-gray);margin-bottom:10px;">Press the button below to capture GPS location</p>'+
+'<button type="button" class="location-btn" id="locationBtn" onclick="captureShopLocation()"><i class="fas fa-location-dot"></i> 📍 Capture GPS Location</button>'+
+'<div id="locationStatus" class="location-status"><i class="fas fa-info-circle"></i> Please press GPS button — this is mandatory</div>'+
+'<div id="locationCoords" class="gps-coords-display"></div>'+
+'<div id="locationAddress" class="gps-address-display"></div>'+
+'<input type="hidden" id="shopLatitude"><input type="hidden" id="shopLongitude"></div>'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-address-card"></i> Address <span class="required">*</span></label><textarea id="shopAddress" class="form-control" rows="2" placeholder="Full address: Building, Street, Area"></textarea></div>'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-city"></i> City <span class="required">*</span></label><input type="text" id="shopCity" class="form-control" placeholder="Auto-detected from GPS"></div>'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-map-pin"></i> Pincode <span class="required">*</span></label><input type="text" id="shopPincode" class="form-control" placeholder="6-digit" maxlength="6"></div>'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-align-left"></i> Description</label><textarea id="shopDesc" class="form-control" rows="2" placeholder="About your shop (optional)"></textarea></div>'+
+'<div class="form-group"><label class="form-label"><i class="fas fa-qrcode"></i> QR Code (UPI/Paytm)</label><div class="image-upload-area" id="qrUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Upload payment QR</p><input type="file" id="qrImageInput" accept="image/*" style="display:none"><img id="qrPreview" class="image-preview"><div id="qrCompressInfo" class="compress-info"></div></div></div>'+
+'<div class="fee-summary"><div class="fee-row"><span>Registration Fee</span><span style="font-weight:700;">₹'+registrationFee+'/year</span></div><div class="fee-row total"><span>Total Payable</span><span style="color:var(--brand-green);">₹'+registrationFee+'</span></div></div>'+
+'<button class="pay-btn" id="payBtn" onclick="startRazorpayPayment()"><i class="fas fa-rupee-sign"></i> Pay ₹'+registrationFee+' & Register</button>'+
+'<p class="text-muted"><i class="fas fa-lock"></i> Secured by Razorpay</p>'+
+'<p class="text-muted"><i class="fas fa-clock"></i> Admin will review within 24 hours</p>'+
+'</div></div>';
+setupImageUpload('imageUploadArea','shopImageInput','imagePreview','imageCompressInfo','selectedImageFile');
+setupImageUpload('qrUploadArea','qrImageInput','qrPreview','qrCompressInfo','selectedQrFile');
+setupRealTimeValidation();loadFormData();}
+
+document.addEventListener('DOMContentLoaded',function(){renderForm();showApp();});
+window.startRazorpayPayment=startRazorpayPayment;
+window.captureShopLocation=captureShopLocation;
+window.closeAlert=closeAlert;
+})();
+</script>
+</body>
+</html>
