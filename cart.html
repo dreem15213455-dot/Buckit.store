@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>My Cart - ZyMart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --brand-green: #0B5A31; --brand-orange: #F59E0B; --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB; --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-full: 9999px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter',-apple-system,sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); padding-bottom: 100px; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 100; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .back-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; text-decoration: none; }
+        .top-title { font-family: 'Poppins',sans-serif; flex: 1; font-size: 16px; font-weight: 700; color: white; }
+        .top-count { font-size: 11px; color: rgba(255,255,255,0.75); }
+        .main-content { padding-top: 58px; }
+        
+        .multi-shop-warning { margin: 10px 14px; padding: 10px 14px; background: #FFF8EB; border: 1px solid #FDE68A; border-radius: var(--radius-md); font-size: 11px; color: #92400E; display: none; }
+        .multi-shop-warning.show { display: block; }
+        
+        .cart-items { padding: 0 14px; }
+        .cart-item { background: white; border-radius: var(--radius-md); padding: 12px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-xs); animation: slideUp 0.3s ease; }
+        .item-image { width: 64px; height: 64px; border-radius: var(--radius-sm); background: var(--neutral-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+        .item-image img { width: 100%; height: 100%; object-fit: cover; }
+        .item-details { flex: 1; min-width: 0; }
+        .item-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-shop { font-size: 9px; color: var(--brand-green); font-weight: 500; margin-top: 1px; }
+        .item-price { font-size: 14px; font-weight: 700; margin-top: 2px; }
+        .qty-control { display: flex; align-items: center; gap: 8px; background: var(--neutral-bg); border-radius: var(--radius-full); padding: 3px; flex-shrink: 0; }
+        .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--neutral-border); background: white; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--brand-green); }
+        .qty-value { font-size: 13px; font-weight: 700; min-width: 18px; text-align: center; }
+        .remove-btn { background: #FEF2F2; border: none; color: #EF4444; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 9px; flex-shrink: 0; }
+        
+        .bill-section { background: white; margin: 14px; border-radius: var(--radius-md); padding: 14px; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-xs); }
+        .bill-title { font-family: 'Poppins',sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+        .bill-row { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 11px; color: var(--neutral-gray); }
+        .bill-row.total { border-top: 2px solid var(--neutral-dark); padding-top: 10px; margin-top: 8px; font-size: 15px; font-weight: 800; color: var(--neutral-dark); }
+        .free-tag { color: #22C55E; font-weight: 700; }
+        
+        .coupon-box { background: white; margin: 0 14px 10px; border-radius: var(--radius-md); padding: 11px; border: 1.5px dashed var(--neutral-border); display: flex; gap: 8px; align-items: center; cursor: pointer; }
+        .coupon-box.applied { border-color: #22C55E; background: #F0FDF4; }
+        
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px 14px; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); z-index: 100; border-top: 1px solid var(--neutral-border); display: flex; align-items: center; gap: 10px; }
+        .total-info { flex: 1; } .total-amount { font-family: 'Poppins',sans-serif; font-size: 17px; font-weight: 700; }
+        .checkout-btn { background: var(--brand-orange); color: white; border: none; padding: 13px 24px; border-radius: var(--radius-full); font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter',sans-serif; }
+        
+        .empty-state { text-align: center; padding: 50px 20px; }
+        .empty-state i { font-size: 56px; color: #D1D5DB; margin-bottom: 14px; display: block; }
+        .empty-state h3 { font-family: 'Poppins',sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+        .empty-state p { font-size: 11px; color: var(--neutral-gray); margin-bottom: 14px; }
+        .btn-primary { background: var(--brand-green); color: white; border: none; padding: 11px 24px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter',sans-serif; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+        .btn-orange { background: var(--brand-orange); color: white; border: none; padding: 10px 22px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter',sans-serif; }
+        
+        .toast { position: fixed; bottom: 95px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 9px 18px; border-radius: var(--radius-full); font-size: 11px; z-index: 200; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-md); transition: all 0.3s ease; }
+        .toast.show { opacity: 1; visibility: visible; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <span class="top-title">My Cart</span>
+    <span class="top-count" id="itemCount">0 items</span>
+</div>
+
+<div class="main-content" id="mainContent"></div>
+
+<div class="bottom-bar" id="bottomBar" style="display:none;">
+    <div class="total-info"><div class="total-amount" id="totalAmount">₹0</div></div>
+    <button class="checkout-btn" onclick="goToCheckout()">Checkout →</button>
+</div>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+(function() {
+    'use strict';
+    window.addEventListener('error', function(e) { console.error('[Cart]', e.message); });
+    
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var cart = [], currentUser = null, couponDiscount = 0;
+    
+    function getEl(id) { return document.getElementById(id); }
+    function safeJSON(s,f) { try { return s?JSON.parse(s):f; } catch(e) { return f; } }
+    function esc(s) { if(!s)return''; var d=document.createElement('div');d.textContent=s;return d.innerHTML; }
+    function showToast(m) { var t=getEl('toastMsg'); if(!t)return; t.textContent=m; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2200); }
+    
+    function loadCart() { cart = safeJSON(localStorage.getItem('zymart_cart'), []); return cart; }
+    function saveCart() { try { localStorage.setItem('zymart_cart', JSON.stringify(cart)); } catch(e) {} }
+    
+    function getUniqueShopIds() {
+        var ids = [];
+        for (var i = 0; i < cart.length; i++) {
+            if (cart[i].shop_id && ids.indexOf(cart[i].shop_id) === -1) ids.push(cart[i].shop_id);
+        }
+        return ids;
+    }
+    
+    function calcTotals() { 
+        var s = cart.reduce(function(a,i){return a+((i.price||0)*(i.quantity||1));},0); 
+        var d = couponDiscount>0 ? Math.round(s*couponDiscount/100) : 0; 
+        var df = (s-d) >= 299 ? 0 : 40; 
+        return {subtotal:s, discount:d, deliveryFee:df, total:s-d+df}; 
+    }
+    
+    function renderCart() {
+        loadCart(); 
+        var c = getEl('mainContent'), bar = getEl('bottomBar'), count = getEl('itemCount');
+        count.textContent = cart.reduce(function(s,i){return s+(i.quantity||1);},0) + ' items';
+        
+        if (!cart.length) {
+            c.innerHTML = '<div class="empty-state"><i class="fas fa-shopping-cart"></i><h3>Cart is Empty</h3><p>Add products from nearby shops</p><a href="products.html" class="btn-primary"><i class="fas fa-shopping-bag"></i> Start Shopping</a><br><br><button class="btn-orange" onclick="window.location.href=\'index.html\'"><i class="fas fa-home"></i> Home</button></div>';
+            bar.style.display = 'none'; 
+            return;
+        }
+        bar.style.display = 'flex';
+        
+        var totals = calcTotals(), h = '';
+        
+        var shopIds = getUniqueShopIds();
+        if (shopIds.length > 1) {
+            h += '<div class="multi-shop-warning show">⚠️ Cart has products from <strong>' + shopIds.length + ' different shops</strong>. Please order from one shop at a time.</div>';
+        }
+        
+        h += '<div class="cart-items">';
+        for (var i = 0; i < cart.length; i++) {
+            var item = cart[i], qty = item.quantity || 1, price = item.price || 0;
+            var shopName = item.shop_name || '';
+            
+            h += '<div class="cart-item">';
+            h += '<div class="item-image">' + (item.image ? '<img src="' + item.image + '" loading="lazy" onerror="this.innerHTML=\'<i class=fas fa-box-open style=font-size:24px;color:#D1D5DB></i>\'">' : '<i class="fas fa-box-open" style="font-size:24px;color:#D1D5DB;"></i>') + '</div>';
+            h += '<div class="item-details">';
+            h += '<div class="item-name">' + esc(item.name || 'Product') + '</div>';
+            if (shopName) h += '<div class="item-shop">🏪 ' + esc(shopName) + '</div>';
+            h += '<div class="item-price">₹' + price.toLocaleString('en-IN') + '</div>';
+            h += '</div>';
+            h += '<div class="qty-control"><button class="qty-btn" onclick="changeQty(' + i + ',-1)">−</button><span class="qty-value">' + qty + '</span><button class="qty-btn" onclick="changeQty(' + i + ',1)">+</button></div>';
+            h += '<button class="remove-btn" onclick="removeItem(' + i + ')">✕</button>';
+            h += '</div>';
+        }
+        h += '</div>';
+        
+        h += '<div class="coupon-box" id="couponBox" onclick="toggleCoupon()"><i class="fas fa-ticket-alt"></i><span id="couponText">Apply Coupon</span></div>';
+        h += '<div class="bill-section"><div class="bill-title"><i class="fas fa-receipt"></i> Bill Details</div>';
+        h += '<div class="bill-row"><span>Item Total</span><span>₹' + totals.subtotal.toLocaleString('en-IN') + '</span></div>';
+        if (totals.discount > 0) h += '<div class="bill-row"><span>Coupon Discount</span><span style="color:#EF4444;">− ₹' + totals.discount.toLocaleString('en-IN') + '</span></div>';
+        h += '<div class="bill-row"><span>Delivery Fee</span><span class="' + (totals.deliveryFee===0 ? 'free-tag' : '') + '">' + (totals.deliveryFee===0 ? '🎉 FREE' : '₹' + totals.deliveryFee) + '</span></div>';
+        h += '<div class="bill-row total"><span>Total</span><span>₹' + totals.total.toLocaleString('en-IN') + '</span></div>';
+        h += '</div>';
+        
+        c.innerHTML = h;
+        getEl('totalAmount').textContent = '₹' + totals.total.toLocaleString('en-IN');
+        if (couponDiscount > 0) { var cb = getEl('couponBox'); if (cb) cb.classList.add('applied'); }
+    }
+    
+    window.changeQty = function(i, d) { 
+        var nq = (cart[i].quantity || 1) + d; 
+        var maxStock = cart[i].stock || 999;
+        if (nq > maxStock) { showToast('⚠️ Only ' + maxStock + ' available!'); return; }
+        if (nq <= 0) { cart.splice(i,1); saveCart(); } 
+        else { cart[i].quantity = nq; saveCart(); } 
+        renderCart(); 
+    };
+    
+    window.removeItem = function(i) { cart.splice(i,1); saveCart(); renderCart(); showToast('🗑️ Removed'); };
+    
+    window.toggleCoupon = function() { 
+        couponDiscount = couponDiscount > 0 ? 0 : 10; 
+        var ct = getEl('couponText'); 
+        if (ct) ct.textContent = couponDiscount > 0 ? '🎫 10% Discount Applied!' : 'Apply Coupon'; 
+        renderCart(); 
+    };
+    
+    async function checkUser() { 
+        try { 
+            var r = await sb.auth.getSession(); 
+            currentUser = (r && r.data && r.data.session) ? r.data.session.user : null; 
+        } catch(e) { currentUser = null; } 
+    }
+    
+    window.goToCheckout = function() {
+        if (!cart.length) { showToast('Cart is empty!'); return; }
+        
+        var shopIds = getUniqueShopIds();
+        if (shopIds.length > 1) {
+            showToast('⚠️ Please order from one shop only!');
+            return;
+        }
+        
+        if (!currentUser) {
+            try { sessionStorage.setItem('zymart_redirect_after_login', 'cart.html'); } catch(e) {} 
+            showToast('🔐 Please login first'); 
+            setTimeout(function(){ window.location.href = 'login.html'; }, 500); 
+            return; 
+        }
+        window.location.href = 'checkout.html';
+    };
+    
+    document.addEventListener('DOMContentLoaded', async function(){ 
+        await checkUser(); 
+        renderCart(); 
+    });
+    
+    window.changeQty = changeQty;
+    window.removeItem = removeItem;
+    window.toggleCoupon = toggleCoupon;
+    window.goToCheckout = goToCheckout;
+})();
+</script>
+</body>
+</html>

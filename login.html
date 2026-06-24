@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - ZyMart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <style>
+        :root { --brand-green: #0B5A31; --brand-orange: #F59E0B; --brand-green-dark: #083D21; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: linear-gradient(135deg, #0B5A31 0%, #083D21 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-container { background: white; border-radius: 24px; padding: 32px 24px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .logo { text-align: center; margin-bottom: 8px; }
+        .logo span { font-family: 'Poppins', sans-serif; font-size: 36px; font-weight: 700; letter-spacing: -1px; }
+        .logo .zy { color: #A3E635; } .logo .mart { color: #FDE047; }
+        .title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 4px; color: #1a1a1a; }
+        .subtitle { font-size: 14px; color: #6B7280; text-align: center; margin-bottom: 28px; }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        .input-group input { width: 100%; padding: 14px 16px; border: 1.5px solid #E5E7EB; border-radius: 12px; font-size: 15px; font-family: 'Inter', sans-serif; background: #F9FAFB; outline: none; transition: all 0.2s ease; }
+        .input-group input:focus { border-color: #F59E0B; background: white; box-shadow: 0 0 0 4px rgba(245,158,11,0.08); }
+        .btn { width: 100%; padding: 15px; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; border: none; font-family: 'Inter', sans-serif; margin-bottom: 12px; transition: all 0.2s ease; }
+        .btn:active { transform: scale(0.97); }
+        .btn-google { background: white; color: #3C4043; border: 1.5px solid #E5E7EB; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 500; }
+        .btn-google img { width: 20px; height: 20px; }
+        .btn-email { background: #0B5A31; color: white; box-shadow: 0 6px 20px rgba(11,90,49,0.3); }
+        .btn-email:active { background: #083D21; }
+        .btn-otp { background: #F59E0B; color: #1a1a1a; font-weight: 700; box-shadow: 0 6px 20px rgba(245,158,11,0.3); }
+        .btn-back { background: transparent; color: #6B7280; font-size: 14px; font-weight: 500; }
+        .divider { display: flex; align-items: center; gap: 10px; margin: 20px 0; color: #9CA3AF; font-size: 12px; font-weight: 500; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #E5E7EB; }
+        .otp-section { display: none; text-align: center; padding-top: 10px; }
+        .otp-section input { width: 100%; padding: 14px; border: 1.5px solid #E5E7EB; border-radius: 12px; font-size: 22px; text-align: center; letter-spacing: 8px; font-family: 'Inter', sans-serif; font-weight: 600; margin-bottom: 16px; }
+        .otp-email-text { font-size: 13px; color: #6B7280; margin-bottom: 16px; }
+        .otp-email-text strong { color: #1a1a1a; }
+        .signup-link { text-align: center; font-size: 14px; color: #6B7280; margin-top: 20px; }
+        .signup-link a { color: #F59E0B; font-weight: 700; text-decoration: none; }
+        .terms { font-size: 11px; color: #9CA3AF; text-align: center; margin-top: 16px; line-height: 1.5; }
+        .terms a { color: #6B7280; text-decoration: underline; }
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="index.html" style="position:absolute;top:20px;left:20px;color:white;text-decoration:none;font-size:14px;font-weight:500;">← Home</a>
+
+    <div class="login-container">
+        <div class="logo"><span class="zy">Zy</span><span class="mart">Mart</span></div>
+        <h1 class="title">Welcome Back</h1>
+        <p class="subtitle">Login to your account</p>
+
+        <div id="emailSection">
+            <button class="btn btn-google" onclick="loginWithGoogle()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">Continue with Google
+            </button>
+            <div class="divider">or login with email</div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="loginEmail" placeholder="example@email.com" autocomplete="email" inputmode="email">
+            </div>
+            <button class="btn btn-email" onclick="sendLoginOTP()"><span id="sendBtnText">Send OTP →</span></button>
+        </div>
+
+        <div id="otpSection" class="otp-section">
+            <p class="otp-email-text">OTP sent to <strong id="otpEmailDisplay"></strong></p>
+            <input type="text" id="otpInput" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+            <button class="btn btn-otp" onclick="verifyLoginOTP()"><span id="verifyBtnText">Verify & Login</span></button>
+            <button class="btn" style="background:#F3F5F4;color:#374151;" onclick="resendLoginOTP()" id="resendBtn">Resend OTP</button>
+            <button class="btn btn-back" onclick="goBackToEmail()">← Change Email</button>
+        </div>
+
+        <p class="signup-link">Don't have an account? <a href="signup.html">Sign Up</a></p>
+        <p class="terms">By continuing, you agree to our<br><a href="terms.html">Terms of Service</a> & <a href="privacy-policy.html">Privacy Policy</a></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+        var SUPABASE_KEY = 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1';
+        var zymartDB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        var currentOtpEmail = null, resendTimer = null, resendSeconds = 0;
+
+        async function loginWithGoogle() {
+            try {
+                localStorage.setItem('auth_redirect_pending', 'true');
+                var redirectUrl = window.location.origin + '/auth-redirect.html';
+                var result = await zymartDB.auth.signInWithOAuth({
+                    provider: 'google', options: { redirectTo: redirectUrl, queryParams: { prompt: 'select_account', access_type: 'offline' } }
+                });
+                if (result && result.error) { alert('Google login failed.'); localStorage.removeItem('auth_redirect_pending'); }
+            } catch(e) { alert('Something went wrong.'); }
+        }
+
+        async function sendLoginOTP() {
+            var emailInput = document.getElementById('loginEmail');
+            var email = emailInput.value.trim().toLowerCase();
+            if (!email || !email.includes('@')) { alert('Please enter a valid email'); return; }
+            var sendBtn = document.getElementById('sendBtnText');
+            sendBtn.innerHTML = '<span class="loading-spinner"></span> Sending...';
+            try {
+                var result = await zymartDB.auth.signInWithOtp({ email: email, options: { shouldCreateUser: false } });
+                if (result && result.error) { alert('Error sending OTP.'); sendBtn.textContent = 'Send OTP →'; return; }
+                currentOtpEmail = email;
+                document.getElementById('otpEmailDisplay').textContent = email;
+                document.getElementById('emailSection').style.display = 'none';
+                document.getElementById('otpSection').style.display = 'block';
+                document.querySelector('.title').textContent = 'Verify OTP';
+                document.querySelector('.subtitle').textContent = 'Enter the 6-digit code';
+                document.getElementById('otpInput').focus();
+                startResendTimer();
+            } catch(e) { alert('Something went wrong.'); sendBtn.textContent = 'Send OTP →'; }
+        }
+
+        // 🔥🔥🔥 ROLE-SAFE LOGIN - Kabhi role overwrite nahi hoga!
+        async function verifyLoginOTP() {
+            var otpInput = document.getElementById('otpInput');
+            var otp = otpInput.value.trim();
+            if (!otp || otp.length < 4) { alert('Please enter the complete OTP'); return; }
+            if (!currentOtpEmail) { alert('Session expired.'); goBackToEmail(); return; }
+            var verifyBtn = document.getElementById('verifyBtnText');
+            verifyBtn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
+            try {
+                var result = await zymartDB.auth.verifyOtp({ email: currentOtpEmail, token: otp, type: 'email' });
+                if (result && result.error) { alert('Invalid OTP.'); verifyBtn.textContent = 'Verify & Login'; otpInput.value = ''; return; }
+                if (result && result.data && result.data.session) {
+                    var user = result.data.session.user;
+                    
+                    // 🔒 Check if user already exists in users table
+                    var userData = await zymartDB.from('users').select('id, role').eq('id', user.id).maybeSingle();
+                    
+                    if (!userData.data) {
+                        // 🆕 NEW USER - Insert with role '3' (customer)
+                        await zymartDB.from('users').insert({
+                            id: user.id, 
+                            email: user.email, 
+                            role: '3', 
+                            name: user.user_metadata?.name || ''
+                        });
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                    
+                    // ✅ EXISTING USER - Use ORIGINAL role from database (NEVER overwrite!)
+                    var role = userData.data.role;
+                    
+                    if (role === '1' || role === 'admin') { 
+                        window.location.href = 'admin-panel.html'; 
+                    } else if (role === '2') { 
+                        window.location.href = 'shop-dashboard.html'; 
+                    } else { 
+                        window.location.href = 'index.html'; 
+                    }
+                }
+            } catch(e) { 
+                console.error('Login error:', e); 
+                window.location.href = 'index.html'; 
+            }
+        }
+
+        async function resendLoginOTP() {
+            if (!currentOtpEmail || resendSeconds > 0) return;
+            try { 
+                await zymartDB.auth.signInWithOtp({ email: currentOtpEmail, options: { shouldCreateUser: false } }); 
+                alert('New OTP sent!'); 
+                document.getElementById('otpInput').value = ''; 
+                startResendTimer(); 
+            } catch(e) { alert('Error sending OTP.'); }
+        }
+
+        function startResendTimer() {
+            resendSeconds = 30; 
+            var resendBtn = document.getElementById('resendBtn'); 
+            resendBtn.disabled = true;
+            if (resendTimer) clearInterval(resendTimer);
+            resendTimer = setInterval(function() { 
+                resendSeconds--; 
+                if (resendSeconds <= 0) { 
+                    clearInterval(resendTimer); 
+                    resendBtn.disabled = false; 
+                    resendBtn.textContent = 'Resend OTP'; 
+                } else { 
+                    resendBtn.textContent = 'Resend OTP (' + resendSeconds + 's)'; 
+                } 
+            }, 1000);
+        }
+
+        function goBackToEmail() {
+            document.getElementById('emailSection').style.display = 'block';
+            document.getElementById('otpSection').style.display = 'none';
+            document.querySelector('.title').textContent = 'Welcome Back';
+            document.querySelector('.subtitle').textContent = 'Login to your account';
+            document.getElementById('sendBtnText').textContent = 'Send OTP →';
+            document.getElementById('otpInput').value = ''; 
+            currentOtpEmail = null;
+            if (resendTimer) { clearInterval(resendTimer); document.getElementById('resendBtn').disabled = false; document.getElementById('resendBtn').textContent = 'Resend OTP'; }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { 
+                document.getElementById('otpSection').style.display === 'block' ? verifyLoginOTP() : sendLoginOTP(); 
+            }
+        });
+
+        window.addEventListener('load', function() { 
+            setTimeout(function() { 
+                var emailField = document.getElementById('loginEmail'); 
+                if (emailField) emailField.focus(); 
+            }, 500); 
+        });
+    </script>
+</body>
+</html>
