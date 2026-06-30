@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, target-densitydpi=device-dpi">
+    <title>ZyMart+ - Your Local Market</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="ZyMart+ - India-wide Local Marketplace.">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" media="print" onload="this.media='all'">
+    
+    <style>
+        :root{--brand-green:#0B5A31;--brand-green-light:#0F6E3B;--brand-green-dark:#083D21;--brand-orange:#F59E0B;--brand-orange-dark:#E8890A;--neutral-white:#FFFFFF;--neutral-bg:#F8FAF9;--neutral-border:#E8ECEA;--neutral-gray:#6B7280;--neutral-dark:#1A1A1A;--shadow-xs:0 1px 2px rgba(0,0,0,0.03);--shadow-sm:0 2px 8px rgba(0,0,0,0.05);--shadow-md:0 4px 16px rgba(0,0,0,0.07);--shadow-lg:0 8px 32px rgba(0,0,0,0.10);--radius-sm:10px;--radius-md:14px;--radius-lg:18px;--radius-xl:22px;--radius-full:9999px;--transition-fast:0.12s ease;--transition-smooth:0.2s ease;--status-bar-height:env(safe-area-inset-top, 0px)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--neutral-bg);color:var(--neutral-dark);overflow-x:hidden;width:100%;max-width:100%;padding-bottom:78px;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em;line-height:1.5}
+        #pageProgress{position:fixed;top:0;left:0;width:0%;height:2px;background:var(--brand-green);z-index:10001;border-radius:0 1px 1px 0;transition:width 0.3s ease}
+        #pageProgress.loading{width:80%;transition:width 2s ease}
+        #pageProgress.complete{width:100%;opacity:0;transition:opacity 0.3s ease}
+        .skeleton-cat{width:68px;height:68px;border-radius:20px;background:linear-gradient(90deg,#eef1ef 25%,#e2e7e4 50%,#eef1ef 75%);background-size:200% 100%;animation:skel 1.2s infinite;flex-shrink:0}
+        .skeleton-txt{height:9px;border-radius:4px;background:linear-gradient(90deg,#eef1ef 25%,#e2e7e4 50%,#eef1ef 75%);background-size:200% 100%;animation:skel 1.2s infinite}
+        .skeleton-txt-sm{width:50%}.skeleton-txt-md{width:70%}
+        .skeleton-img{width:100%;aspect-ratio:1/1;border-radius:var(--radius-sm);background:linear-gradient(90deg,#eef1ef 25%,#e2e7e4 50%,#eef1ef 75%);background-size:200% 100%;animation:skel 1.2s infinite}
+        .skeleton-fcard{min-width:142px;width:142px;flex-shrink:0}
+        @keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        .top-bar{background:var(--brand-green);position:fixed;top:0;left:0;width:100%;z-index:1000;padding-top:calc(8px + var(--status-bar-height));padding-bottom:6px;padding-left:14px;padding-right:14px;box-shadow:0 2px 16px rgba(11,90,49,0.30)}
+        .top-row-1{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+        .left-group{display:flex;align-items:center;gap:10px}
+        .menu-btn{width:32px;height:32px;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+        .menu-btn:active{background:rgba(255,255,255,0.18);transform:scale(0.93)}.menu-btn i{color:white;font-size:13px}
+        .brand-name{font-family:'Poppins',sans-serif;font-size:21px;font-weight:700;letter-spacing:-0.3px;display:flex;align-items:baseline}
+        .brand-zy{color:#A3E635}.brand-mart{color:#FDE047}
+        .brand-plus{color:#FFFFFF;font-size:14px;font-weight:700;margin-left:2px}
+        .right-group{display:flex;align-items:center;gap:6px}
+        .location-header{display:flex;align-items:center;gap:3px;padding:5px 9px;background:rgba(255,255,255,0.08);border-radius:var(--radius-full);cursor:pointer;border:none;max-width:140px}
+        .location-header:active{background:rgba(255,255,255,0.18)}.location-header i{color:var(--brand-orange);font-size:8px}
+        .location-header span{font-size:9px;font-weight:500;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .icon-btn-sm{width:32px;height:32px;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;position:relative}
+        .icon-btn-sm:active{background:rgba(255,255,255,0.18);transform:scale(0.93)}.icon-btn-sm i{color:white;font-size:12px}
+        .search-box{background:#FFFFFF;border-radius:var(--radius-full);display:flex;align-items:center;padding:8px 12px;gap:7px;width:100%;transition:all var(--transition-smooth);box-shadow:var(--shadow-xs)}
+        .search-box:focus-within{box-shadow:0 0 0 3px rgba(245,158,11,0.10)}
+        .search-box i{color:#9CA3AF;font-size:12px}.search-box input{flex:1;border:none;outline:none;background:transparent;font-size:11px;font-family:'Inter',sans-serif;color:#1A1A1A}
+        .search-box input::placeholder{color:#B0B8B4}
+        #menuOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(8,61,33,0.45);backdrop-filter:blur(3px);z-index:1001;opacity:0;visibility:hidden;transition:all var(--transition-smooth)}
+        #menuOverlay.show{opacity:1;visibility:visible}
+        #menuDropdown{position:fixed;top:10px;left:6px;background:#FFFFFF;border-radius:18px;box-shadow:0 16px 48px rgba(0,0,0,0.16);z-index:1002;min-width:280px;max-width:calc(100vw - 16px);max-height:calc(100vh - 80px);overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;visibility:hidden;transform:translateY(-6px) scale(0.97);transition:all 0.25s cubic-bezier(0.34,1.15,0.64,1);padding:4px 0 10px}
+        #menuDropdown.show{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+        #menuDropdown::-webkit-scrollbar{width:2px}#menuDropdown::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:2px}
+        .menu-header{padding:12px 14px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F3F5F4;margin-bottom:2px;position:sticky;top:0;background:#FFFFFF;z-index:2;border-radius:18px 18px 0 0}
+        .menu-avatar{width:40px;height:40px;border-radius:50%;background:#EDF7F1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .menu-avatar img{width:100%;height:100%;object-fit:cover}.menu-avatar i{font-size:18px;color:var(--brand-green)}
+        .menu-user-info{flex:1}.menu-user-name{font-size:14px;font-weight:600}.menu-user-sub{font-size:10px;color:#6B7280}
+        #menuDropdown ul{list-style:none;padding:0}
+        #menuDropdown li{padding:11px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:500;margin:1px 5px;border-radius:10px;transition:background var(--transition-fast)}
+        #menuDropdown li:active{background:#F3F5F4}
+        #menuDropdown li .menu-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+        .menu-icon-green{background:#EDF7F1;color:#0B5A31}.menu-icon-red{background:#FEF2F2;color:#EF4444}
+        .menu-icon-blue{background:#EFF6FF;color:#3B82F6}.menu-icon-amber{background:#FFF8EB;color:#F59E0B}
+        .menu-icon-purple{background:#F5F3FF;color:#7C3AED}.menu-icon-teal{background:#F0FDFA;color:#0D9488}
+        .menu-divider{height:1px;background:#F3F5F4;margin:3px 12px}
+        .menu-section-label{padding:6px 14px 2px;font-size:9px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.7px}
+        .menu-badge{background:#F59E0B;color:white;font-size:8px;padding:2px 6px;border-radius:9999px;margin-left:auto;font-weight:600}
+        .menu-badge-new{background:#EF4444;color:white;font-size:8px;padding:2px 6px;border-radius:9999px;margin-left:auto;font-weight:600;animation:pulseAnim 2s infinite}
+        @keyframes pulseAnim{0%,100%{opacity:1}50%{opacity:0.6}}
+        .menu-footer{padding:10px 14px 2px;font-size:9px;color:#9CA3AF;text-align:center;border-top:1px solid #F3F5F4;margin-top:4px;position:sticky;bottom:0;background:#FFFFFF;border-radius:0 0 18px 18px}
+        #mainApp{display:block}
+        .main-content{padding-top:98px;overflow-x:hidden;width:100%}
+        .pull-indicator{text-align:center;padding:6px;color:var(--brand-green);font-size:11px;font-weight:600;display:none;background:#EDF7F1;position:fixed;top:88px;left:0;width:100%;z-index:999}
+        .pull-indicator.show{display:block}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .section-header{display:flex;justify-content:space-between;align-items:center;padding:0 14px;margin-bottom:2px}
+        .section-header h2,.section-header h3{font-family:'Poppins',sans-serif;font-size:14px;font-weight:700}
+        .view-all{color:var(--brand-green);font-size:10px;font-weight:600;cursor:pointer;padding:2px 7px;border-radius:var(--radius-full);border:none;background:transparent}
+        .view-all:active{background:#EDF7F1}
+        .categories-block{background:transparent;padding:6px 0 2px}
+        .categories-scroll-wrapper{padding-left:10px}
+        .categories-scroll{display:flex;gap:6px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 10px 2px 0;flex-wrap:nowrap}
+        .categories-scroll::-webkit-scrollbar{display:none}
+        .category-circle-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;flex-shrink:0;width:72px}
+        .category-circle-item:active{transform:scale(0.92)}
+        .category-circle{width:68px;height:68px;border-radius:20px;background:transparent;display:flex;align-items:center;justify-content:center;margin-bottom:3px;overflow:hidden;box-shadow:none;border:none}
+        .category-circle img{width:56px;height:56px;object-fit:cover;border-radius:14px}
+        .category-circle i{font-size:28px;color:var(--brand-green)}
+        .category-circle-name{font-size:9px;font-weight:600;text-align:center;width:72px;line-height:1.1;color:#1A1A1A}
+        .offers-section{background:white;padding:3px 0}.offers-slider-container{padding:0 14px}
+        .offers-track{display:flex;gap:7px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:1px 0}
+        .offers-track::-webkit-scrollbar{display:none}.offer-card{min-width:130px;width:130px;height:150px;flex-shrink:0;position:relative;border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-sm);background:linear-gradient(140deg,var(--brand-green),var(--brand-green-light))}
+        .offer-card:active{transform:scale(0.96)}.offer-card-image{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+        .offer-card-overlay{position:absolute;bottom:0;left:0;right:0;padding:10px 9px;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent)}
+        .offer-content h4{font-family:'Poppins',sans-serif;font-size:10px;font-weight:600;color:white;margin-bottom:3px}
+        .offer-btn{background:var(--brand-orange);color:#FFFFFF;border:none;padding:2px 8px;border-radius:12px;font-size:8px;font-weight:700}
+        .featured-section{margin-bottom:0}.featured-scroll-wrapper{padding-left:12px}
+        .featured-scroll{display:flex;gap:7px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 12px 2px 0}
+        .featured-scroll::-webkit-scrollbar{display:none}
+        .featured-product-card{min-width:140px;width:140px;background:white;border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow-xs);border:1px solid var(--neutral-border);cursor:pointer;flex-shrink:0;transition:transform var(--transition-fast)}
+        .featured-product-card:active{transform:scale(0.97)}
+        .featured-product-img{width:100%;aspect-ratio:1/1;overflow:hidden;background:#F9FAFB;display:flex;align-items:center;justify-content:center;position:relative;padding:8px}
+        .featured-product-img img{width:85%;height:85%;object-fit:contain;border-radius:6px}
+        .featured-discount-tag{position:absolute;top:6px;left:6px;background:var(--brand-orange);color:white;font-size:8px;font-weight:700;padding:2px 6px;border-radius:var(--radius-full);z-index:1}
+        .featured-weight-tag{position:absolute;bottom:6px;right:6px;background:rgba(11,90,49,0.85);color:white;font-size:8px;font-weight:600;padding:2px 6px;border-radius:var(--radius-full);z-index:1}
+        .featured-product-info{padding:7px 9px}
+        .featured-shop-name{font-size:8px;color:var(--brand-green);font-weight:600;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .featured-product-name{font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
+        .featured-product-price-row{display:flex;align-items:center;gap:3px;margin-bottom:5px}
+        .featured-product-price{font-size:13px;font-weight:700;color:#0B5A31}
+        .featured-original-price{font-size:9px;color:#9CA3AF;text-decoration:line-through}
+        .featured-add-btn{background:var(--brand-green);color:white;border:none;border-radius:var(--radius-full);padding:6px 0;font-size:10px;font-weight:600;width:100%;cursor:pointer;transition:background var(--transition-fast)}
+        .featured-add-btn:active{background:var(--brand-green-dark);transform:scale(0.97)}
+        .hero-section{margin:6px 0 2px}.hero-slider{border-radius:var(--radius-lg);overflow:hidden;margin:0 12px;box-shadow:var(--shadow-sm)}
+        .hero-slide{position:relative;height:140px;border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;background:#EDF7F1}
+        .hero-slide img{width:100%;height:100%;object-fit:cover}.hero-overlay{position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(to top,rgba(0,0,0,0.6),transparent)}
+        .hero-title{font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;color:white}
+        .trending-section{margin-bottom:2px}.products-scroll{padding:0 14px}
+        .trending-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+        .trending-card{background:white;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-xs);border:1px solid var(--neutral-border);cursor:pointer;transition:transform var(--transition-fast)}
+        .trending-card:active{transform:scale(0.97)}
+        .trending-card-img{width:100%;aspect-ratio:1/1;background:#F9FAFB;display:flex;align-items:center;justify-content:center;position:relative;padding:10px;overflow:hidden}
+        .trending-card-img img{width:82%;height:82%;object-fit:contain}
+        .trending-discount-tag{position:absolute;top:6px;left:6px;background:#F59E0B;color:white;font-size:9px;font-weight:700;padding:2px 7px;border-radius:9999px;z-index:1}
+        .trending-weight-tag{position:absolute;bottom:6px;right:6px;background:rgba(11,90,49,0.85);color:white;font-size:8px;font-weight:600;padding:2px 6px;border-radius:9999px;z-index:1}
+        .trending-card-info{padding:8px 10px}
+        .trending-shop-name{font-size:8px;color:#0B5A31;font-weight:600;margin-bottom:1px}
+        .trending-product-name{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .trending-product-price{font-size:14px;font-weight:700;color:#0B5A31;margin-top:1px}
+        .trending-original-price{font-size:9px;color:#9CA3AF;text-decoration:line-through;margin-left:3px}
+        .trending-add-btn{margin-top:6px;background:#0B5A31;color:white;border:none;padding:7px 0;border-radius:9999px;font-size:10px;font-weight:600;cursor:pointer;width:100%;transition:background var(--transition-fast)}
+        .bottom-nav{background:white;position:fixed;bottom:0;left:0;width:100%;display:flex;justify-content:space-around;padding:3px 8px 8px;box-shadow:0 -4px 16px rgba(0,0,0,0.05);z-index:1000;border-top:1px solid var(--neutral-border)}
+        .nav-item{display:flex;flex-direction:column;align-items:center;font-size:8px;font-weight:500;color:#6B7280;cursor:pointer;padding:2px 7px;border-radius:var(--radius-full);border:none;background:transparent;position:relative;transition:all var(--transition-fast);text-decoration:none}
+        .nav-item:active{background:#EDF7F1}.nav-item.active{color:var(--brand-green);font-weight:600}.nav-item i{font-size:17px;margin-bottom:1px}
+        .cart-count{position:absolute;top:-5px;right:-7px;background:var(--brand-orange);color:white;border-radius:50%;width:15px;height:15px;font-size:7px;display:flex;align-items:center;justify-content:center;border:2px solid white;font-weight:700}
+        .toast-notification{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:white;padding:8px 16px;border-radius:var(--radius-full);font-size:11px;z-index:10050;opacity:0;visibility:hidden;transition:all 0.3s ease;box-shadow:var(--shadow-md)}
+        .toast-notification.show{opacity:1;visibility:visible}
+        .error-state{text-align:center;padding:20px;color:#6B7280;font-size:10px}
+        .empty-state{text-align:center;padding:12px;color:#6B7280;font-size:10px}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+</head>
+<body>
+
+<div id="mainApp">
+    <div class="top-bar">
+        <div class="top-row-1">
+            <div class="left-group"><button class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button><div class="brand-name"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span><span class="brand-plus">+</span></div></div>
+            <div class="right-group">
+                <button class="location-header" onclick="findNearbyShops()"><i class="fas fa-map-pin"></i><span id="currentLocation">📍 Nearby</span></button>
+                <button class="icon-btn-sm" onclick="fastNavigate('wishlist.html')"><i class="fas fa-heart"></i></button>
+                <button class="icon-btn-sm" onclick="showNotifications()"><i class="far fa-bell"></i></button>
+            </div>
+        </div>
+        <div class="top-row-2"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search products, shops..." autocomplete="off"></div></div>
+    </div>
+    
+    <div id="menuOverlay" onclick="closeMenu()"></div>
+    
+    <div id="menuDropdown">
+        <div class="menu-header"><div class="menu-avatar" id="menuAvatar"><i class="fas fa-user"></i></div><div class="menu-user-info"><div class="menu-user-name" id="menuUserName">Guest</div><div class="menu-user-sub" id="menuUserSub">Login to continue</div></div></div>
+        <ul>
+            <li onclick="fastNavigate('shop-register.html')" style="background:linear-gradient(135deg,#EDF7F1,#FFF8EB);border:1px solid #C8E6C9;"><span class="menu-icon menu-icon-green"><i class="fas fa-store-alt"></i></span><span style="font-weight:700;color:#0B5A31;">🏪 Register Shop</span></li>
+            <div class="menu-divider"></div>
+            <div class="menu-section-label">🔥 Account</div>
+            <li onclick="fastNavigate('login.html')"><span class="menu-icon menu-icon-amber"><i class="fas fa-sign-in-alt"></i></span> Login</li>
+            <li onclick="fastNavigate('signup.html')"><span class="menu-icon menu-icon-purple"><i class="fas fa-user-plus"></i></span> Sign Up <span class="menu-badge-new">New</span></li>
+            <div class="menu-divider"></div>
+            <div class="menu-section-label">📦 My Orders</div>
+            <li onclick="fastNavigate('orders.html')"><span class="menu-icon menu-icon-green"><i class="fas fa-clipboard-list"></i></span> My Orders</li>
+            <li onclick="fastNavigate('wishlist.html')"><span class="menu-icon menu-icon-red"><i class="fas fa-heart"></i></span> Wishlist</li>
+            <div class="menu-divider"></div>
+            <div class="menu-section-label">🏪 Shops</div>
+            <li onclick="fastNavigate('all-shops.html')"><span class="menu-icon menu-icon-teal"><i class="fas fa-store"></i></span> All Shops</li>
+            <li onclick="fastNavigate('shop-categories.html')"><span class="menu-icon menu-icon-blue"><i class="fas fa-tags"></i></span> Shop Categories</li>
+            <div class="menu-divider"></div>
+            <div class="menu-section-label">📞 Support</div>
+            <li onclick="showHelpModal()"><span class="menu-icon menu-icon-blue"><i class="fas fa-headset"></i></span> Help</li>
+            <li onclick="window.open('https://wa.me/918600252238','_blank')"><span class="menu-icon menu-icon-green"><i class="fab fa-whatsapp"></i></span> WhatsApp</li>
+        </ul>
+        <div class="menu-footer">ZyMart+ v2.0 • Premium</div>
+    </div>
+    
+    <div class="main-content">
+        <div class="pull-indicator" id="pullIndicator">⬇️ Pull to refresh</div>
+        <div class="categories-block">
+            <div class="section-header"><h2>Categories</h2><button class="view-all" onclick="fastNavigate('shop-categories.html')">All →</button></div>
+            <div class="categories-scroll-wrapper">
+                <div class="categories-scroll" id="categoriesScrollFood"></div>
+                <div class="categories-scroll" id="categoriesScrollFashion"></div>
+            </div>
+        </div>
+        <div class="offers-section"><div class="section-header"><h3>Hot Offers</h3><button class="view-all" onclick="fastNavigate('offers.html')">All →</button></div><div class="offers-slider-container"><div class="offers-track" id="offersTrack"></div></div></div>
+        <div class="featured-section"><div class="section-header"><h3>Featured Products</h3><button class="view-all" onclick="fastNavigate('products.html')">All →</button></div><div class="featured-scroll-wrapper"><div class="featured-scroll" id="featuredContainer"></div></div></div>
+        <div class="hero-section"><div class="swiper hero-slider" id="heroSwiper"><div class="swiper-wrapper" id="heroContainer"></div><div class="swiper-pagination"></div></div></div>
+        <div class="trending-section"><div class="section-header"><h3>Trending Now</h3></div><div class="products-scroll"><div id="trendingContainer"></div></div></div>
+    </div>
+    
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="fastNavigate('index.html')"><i class="fas fa-home"></i><span>Home</span></button>
+        <button class="nav-item" onclick="handleCartClick()"><i class="fas fa-shopping-cart"></i><span>Cart</span><span class="cart-count" id="cartCount">0</span></button>
+        <button class="nav-item" onclick="fastNavigate('orders.html')"><i class="fas fa-receipt"></i><span>Orders</span></button>
+        <button class="nav-item" onclick="fastNavigate('profile.html')"><i class="fas fa-user"></i><span>Profile</span></button>
+        <a class="nav-item" href="more.html"><i class="fas fa-ellipsis-h"></i><span>More</span></a>
+    </nav>
+</div>
+
+<div id="pageProgress"></div>
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<script>
+(function() {
+    'use strict';
+    window.addEventListener('error', function(e) { console.error('[ZyMart]', e.message); try { showToast('Something went wrong', true); } catch(_) {} });
+    window.addEventListener('unhandledrejection', function(e) { console.error('[ZyMart]', e.reason); e.preventDefault(); try { showToast('Network error', true); } catch(_) {} });
+    
+    function safeGet(id) { try { return document.getElementById(id); } catch(e) { return null; } }
+    function safeSetText(id, t) { try { var el = document.getElementById(id); if (el) el.textContent = t; } catch(e) {} }
+    function safeLocalStorageGet(k, f) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch(e) { return f; } }
+    function safeLocalStorageSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+    
+    var CONFIG = { SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co', SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1', CACHE_DURATION: { CATEGORIES: 7200000, PRODUCTS: 300000, OFFERS: 3600000, SLIDERS: 3600000, SHOPS: 1800000 }, LOCATION_MAX_AGE: 86400000, PRODUCT_REFRESH_DEBOUNCE: 250, GEOCODE_DEBOUNCE: 1500 };
+    var zymartDB = null;
+    try { zymartDB = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY); } catch(e) { zymartDB = { auth: { getSession: function() { return Promise.resolve({ data: { session: null } }); } } }; }
+    var SUPABASE_URL = CONFIG.SUPABASE_URL;
+    var currentUser = null, heroSwiper = null;
+    var userLat = null, userLng = null, userCity = null, userPincode = null, locationShortName = null;
+    var nearbyShopIds = [], allCategories = [];
+    var gpsInProgress = false, geocodeInProgress = false, geocodeQueue = null, productRefreshTimer = null;
+    var onlineHandler = null, offlineHandler = null;
+    var notificationTimer = null;
+    
+    function getFullUrl(u) { if (!u || typeof u !== 'string') return ''; if (u.indexOf('http')===0 || u.indexOf('data:')===0) return u; return SUPABASE_URL + '/storage/v1/object/public/' + u; }
+    function formatWeight(w, u) { if (!w) return ''; if (u === 'gram' || u === 'g' || u === 'gm') return w >= 1000 ? (w/1000).toFixed(1).replace(/\.0$/, '') + ' kg' : w + ' g'; if (u === 'kg') return w + ' kg'; if (u === 'liter' || u === 'l') return w + ' L'; if (u === 'ml') return w + ' ml'; return w + ' ' + (u || 'pcs'); }
+    function getCategoryName(catId) { var cat = allCategories.find(function(c) { return c.id === catId; }); return cat ? cat.name : ''; }
+    async function safeFetch(fn, r) { r = r || 3; for (var i = 0; i < r; i++) { try { var res = await fn(); if (res && res.error) { if (i === r-1) return { data: [] }; await new Promise(function(x) { setTimeout(x, 800*(i+1)); }); continue; } return res || { data: [] }; } catch(err) { if (i < r-1) await new Promise(function(x) { setTimeout(x, 800*(i+1)); }); } } return { data: [] }; }
+    
+    function showToast(m, e) { try { var t = safeGet('toastMsg'), s = safeGet('toastText'); if (!t || !s) return; s.textContent = m; t.style.background = e ? '#EF4444' : '#1A1A1A'; t.classList.add('show'); clearTimeout(t._timer); t._timer = setTimeout(function() { t.classList.remove('show'); }, 2000); } catch(_) {} }
+    function startProgress() { try { var b = safeGet('pageProgress'); if (b) { b.style.width = '0%'; b.classList.add('loading'); requestAnimationFrame(function() { b.style.width = '80%'; }); } } catch(_) {} }
+    function completeProgress() { try { var b = safeGet('pageProgress'); if (b) { b.classList.remove('loading'); b.classList.add('complete'); setTimeout(function() { b.style.width = '0%'; b.classList.remove('complete'); }, 300); } } catch(_) {} }
+    
+    function calculateDistance(lat1, lng1, lat2, lng2) { var R = 6371; var dLat = (lat2 - lat1) * Math.PI / 180; var dLng = (lng2 - lng1) * Math.PI / 180; var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLng/2) * Math.sin(dLng/2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
+    function isLocationValid() { var ts = parseInt(localStorage.getItem('location_timestamp') || '0'); return (Date.now() - ts) < CONFIG.LOCATION_MAX_AGE; }
+    function validateCoordinates(lat, lng) { if (!lat || !lng || (lat===0&&lng===0)) return false; if (lat<6.0||lat>38.0||lng<68.0||lng>98.0) return false; return true; }
+    function saveLocation(lat, lng) { if (!validateCoordinates(lat, lng)) return; try { localStorage.setItem('user_lat', String(lat)); localStorage.setItem('user_lng', String(lng)); localStorage.setItem('location_timestamp', String(Date.now())); } catch(e) {} }
+    
+    function trySilentGPS() { var canQuery = false; try { canQuery = !!(navigator.permissions && typeof navigator.permissions.query === 'function'); } catch(e) {} if (!canQuery) { silentGPSFallback(); return; } navigator.permissions.query({name:'geolocation'}).then(function(result) { if (result.state === 'granted') silentGPSFallback(); }).catch(function() { silentGPSFallback(); }); }
+    function silentGPSFallback() { if (!navigator.geolocation || gpsInProgress) return; gpsInProgress = true; navigator.geolocation.getCurrentPosition(function(pos) { gpsInProgress = false; userLat = pos.coords.latitude; userLng = pos.coords.longitude; saveLocation(userLat, userLng); fetchAddress(userLat, userLng); findNearbyShopIds(userLat, userLng); }, function() { gpsInProgress = false; }, { timeout: 4000, maximumAge: 300000, enableHighAccuracy: false }); }
+    function fetchAddress(lat, lng) { return new Promise(function(resolve) { geocodeQueue = { lat: lat, lng: lng, resolve: resolve }; if (!geocodeInProgress) executeGeocode(); }); }
+    async function executeGeocode() { if (!geocodeQueue || geocodeInProgress) return; geocodeInProgress = true; var q = geocodeQueue; geocodeQueue = null; try { var ctrl = new AbortController(); var t = setTimeout(function() { ctrl.abort(); }, 4000); var r = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+q.lat+'&lon='+q.lng+'&zoom=18&addressdetails=1', { headers: { 'User-Agent': 'ZyMartApp/2.0' }, signal: ctrl.signal }); clearTimeout(t); if (r.ok) { var d = await r.json(); if (d.address) { userCity = d.address.city||d.address.town||''; userPincode = d.address.postcode||''; locationShortName = userCity||d.address.road||'Your Area'; try { if(userPincode)localStorage.setItem('user_pincode',userPincode); if(userCity)localStorage.setItem('user_city',userCity); localStorage.setItem('location_short',locationShortName); } catch(e) {} updateLocationDisplay(); } } } catch(e) {} finally { geocodeInProgress = false; q.resolve(); if (geocodeQueue) setTimeout(executeGeocode, CONFIG.GEOCODE_DEBOUNCE); } }
+    async function findNearbyShopIds(lat, lng) { try { var result = await safeFetch(function() { return zymartDB.from('shops').select('id,latitude,longitude,delivery_radius_km').eq('status','approved').eq('is_open',true); }, 2); if (!result.data||!result.data.length) return; var newIds = []; for (var i=0;i<result.data.length;i++) { var shop=result.data[i]; if(!shop.latitude||!shop.longitude)continue; var dist=calculateDistance(lat,lng,shop.latitude,shop.longitude); if(dist<=(shop.delivery_radius_km||10)) newIds.push(shop.id); } var changed = (newIds.length!==nearbyShopIds.length) || newIds.some(function(id,idx){return id!==nearbyShopIds[idx];}); if (changed) { nearbyShopIds = newIds; updateLocationDisplay(); refreshProducts(); } } catch(e) {} }
+    function refreshProducts() { clearTimeout(productRefreshTimer); productRefreshTimer = setTimeout(function() { Promise.all([loadFeaturedProductsInternal(), loadTrendingProductsInternal()]); }, CONFIG.PRODUCT_REFRESH_DEBOUNCE); }
+    function loadLocationFromStorage() { if (!isLocationValid()) { ['user_lat','user_lng','location_timestamp'].forEach(function(k){ try{localStorage.removeItem(k);}catch(e){} }); userLat=null;userLng=null;updateLocationDisplay();return; } userPincode=localStorage.getItem('user_pincode');userCity=localStorage.getItem('user_city'); userLat=parseFloat(localStorage.getItem('user_lat')||'0')||null;userLng=parseFloat(localStorage.getItem('user_lng')||'0')||null; locationShortName=localStorage.getItem('location_short')||'';updateLocationDisplay(); if(userLat&&userLng&&validateCoordinates(userLat,userLng))findNearbyShopIds(userLat,userLng); }
+    function updateLocationDisplay() { var t='📍 Nearby'; if(locationShortName&&nearbyShopIds.length>0)t='📍 '+locationShortName+' • '+nearbyShopIds.length; else if(locationShortName)t='📍 '+locationShortName; safeSetText('currentLocation',t); }
+    
+    window.findNearbyShops = function() { if (gpsInProgress) return; if (window.Android && typeof window.Android.requestLocation === 'function') { gpsInProgress = true; showToast('📍 Detecting...'); window.Android.requestLocation(); setTimeout(function() { gpsInProgress = false; }, 15000); return; } if (!navigator.geolocation) { showToast('GPS not supported', true); return; } gpsInProgress = true; showToast('📍 Detecting...'); navigator.geolocation.getCurrentPosition( async function(pos) { gpsInProgress = false; userLat = pos.coords.latitude; userLng = pos.coords.longitude; saveLocation(userLat, userLng); await fetchAddress(userLat, userLng); await findNearbyShopIds(userLat, userLng); updateLocationDisplay(); showToast(nearbyShopIds.length > 0 ? '✅ ' + nearbyShopIds.length + ' shops found!' : '🚀 Expanding in your area'); }, function(err) { gpsInProgress = false; if (err.code === 2) { if (window.Android && typeof window.Android.openLocationSettings === 'function') { window.Android.openLocationSettings(); } else { showToast('📍 Please enable GPS in Settings', true); } } else if (err.code === 1) { showToast('📍 Location permission needed', true); } }, { timeout: 12000, maximumAge: 0, enableHighAccuracy: true } ); };
+    window.setLocationFromAndroid = async function(lat, lng) { gpsInProgress = false; userLat = parseFloat(lat); userLng = parseFloat(lng); saveLocation(userLat, userLng); await fetchAddress(userLat, userLng); await findNearbyShopIds(userLat, userLng); updateLocationDisplay(); showToast(nearbyShopIds.length > 0 ? '✅ ' + nearbyShopIds.length + ' shops found!' : '🚀 Expanding in your area'); };
+    window.onLocationError = function(msg) { gpsInProgress = false; };
+    
+    function updateMenuHeader() { if(currentUser){ safeSetText('menuUserName',(currentUser.user_metadata||{}).name||currentUser.email||'User'); safeSetText('menuUserSub',currentUser.email||''); } else { safeSetText('menuUserName','Guest'); safeSetText('menuUserSub','Login to continue'); var av=safeGet('menuAvatar');if(av)av.innerHTML='<i class="fas fa-user"></i>'; } }
+    function updateCartCount() { var cart=safeLocalStorageGet('zymart_cart',[]); safeSetText('cartCount',cart.reduce(function(s,i){return s+(i.quantity||1);},0)); }
+    function toggleMenu() { var m=safeGet('menuDropdown'),o=safeGet('menuOverlay'); if(!m||!o)return; if(m.classList.contains('show'))closeMenu();else{o.classList.add('show');requestAnimationFrame(function(){m.classList.add('show');});} }
+    function closeMenu() { var m=safeGet('menuDropdown'),o=safeGet('menuOverlay'); if(m)m.classList.remove('show'); if(o)o.classList.remove('show'); }
+    function showHelpModal() { showToast('📞 8600252238'); closeMenu(); }
+    function showNotifications() { showToast('No notifications'); }
+    
+    async function loadAllData() { if(window._dataLoading)return; window._dataLoading=true; startProgress(); showCategorySkeleton(); showFeaturedSkeleton(); showProductsSkeleton('trendingContainer'); try { var catRes=await safeFetch(function(){return zymartDB.from('categories').select('id,name').eq('is_active',true);},3); allCategories=catRes.data||[]; await Promise.allSettled([loadCategoriesInternal(),loadOffersInternal(),loadHeroSliderInternal(),loadFeaturedProductsInternal(),loadTrendingProductsInternal()]); } finally { completeProgress(); window._dataLoading=false; } }
+    
+    async function loadCategoriesInternal() { var cf = safeGet('categoriesScrollFood'); var cfa = safeGet('categoriesScrollFashion'); if (!cf && !cfa) return; showCategorySkeleton(); localStorage.removeItem('zm_categories_all'); var r = await safeFetch(function() { return zymartDB.from('categories').select('id,name,image_url,category_type').eq('is_active',true).eq('is_on_hold',false).order('priority'); }, 3); if (r.data && r.data.length > 0) { Cache.set('categories_all', r.data, CONFIG.CACHE_DURATION.CATEGORIES); renderSplitCategories(r.data); } else { if(cf)cf.innerHTML=''; if(cfa)cfa.innerHTML=''; } }
+    function renderSplitCategories(data) { var foodCategories = data.filter(function(c) { return (c.category_type || 'food') === 'food'; }); var fashionCategories = data.filter(function(c) { return c.category_type === 'fashion'; }); var cf = safeGet('categoriesScrollFood'); var cfa = safeGet('categoriesScrollFashion'); if (cf) cf.innerHTML = foodCategories.length ? renderCategoryHTML(foodCategories) : ''; if (cfa) cfa.innerHTML = fashionCategories.length ? renderCategoryHTML(fashionCategories) : ''; if (cfa && !fashionCategories.length) cfa.style.display = 'none'; else if (cfa) cfa.style.display = ''; }
+    function renderCategoryHTML(cats) { return cats.map(function(cat) { var iu = getFullUrl(cat.image_url); var name = (cat.name || '').replace(/'/g, "\\'"); var imgHtml = cat.image_url ? '<img src="' + iu + '" loading="lazy"><i class="fas fa-store" style="display:none;"></i>' : '<i class="fas fa-store"></i>'; return '<div class="category-circle-item" onclick="filterByCategory(\'' + cat.id + '\',\'' + name + '\')"><div class="category-circle">' + imgHtml + '</div><div class="category-circle-name">' + cat.name + '</div></div>'; }).join(''); }
+    
+    async function loadHeroSliderInternal() { var c=safeGet('heroContainer'); if(!c)return; var r=await safeFetch(function(){return zymartDB.from('sliders').select('*').eq('is_active',true).order('display_order');},3); if(r.data&&r.data.length>0)renderHeroSlider(r.data); }
+    function renderHeroSlider(s) { var c=safeGet('heroContainer'); if(!c||!s||!s.length)return; c.innerHTML=s.map(function(sl){return'<div class="swiper-slide hero-slide" onclick="fastNavigate(\''+(sl.link||'#')+'\')"><img src="'+getFullUrl(sl.image_url)+'" loading="lazy" onerror="this.parentElement.style.background=\'#EDF7F1\'"><div class="hero-overlay"><div class="hero-title">'+(sl.title||'')+'</div></div></div>';}).join(''); if(heroSwiper){try{heroSwiper.destroy(true,true);}catch(e){}} try{heroSwiper=new Swiper('#heroSwiper',{loop:s.length>1,autoplay:s.length>1?{delay:3500}:false,pagination:{el:'.swiper-pagination',clickable:true}});}catch(e){} }
+    
+    async function loadOffersInternal() { var t=safeGet('offersTrack'); if(!t)return; var r=await safeFetch(function(){return zymartDB.from('offers').select('*').eq('is_active',true).order('priority').limit(10);},3); if(r.data&&r.data.length>0)renderOffers(r.data); }
+    function renderOffers(o) { var t=safeGet('offersTrack'); if(!t||!o||!o.length)return; t.innerHTML=o.map(function(of){return'<div class="offer-card" onclick="fastNavigate(\''+(of.link||'offers.html')+'\')">'+(of.image_url?'<img src="'+getFullUrl(of.image_url)+'" class="offer-card-image" loading="lazy">':'')+'<div class="offer-card-overlay"><div class="offer-content"><h4>'+(of.title||'')+'</h4><button class="offer-btn">'+of.discount_value+(of.discount_type==='percentage'?'% OFF':'₹ OFF')+'</button></div></div></div>';}).join(''); }
+    
+    async function loadFeaturedProductsInternal() { var c=safeGet('featuredContainer'); if(!c)return; showFeaturedSkeleton(); try{var query=zymartDB.from('products').select('*').eq('is_featured',true).eq('is_active',true).eq('is_on_hold',false); if(nearbyShopIds.length>0)query=query.in('shop_id',nearbyShopIds); query=query.limit(30); var fr=await safeFetch(function(){return query;},3); if((!fr.data||fr.data.length===0)&&nearbyShopIds.length>0)fr=await safeFetch(function(){return zymartDB.from('products').select('*').eq('is_featured',true).eq('is_active',true).eq('is_on_hold',false).limit(30);},3); if(fr.data&&fr.data.length>0)renderFeaturedProducts(fr.data); else c.innerHTML='<div class="empty-state"><p>No featured products</p></div>'; }catch(e){c.innerHTML='<div class="error-state"><p>Failed to load</p></div>';} }
+    function renderFeaturedProducts(d) { var c=safeGet('featuredContainer'); if(!c||!d||!d.length)return; c.innerHTML=d.map(function(pr){var img=getFullUrl((pr.images&&pr.images[0])||pr.image_url||'');var dis=pr.offer_price?Math.round((1-pr.offer_price/pr.price)*100):0;var name=(pr.name||'').replace(/'/g,"\\'");var shopName=pr.shop_name||'';var weightDisplay=formatWeight(pr.weight,pr.weight_unit||pr.unit);var catName=getCategoryName(pr.category_id);return'<div class="featured-product-card" onclick="openProductDetails(\''+pr.id+'\')"><div class="featured-product-img">'+(dis>0?'<div class="featured-discount-tag">'+dis+'% OFF</div>':'')+(img?'<img src="'+img+'" loading="lazy" onerror="this.style.display=\'none\'">':'')+(weightDisplay?'<div class="featured-weight-tag">'+weightDisplay+'</div>':'')+'</div><div class="featured-product-info">'+(shopName?'<div class="featured-shop-name">🏪 '+shopName+'</div>':'')+'<div class="featured-product-name">'+pr.name+'</div>'+(catName?'<div style="font-size:8px;color:#6B7280;">📂 '+catName+'</div>':'')+'<div class="featured-product-price-row"><span class="featured-product-price">₹'+(pr.offer_price||pr.price)+'</span>'+(pr.offer_price?'<span class="featured-original-price">₹'+pr.price+'</span>':'')+'</div><button class="featured-add-btn" onclick="event.stopPropagation();addToCart(\''+pr.id+'\',\''+name+'\','+(pr.offer_price||pr.price)+',\''+img+'\')">Add</button></div></div>';}).join(''); }
+    
+    async function loadTrendingProductsInternal() { var c=safeGet('trendingContainer'); if(!c)return; showProductsSkeleton('trendingContainer'); try{var query=zymartDB.from('products').select('*').eq('is_active',true).eq('is_on_hold',false); if(nearbyShopIds.length>0)query=query.in('shop_id',nearbyShopIds); query=query.order('created_at',{ascending:false}).limit(30); var r=await safeFetch(function(){return query;},3); if((!r.data||r.data.length===0)&&nearbyShopIds.length>0)r=await safeFetch(function(){return zymartDB.from('products').select('*').eq('is_active',true).eq('is_on_hold',false).order('created_at',{ascending:false}).limit(30);},3); if(r.data&&r.data.length>0){var html='<div class="trending-grid">'; for(var i=0;i<r.data.length;i++){var p=r.data[i],img=getFullUrl((p.images&&p.images[0])||p.image_url||''),dis=p.offer_price?Math.round((1-p.offer_price/p.price)*100):0,name=(p.name||'').replace(/'/g,"\\'"),sn=p.shop_name||'',weightD=formatWeight(p.weight,p.weight_unit||p.unit),catN=getCategoryName(p.category_id);html+='<div class="trending-card" onclick="openProductDetails(\''+p.id+'\')"><div class="trending-card-img">'+(dis>0?'<div class="trending-discount-tag">'+dis+'% OFF</div>':'')+(weightD?'<div class="trending-weight-tag">'+weightD+'</div>':'')+(img?'<img src="'+img+'" loading="lazy" onerror="this.style.display=\'none\'">':'')+'</div><div class="trending-card-info">'+(sn?'<div class="trending-shop-name">🏪 '+sn+'</div>':'')+'<div class="trending-product-name">'+p.name+'</div>'+(catN?'<div style="font-size:8px;color:#6B7280;">📂 '+catN+'</div>':'')+'<div class="trending-product-price">₹'+(p.offer_price||p.price)+(p.offer_price?'<span class="trending-original-price">₹'+p.price+'</span>':'')+'</div><button class="trending-add-btn" onclick="event.stopPropagation();addToCart(\''+p.id+'\',\''+name+'\','+(p.offer_price||p.price)+',\''+img+'\')">Add +</button></div></div>';} html+='</div>'; c.innerHTML=html; }else{c.innerHTML='<div class="empty-state"><p>No products</p></div>';} }catch(e){c.innerHTML='<div class="error-state"><p>Failed to load</p></div>';} }
+    
+    function addToCart(id,n,p,img){try{var cart=safeLocalStorageGet('zymart_cart',[]);var ex=cart.find(function(i){return i.id===id;});if(ex)ex.quantity=(ex.quantity||1)+1;else cart.push({id:id,name:n,price:p,image:img,quantity:1});safeLocalStorageSet('zymart_cart',cart);safeSetText('cartCount',cart.reduce(function(s,i){return s+(i.quantity||1);},0));showToast('🛒 '+n+' added');}catch(e){showToast('❌ Cart error',true);}}
+    
+    function showCategorySkeleton(){ var skelHTML = Array(6).fill(0).map(function(){return '<div class="category-circle-item"><div class="skeleton-cat"></div></div>';}).join(''); var cf = safeGet('categoriesScrollFood'); if (cf) cf.innerHTML = skelHTML; var cfa = safeGet('categoriesScrollFashion'); if (cfa) cfa.innerHTML = skelHTML; }
+    function showFeaturedSkeleton(){var c=safeGet('featuredContainer');if(!c)return;c.innerHTML=Array(4).fill(0).map(function(){return'<div class="skeleton-fcard"><div class="skeleton-img"></div><div class="skeleton-txt skeleton-txt-md" style="margin:4px;"></div></div>';}).join('');}
+    function showProductsSkeleton(id){var c=safeGet(id);if(!c)return;c.innerHTML='<div class="trending-grid">'+Array(4).fill(0).map(function(){return'<div><div class="skeleton-img"></div><div class="skeleton-txt"></div></div>';}).join('')+'</div>';}
+    
+    function openProductDetails(id){if(id)fastNavigate('product-detail.html?id='+id);}
+    function filterByCategory(cid,cn){if(cid)fastNavigate('products.html?category_id='+cid+'&category_name='+encodeURIComponent(cn));}
+    function handleCartClick(){fastNavigate('cart.html');}
+    
+    window.fastNavigate=function(url){ closeMenu(); if(!url)return; if(url.indexOf('http')===0||url.indexOf('javascript:')===0||url.indexOf('mailto:')===0||url.indexOf('tel:')===0||url.indexOf('whatsapp:')===0){ window.location.href=url; return; } window.location.href=url; };
+    
+    async function checkLoggedInUser(){
+        try {
+            var sr = await zymartDB.auth.getSession();
+            if(sr && sr.data && sr.data.session){
+                currentUser = sr.data.session.user;
+                var userRole = null;
+                try { var userData = await zymartDB.from('users').select('role').eq('id', currentUser.id).maybeSingle(); if (userData && userData.data && userData.data.role) { userRole = String(userData.data.role); } } catch(e) {}
+                if (!userRole) { userRole = (currentUser.user_metadata && currentUser.user_metadata.role) || null; if (userRole) userRole = String(userRole); }
+                try { localStorage.removeItem('auth_redirect_pending'); } catch(e) {}
+                if (userRole === '1' || userRole === 'admin') { setTimeout(function() { window.location.href = 'admin-panel.html'; }, 300); return true; }
+                if (userRole === '2' || userRole === 'shop_owner') { setTimeout(function() { window.location.href = 'shop-dashboard.html'; }, 300); return true; }
+            } else {
+                var rr = await zymartDB.auth.refreshSession();
+                if(rr && rr.data && rr.data.session){ currentUser = rr.data.session.user; return checkLoggedInUser(); }
+                else { currentUser = null; }
+            }
+        } catch(e) { currentUser = null; }
+        updateMenuHeader(); updateCartCount();
+        // 🔥 START NOTIFICATION POLLING
+        startNotificationPolling();
+        return !!currentUser;
+    }
+    
+    // 🔥 NOTIFICATION POLLING
+    function startNotificationPolling() {
+        if (notificationTimer) clearInterval(notificationTimer);
+        notificationTimer = setInterval(async function() {
+            if (!currentUser) return;
+            try {
+                var res = await zymartDB.from('notifications')
+                    .select('*')
+                    .eq('is_read', false)
+                    .or('user_id.eq.' + currentUser.id + ',user_id.is.null')
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+                
+                if (res.data && res.data.length > 0) {
+                    var notif = res.data[0];
+                    if (window.Android && typeof window.Android.sendNotification === 'function') {
+                        window.Android.sendNotification(notif.title, notif.message);
+                    }
+                    await zymartDB.from('notifications').update({ is_read: true }).eq('id', notif.id);
+                }
+            } catch(e) {}
+        }, 30000);
+    }
+    
+    function setupNetworkListeners(){ if(onlineHandler)window.removeEventListener('online',onlineHandler); if(offlineHandler)window.removeEventListener('offline',offlineHandler); onlineHandler=function(){showToast('Internet restored!');}; offlineHandler=function(){showToast('Offline',true);}; window.addEventListener('online',onlineHandler); window.addEventListener('offline',offlineHandler); }
+    var Cache={set:function(k,d,t){try{localStorage.setItem('zm_'+k,JSON.stringify({d:d,e:Date.now()+(t||CONFIG.CACHE_DURATION.PRODUCTS)}));}catch(e){}},get:function(k){try{var c=localStorage.getItem('zm_'+k);if(!c)return null;var p=JSON.parse(c);if(Date.now()>p.e){localStorage.removeItem('zm_'+k);return null;}return p.d;}catch(e){return null;}}};
+    
+    function setupPullToRefresh() {
+        var pullIndicator = safeGet('pullIndicator');
+        if (!pullIndicator) return;
+        var touchStartY = 0, pullThreshold = 60, pulling = false;
+        document.addEventListener('touchstart', function(e) { if (window.scrollY === 0) { touchStartY = e.touches[0].clientY; pulling = true; } }, {passive: true});
+        document.addEventListener('touchmove', function(e) { if (!pulling) return; var d = e.touches[0].clientY - touchStartY; if (d > 20 && pullIndicator) { pullIndicator.classList.add('show'); pullIndicator.textContent = d > pullThreshold ? '✅ Release to refresh' : '⬇️ Pull to refresh'; } }, {passive: true});
+        document.addEventListener('touchend', function(e) { if (!pulling) return; pulling = false; var d = e.changedTouches[0].clientY - touchStartY; if (d > pullThreshold && pullIndicator) { pullIndicator.textContent = '⏳ Refreshing...'; loadAllData().then(function() { pullIndicator.textContent = '✅ Refreshed!'; setTimeout(function() { pullIndicator.classList.remove('show'); }, 800); }); } else { if (pullIndicator) pullIndicator.classList.remove('show'); } }, {passive: true});
+    }
+    
+    document.addEventListener('DOMContentLoaded', async function() {
+        await checkLoggedInUser(); 
+        loadLocationFromStorage(); 
+        var cart=safeLocalStorageGet('zymart_cart',[]); safeSetText('cartCount',cart.reduce(function(s,i){return s+(i.quantity||1);},0)); 
+        var si=safeGet('searchInput'); if(si){ var st; si.addEventListener('input',function(e){ clearTimeout(st); st=setTimeout(function(){ var v=e.target.value.trim(); if(v.length>2)fastNavigate('products.html?search='+encodeURIComponent(v)); },400); }); } 
+        setupNetworkListeners();
+        setupPullToRefresh();
+        loadAllData();
+        trySilentGPS();
+        startNotificationPolling();
+    });
+    
+    window.toggleMenu=toggleMenu; window.closeMenu=closeMenu;
+    window.addToCart=addToCart; window.openProductDetails=openProductDetails;
+    window.filterByCategory=filterByCategory; window.handleCartClick=handleCartClick;
+    window.showHelpModal=showHelpModal; window.showNotifications=showNotifications;
+})();
+</script>
+</body>
+</html>
