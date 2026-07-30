@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Admin Panel - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root{--brand-green:#0B5A31;--brand-green-dark:#083D21;--brand-orange:#F59E0B;--neutral-white:#FFFFFF;--neutral-bg:#F9FAFB;--neutral-border:#E5E7EB;--neutral-gray:#6B7280;--neutral-dark:#1A1A1A;--danger:#EF4444;--success:#22C55E;--warning:#F59E0B;--shadow-xs:0 1px 2px rgba(0,0,0,0.04);--shadow-sm:0 1px 4px rgba(0,0,0,0.06);--shadow-md:0 4px 16px rgba(0,0,0,0.08);--shadow-lg:0 8px 30px rgba(0,0,0,0.12);--radius-sm:10px;--radius-md:14px;--radius-lg:18px;--radius-xl:22px;--radius-full:9999px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:var(--neutral-bg);color:var(--neutral-dark);min-height:100vh;overflow-x:hidden}
+        @keyframes spin{to{transform:rotate(360deg)}}@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        #simpleLoader{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--neutral-white);z-index:10002;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+        #simpleLoader.fade-out{opacity:0;visibility:hidden;pointer-events:none}
+        .simple-spinner{width:34px;height:34px;border:2.5px solid var(--neutral-border);border-top-color:var(--brand-orange);border-radius:50%;animation:spin 0.7s linear infinite}
+        .loader-logo{font-family:'Poppins',sans-serif;font-size:24px;font-weight:700}.loader-zy{color:#A3E635}.loader-mart{color:#FDE047}
+        .login-container{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#EDF7F1,#F9FAFB,#FFFFFF);padding:20px}
+        .login-card{background:white;border-radius:var(--radius-xl);padding:36px 28px;width:100%;max-width:400px;box-shadow:var(--shadow-lg);text-align:center;animation:slideUp 0.5s ease}
+        .login-logo{font-family:'Poppins',sans-serif;font-size:32px;font-weight:700}.login-zy{color:#A3E635}.login-mart{color:#FDE047}
+        .login-subtitle{color:var(--neutral-gray);font-size:13px;margin-bottom:24px}
+        .login-input{width:100%;padding:12px 14px;border:1.5px solid var(--neutral-border);border-radius:var(--radius-sm);font-size:14px;margin-bottom:12px;font-family:'Inter',sans-serif;outline:none;background:var(--neutral-bg)}
+        .login-input:focus{border-color:var(--brand-orange)}.login-error{background:#FEF2F2;color:#EF4444;padding:10px 14px;border-radius:var(--radius-sm);font-size:12px;margin-bottom:14px;display:none}
+        .login-btn{width:100%;padding:13px;background:var(--brand-green);color:white;border:none;border-radius:var(--radius-full);font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+        .login-btn:active{background:var(--brand-green-dark);transform:scale(0.98)}.login-btn:disabled{opacity:0.6}
+        .login-back{background:none;border:none;color:var(--brand-green);cursor:pointer;margin-top:10px;font-size:13px;font-weight:600}
+        .sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:white;border-right:1px solid var(--neutral-border);z-index:100;overflow-y:auto;box-shadow:var(--shadow-sm);transition:transform 0.3s ease}
+        .sidebar-header{padding:20px 16px;border-bottom:1px solid var(--neutral-border);background:linear-gradient(135deg,#EDF7F1,white)}
+        .sidebar-logo{font-family:'Poppins',sans-serif;font-size:26px;font-weight:700}.sidebar-zy{color:#A3E635}.sidebar-mart{color:#FDE047}
+        .sidebar-version{font-size:10px;color:var(--neutral-gray)}.sidebar-menu{padding:10px 8px}
+        .menu-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-md);cursor:pointer;color:var(--neutral-gray);font-weight:500;font-size:13px;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif}
+        .menu-item:hover{background:#EDF7F1}.menu-item.active{background:var(--brand-green);color:white;box-shadow:var(--shadow-sm)}
+        .menu-item i{width:20px;text-align:center;font-size:14px}.menu-divider{height:1px;background:var(--neutral-border);margin:8px 0}
+        .menu-badge{margin-left:auto;background:var(--danger);color:white;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700}
+        .sidebar-toggle{position:fixed;top:12px;left:12px;z-index:101;width:38px;height:38px;background:var(--brand-green);color:white;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;border:none;font-size:16px;box-shadow:var(--shadow-md)}
+        .main-content{margin-left:260px;padding:20px 24px;min-height:100vh;transition:margin-left 0.3s ease}
+        .admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+        .page-title{font-family:'Poppins',sans-serif;font-size:26px;font-weight:700}
+        .admin-info{display:flex;align-items:center;gap:10px;background:white;padding:8px 16px;border-radius:var(--radius-full);border:1px solid var(--neutral-border);font-size:13px;box-shadow:var(--shadow-xs)}
+        .admin-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--brand-green),#22C55E);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+        .stat-card{background:white;border-radius:var(--radius-lg);padding:18px 16px;display:flex;align-items:center;gap:14px;border:1px solid var(--neutral-border);box-shadow:var(--shadow-xs);cursor:pointer}
+        .stat-card:active{transform:scale(0.98)}.stat-icon{width:48px;height:48px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:20px;color:white}
+        .stat-icon.green{background:linear-gradient(135deg,#22C55E,#16A34A)}.stat-icon.blue{background:linear-gradient(135deg,#3B82F6,#2563EB)}
+        .stat-icon.orange{background:linear-gradient(135deg,#F59E0B,#EA580C)}.stat-icon.purple{background:linear-gradient(135deg,#8B5CF6,#6D28D9)}
+        .stat-icon.teal{background:linear-gradient(135deg,#14B8A6,#0D9488)}
+        .stat-info h3{font-family:'Poppins',sans-serif;font-size:24px;font-weight:700}.stat-info p{font-size:11px;color:var(--neutral-gray)}
+        .content-card{background:white;border-radius:var(--radius-lg);border:1px solid var(--neutral-border);overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow-xs)}
+        .card-header{padding:16px 20px;border-bottom:1px solid var(--neutral-border);display:flex;justify-content:space-between;align-items:center;background:#FAFAFA}
+        .card-header h2{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700}
+        .table-wrapper{overflow-x:auto}.data-table{width:100%;border-collapse:collapse;min-width:600px;font-size:13px}
+        .data-table th{text-align:left;padding:12px;background:var(--neutral-bg);font-weight:700;font-size:11px;text-transform:uppercase;color:var(--neutral-gray);border-bottom:2px solid var(--neutral-border)}
+        .data-table td{padding:10px 12px;border-bottom:1px solid var(--neutral-border)}.data-table tr:hover{background:#F9FAFB}
+        .badge{padding:4px 10px;border-radius:var(--radius-full);font-size:10px;font-weight:700;display:inline-block}
+        .badge-success{background:#EDF7F1;color:#059669}.badge-warning{background:#FFF8EB;color:#D97706}.badge-danger{background:#FEF2F2;color:#DC2626}.badge-info{background:#EFF6FF;color:#2563EB}
+        .btn{padding:8px 16px;border-radius:var(--radius-full);font-size:11px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;white-space:nowrap}
+        .btn:active{transform:scale(0.96)}.btn-primary{background:var(--brand-green);color:white}.btn-success{background:var(--success);color:white}
+        .btn-danger{background:var(--danger);color:white}.btn-warning{background:var(--brand-orange);color:white}
+        .btn-outline{background:white;color:var(--neutral-dark);border:1px solid var(--neutral-border)}.btn-featured{background:#FFF8EB;color:#D97706;border:1px solid #F59E0B}
+        .btn-sm{padding:6px 10px;font-size:10px}.btn-group{display:flex;gap:5px;flex-wrap:wrap}
+        .search-box{padding:12px 16px}.search-box input{width:100%;padding:9px 14px;border:1.5px solid var(--neutral-border);border-radius:var(--radius-full);font-size:13px;font-family:'Inter',sans-serif;outline:none;background:var(--neutral-bg)}
+        .search-box input:focus{border-color:var(--brand-green);background:white}
+        .tabs{display:flex;gap:6px;padding:0 16px 12px;flex-wrap:wrap;border-bottom:1px solid var(--neutral-border);margin-bottom:12px}
+        .tab-btn{padding:7px 16px;border-radius:var(--radius-full);font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--neutral-border);background:white;color:var(--neutral-gray);font-family:'Inter',sans-serif}
+        .tab-btn.active{background:var(--brand-green);color:white;border-color:var(--brand-green)}
+        .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:16px}
+        .card-item{background:white;border:1px solid var(--neutral-border);border-radius:var(--radius-lg);overflow:hidden;position:relative;cursor:pointer}
+        .card-item:active{transform:scale(0.98)}.card-item.featured{border-color:#F59E0B}.card-item.on-hold{opacity:0.6;border-color:var(--brand-orange)}
+        .card-item-img{width:100%;height:120px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .card-item-img img{width:100%;height:100%;object-fit:contain;padding:8px}.card-item-img i{font-size:36px;color:var(--brand-green)}
+        .card-item-body{padding:12px}.card-item-title{font-weight:700;font-size:13px;margin-bottom:4px}
+        .card-item-subtitle{font-size:10px;color:var(--neutral-gray);margin-bottom:8px}
+        .featured-badge{position:absolute;top:8px;left:8px;background:#F59E0B;color:white;padding:3px 8px;border-radius:var(--radius-full);font-size:9px;font-weight:700;z-index:2}
+        .hold-badge{position:absolute;top:8px;right:8px;background:#F59E0B;color:white;padding:3px 8px;border-radius:var(--radius-full);font-size:9px;font-weight:700;z-index:2}
+        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(8,61,33,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000}
+        .modal-overlay.show{display:flex}
+        .modal-container{background:white;border-radius:var(--radius-xl);width:92%;max-width:500px;max-height:85vh;overflow-y:auto;padding:20px;animation:slideUp 0.3s ease;box-shadow:var(--shadow-lg)}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--neutral-border)}
+        .modal-header h3{font-family:'Poppins',sans-serif;font-size:17px;font-weight:700}
+        .modal-close{width:32px;height:32px;background:var(--neutral-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;font-size:14px;color:var(--neutral-gray)}
+        .modal-close:hover{background:#FEE2E2;color:var(--danger)}
+        .form-group{margin-bottom:14px}.form-label{font-size:12px;font-weight:600;margin-bottom:5px;display:block;color:var(--neutral-dark)}
+        .form-control{width:100%;padding:10px 12px;border:1.5px solid var(--neutral-border);border-radius:var(--radius-sm);font-size:13px;font-family:'Inter',sans-serif;outline:none;background:white}
+        .form-control:focus{border-color:var(--brand-orange)}select.form-control{-webkit-appearance:none;padding-right:32px}
+        textarea.form-control{resize:vertical;min-height:60px}
+        .toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+        .toast{background:white;padding:12px 18px;border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;border-left:4px solid var(--brand-green);animation:slideIn 0.3s ease;min-width:240px}
+        .toast.error{border-left-color:var(--danger)}.toast.success{border-left-color:var(--success)}
+        .empty-state{text-align:center;padding:40px;color:var(--neutral-gray)}.empty-state i{font-size:48px;margin-bottom:12px;display:block;color:#D1D5DB}
+        .text-xs{font-size:10px;color:var(--neutral-gray)}
+        .visit-mini-table{width:100%;font-size:11px}
+        .visit-mini-table td{padding:4px 8px;border-bottom:1px solid #F3F4F6}
+        @media(max-width:1024px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.sidebar-toggle{display:flex}.main-content{margin-left:0;padding:14px}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:640px){.stats-grid{grid-template-columns:1fr}.card-grid{grid-template-columns:repeat(2,1fr)}.admin-header{flex-direction:column}.btn{font-size:10px;padding:6px 12px}}
+    </style>
+</head>
+<body>
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div></div>
+<div id="app"></div>
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+(function(){'use strict';
+window.addEventListener('error',function(e){});
+window.addEventListener('unhandledrejection',function(e){e.preventDefault();});
+
+function getEl(id){return document.getElementById(id);}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function safeText(id,t){var el=getEl(id);if(el)el.textContent=t;}
+function fmtDate(d){if(!d)return'-'; try{return new Date(d).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch(e){return d;}}
+
+var sb=supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+var SUPABASE_URL='https://zwajyovemwdqtkecipeb.supabase.co';
+var currentAdmin=null,allUsers=[],allShops=[],allProducts=[],allCategories=[],allOffers=[],allSliders=[],allOrders=[],allNotifications=[];
+var currentSection='dashboard',shopFilter='all';
+var catImageFile=null,catEditId=null;
+var otpTimerInterval=null,currentOtpEmail=null;
+var visitStats={total:0,today:0,unique:0,recentVisits:[]};
+
+function showApp(){var l=getEl('simpleLoader');if(l){l.classList.add('fade-out');setTimeout(function(){if(l.parentNode)l.parentNode.removeChild(l);},300);}}
+function getImageUrl(url){if(!url)return'';if(url.indexOf('http')===0||url.indexOf('data:')===0)return url;return SUPABASE_URL+'/storage/v1/object/public/'+url;}
+async function safeFetch(fn,r){r=r||3;for(var i=0;i<r;i++){try{var res=await fn();if(res&&res.error)throw new Error(res.error.message);return res||{data:null};}catch(e){if(i===r-1)throw e;await new Promise(function(x){setTimeout(x,Math.pow(2,i)*500);});}}}
+function getCatName(catId){var c=allCategories.find(function(x){return x.id===catId;});return c?c.name:(catId||'');}
+function toast(msg,type){type=type||'success';var c=getEl('toastContainer');if(!c)return;var el=document.createElement('div');el.className='toast '+type;el.innerHTML='<i class="fas fa-'+(type==='success'?'check-circle':'exclamation-circle')+'"></i> '+msg;c.appendChild(el);setTimeout(function(){el.style.opacity='0';setTimeout(function(){el.remove();},300);},3000);}
+window.fastNavigate=function(url){window.location.href=url;};
+
+async function loadAllData(){
+try{var results=await Promise.allSettled([
+safeFetch(function(){return sb.from('users').select('*').order('created_at',{ascending:false});}),
+safeFetch(function(){return sb.from('shops').select('*').order('created_at',{ascending:false});}),
+safeFetch(function(){return sb.from('products').select('*, shops(name)').order('created_at',{ascending:false});}),
+safeFetch(function(){return sb.from('categories').select('*').order('priority');}),
+safeFetch(function(){return sb.from('offers').select('*').order('priority');}),
+safeFetch(function(){return sb.from('sliders').select('*').order('display_order');}),
+safeFetch(function(){return sb.from('orders').select('*').order('created_at',{ascending:false});}),
+safeFetch(function(){return sb.from('app_settings').select('*');}),
+safeFetch(function(){return sb.from('notifications').select('*').order('created_at',{ascending:false});}),
+safeFetch(function(){return sb.from('user_visits').select('*',{count:'exact'}).order('timestamp',{ascending:false}).limit(100);})
+]);
+allUsers=results[0].status==='fulfilled'?(results[0].value.data||[]):[];
+allShops=results[1].status==='fulfilled'?(results[1].value.data||[]):[];
+allProducts=results[2].status==='fulfilled'?(results[2].value.data||[]):[];
+allCategories=results[3].status==='fulfilled'?(results[3].value.data||[]):[];
+allOffers=results[4].status==='fulfilled'?(results[4].value.data||[]):[];
+allSliders=results[5].status==='fulfilled'?(results[5].value.data||[]):[];
+allOrders=results[6].status==='fulfilled'?(results[6].value.data||[]):[];
+allNotifications=results[8].status==='fulfilled'?(results[8].value.data||[]):[];
+if(results[9].status==='fulfilled'&&results[9].value.data){
+var visits=results[9].value.data;
+visitStats.total=results[9].value.count||visits.length;
+var today=new Date().toDateString();
+visitStats.today=visits.filter(function(v){return new Date(v.timestamp).toDateString()===today;}).length;
+var uniqueIds={};
+for(var i=0;i<visits.length;i++){if(visits[i].user_id)uniqueIds[visits[i].user_id]=true;}
+visitStats.unique=Object.keys(uniqueIds).length;
+visitStats.recentVisits=visits.slice(0,10);
+}
+}catch(e){toast('Failed to load data','error');}}
+
+// ==================== LOGIN ====================
+function showLogin(){getEl('app').innerHTML='<div class="login-container"><div class="login-card"><div class="login-logo"><span class="login-zy">Zy</span><span class="login-mart">Mart</span></div><div class="login-subtitle">🔐 Admin Panel</div><div class="login-error" id="loginError"></div><div id="loginStepEmail"><input type="email" id="adminEmail" class="login-input" placeholder="Admin Email"><button class="login-btn" onclick="sendAdminOTP()"><i class="fas fa-paper-plane"></i> Send OTP</button></div><div id="loginStepOTP" style="display:none;"><p style="font-size:13px;margin-bottom:8px;color:var(--neutral-gray);">OTP sent to: <strong id="otpEmailDisplay"></strong></p><input type="text" id="adminOtp" class="login-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric"><button class="login-btn" onclick="verifyAdminOTP()"><i class="fas fa-check-circle"></i> Verify & Login</button><button class="login-btn" id="resendAdminBtn" onclick="resendAdminOTP()" style="background:transparent;border:1.5px solid var(--neutral-border);color:var(--neutral-dark);">📩 Resend OTP</button><button class="login-back" onclick="backToAdminEmail()">← Back to Email</button></div><button class="login-back" style="margin-top:16px;" onclick="fastNavigate(\'index.html\')">← Go to Home</button></div></div>';}
+
+window.sendAdminOTP=async function(){var email=getEl('adminEmail').value.trim();var errEl=getEl('loginError');if(!email){errEl.style.display='block';errEl.textContent='⚠️ Please enter admin email';return;}errEl.style.display='none';var btn=document.querySelector('#loginStepEmail .login-btn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Sending...';try{var res=await sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:false}});if(res&&res.error){errEl.style.display='block';errEl.textContent='❌ '+res.error.message;btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Send OTP';return;}currentOtpEmail=email;safeText('otpEmailDisplay',email);getEl('loginStepEmail').style.display='none';getEl('loginStepOTP').style.display='block';startOtpTimer();toast('📩 OTP sent!');}catch(e){errEl.style.display='block';errEl.textContent='❌ Failed';btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Send OTP';}};
+window.verifyAdminOTP=async function(){var otp=getEl('adminOtp').value.trim();var errEl=getEl('loginError');if(!otp||otp.length<4){errEl.style.display='block';errEl.textContent='⚠️ Enter valid OTP';return;}errEl.style.display='none';var btn=document.querySelector('#loginStepOTP .login-btn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Verifying...';try{var res=await sb.auth.verifyOtp({email:currentOtpEmail,token:otp,type:'email'});if(res&&res.error){errEl.style.display='block';errEl.textContent='❌ Invalid OTP';btn.disabled=false;btn.innerHTML='<i class="fas fa-check-circle"></i> Verify & Login';return;}var prof=await safeFetch(function(){return sb.from('users').select('role').eq('id',res.data.user.id).single();});var role=prof.data?prof.data.role:null;if(role!=1&&role!=='1'&&role!=='admin'){await sb.auth.signOut();errEl.style.display='block';errEl.textContent='🚫 Access denied';btn.disabled=false;btn.innerHTML='<i class="fas fa-check-circle"></i> Verify & Login';return;}currentAdmin=res.data.user;toast('✅ Login successful!');await loadAllData();renderApp();}catch(e){errEl.style.display='block';errEl.textContent='❌ Error';btn.disabled=false;btn.innerHTML='<i class="fas fa-check-circle"></i> Verify & Login';}};
+window.resendAdminOTP=async function(){if(!currentOtpEmail){backToAdminEmail();return;}try{await sb.auth.signInWithOtp({email:currentOtpEmail,options:{shouldCreateUser:false}});startOtpTimer();toast('📩 New OTP sent!');}catch(e){toast('❌ Failed','error');}};
+function startOtpTimer(){var s=60,b=getEl('resendAdminBtn');if(!b)return;if(otpTimerInterval)clearInterval(otpTimerInterval);b.disabled=true;b.textContent='⏳ Resend ('+s+'s)';otpTimerInterval=setInterval(function(){s--;b.textContent='⏳ Resend ('+s+'s)';if(s<=0){clearInterval(otpTimerInterval);b.disabled=false;b.textContent='📩 Resend OTP';}},1000);}
+window.backToAdminEmail=function(){if(otpTimerInterval)clearInterval(otpTimerInterval);getEl('loginStepOTP').style.display='none';getEl('loginStepEmail').style.display='block';getEl('adminOtp').value='';currentOtpEmail=null;};
+
+// ==================== RENDER APP ====================
+function renderApp(){
+var ps=allShops.filter(function(s){return s.status==='pending';}).length;
+var po=allOrders.filter(function(o){return o.status==='pending';}).length;
+var dr=allProducts.filter(function(p){return p.delete_requested===true;}).length;
+getEl('app').innerHTML='<button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button><div class="sidebar" id="sidebar"><div class="sidebar-header"><div class="sidebar-logo"><span class="sidebar-zy">Zy</span><span class="sidebar-mart">Mart</span></div><div class="sidebar-version">🔧 Admin v2.0</div></div><div class="sidebar-menu"><button class="menu-item active" onclick="loadSection(\'dashboard\')"><i class="fas fa-chart-pie"></i> Dashboard</button><div class="menu-divider"></div><button class="menu-item" onclick="loadSection(\'shops\')"><i class="fas fa-store"></i> Shops <span class="menu-badge">'+ps+'</span></button><button class="menu-item" onclick="loadSection(\'users\')"><i class="fas fa-users"></i> Users</button><button class="menu-item" onclick="loadSection(\'categories\')"><i class="fas fa-tags"></i> Categories</button><button class="menu-item" onclick="loadSection(\'products\')"><i class="fas fa-box"></i> Products</button><button class="menu-item" onclick="loadSection(\'deleteRequests\')"><i class="fas fa-trash-alt"></i> Delete Req <span class="menu-badge">'+dr+'</span></button><button class="menu-item" onclick="loadSection(\'offers\')"><i class="fas fa-fire"></i> Offers</button><button class="menu-item" onclick="loadSection(\'sliders\')"><i class="fas fa-images"></i> Sliders</button><button class="menu-item" onclick="loadSection(\'orders\')"><i class="fas fa-receipt"></i> Orders <span class="menu-badge">'+po+'</span></button><button class="menu-item" onclick="loadSection(\'notifications\')"><i class="fas fa-bell"></i> Notifications</button><button class="menu-item" onclick="loadSection(\'settings\')"><i class="fas fa-cog"></i> Settings</button><div class="menu-divider"></div><button class="menu-item" onclick="fastNavigate(\'index.html\')"><i class="fas fa-external-link-alt"></i> View Site</button><button class="menu-item" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div></div><div class="main-content" id="mainContent"><div class="admin-header"><h1 class="page-title" id="pageTitle">📊 Dashboard</h1><div class="admin-info"><div class="admin-avatar">'+(currentAdmin.email||'A').charAt(0).toUpperCase()+'</div><span>'+esc(currentAdmin.email)+'</span></div></div><div id="contentArea"></div></div>';
+loadSection('dashboard');}
+
+function toggleSidebar(){getEl('sidebar').classList.toggle('open');}
+
+function loadSection(section){
+currentSection=section;
+var items=document.querySelectorAll('.menu-item');for(var i=0;i<items.length;i++)items[i].classList.remove('active');
+var titles={dashboard:'📊 Dashboard',shops:'🏪 Shops',users:'👥 Users',categories:'🏷️ Categories',products:'📦 Products',deleteRequests:'🗑️ Delete Requests',offers:'🔥 Offers',sliders:'🖼️ Sliders',orders:'📋 Orders',notifications:'🔔 Notifications',settings:'⚙️ Settings'};
+safeText('pageTitle',titles[section]||section);
+getEl('sidebar').classList.remove('open');
+var content=getEl('contentArea');
+if(section==='dashboard')renderDashboard(content);
+else if(section==='shops')renderShops(content);
+else if(section==='users')renderUsers(content);
+else if(section==='categories')renderCategories(content);
+else if(section==='products')renderProducts(content);
+else if(section==='deleteRequests')renderDeleteRequests(content);
+else if(section==='offers')renderOffers(content);
+else if(section==='sliders')renderSliders(content);
+else if(section==='orders')renderOrders(content);
+else if(section==='notifications')renderNotifications(content);
+else if(section==='settings')renderSettings(content);
+}
+
+// ==================== 🔥 DASHBOARD WITH VISIT COUNTER ====================
+function renderDashboard(c){
+var pending=allShops.filter(function(s){return s.status==='pending';}).length;
+var approved=allShops.filter(function(s){return s.status==='approved';}).length;
+var revenue=0;for(var i=0;i<allOrders.length;i++){if(allOrders[i].status!=='cancelled')revenue+=parseFloat(allOrders[i].total_amount)||0;}
+
+var recentVisitsHtml='';
+if(visitStats.recentVisits.length>0){
+recentVisitsHtml='<div class="content-card"><div class="card-header"><h2>🕐 Recent Visits</h2></div><div style="padding:12px;"><table class="visit-mini-table"><tbody>';
+for(var v=0;v<visitStats.recentVisits.length;v++){
+var visit=visitStats.recentVisits[v];
+recentVisitsHtml+='<tr><td>📱</td><td>'+(visit.page||'/')+'</td><td>'+(visit.city||visit.pincode||'Unknown')+'</td><td style="font-size:9px;color:#6B7280;">'+fmtDate(visit.timestamp)+'</td></tr>';
+}
+recentVisitsHtml+='</tbody></table></div></div>';
+}
+
+c.innerHTML=
+'<div class="stats-grid">'+
+'<div class="stat-card" onclick="loadSection(\'users\')"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-info"><h3>'+allUsers.length+'</h3><p>Total Users</p></div></div>'+
+'<div class="stat-card" onclick="loadSection(\'shops\')"><div class="stat-icon green"><i class="fas fa-store"></i></div><div class="stat-info"><h3>'+approved+'</h3><p>Active Shops ('+pending+' pending)</p></div></div>'+
+'<div class="stat-card" onclick="loadSection(\'products\')"><div class="stat-icon orange"><i class="fas fa-box"></i></div><div class="stat-info"><h3>'+allProducts.length+'</h3><p>Products</p></div></div>'+
+'<div class="stat-card"><div class="stat-icon purple"><i class="fas fa-rupee-sign"></i></div><div class="stat-info"><h3>₹'+revenue.toLocaleString('en-IN')+'</h3><p>Total Revenue</p></div></div>'+
+'<div class="stat-card" style="grid-column:span 2;"><div class="stat-icon teal"><i class="fas fa-eye"></i></div><div class="stat-info"><h3>'+visitStats.total+'</h3><p>Total App Visits</p></div><div style="margin-left:auto;text-align:right;font-size:11px;">📅 Today: <b>'+visitStats.today+'</b><br>👤 Unique: <b>'+visitStats.unique+'</b></div></div>'+
+'</div>'+
+recentVisitsHtml;
+}
+
+// ==================== 🔥 SHOPS WITH APPROVAL ====================
+function renderShops(c){
+c.innerHTML='<div class="content-card"><div class="card-header"><h2>🏪 Shop Management</h2></div><div class="search-box"><input type="text" id="shopSearch" placeholder="🔍 Search shops..." onkeyup="filterShops()"></div><div class="tabs"><button class="tab-btn active" onclick="setShopFilter(\'all\',this)">📋 All</button><button class="tab-btn" onclick="setShopFilter(\'pending\',this)">⏳ Pending ('+allShops.filter(function(s){return s.status==='pending';}).length+')</button><button class="tab-btn" onclick="setShopFilter(\'approved\',this)">✅ Approved</button></div><div id="shopsList"></div></div>';filterShops();}
+
+window.setShopFilter=function(filter,btn){shopFilter=filter;var tabs=document.querySelectorAll('#contentArea .tab-btn');for(var i=0;i<tabs.length;i++)tabs[i].classList.remove('active');btn.classList.add('active');filterShops();};
+
+window.filterShops=function(){
+var term=(getEl('shopSearch')?.value||'').toLowerCase();
+var filtered=allShops.filter(function(s){
+if(shopFilter!=='all'&&s.status!==shopFilter)return false;
+if(term&&!(s.name||'').toLowerCase().includes(term)&&!(s.owner_name||'').toLowerCase().includes(term)&&!(s.owner_phone||'').includes(term))return false;
+return true;
+});
+var el=getEl('shopsList');
+if(!filtered.length){el.innerHTML='<div class="empty-state"><i class="fas fa-store-slash"></i><p>No shops found</p></div>';return;}
+
+var html='<div class="table-wrapper"><table class="data-table"><thead><tr><th>Shop</th><th>Owner & Contact</th><th>Status</th><th>Payment</th><th>Actions</th></tr></thead><tbody>';
+for(var i=0;i<filtered.length;i++){
+var s=filtered[i];
+var paymentStatus=s.payment_status||'pending';
+var paymentBadge=paymentStatus==='paid'?'badge-success':'badge-warning';
+var statusBadge=s.status==='approved'?'badge-success':s.status==='rejected'?'badge-danger':'badge-warning';
+
+html+='<tr>';
+html+='<td><strong>'+esc(s.name||s.shop_name||'-')+'</strong><br><small>📍 '+esc(s.city||'')+' · 📅 '+fmtDate(s.created_at)+'</small></td>';
+html+='<td>'+esc(s.owner_name||'-')+'<br><small>📱 '+esc(s.owner_phone||'')+'<br>📧 '+esc(s.owner_email||'')+'</small></td>';
+html+='<td><span class="badge '+statusBadge+'">'+s.status+'</span></td>';
+html+='<td><span class="badge '+paymentBadge+'">'+(paymentStatus==='paid'?'✅ Paid ₹'+(s.payment_amount||299):'⏳ Pending')+'</span></td>';
+html+='<td><div class="btn-group">';
+
+// APPROVE button for pending shops
+if(s.status==='pending'){
+html+='<button class="btn btn-success btn-sm" onclick="approveShop(\''+s.id+'\')"><i class="fas fa-check"></i> Approve</button>';
+}
+
+// WhatsApp contact
+if(s.owner_phone){
+html+='<a href="https://wa.me/91'+s.owner_phone.replace(/[^0-9]/g,'')+'" target="_blank" class="btn btn-outline btn-sm"><i class="fab fa-whatsapp"></i></a>';
+}
+
+// Delete
+html+='<button class="btn btn-danger btn-sm" onclick="deleteShop(\''+s.id+'\')"><i class="fas fa-trash"></i></button>';
+html+='</div></td></tr>';
+}
+html+='</tbody></table></div>';
+el.innerHTML=html;
+};
+
+// 🔥 APPROVE SHOP - Creates user account with role='2'
+window.approveShop=async function(id){
+var shop=allShops.find(function(s){return s.id===id;});
+if(!shop){toast('Shop not found','error');return;}
+if(!shop.owner_email&&!shop.owner_phone){toast('Owner contact missing!','error');return;}
+
+try{
+var userId=null;
+var email=shop.owner_email||'';
+var phone=shop.owner_phone||'';
+
+// Find or create user
+if(email){
+var existingUser=await safeFetch(function(){return sb.from('users').select('id,role').eq('email',email).maybeSingle();});
+if(existingUser&&existingUser.data){
+userId=existingUser.data.id;
+await sb.from('users').update({role:'2',name:shop.owner_name||''}).eq('id',userId);
+}
+}
+
+if(!userId&&phone){
+var existingByPhone=await safeFetch(function(){return sb.from('users').select('id,role').eq('phone',phone).maybeSingle();});
+if(existingByPhone&&existingByPhone.data){
+userId=existingByPhone.data.id;
+await sb.from('users').update({role:'2',name:shop.owner_name||'',email:email||null}).eq('id',userId);
+}
+}
+
+if(!userId){
+// Create new user
+var newUser={
+email:email||(phone+'@zymart.user'),
+name:shop.owner_name||'Shop Owner',
+phone:phone||null,
+role:'2',
+is_active:true,
+created_at:new Date().toISOString()
+};
+var insertRes=await sb.from('users').insert([newUser]).select('id').single();
+if(insertRes&&insertRes.data)userId=insertRes.data.id;
+}
+
+// Update shop
+await safeFetch(function(){return sb.from('shops').update({status:'approved',is_open:true,owner_id:userId||null}).eq('id',id);});
+
+toast('✅ Shop approved! Shop owner can now login.','success');
+await loadAllData();
+filterShops();
+}catch(e){
+console.error('Approve error:',e);
+toast('❌ Failed: '+e.message,'error');
+}
+};
+
+window.deleteShop=async function(id){
+if(!confirm('🗑️ Delete this shop permanently?'))return;
+try{
+await sb.from('products').delete().eq('shop_id',id);
+await sb.from('shops').delete().eq('id',id);
+toast('🗑️ Shop deleted!','success');
+await loadAllData();
+filterShops();
+}catch(e){toast('❌ Error','error');}
+};
+
+// ==================== USERS ====================
+function renderUsers(c){c.innerHTML='<div class="content-card"><div class="card-header"><h2>👥 Users ('+allUsers.length+')</h2></div><div class="search-box"><input type="text" id="userSearch" placeholder="🔍 Search users..." onkeyup="filterUsers()"></div><div id="usersList"></div></div>';filterUsers();}
+window.filterUsers=function(){var term=(getEl('userSearch')?.value||'').toLowerCase();var filtered=allUsers.filter(function(u){return !term||(u.name||'').toLowerCase().includes(term)||(u.email||'').toLowerCase().includes(term)||(u.phone||'').includes(term);});var el=getEl('usersList');if(!filtered.length){el.innerHTML='<div class="empty-state"><i class="fas fa-user-slash"></i><p>No users</p></div>';return;}var html='<div class="table-wrapper"><table class="data-table"><thead><tr><th>Name</th><th>Email/Phone</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody>';for(var i=0;i<filtered.length;i++){var u=filtered[i],isBlocked=u.is_blocked===true;html+='<tr><td><strong>'+esc(u.name||'N/A')+'</strong></td><td>'+esc(u.email||'')+'<br><small>📱 '+esc(u.phone||'')+'</small></td><td>'+(u.role==='1'||u.role==='admin'?'👑 Admin':u.role==='2'||u.role==='shop_owner'?'🏪 Shop Owner':'👤 Customer')+'</td><td><span class="badge '+(isBlocked?'badge-danger':'badge-success')+'">'+(isBlocked?'🔒 Blocked':'✅ Active')+'</span></td><td><div class="btn-group">'+(isBlocked?'<button class="btn btn-success btn-sm" onclick="toggleBlockUser(\''+u.id+'\',false)"><i class="fas fa-unlock"></i> Unblock</button>':'<button class="btn btn-warning btn-sm" onclick="toggleBlockUser(\''+u.id+'\',true)"><i class="fas fa-lock"></i> Block</button>')+'<button class="btn btn-danger btn-sm" onclick="deleteUser(\''+u.id+'\')"><i class="fas fa-trash"></i></button></div></td></tr>';}html+='</tbody></table></div>';el.innerHTML=html;};
+window.toggleBlockUser=async function(id,block){await sb.from('users').update({is_blocked:block}).eq('id',id);toast(block?'🔒 Blocked!':'🔓 Unblocked!');await loadAllData();filterUsers();};
+window.deleteUser=async function(id){if(!confirm('🗑️ Delete user?'))return;await sb.from('users').delete().eq('id',id);toast('🗑️ Deleted');await loadAllData();filterUsers();};
+
+// ==================== CATEGORIES ====================
+function renderCategories(c){c.innerHTML='<div class="content-card"><div class="card-header"><h2>🏷️ Categories</h2><button class="btn btn-primary btn-sm" onclick="showCategoryModal()"><i class="fas fa-plus"></i> Add</button></div><div class="card-grid" id="catGrid"></div></div>';var grid=getEl('catGrid');if(!allCategories.length){grid.innerHTML='<div class="empty-state"><p>No categories</p></div>';return;}var html='';for(var i=0;i<allCategories.length;i++){var cat=allCategories[i],imgUrl=getImageUrl(cat.image_url),isHold=cat.is_on_hold===true;html+='<div class="card-item'+(isHold?' on-hold':'')+'">'+(isHold?'<span class="hold-badge">⏸️</span>':'')+'<div class="card-item-img">'+(imgUrl?'<img src="'+imgUrl+'">':'<i class="fas fa-folder"></i>')+'</div><div class="card-item-body"><div class="card-item-title">'+esc(cat.name)+'</div><div class="btn-group"><button class="btn btn-warning btn-sm" onclick="showCategoryModal(\''+cat.id+'\')"><i class="fas fa-edit"></i></button><button class="btn btn-outline btn-sm" onclick="toggleCategoryHold(\''+cat.id+'\','+isHold+')">'+(isHold?'🟢 Unhold':'🟡 Hold')+'</button><button class="btn btn-danger btn-sm" onclick="deleteCategory(\''+cat.id+'\')"><i class="fas fa-trash"></i></button></div></div></div>';}grid.innerHTML=html;}
+window.showCategoryModal=function(id){catEditId=id||null;var cat=id?allCategories.find(function(c){return c.id===id;}):null;var existingImg=cat&&cat.image_url?getImageUrl(cat.image_url):'';var html='<div class="modal-header"><h3>'+(cat?'✏️ Edit':'➕ Add')+' Category</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';html+='<div class="form-group"><label>Name *</label><input type="text" id="catName" class="form-control" value="'+esc(cat?cat.name:'')+'"></div>';html+='<div class="form-group"><label>Image</label><div class="image-upload-box" onclick="document.getElementById(\'catImgInput\').click()"><input type="file" id="catImgInput" accept="image/*" style="display:none" onchange="handleCatImage(this)"><i class="fas fa-cloud-upload-alt" style="font-size:24px;"></i> Upload'+(existingImg?'<img src="'+existingImg+'" class="image-preview" style="display:block;margin:8px auto 0;">':'')+'</div></div>';html+='<button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveCategory()"><i class="fas fa-save"></i> Save</button>';var modal=document.createElement('div');modal.className='modal-overlay show';modal.id='modalContainer';modal.innerHTML='<div class="modal-container">'+html+'</div>';document.body.appendChild(modal);catImageFile=null;};
+window.handleCatImage=function(input){var f=input.files[0];if(!f)return;catImageFile=f;};
+window.saveCategory=async function(){var name=getEl('catName').value.trim();if(!name){toast('⚠️ Enter name','error');return;}var imageUrl='';if(catImageFile){try{var fn='cat_'+Date.now()+'.jpg';var ur=await sb.storage.from('category-images').upload(fn,catImageFile,{cacheControl:'3600',upsert:true,contentType:'image/jpeg'});if(ur.error){toast('❌ Upload failed','error');return;}imageUrl=sb.storage.from('category-images').getPublicUrl(fn).data.publicUrl;}catch(e){toast('❌ Upload error','error');return;}}var data={name:name,image_url:imageUrl||null,is_active:true};if(catEditId){if(!imageUrl)delete data.image_url;await sb.from('categories').update(data).eq('id',catEditId);toast('✅ Updated!');}else{await sb.from('categories').insert([data]);toast('✅ Added!');}closeModal();await loadAllData();renderCategories(getEl('contentArea'));};
+window.toggleCategoryHold=async function(id,currentHold){await sb.from('categories').update({is_on_hold:!currentHold}).eq('id',id);toast(currentHold?'✅ Unheld!':'⏸️ On Hold!');await loadAllData();renderCategories(getEl('contentArea'));};
+window.deleteCategory=async function(id){if(!confirm('🗑️ Delete?'))return;await sb.from('categories').delete().eq('id',id);toast('🗑️ Deleted');await loadAllData();renderCategories(getEl('contentArea'));};
+window.closeModal=function(){var modal=getEl('modalContainer');if(modal)modal.remove();};
+
+// ==================== PRODUCTS ====================
+function renderProducts(c){c.innerHTML='<div class="content-card"><div class="card-header"><h2>📦 Products</h2></div><div class="card-grid" id="prodGrid"></div></div>';var grid=getEl('prodGrid');if(!allProducts.length){grid.innerHTML='<div class="empty-state"><p>No products</p></div>';return;}var html='';for(var i=0;i<allProducts.length;i++){var p=allProducts[i],img=getImageUrl((p.images&&p.images[0])||p.image_url||'');html+='<div class="card-item'+(p.is_featured?' featured':'')+'">'+(p.is_featured?'<span class="featured-badge">⭐</span>':'')+'<div class="card-item-img">'+(img?'<img src="'+img+'">':'<i class="fas fa-box"></i>')+'</div><div class="card-item-body"><div class="card-item-title">'+esc(p.name)+'</div><div class="card-item-subtitle">💰 ₹'+Number(p.price).toLocaleString('en-IN')+' · 🏪 '+esc(p.shops?p.shops.name:p.shop_name||'')+'</div><div class="btn-group">'+(p.is_featured?'<button class="btn btn-outline btn-sm" onclick="toggleFeatured(\''+p.id+'\',false)">Unfeature</button>':'<button class="btn btn-featured btn-sm" onclick="toggleFeatured(\''+p.id+'\',true)">⭐ Feature</button>')+'<button class="btn btn-danger btn-sm" onclick="deleteProduct(\''+p.id+'\')"><i class="fas fa-trash"></i></button></div></div></div>';}grid.innerHTML=html;};
+window.toggleFeatured=async function(id,featured){await sb.from('products').update({is_featured:featured}).eq('id',id);toast(featured?'⭐ Featured!':'Removed');await loadAllData();renderProducts(getEl('contentArea'));};
+window.deleteProduct=async function(id){if(!confirm('🗑️ Delete?'))return;await sb.from('products').delete().eq('id',id);toast('🗑️ Deleted');await loadAllData();renderProducts(getEl('contentArea'));};
+
+// ==================== DELETE REQUESTS ====================
+function renderDeleteRequests(c){var req=allProducts.filter(function(p){return p.delete_requested===true;});if(!req.length){c.innerHTML='<div class="content-card"><div class="card-header"><h2>🗑️ Delete Requests</h2></div><div class="empty-state"><i class="fas fa-check-circle" style="color:#22C55E;"></i><p>No pending requests</p></div></div>';return;}var html='<div class="content-card"><div class="card-header"><h2>🗑️ Delete Requests ('+req.length+')</h2></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>Product</th><th>Shop</th><th>Actions</th></tr></thead><tbody>';for(var i=0;i<req.length;i++){var p=req[i];html+='<tr><td><strong>'+esc(p.name)+'</strong></td><td>'+esc(p.shops?p.shops.name:p.shop_name||'')+'</td><td><div class="btn-group"><button class="btn btn-success btn-sm" onclick="approveDelete(\''+p.id+'\')">✅ Approve</button><button class="btn btn-warning btn-sm" onclick="rejectDelete(\''+p.id+'\')">↩️ Reject</button></div></td></tr>';}html+='</tbody></table></div></div>';c.innerHTML=html;}
+window.approveDelete=async function(id){await sb.from('products').delete().eq('id',id);toast('✅ Deleted!');await loadAllData();renderDeleteRequests(getEl('contentArea'));};
+window.rejectDelete=async function(id){await sb.from('products').update({delete_requested:false}).eq('id',id);toast('↩️ Rejected!');await loadAllData();renderDeleteRequests(getEl('contentArea'));};
+
+// ==================== OFFERS ====================
+function renderOffers(c){c.innerHTML='<div class="content-card"><div class="card-header"><h2>🔥 Offers</h2><button class="btn btn-primary btn-sm" onclick="showOfferModal()"><i class="fas fa-plus"></i> Add</button></div><div class="card-grid" id="offerGrid"></div></div>';var grid=getEl('offerGrid');if(!allOffers.length){grid.innerHTML='<div class="empty-state"><p>No offers</p></div>';return;}var html='';for(var i=0;i<allOffers.length;i++){var o=allOffers[i],imgUrl=o.image_url?getImageUrl(o.image_url):'';html+='<div class="card-item"><div class="card-item-img">'+(imgUrl?'<img src="'+imgUrl+'">':'<div style="background:linear-gradient(135deg,#F59E0B,#E8890A);display:flex;align-items:center;justify-content:center;color:white;font-size:28px;height:100%;font-weight:700;">'+o.discount_value+(o.discount_type==='percentage'?'%':'₹')+' OFF</div>')+'</div><div class="card-item-body"><div class="card-item-title">'+esc(o.title)+'</div><button class="btn btn-danger btn-sm" onclick="deleteOffer(\''+o.id+'\')"><i class="fas fa-trash"></i></button></div></div>';}grid.innerHTML=html;}
+window.showOfferModal=function(){var html='<div class="modal-header"><h3>➕ Add Offer</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';html+='<div class="form-group"><label>Title *</label><input type="text" id="offerTitle" class="form-control"></div>';html+='<div style="display:flex;gap:10px;"><div style="flex:1;"><label>Type</label><select id="offerType" class="form-control"><option value="percentage">%</option><option value="fixed">₹</option></select></div><div style="flex:1;"><label>Value *</label><input type="number" id="offerValue" class="form-control"></div></div>';html+='<div class="form-group"><label>Image URL</label><input type="text" id="offerImageUrl" class="form-control" placeholder="https://..."></div>';html+='<button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveOffer()"><i class="fas fa-save"></i> Save</button>';var modal=document.createElement('div');modal.className='modal-overlay show';modal.id='modalContainer';modal.innerHTML='<div class="modal-container">'+html+'</div>';document.body.appendChild(modal);};
+window.saveOffer=async function(){var title=getEl('offerTitle').value.trim(),type=getEl('offerType').value,value=parseFloat(getEl('offerValue').value),imageUrl=getEl('offerImageUrl').value.trim();if(!title||!value){toast('⚠️ Fill fields','error');return;}await sb.from('offers').insert([{title:title,discount_type:type,discount_value:value,image_url:imageUrl||null,is_active:true,priority:allOffers.length+1}]);toast('✅ Created!');closeModal();await loadAllData();renderOffers(getEl('contentArea'));};
+window.deleteOffer=async function(id){if(!confirm('🗑️ Delete?'))return;await sb.from('offers').delete().eq('id',id);toast('🗑️ Deleted');await loadAllData();renderOffers(getEl('contentArea'));};
+
+// ==================== SLIDERS ====================
+function renderSliders(c){c.innerHTML='<div class="content-card"><div class="card-header"><h2>🖼️ Hero Sliders</h2><button class="btn btn-primary btn-sm" onclick="showSliderModal()"><i class="fas fa-plus"></i> Add</button></div><div class="card-grid" id="sliderGrid"></div></div>';var grid=getEl('sliderGrid');if(!allSliders.length){grid.innerHTML='<div class="empty-state"><p>No sliders</p></div>';return;}var html='';for(var i=0;i<allSliders.length;i++){var s=allSliders[i],imgUrl=getImageUrl(s.image_url);html+='<div class="card-item"><div class="card-item-img">'+(imgUrl?'<img src="'+imgUrl+'">':'<i class="fas fa-image"></i>')+'</div><div class="card-item-body"><div class="card-item-title">'+esc(s.title||'')+'</div><button class="btn btn-danger btn-sm" onclick="deleteSlider(\''+s.id+'\')"><i class="fas fa-trash"></i></button></div></div>';}grid.innerHTML=html;}
+window.showSliderModal=function(){var html='<div class="modal-header"><h3>➕ Add Slider</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';html+='<div class="form-group"><label>Image URL *</label><input type="text" id="sliderImageUrl" class="form-control" placeholder="https://..."></div>';html+='<div class="form-group"><label>Title</label><input type="text" id="sliderTitle" class="form-control"></div>';html+='<div class="form-group"><label>Link</label><input type="text" id="sliderLink" class="form-control" placeholder="products.html"></div>';html+='<button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveSlider()"><i class="fas fa-save"></i> Save</button>';var modal=document.createElement('div');modal.className='modal-overlay show';modal.id='modalContainer';modal.innerHTML='<div class="modal-container">'+html+'</div>';document.body.appendChild(modal);};
+window.saveSlider=async function(){var imageUrl=getEl('sliderImageUrl').value.trim();if(!imageUrl){toast('⚠️ Enter image URL','error');return;}await sb.from('sliders').insert([{image_url:imageUrl,title:getEl('sliderTitle')?.value||'',link:getEl('sliderLink')?.value||'',is_active:true,display_order:allSliders.length+1}]);toast('✅ Added!');closeModal();await loadAllData();renderSliders(getEl('contentArea'));};
+window.deleteSlider=async function(id){if(!confirm('🗑️ Delete?'))return;await sb.from('sliders').delete().eq('id',id);toast('🗑️ Deleted');await loadAllData();renderSliders(getEl('contentArea'));};
+
+// ==================== ORDERS ====================
+function renderOrders(c){c.innerHTML='<div class="content-card"><div class="card-header"><h2>📋 Orders</h2></div><div id="ordersList"></div></div>';var el=getEl('ordersList');if(!allOrders.length){el.innerHTML='<div class="empty-state"><p>No orders</p></div>';return;}var html='<div class="table-wrapper"><table class="data-table"><thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead><tbody>';for(var i=0;i<allOrders.length;i++){var o=allOrders[i];html+='<tr><td><strong>#'+(o.id||'').substring(0,8).toUpperCase()+'</strong></td><td>'+esc(o.customer_name||'N/A')+'<br><small>📱 '+esc(o.customer_phone||'')+'</small></td><td>₹'+(parseFloat(o.total_amount)||0).toLocaleString('en-IN')+'</td><td><span class="badge '+(o.status==='pending'?'badge-warning':o.status==='delivered'?'badge-success':'badge-info')+'">'+o.status+'</span></td><td><div class="btn-group">'+(o.status==='pending'?'<button class="btn btn-success btn-sm" onclick="confirmOrder(\''+o.id+'\')">✅ Confirm</button>':'')+'<button class="btn btn-danger btn-sm" onclick="deleteOrder(\''+o.id+'\')">🗑️</button></div></td></tr>';}html+='</tbody></table></div>';el.innerHTML=html;}
+window.confirmOrder=async function(id){await sb.from('orders').update({status:'confirmed'}).eq('id',id);toast('✅ Confirmed!');await loadAllData();renderOrders(getEl('contentArea'));};
+window.deleteOrder=async function(id){if(!confirm('🗑️ Delete?'))return;await sb.from('orders').delete().eq('id',id);toast('🗑️ Deleted');await loadAllData();renderOrders(getEl('contentArea'));};
+
+// ==================== NOTIFICATIONS ====================
+function renderNotifications(c){c.innerHTML='<div class="content-card"><div class="card-header"><h2>🔔 Send Notification</h2></div><div style="padding:16px;"><div class="form-group"><label>📝 Title</label><input type="text" id="notifTitle" class="form-control"></div><div class="form-group"><label>💬 Message</label><textarea id="notifMessage" class="form-control" rows="3"></textarea></div><button class="btn btn-primary" style="width:100%;padding:12px;" onclick="sendNotification()"><i class="fas fa-save"></i> Save & Send</button></div></div><div class="content-card"><div class="card-header"><h2>📋 History ('+allNotifications.length+')</h2></div><div id="notifHistory"></div></div>';renderNotifHistory();}
+window.sendNotification=async function(){var title=getEl('notifTitle').value.trim(),message=getEl('notifMessage').value.trim();if(!title||!message){toast('⚠️ Fill fields','error');return;}await sb.from('notifications').insert([{title:title,message:message,user_id:null,is_read:false,created_at:new Date().toISOString()}]);toast('✅ Sent!');getEl('notifTitle').value='';getEl('notifMessage').value='';await loadAllData();renderNotifHistory();};
+function renderNotifHistory(){var el=getEl('notifHistory');if(!allNotifications.length){el.innerHTML='<div class="empty-state"><p>No notifications</p></div>';return;}el.innerHTML='<div class="table-wrapper"><table class="data-table"><thead><tr><th>Title</th><th>Message</th><th>Date</th></tr></thead><tbody>'+allNotifications.map(function(n){return'<tr><td><strong>'+esc(n.title)+'</strong></td><td>'+esc(n.message)+'</td><td><small>'+fmtDate(n.created_at)+'</small></td></tr>';}).join('')+'</tbody></table></div>';}
+
+// ==================== SETTINGS ====================
+async function renderSettings(c){await loadAllData();var regFee=allShops.length>0?allShops[0].payment_amount||299:299;c.innerHTML='<div class="content-card"><div class="card-header"><h2>⚙️ Settings</h2></div><div style="padding:16px;"><div class="form-group"><label>Registration Fee (₹)</label><input type="number" id="regFee" class="form-control" value="'+regFee+'"></div><button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveSettings()"><i class="fas fa-save"></i> Save</button></div></div>';}
+window.saveSettings=async function(){var fee=getEl('regFee').value;await sb.from('app_settings').upsert([{key:'registration_fee',value:fee}],{onConflict:'key'});toast('✅ Saved!');};
+
+// ==================== AUTH ====================
+async function checkSession(){try{var res=await sb.auth.getSession();if(res&&res.data&&res.data.session){var prof=await safeFetch(function(){return sb.from('users').select('role').eq('id',res.data.session.user.id).single();});var role=prof.data?prof.data.role:null;if(role===1||role==='1'||role==='admin'){currentAdmin=res.data.session.user;await loadAllData();renderApp();showApp();return;}window.location.href='index.html';return;}showLogin();showApp();}catch(e){showLogin();showApp();}}
+window.handleLogout=async function(){try{await sb.auth.signOut();}catch(e){}currentAdmin=null;window.location.replace('index.html');};
+document.addEventListener('DOMContentLoaded',function(){checkSession();});
+
+// Expose all functions
+window.toggleSidebar=toggleSidebar;window.loadSection=loadSection;
+window.setShopFilter=setShopFilter;window.filterShops=filterShops;
+window.approveShop=approveShop;window.deleteShop=deleteShop;
+window.filterUsers=filterUsers;window.toggleBlockUser=toggleBlockUser;window.deleteUser=deleteUser;
+window.showCategoryModal=showCategoryModal;window.handleCatImage=handleCatImage;window.saveCategory=saveCategory;window.toggleCategoryHold=toggleCategoryHold;window.deleteCategory=deleteCategory;window.closeModal=closeModal;
+window.toggleFeatured=toggleFeatured;window.deleteProduct=deleteProduct;
+window.approveDelete=approveDelete;window.rejectDelete=rejectDelete;
+window.showOfferModal=showOfferModal;window.saveOffer=saveOffer;window.deleteOffer=deleteOffer;
+window.showSliderModal=showSliderModal;window.saveSlider=saveSlider;window.deleteSlider=deleteSlider;
+window.confirmOrder=confirmOrder;window.deleteOrder=deleteOrder;
+window.sendNotification=sendNotification;
+window.saveSettings=saveSettings;
+window.handleLogout=handleLogout;window.fastNavigate=fastNavigate;
+window.sendAdminOTP=sendAdminOTP;window.verifyAdminOTP=verifyAdminOTP;window.resendAdminOTP=resendAdminOTP;window.backToAdminEmail=backToAdminEmail;
+})();
+</script>
+</body>
+</html>

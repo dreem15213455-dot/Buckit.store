@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Invite & Earn - ZyMart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root{--brand-green:#0B5A31;--brand-orange:#F59E0B;--neutral-white:#FFFFFF;--neutral-bg:#F9FAFB;--neutral-border:#E5E7EB;--neutral-gray:#6B7280;--neutral-dark:#1A1A1A;--shadow-xs:0 1px 2px rgba(0,0,0,0.04);--shadow-sm:0 1px 4px rgba(0,0,0,0.06);--shadow-md:0 4px 16px rgba(0,0,0,0.08);--radius-sm:10px;--radius-md:14px;--radius-lg:18px;--radius-xl:22px;--radius-full:9999px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--neutral-bg);color:var(--neutral-dark);min-height:100vh;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        .top-bar{background:var(--brand-green);position:fixed;top:0;left:0;width:100%;z-index:100;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 16px rgba(11,90,49,0.3)}
+        .back-btn{width:40px;height:40px;min-width:40px;background:rgba(255,255,255,0.10);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:white;font-size:15px;text-decoration:none}
+        .back-btn:active{background:rgba(255,255,255,0.22);transform:scale(0.93)}
+        .top-title{font-family:'Poppins',sans-serif;flex:1;font-size:16px;font-weight:700;color:white}
+        .brand-zy{color:#A3E635}.brand-mart{color:#FDE047}
+        .main-content{padding-top:62px;max-width:600px;margin:0 auto;padding-bottom:30px}
+        .hero-card{background:#FFF8EB;margin:12px 14px;border-radius:var(--radius-xl);padding:24px 20px;text-align:center;border:2px solid #FDE68A;animation:fadeInUp 0.4s ease}
+        .hero-icon{font-size:52px;margin-bottom:10px;animation:bounce 2s infinite}
+        .hero-title{font-family:'Poppins',sans-serif;font-size:21px;font-weight:700;color:#92400E}
+        .hero-subtitle{font-size:13px;color:#A16207;margin-bottom:16px}
+        .reward-badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+        .reward-badge{background:white;padding:10px 16px;border-radius:var(--radius-full);font-weight:600;font-size:13px;box-shadow:var(--shadow-xs);border:1.5px solid #FDE68A;display:flex;align-items:center;gap:6px}
+        .reward-badge i{color:var(--brand-orange)}.reward-badge .amount{color:#92400E;font-size:16px;font-weight:700}
+        .referral-section{background:var(--neutral-white);margin:0 14px 12px;border-radius:var(--radius-lg);padding:18px;border:1px solid var(--neutral-border);box-shadow:var(--shadow-xs);text-align:center}
+        .section-title{font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .section-title i{color:var(--brand-green)}
+        .referral-code-box{background:#F3F5F4;border:2px dashed var(--brand-green);border-radius:var(--radius-md);padding:14px;margin:10px 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+        .referral-code{font-size:18px;font-weight:700;color:var(--brand-green);letter-spacing:2px;font-family:monospace}
+        .copy-btn{background:var(--brand-green);color:white;border:none;padding:8px 14px;border-radius:var(--radius-full);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px}
+        .copy-btn.copied{background:#22C55E}
+        .share-buttons{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+        .share-btn{padding:10px 16px;border-radius:var(--radius-full);font-weight:600;font-size:12px;cursor:pointer;border:none;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px}
+        .share-btn.whatsapp{background:#25D366;color:white}.share-btn.copy-link{background:#F3F5F4;color:var(--neutral-dark);border:1.5px solid var(--neutral-border)}.share-btn.more{background:#F3F5F4;color:var(--neutral-dark);border:1.5px solid var(--neutral-border)}
+        .share-btn:active{transform:scale(0.96)}
+        .how-section{background:var(--neutral-white);margin:0 14px 12px;border-radius:var(--radius-lg);padding:18px;border:1px solid var(--neutral-border);box-shadow:var(--shadow-xs)}
+        .step{display:flex;gap:12px;align-items:flex-start;padding:12px;background:#F3F5F4;border-radius:var(--radius-sm);margin-bottom:8px}
+        .step-number{width:32px;height:32px;min-width:32px;background:var(--brand-green);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+        .step-text h4{font-size:13px;font-weight:600;margin-bottom:2px}.step-text p{font-size:11px;color:var(--neutral-gray)}
+        .login-prompt{text-align:center;padding:40px 20px}
+        .login-prompt i{font-size:48px;color:#D1D5DB;margin-bottom:10px;display:block}
+        .login-prompt h3{font-family:'Poppins',sans-serif;font-size:17px;font-weight:700}.login-prompt p{color:var(--neutral-gray);font-size:13px;margin-bottom:14px}
+        .btn-orange{background:var(--brand-orange);color:white;border:none;padding:12px 28px;border-radius:var(--radius-full);font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 14px rgba(245,158,11,0.25);display:inline-flex;align-items:center;gap:6px}
+        .terms-section{background:var(--neutral-white);margin:0 14px 30px;border-radius:var(--radius-lg);padding:18px;border:1px solid var(--neutral-border);box-shadow:var(--shadow-xs)}
+        .terms-section h3{font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;margin-bottom:8px}
+        .terms-section li{font-size:12px;color:var(--neutral-gray);margin-bottom:4px;line-height:1.5}
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--neutral-dark);color:white;padding:10px 20px;border-radius:var(--radius-full);font-size:12px;z-index:200;opacity:0;visibility:hidden;white-space:nowrap;box-shadow:var(--shadow-md);transition:all 0.3s ease}
+        .toast.show{opacity:1;visibility:visible}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <span class="top-title"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span> Invite</span>
+</div>
+
+<div class="main-content" id="mainContent"></div>
+<div class="toast" id="toastMsg"></div>
+
+<script>
+(function(){'use strict';
+window.addEventListener('error',function(e){console.error('[Invite]',e.message);});
+
+function getEl(id){return document.getElementById(id);}
+function esc(s){if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+var sb=supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co','sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+var currentUser=null,isLoggedIn=false,referralCode='ZYMART',rewardValue=50,newUserOfferValue=25;
+
+function showToast(m,e){var t=getEl('toastMsg');if(!t)return;t.textContent=m;t.style.background=e?'#EF4444':'#1A1A1A';t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2500);}
+function generateCode(email){var p='ZY';if(email){var n=email.split('@')[0].replace(/[^a-zA-Z0-9]/g,'').substring(0,4).toUpperCase();if(n)p+=n;}return(p+Math.random().toString(36).substring(2,5).toUpperCase()).substring(0,10);}
+
+function goToLogin(){window.location.href='login.html';}
+
+function renderPage(){
+var mc=getEl('mainContent');
+var rewardText='₹'+rewardValue;
+var offerText='₹'+newUserOfferValue+' Cashback';
+
+if(!isLoggedIn){
+mc.innerHTML='<div class="login-prompt"><i class="fas fa-gift"></i><h3>Login to Start Inviting</h3><p>Invite friends and earn '+rewardText+'!</p><button class="btn-orange" onclick="goToLogin()"><i class="fas fa-sign-in-alt"></i> Login / Register</button></div>'+
+'<div class="how-section"><div class="section-title"><i class="fas fa-question-circle"></i> How It Works</div>'+
+'<div class="step"><div class="step-number">1</div><div class="step-text"><h4>Share Your Code</h4><p>Send via WhatsApp, SMS or copy link</p></div></div>'+
+'<div class="step"><div class="step-number">2</div><div class="step-text"><h4>Friend Joins</h4><p>They enter your code during signup</p></div></div>'+
+'<div class="step"><div class="step-number">3</div><div class="step-text"><h4>First Order</h4><p>You get '+rewardText+' after their first order!</p></div></div></div>';
+return;}
+
+var html='<div class="hero-card"><div class="hero-icon">🎁</div><div class="hero-title">Invite Friends & Earn!</div><div class="hero-subtitle">Get '+rewardText+' for every friend\'s first order</div>';
+html+='<div class="reward-badges"><div class="reward-badge"><i class="fas fa-gift"></i> You get <span class="amount">'+rewardText+'</span></div><div class="reward-badge"><i class="fas fa-tag"></i> Friend gets <span class="amount">'+offerText+'</span></div></div></div>';
+
+html+='<div class="referral-section"><div class="section-title"><i class="fas fa-hashtag"></i> Your Referral Code</div>';
+html+='<div class="referral-code-box"><span class="referral-code">'+esc(referralCode)+'</span><button class="copy-btn" id="copyBtn" onclick="copyCode()"><i class="fas fa-copy"></i> Copy</button></div>';
+html+='<div class="share-buttons"><button class="share-btn whatsapp" onclick="shareWA()"><i class="fab fa-whatsapp"></i> WhatsApp</button><button class="share-btn copy-link" onclick="copyCode()"><i class="fas fa-link"></i> Copy Link</button><button class="share-btn more" onclick="shareMore()"><i class="fas fa-share-alt"></i> More</button></div></div>';
+
+html+='<div class="how-section"><div class="section-title"><i class="fas fa-question-circle"></i> How It Works</div>';
+html+='<div class="step"><div class="step-number">1</div><div class="step-text"><h4>Share Your Code</h4><p>Send via WhatsApp, SMS or copy link</p></div></div>';
+html+='<div class="step"><div class="step-number">2</div><div class="step-text"><h4>Friend Joins</h4><p>They enter your code during signup</p></div></div>';
+html+='<div class="step"><div class="step-number">3</div><div class="step-text"><h4>First Order</h4><p>You get '+rewardText+' after their first order!</p></div></div></div>';
+
+html+='<div class="terms-section"><h3><i class="fas fa-file-contract"></i> Terms & Conditions</h3><ul><li>Reward credited after friend\'s first order is delivered.</li><li>'+rewardText+' will be added to ZyMart Wallet.</li><li>Fraudulent activity will result in reward cancellation.</li></ul></div>';
+
+mc.innerHTML=html;}
+
+// 🔥 FIXED: Check both Supabase Auth + localStorage session
+async function checkAuth(){
+    try{var r=await sb.auth.getSession();if(r&&r.data&&r.data.session){currentUser=r.data.session.user;isLoggedIn=true;referralCode=generateCode(currentUser.email);return;}}catch(e){}
+    try{var session=JSON.parse(localStorage.getItem('zymart_session')||'null');if(session&&session.userId){currentUser={id:session.userId,phone:session.phone};isLoggedIn=true;referralCode=generateCode(session.phone||'');return;}}catch(e){}
+    isLoggedIn=false;
+}
+
+function copyCode(){var t='🎁 *ZyMart* - Your Local Market!\nReferral Code: *'+referralCode+'*\nJoin now & get '+newUserOfferValue+' Cashback!';if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){showToast('✅ Copied!');var b=getEl('copyBtn');if(b){b.classList.add('copied');b.innerHTML='<i class="fas fa-check"></i> Copied!';}});}else{showToast('📋 Code: '+referralCode);}}
+function shareWA(){window.open('https://wa.me/?text='+encodeURIComponent('🎁 *ZyMart* - Use Code: *'+referralCode+'*\nJoin now!'),'_blank');}
+function shareMore(){if(navigator.share){navigator.share({title:'ZyMart',text:'🎁 ZyMart - Code: '+referralCode}).catch(function(){});}else{copyCode();}}
+
+async function init(){renderPage();await checkAuth();if(isLoggedIn)renderPage();}
+document.addEventListener('DOMContentLoaded',init);
+
+window.copyCode=copyCode;window.shareWA=shareWA;window.shareMore=shareMore;window.goToLogin=goToLogin;
+})();
+</script>
+</body>
+</html>

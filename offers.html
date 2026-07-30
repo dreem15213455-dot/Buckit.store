@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>धमाकेदार ऑफर - Zymart</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="Zymart पर धमाकेदार ऑफर - स्थानीय दुकान, झटपट डिलीवरी">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-orange: #F59E0B;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif; background: var(--neutral-bg); color: var(--neutral-dark);
+            padding-bottom: 85px; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; min-height: 100vh;
+        }
+        @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--neutral-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: opacity 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 36px; height: 36px; border: 3px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.6s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; }
+        .loader-zy { color: var(--brand-green); } .loader-mart { color: var(--brand-orange); }
+        
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 12px rgba(11,90,49,0.3); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; transition: all 0.15s ease; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { font-family: 'Poppins', sans-serif; flex: 1; font-size: 17px; font-weight: 700; color: white; }
+        .main-content { padding-top: 58px; max-width: 600px; margin: 0 auto; min-height: 70vh; }
+        
+        .offer-card { background: var(--neutral-white); margin: 10px 14px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-sm); cursor: pointer; animation: slideUp 0.3s ease forwards; transition: transform 0.15s; }
+        .offer-card:active { transform: scale(0.98); }
+        .offer-banner { height: 120px; background: linear-gradient(135deg, var(--brand-green), #0F6E3B); display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; font-weight: 900; position: relative; overflow: hidden; }
+        .offer-banner img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+        .offer-banner span { position: relative; z-index: 1; text-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+        .offer-body { padding: 14px; }
+        .offer-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .offer-desc { font-size: 12px; color: var(--neutral-gray); margin-bottom: 10px; line-height: 1.4; }
+        .offer-meta { display: flex; gap: 8px; font-size: 10px; color: var(--neutral-gray); flex-wrap: wrap; }
+        .offer-meta span { background: var(--neutral-bg); padding: 4px 10px; border-radius: var(--radius-full); font-weight: 500; }
+        .expiry-badge { background: #FEF2F2; color: #EF4444; font-weight: 600; }
+        
+        .invite-banner { margin: 12px 14px; padding: 14px; background: #FFF8EB; border: 1px solid #FDE68A; border-radius: var(--radius-lg); text-align: center; animation: slideUp 0.4s ease; }
+        .invite-banner .invite-title { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; color: #92400E; margin-bottom: 4px; }
+        .invite-banner .invite-subtitle { font-size: 11px; color: #A16207; margin-bottom: 10px; }
+        .btn-invite { background: var(--brand-orange); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .btn-invite:active { background: #E8890A; transform: scale(0.96); }
+        
+        .empty-state { text-align: center; padding: 60px 20px; animation: slideUp 0.3s ease; }
+        .empty-state i { font-size: 48px; color: #D1D5DB; margin-bottom: 12px; display: block; }
+        .empty-state h3 { font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .empty-state p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 14px; }
+        .empty-state button { background: var(--brand-green); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        .bottom-nav { background: white; position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 5px 10px 10px; box-shadow: 0 -4px 16px rgba(0,0,0,0.03); z-index: 1000; border-top: 1px solid var(--neutral-border); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 9px; font-weight: 500; color: var(--neutral-gray); cursor: pointer; padding: 3px 10px; border-radius: var(--radius-full); border: none; background: transparent; transition: all 0.15s ease; font-family: 'Inter', sans-serif; }
+        .nav-item:active { background: #EDF7F1; } .nav-item.active { color: var(--brand-green); font-weight: 600; } .nav-item i { font-size: 18px; margin-bottom: 1px; }
+        
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-md); transition: all 0.25s; }
+        .toast.show { opacity: 1; visibility: visible; }
+        @media (max-width: 380px) { .offer-banner { height: 100px; font-size: 22px; } }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">mart</span></div></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()" aria-label="वापस"><i class="fas fa-arrow-left"></i></button>
+        <span class="top-title">🔥 धमाकेदार ऑफर</span>
+    </div>
+    <div class="main-content" id="mainContent">
+        <div style="text-align:center;padding:40px;"><div class="simple-spinner"></div><p style="font-size:12px;color:var(--neutral-gray);">लोड हो रहे हैं...</p></div>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <button class="nav-item" onclick="fastNavigate('index.html')"><i class="fas fa-home"></i><span>होम</span></button>
+    <button class="nav-item" onclick="fastNavigate('products.html')"><i class="fas fa-box"></i><span>खोजें</span></button>
+    <button class="nav-item" onclick="fastNavigate('cart.html')"><i class="fas fa-shopping-cart"></i><span>कार्ट</span></button>
+    <button class="nav-item" onclick="fastNavigate('profile.html')"><i class="fas fa-user"></i><span>प्रोफाइल</span></button>
+    <button class="nav-item active"><i class="fas fa-tag"></i><span>ऑफर</span></button>
+</nav>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    window.addEventListener('error', function(e) { console.error('[Zymart Offers]', e.message); });
+    window.addEventListener('unhandledrejection', function(e) { console.error('[Zymart Offers]', e.reason); e.preventDefault(); });
+    
+    function $(id) { return document.getElementById(id); }
+    function esc(str) { if (!str) return ''; var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+    
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    var initComplete = false;
+    
+    function getFullUrl(u) { if (!u || typeof u !== 'string') return ''; if (u.indexOf('http')===0 || u.indexOf('data:')===0) return u; return SUPABASE_URL + '/storage/v1/object/public/' + u; }
+    function showApp() { var l = $('simpleLoader'), a = $('mainApp'); if (a) a.style.display = ''; if (l) { l.classList.add('fade-out'); setTimeout(function() { if (l && l.parentNode) l.parentNode.removeChild(l); }, 300); } }
+    function showToast(m, e) { var t = $('toastMsg'); if (!t) return; t.textContent = m; t.style.background = e ? '#EF4444' : '#1A1A1A'; t.classList.add('show'); clearTimeout(t._timer); t._timer = setTimeout(function() { t.classList.remove('show'); }, 2500); }
+    function goBack() { try { if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) { window.history.back(); return; } } catch(e) {} window.location.href = 'index.html'; }
+    window.fastNavigate = function(url) { window.location.href = url; };
+    
+    window.addEventListener('online', function() { showToast('✅ इंटरनेट बहाल!'); if(initComplete) loadOffers(); });
+    window.addEventListener('offline', function() { showToast('⚠️ ऑफलाइन', true); });
+    
+    async function loadOffers() {
+        var c = $('mainContent'); if (!c) return;
+        try {
+            var result = await sb.from('offers').select('*').eq('is_active', true).order('priority');
+            var offers = (result && result.data) ? result.data : [];
+            if (!offers.length) { c.innerHTML = '<div class="empty-state"><i class="fas fa-tag"></i><h3>अभी कोई ऑफर नहीं</h3><p>जल्द ही नए धमाकेदार ऑफर आ रहे हैं</p><button onclick="fastNavigate(\'products.html\')">🛍️ खरीदारी करें</button></div>'; return; }
+            
+            var h = '';
+            for (var i = 0; i < offers.length; i++) {
+                var o = offers[i], imgUrl = getFullUrl(o.image_url || '');
+                var discountText = o.discount_value + (o.discount_type === 'percentage' ? '% छूट' : '₹ छूट');
+                var applyText = o.apply_to === 'global' ? 'सभी प्रोडक्ट्स' : o.apply_to === 'category' ? 'श्रेणी' : o.apply_to === 'product' ? 'प्रोडक्ट' : o.apply_to === 'shop' ? 'दुकान' : 'सभी';
+                var expiryHtml = '';
+                if (o.valid_till) {
+                    var expiry = new Date(o.valid_till), now = new Date();
+                    var daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                    if (daysLeft <= 3 && daysLeft > 0) expiryHtml = '<span class="expiry-badge">⏰ ' + daysLeft + ' दिन बाकी</span>';
+                    else if (daysLeft <= 0) expiryHtml = '<span class="expiry-badge">❌ समाप्त</span>';
+                }
+                h += '<div class="offer-card" onclick="fastNavigate(\'offer-details.html?id=' + o.id + '\')" style="animation-delay:' + (i * 0.06) + 's;">';
+                h += '<div class="offer-banner">' + (imgUrl ? '<img src="' + imgUrl + '" loading="lazy" onerror="this.style.display=\'none\'">' : '') + '<span>' + discountText + '</span></div>';
+                h += '<div class="offer-body"><div class="offer-title">' + esc(o.title || 'विशेष ऑफर') + '</div>';
+                h += '<div class="offer-desc">' + esc(o.subtitle || 'इस शानदार डील को अभी पाएं!') + '</div>';
+                h += '<div class="offer-meta"><span>🏷️ ' + o.discount_value + (o.discount_type === 'percentage' ? '%' : '₹') + ' छूट</span>';
+                if (o.min_order_amount > 0) h += '<span>📦 न्यूनतम ₹' + Number(o.min_order_amount).toLocaleString('en-IN') + '</span>';
+                h += '<span>📋 ' + applyText + '</span>' + expiryHtml + '</div></div></div>';
+            }
+            h += '<div class="invite-banner"><div class="invite-title">🎁 दोस्तों को इन्वाइट करें और ₹50 पाएं!</div><div class="invite-subtitle">हर दोस्त के पहले ऑर्डर पर ₹50 मिलेंगे</div><button class="btn-invite" onclick="fastNavigate(\'invite-earn.html\')"><i class="fas fa-gift"></i> अभी इन्वाइट करें</button></div>';
+            c.innerHTML = h;
+        } catch(e) { c.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>लोड विफल</h3><p>कनेक्शन जांचें</p><button onclick="loadOffers()">🔄 पुनः प्रयास</button></div>'; showToast('❌ लोड विफल', true); }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() { loadOffers(); showApp(); initComplete = true; });
+    window.goBack = goBack; window.loadOffers = loadOffers;
+})();
+</script>
+</body>
+</html>
