@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Product Details - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="description" content="View product details on ZyMart+ - Your Local Market">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" media="print" onload="this.media='all'">
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-green-light: #0F6E3B; --brand-green-dark: #083D21;
+            --brand-orange: #F59E0B; --brand-orange-dark: #E8890A;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --shadow-bottom: 0 -4px 20px rgba(0,0,0,0.08);
+            --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); overflow-x: hidden; padding-bottom: 95px; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; min-height: 100vh; width: 100%; max-width: 100%; }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--neutral-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; transition: opacity 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; }
+        .loader-zy { color: #A3E635; } .loader-mart { color: #FDE047; }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes heartPop { 0%{transform:scale(1)} 30%{transform:scale(1.3)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
+        
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 8px 12px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { flex: 1; font-size: 15px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .top-actions { display: flex; align-items: center; gap: 6px; }
+        .icon-btn { width: 38px; height: 38px; min-width: 38px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; position: relative; }
+        .icon-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .wishlist-icon.liked i { color: #EF4444 !important; animation: heartPop 0.4s ease; }
+        .cart-badge { position: absolute; top: -4px; right: -4px; background: var(--brand-orange); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--brand-green); font-weight: 700; }
+        
+        .main-content { padding-top: 56px; animation: fadeInUp 0.4s ease; }
+        
+        .product-slider { position: relative; background: var(--neutral-white); width: 100%; }
+        .swiper.product-swiper { width: 100%; height: 340px; }
+        .product-swiper .swiper-slide { display: flex; align-items: center; justify-content: center; background: var(--neutral-white); cursor: zoom-in; }
+        .product-swiper .swiper-slide img { width: 100%; height: 100%; object-fit: contain; background: var(--neutral-white); }
+        .image-counter { position: absolute; bottom: 10px; right: 16px; z-index: 10; background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; }
+        
+        .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: none; opacity: 0; transition: opacity 0.3s ease; }
+        .fullscreen-modal.active { display: block; opacity: 1; }
+        .fullscreen-swiper { width: 100%; height: 100%; }
+        .fullscreen-swiper .swiper-slide { display: flex; align-items: center; justify-content: center; background: black; }
+        .fullscreen-swiper .swiper-slide img { width: 100%; height: 100%; object-fit: contain; }
+        .close-fullscreen { position: fixed; top: 16px; right: 16px; z-index: 10000; width: 44px; height: 44px; background: rgba(255,255,255,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 20px; border: 1px solid rgba(255,255,255,0.18); }
+        
+        .product-info-section { background: var(--neutral-white); padding: 16px; border-bottom: 8px solid var(--neutral-bg); }
+        .product-name { font-family: 'Poppins', sans-serif; font-size: 21px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+        .product-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+        .rating-badge { display: flex; align-items: center; gap: 4px; background: var(--brand-green); color: white; padding: 5px 10px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; }
+        .rating-badge i { font-size: 11px; color: #FACC15; }
+        .rating-count { font-size: 12px; color: var(--neutral-gray); }
+        
+        .variant-section { margin: 12px 0; background: #F9FAFB; border-radius: var(--radius-md); padding: 12px; border: 1px solid var(--neutral-border); }
+        .variant-label { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .variant-label i { color: var(--brand-orange); }
+        .variant-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+        .variant-pill { padding: 10px 12px; border-radius: var(--radius-md); border: 2px solid var(--neutral-border); background: white; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.15s ease; text-align: center; min-width: 70px; position: relative; }
+        .variant-pill:active { transform: scale(0.94); }
+        .variant-pill.active { border-color: var(--brand-green); background: #EDF7F1; color: var(--brand-green); font-weight: 700; box-shadow: 0 0 0 3px rgba(11,90,49,0.12); }
+        .variant-pill.oos { opacity: 0.45; cursor: not-allowed; pointer-events: none; position: relative; }
+        .variant-pill.oos::after { content: 'Out of Stock'; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); font-size: 7px; color: #EF4444; font-weight: 700; white-space: nowrap; }
+        .variant-pill .pill-weight { font-size: 14px; font-weight: 700; display: block; }
+        .variant-pill .pill-price { font-size: 11px; font-weight: 500; color: var(--neutral-gray); display: block; margin-top: 2px; }
+        .variant-pill.active .pill-price { color: var(--brand-green); }
+        .variant-pill .pill-offer { font-size: 9px; color: #059669; font-weight: 600; display: block; }
+        
+        .product-price-section { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+        .current-price { font-family: 'Poppins', sans-serif; font-size: 32px; font-weight: 700; color: var(--brand-green-dark); }
+        .original-price { font-size: 16px; color: var(--neutral-gray); text-decoration: line-through; }
+        .discount-percent { background: var(--brand-orange); color: white; padding: 3px 8px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; }
+        .saved-text { font-size: 12px; color: #059669; font-weight: 600; display: block; margin-bottom: 4px; }
+        .tax-info { font-size: 10px; color: var(--neutral-gray); margin-bottom: 8px; }
+        
+        .quantity-section { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-top: 1px solid var(--neutral-border); border-bottom: 1px solid var(--neutral-border); margin-bottom: 8px; }
+        .quantity-label { font-size: 14px; font-weight: 700; }
+        .quantity-label small { font-weight: 400; color: var(--neutral-gray); font-size: 11px; }
+        .quantity-control { display: flex; align-items: center; gap: 14px; background: #F3F5F4; border-radius: var(--radius-full); padding: 4px 6px; }
+        .quantity-btn { width: 34px; height: 34px; border-radius: 50%; background: white; border: 1.5px solid var(--neutral-border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; font-weight: 700; color: var(--brand-green); }
+        .quantity-btn.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+        .quantity-value { font-size: 18px; font-weight: 700; min-width: 28px; text-align: center; }
+        .stock-info { font-size: 11px; color: var(--neutral-gray); margin-top: 10px; }
+        .stock-info.low-stock { color: #EF4444; font-weight: 600; }
+        
+        .shop-info-section { background: var(--neutral-white); padding: 16px; border-bottom: 8px solid var(--neutral-bg); }
+        .shop-info-section.nearby-shop { border: 2px solid #0B5A31; background: #F9FDF9; border-radius: var(--radius-md); }
+        .shop-header { display: flex; align-items: center; gap: 12px; }
+        .shop-img { width: 52px; height: 52px; border-radius: var(--radius-sm); background: #EDF7F1; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid #C8E6C9; }
+        .shop-img img { width: 100%; height: 100%; object-fit: cover; }
+        .shop-name { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; }
+        .shop-meta { font-size: 11px; color: var(--neutral-gray); margin-top: 2px; }
+        .nearby-tag { background: #EDF7F1; color: #0B5A31; font-size: 9px; padding: 2px 6px; border-radius: 9999px; font-weight: 600; }
+        .view-shop-btn { background: #EDF7F1; color: var(--brand-green); border: 1.5px solid var(--brand-green); border-radius: var(--radius-full); padding: 8px 16px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        .description-section { background: var(--neutral-white); padding: 16px; border-bottom: 8px solid var(--neutral-bg); }
+        .section-title { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+        .description-text { font-size: 14px; color: var(--neutral-gray); line-height: 1.7; }
+        
+        .related-section { background: var(--neutral-white); padding: 16px 0; }
+        .related-header { padding: 0 16px 14px; display: flex; justify-content: space-between; align-items: center; }
+        .related-header h3 { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; }
+        .view-all { color: var(--brand-green); font-size: 11px; font-weight: 600; cursor: pointer; }
+        .products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; padding: 0 12px; }
+        .mini-product-card { background: white; border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-xs); border: 1px solid var(--neutral-border); cursor: pointer; }
+        .mini-product-card:active { transform: scale(0.96); }
+        .mini-product-img { width: 100%; aspect-ratio: 1/1; overflow: hidden; background: var(--neutral-bg); display: flex; align-items: center; justify-content: center; }
+        .mini-product-img img { width: 100%; height: 100%; object-fit: contain; }
+        .mini-product-info { padding: 7px; }
+        .mini-product-name { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-product-price { font-size: 13px; font-weight: 700; }
+        
+        .bottom-action-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px 14px; box-shadow: var(--shadow-bottom); z-index: 1000; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--neutral-border); }
+        .add-to-cart-btn { flex: 1; background: var(--brand-green); color: white; border: none; padding: 14px; border-radius: var(--radius-full); font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .add-to-cart-btn:active { background: var(--brand-green-dark); transform: scale(0.97); }
+        .add-to-cart-btn.disabled { background: #D1D5DB; color: #9CA3AF; cursor: not-allowed; pointer-events: none; }
+        .buy-now-btn { flex: 1; background: var(--brand-orange); color: white; border: none; padding: 14px; border-radius: var(--radius-full); font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .buy-now-btn:active { background: var(--brand-orange-dark); transform: scale(0.97); }
+        .buy-now-btn.disabled { background: #D1D5DB; color: #9CA3AF; cursor: not-allowed; pointer-events: none; }
+        
+        .toast-notification { position: fixed; bottom: 95px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 11px 22px; border-radius: var(--radius-full); font-size: 12px; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-md); transition: all 0.3s ease; }
+        .toast-notification.show { opacity: 1; visibility: visible; }
+        .toast-notification.error { background: #EF4444; }
+        .toast-notification.success { background: #059669; }
+        .toast-notification.warning { background: #F59E0B; color: #1A1A1A; }
+        
+        .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; gap: 14px; }
+        
+        .error-container { text-align: center; padding: 55px 20px; }
+        .error-container i { font-size: 52px; color: #D1D5DB; margin-bottom: 12px; display: block; }
+        .error-container h3 { font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+        .error-container p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 12px; }
+        .error-container button { background: var(--brand-green); color: white; border: none; padding: 10px 22px; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        @media (max-width: 380px) { .product-swiper { height: 280px; } .current-price { font-size: 28px; } .product-name { font-size: 19px; } .variant-pill { padding: 8px 10px; font-size: 10px; min-width: 60px; } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div></div>
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<div id="fullscreenModal" class="fullscreen-modal">
+    <button class="close-fullscreen" onclick="closeFullscreen()"><i class="fas fa-times"></i></button>
+    <div class="swiper fullscreen-swiper" id="fullscreenSwiper"><div class="swiper-wrapper" id="fullscreenWrapper"></div></div>
+</div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+        <div class="top-title" id="productTitle">Product Details</div>
+        <div class="top-actions">
+            <button class="icon-btn wishlist-icon" id="wishlistBtn" onclick="toggleWishlist()"><i class="far fa-heart"></i></button>
+            <button class="icon-btn" onclick="shareProduct()"><i class="fas fa-share-alt"></i></button>
+            <button class="icon-btn" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-bag"></i><span class="cart-badge" id="cartBadge">0</span></button>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="loading-container"><div class="loading-spinner" style="width:40px;height:40px;border:3px solid #E5E7EB;border-top-color:#F59E0B;border-radius:50%;animation:spin 0.7s linear infinite;"></div><p style="color:#6B7280;">Loading product...</p></div>
+    </div>
+
+    <div class="bottom-action-bar" id="bottomBar" style="display:none;">
+        <button class="add-to-cart-btn" id="addToCartBtn" onclick="addToCart()"><i class="fas fa-shopping-bag"></i> <span id="addToCartText">Add to Cart</span></button>
+        <button class="buy-now-btn" id="buyNowBtn" onclick="buyNow()"><i class="fas fa-bolt"></i> Buy Now</button>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    
+    window.addEventListener('error', function(e) { console.error('[Detail]', e.message); try { showToast('⚠️ Something went wrong', 'error'); } catch(_) {} });
+    window.addEventListener('unhandledrejection', function(e) { console.error('[Detail]', e.reason); e.preventDefault(); try { showToast('⚠️ Network error', 'error'); } catch(_) {} });
+    
+    function getEl(id) { return document.getElementById(id); }
+    function safeJSON(s, f) { try { return s ? JSON.parse(s) : f; } catch(e) { return f; } }
+    function esc(str) { if (!str) return ''; var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+    
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    
+    var currentProduct = null, currentShop = null, quantity = 1;
+    var productSwiper = null, fullscreenSwiper = null;
+    var isInWishlist = false, productImages = [];
+    var currentUser = null, productId = null;
+    var variants = [];
+    var selectedVariantIndex = 0;
+    var TALUKAS = [
+        { name: 'Sillod', lat: 20.3030, lng: 75.6529 },
+        { name: 'Bhokardan', lat: 20.2691, lng: 75.7693 },
+        { name: 'Jamner', lat: 20.8076, lng: 75.7796 }
+    ];
+    var SERVICE_RADIUS_KM = 10;
+    
+    try { productId = new URLSearchParams(window.location.search).get('id'); } catch(e) { productId = null; }
+    
+    function getFullUrl(u) { if (!u || typeof u !== 'string') return ''; if (u.indexOf('http')===0||u.indexOf('data:')===0) return u; return SUPABASE_URL + '/storage/v1/object/public/' + u; }
+    function showApp() { var l = getEl('simpleLoader'), a = getEl('mainApp'); if (a) a.style.display = ''; if (l) { l.classList.add('fade-out'); setTimeout(function() { if (l && l.parentNode) l.parentNode.removeChild(l); }, 300); } }
+    
+    function showToast(m, type) { 
+        var t = getEl('toastMsg'), s = getEl('toastText'); 
+        if (!t||!s) return; 
+        s.textContent = m; 
+        t.className = 'toast-notification';
+        if (type === 'error') t.classList.add('error');
+        else if (type === 'success') t.classList.add('success');
+        else if (type === 'warning') t.classList.add('warning');
+        t.classList.add('show'); 
+        clearTimeout(t._timer); 
+        t._timer = setTimeout(function(){t.classList.remove('show','error','success','warning');},2500); 
+    }
+    
+    async function checkUser() { try { var res = await sb.auth.getSession(); currentUser = (res && res.data && res.data.session) ? res.data.session.user : null; } catch(e) { currentUser = null; } return !!currentUser; }
+    function goToLogin() { try { sessionStorage.setItem('zymart_redirect_after_login', 'checkout.html'); } catch(e) {} window.location.href = 'login.html'; }
+    function getCart() { return safeJSON(localStorage.getItem('zymart_cart'), []); }
+    function saveCart(c) { try { localStorage.setItem('zymart_cart', JSON.stringify(c)); } catch(e) {} }
+    function updateCartBadge() { var cart = getCart(), count = cart.reduce(function(s,i){return s+(i.quantity||1);},0); var badge = getEl('cartBadge'); if (badge) badge.textContent = count; }
+    
+    function fmtWeight(w, u) {
+        if (!w) return '';
+        if (u === 'gram' || u === 'g' || u === 'gm') return w >= 1000 ? (w/1000).toFixed(1).replace(/\.0$/, '') + ' kg' : w + ' g';
+        if (u === 'kg') return w + ' kg';
+        if (u === 'liter' || u === 'l') return w + ' L';
+        if (u === 'ml') return w + ' ml';
+        if (u === 'piece' || u === 'pcs') return w + ' pcs';
+        return w + ' ' + (u || '');
+    }
+    
+    function parseVariants(product) {
+        if (product.variants && Array.isArray(product.variants) && product.variants.length > 0) {
+            return product.variants.map(function(v) {
+                return {
+                    weight: v.weight || product.weight || 1,
+                    unit: v.weight_unit || v.unit || product.weight_unit || product.unit || 'kg',
+                    price: v.price || product.price || 0,
+                    offer_price: v.offer_price || null,
+                    stock: v.stock || 0,
+                    is_active: v.is_active !== false,
+                    image_url: v.image_url || null // 🔥 ADDED: Variant photo
+                };
+            });
+        }
+        return [{
+            weight: product.weight || 1,
+            unit: product.weight_unit || product.unit || 'kg',
+            price: product.price || 0,
+            offer_price: product.offer_price || null,
+            stock: product.stock || 0,
+            is_active: true,
+            image_url: null
+        }];
+    }
+    
+    function getSelectedVariant() { return variants[selectedVariantIndex] || variants[0] || null; }
+    
+    function getVariantPrice(v) {
+        if (!v) return { price: 0, discountPercent: 0, savedAmount: 0 };
+        var price = v.price || 0;
+        var offerPrice = v.offer_price;
+        if (offerPrice && offerPrice > 0 && offerPrice < price) {
+            return { 
+                price: offerPrice, 
+                discountPercent: Math.round((1 - offerPrice / price) * 100),
+                savedAmount: price - offerPrice
+            };
+        }
+        return { price: price, discountPercent: 0, savedAmount: 0 };
+    }
+    
+    function makeCartKey(productId, variant) {
+        if (!variant) return productId + '_default';
+        return productId + '_' + (variant.weight || 0) + '_' + (variant.unit || '');
+    }
+    
+    function calculateDistance(lat1, lng1, lat2, lng2) {
+        var R = 6371;
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLng = (lng2 - lng1) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLng/2) * Math.sin(dLng/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+    
+    function shareProduct() { 
+        if(!currentProduct) return; 
+        if(navigator.share) { navigator.share({title:currentProduct.name,text:'Check out '+currentProduct.name+' on ZyMart+!',url:window.location.href}).catch(function(){}); } 
+        else { navigator.clipboard.writeText(window.location.href).then(function(){showToast('📋 Link copied!','success');}).catch(function(){showToast('📋 '+window.location.href,'warning');}); } 
+    }
+    
+    function openFullscreen() {
+        var modal = getEl('fullscreenModal'), wrapper = getEl('fullscreenWrapper');
+        if (!modal || !wrapper || !productImages.length) return;
+        wrapper.innerHTML = productImages.map(function(img){return'<div class="swiper-slide"><img src="'+img+'" loading="lazy"></div>';}).join('');
+        modal.classList.add('active'); document.body.style.overflow = 'hidden';
+        setTimeout(function() { if(fullscreenSwiper){try{fullscreenSwiper.destroy();}catch(e){}} fullscreenSwiper = new Swiper('#fullscreenSwiper',{loop:productImages.length>1}); }, 150);
+    }
+    window.closeFullscreen = function() { var m = getEl('fullscreenModal'); if (m) m.classList.remove('active'); document.body.style.overflow = ''; };
+    
+    // 🔥 VARIANT SELECTION - NOW UPDATES SLIDER IMAGE
+    window.selectVariant = function(index) {
+        if (index >= variants.length) return;
+        var v = variants[index];
+        if ((v.stock || 0) <= 0) {
+            showToast('⚠️ This variant is out of stock', 'warning');
+            return;
+        }
+        selectedVariantIndex = index;
+        quantity = 1;
+        
+        // 🔥 Update slider to show variant photo first
+        updateSliderForVariant(v);
+        updateVariantUI();
+        updateAddToCartButtonText();
+    };
+    
+    // 🔥 NEW: Update image slider when variant changes
+    function updateSliderForVariant(v) {
+        if (!v || !v.image_url) return; // No variant photo, keep existing slider
+        
+        var variantImg = getFullUrl(v.image_url);
+        if (!variantImg) return;
+        
+        // Check if variant image already in slider
+        var existsInSlider = productImages.indexOf(variantImg) !== -1;
+        
+        if (!existsInSlider && productSwiper) {
+            // Add variant image to front of slider
+            productImages.unshift(variantImg);
+            // Keep max 5 images
+            if (productImages.length > 5) productImages = productImages.slice(0, 5);
+            
+            // Rebuild slider
+            rebuildProductSlider();
+        } else if (productSwiper && existsInSlider) {
+            // Slide to variant image
+            var idx = productImages.indexOf(variantImg);
+            if (idx >= 0) productSwiper.slideTo(idx);
+        }
+    }
+    
+    function rebuildProductSlider() {
+        if (!productSwiper) return;
+        try { productSwiper.destroy(true, true); } catch(e) {}
+        
+        var wrapper = document.querySelector('#productSwiper .swiper-wrapper');
+        if (wrapper) {
+            wrapper.innerHTML = productImages.map(function(img){
+                return '<div class="swiper-slide" onclick="openFullscreen()"><img src="'+img+'" loading="eager"></div>';
+            }).join('');
+        }
+        
+        if (productImages.length > 1) {
+            var counter = getEl('currentSlide');
+            if (counter) counter.textContent = '1';
+        }
+        
+        setTimeout(function() {
+            productSwiper = new Swiper('#productSwiper', { 
+                loop: productImages.length > 1, 
+                pagination: { el: '.slider-pagination .swiper-pagination', clickable: true }, 
+                on: { slideChange: function() { if(productImages.length>1) { var el=getEl('currentSlide'); if(el) el.textContent = this.realIndex+1; } } } 
+            });
+            productSwiper.slideTo(0);
+        }, 200);
+    }
+    
+    function updateVariantUI() {
+        var pills = document.querySelectorAll('.variant-pill');
+        for (var i = 0; i < pills.length; i++) {
+            pills[i].classList.toggle('active', i === selectedVariantIndex);
+        }
+        
+        var v = getSelectedVariant();
+        if (!v) return;
+        
+        var priceInfo = getVariantPrice(v);
+        var op = priceInfo.price;
+        var dp = priceInfo.discountPercent;
+        var savedAmount = priceInfo.savedAmount;
+        var stock = v.stock || 0;
+        var isOut = stock <= 0;
+        
+        var priceSection = document.querySelector('.product-price-section');
+        if (priceSection) {
+            var html = '<span class="current-price">₹' + Number(op).toLocaleString('en-IN') + '</span>';
+            if (dp > 0) html += '<span class="original-price">₹' + Number(v.price).toLocaleString('en-IN') + '</span><span class="discount-percent">' + dp + '% OFF</span>';
+            priceSection.innerHTML = html;
+        }
+        
+        var savedEl = document.querySelector('.saved-text');
+        if (savedEl) {
+            savedEl.textContent = savedAmount > 0 ? '💰 You save ₹' + Number(savedAmount).toLocaleString('en-IN') + '!' : '';
+        }
+        
+        var qtyDisplay = getEl('quantityDisplay');
+        if (qtyDisplay) qtyDisplay.textContent = quantity;
+        
+        var stockInfo = document.querySelector('.stock-info');
+        if (stockInfo) {
+            stockInfo.textContent = isOut ? '❌ Out of Stock' : (stock < 10 ? '⚠️ Only ' + stock + ' left in stock!' : '✅ In Stock (' + stock + ' available)');
+            stockInfo.className = 'stock-info' + (stock < 10 && !isOut ? ' low-stock' : '');
+        }
+        
+        var qtyLabelSmall = document.querySelector('.quantity-label small');
+        if (qtyLabelSmall) qtyLabelSmall.textContent = '(' + stock + ' available)';
+        
+        updateQuantityButtons(stock);
+        
+        var ab = getEl('addToCartBtn'), bn = getEl('buyNowBtn');
+        if (isOut) {
+            if (ab) { ab.classList.add('disabled'); ab.innerHTML = '<i class="fas fa-ban"></i> Out of Stock'; }
+            if (bn) { bn.classList.add('disabled'); bn.innerHTML = '<i class="fas fa-ban"></i> Out of Stock'; }
+        } else {
+            if (ab) { ab.classList.remove('disabled'); }
+            if (bn) { bn.classList.remove('disabled'); }
+        }
+    }
+    
+    function updateQuantityButtons(stock) {
+        var btns = document.querySelectorAll('.quantity-btn');
+        if (btns[0]) btns[0].classList.toggle('disabled', quantity <= 1);
+        if (btns[1]) btns[1].classList.toggle('disabled', quantity >= (stock || 0));
+    }
+    
+    function updateAddToCartButtonText() { 
+        if(!currentProduct) return; 
+        var v = getSelectedVariant();
+        if (!v) return;
+        var cartKey = makeCartKey(currentProduct.id, v);
+        var cart = getCart(), ci = cart.find(function(i){return i.cartKey === cartKey;});
+        var ab = getEl('addToCartBtn'), at = getEl('addToCartText'); 
+        if (ci && ab && at) { 
+            at.textContent = 'View Cart (' + (ci.quantity||1) + ')'; 
+            ab.setAttribute('onclick',"window.location.href='cart.html'"); 
+        } else if (ab && at) { 
+            at.textContent = 'Add to Cart'; 
+            ab.setAttribute('onclick',"addToCart()"); 
+        }
+    }
+    
+    async function loadProduct() {
+        var mc = getEl('mainContent');
+        if (!productId) { 
+            if (mc) mc.innerHTML='<div class="error-container"><i class="fas fa-box-open"></i><h3>Product Not Found</h3><p>No product ID provided.</p><button onclick="window.location.href=\'products.html\'">🔙 Browse Products</button></div>'; 
+            showApp(); return; 
+        }
+        try {
+            var result = await sb.from('products').select('*').eq('id', productId).single();
+            var product = (result && result.data) ? result.data : null;
+            if (!product) { 
+                showToast('⚠️ Product not found', 'error'); 
+                if (mc) mc.innerHTML='<div class="error-container"><i class="fas fa-box-open"></i><h3>Product Not Found</h3><p>This product may have been removed.</p><button onclick="window.location.href=\'products.html\'">🔙 Browse Products</button></div>';
+                showApp(); return; 
+            }
+            currentProduct = product;
+            if (product.shop_id) { try { var shopRes = await sb.from('shops').select('*').eq('id', product.shop_id).single(); if (shopRes && shopRes.data) currentShop = shopRes.data; } catch(shopErr) {} }
+            variants = parseVariants(product);
+            selectedVariantIndex = 0;
+            for (var i = 0; i < variants.length; i++) { if ((variants[i].stock || 0) > 0) { selectedVariantIndex = i; break; } }
+            
+            // 🔥 Build image list - include variant photos
+            productImages = [];
+            if (product.images && Array.isArray(product.images) && product.images.length) {
+                productImages = product.images.map(function(img){return getFullUrl(img);});
+            } else if (product.image_url) {
+                productImages = [getFullUrl(product.image_url)];
+            }
+            // 🔥 Add selected variant photo to slider
+            var sv = getSelectedVariant();
+            if (sv && sv.image_url) {
+                var vImg = getFullUrl(sv.image_url);
+                if (vImg && productImages.indexOf(vImg) === -1) {
+                    productImages.unshift(vImg);
+                }
+            }
+            
+            var wishlist = safeJSON(localStorage.getItem('zymart_wishlist'), []);
+            isInWishlist = wishlist.some(function(item) { return (typeof item === 'object' && item.id === productId) || item === productId; });
+            updateWishlistUI();
+            var v = getSelectedVariant();
+            if (v) { var cartKey = makeCartKey(product.id, v); var cart = getCart(), cartItem = cart.find(function(i){return i.cartKey === cartKey;}); quantity = cartItem ? (cartItem.quantity||1) : 1; }
+            document.title = (product.name||'Product') + ' - ZyMart+';
+            renderProduct();
+            loadRelatedProducts();
+            showApp();
+        } catch(e) { 
+            console.error('[Detail] Load error:', e);
+            if (mc) mc.innerHTML='<div class="error-container"><i class="fas fa-exclamation-circle"></i><h3>Failed to Load Product</h3><p>Please check your connection and try again.</p><button onclick="loadProduct()">🔄 Retry</button></div>'; 
+            showApp();
+        }
+    }
+    
+    function renderProduct() {
+        var p = currentProduct; if (!p) return;
+        getEl('productTitle').textContent = p.name || 'Product';
+        var v = getSelectedVariant();
+        var priceInfo = getVariantPrice(v);
+        var op = priceInfo.price;
+        var dp = priceInfo.discountPercent;
+        var savedAmount = priceInfo.savedAmount;
+        var stock = v ? (v.stock || 0) : 0;
+        var isOut = stock <= 0;
+        var html = '';
+        
+        if (productImages.length > 0) {
+            html += '<div class="product-slider"><div class="swiper product-swiper" id="productSwiper"><div class="swiper-wrapper">';
+            html += productImages.map(function(img){return'<div class="swiper-slide" onclick="openFullscreen()"><img src="'+img+'" loading="eager" alt="'+esc(p.name)+'"></div>';}).join('');
+            html += '</div></div>';
+            if (productImages.length>1) html += '<div class="image-counter"><span id="currentSlide">1</span>/'+productImages.length+'</div>';
+            html += '<div class="slider-pagination"><div class="swiper-pagination" style="display:flex;justify-content:center;gap:6px;margin-top:8px;"></div></div></div>';
+        }
+        
+        html += '<div class="product-info-section">';
+        html += '<h1 class="product-name">' + esc(p.name) + '</h1>';
+        html += '<div class="product-meta"><div class="rating-badge">⭐ ' + (p.rating||'4.0') + '</div>';
+        html += '<span class="rating-count">' + (p.rating_count||0) + ' ratings</span></div>';
+        
+        if (variants.length > 1) {
+            html += '<div class="variant-section">';
+            html += '<div class="variant-label"><i class="fas fa-weight-scale"></i> Select Variant:</div>';
+            html += '<div class="variant-pills">';
+            for (var w = 0; w < variants.length; w++) {
+                var vr = variants[w];
+                var vw = fmtWeight(vr.weight, vr.unit);
+                var vp = getVariantPrice(vr).price;
+                var vdp = getVariantPrice(vr).discountPercent;
+                var isOOS = (vr.stock || 0) <= 0;
+                var isActive = w === selectedVariantIndex;
+                html += '<div class="variant-pill' + (isActive ? ' active' : '') + (isOOS ? ' oos' : '') + '" onclick="selectVariant(' + w + ')">';
+                html += '<span class="pill-weight">' + vw + '</span>';
+                html += '<span class="pill-price">₹' + Number(vp).toLocaleString('en-IN') + '</span>';
+                if (vdp > 0) html += '<span class="pill-offer">' + vdp + '% OFF</span>';
+                html += '</div>';
+            }
+            html += '</div></div>';
+        }
+        
+        html += '<div class="product-price-section"><span class="current-price">₹' + Number(op).toLocaleString('en-IN') + '</span>';
+        if (dp > 0) html += '<span class="original-price">₹' + Number(v.price).toLocaleString('en-IN') + '</span><span class="discount-percent">' + dp + '% OFF</span>';
+        html += '</div>';
+        if (savedAmount > 0) html += '<span class="saved-text">💰 You save ₹' + Number(savedAmount).toLocaleString('en-IN') + '!</span>';
+        html += '<div class="tax-info">✅ All taxes included</div>';
+        
+        if (!isOut && v) {
+            html += '<div class="quantity-section"><span class="quantity-label">Quantity <small>(' + stock + ' available)</small></span><div class="quantity-control"><button class="quantity-btn' + (quantity<=1?' disabled':'') + '" onclick="changeQuantity(-1)">−</button><span class="quantity-value" id="quantityDisplay">' + quantity + '</span><button class="quantity-btn' + (quantity>=stock?' disabled':'') + '" onclick="changeQuantity(1)">+</button></div></div>';
+            html += '<div class="stock-info' + (stock<10?' low-stock':'') + '">' + (stock<10?'⚠️ Only '+stock+' left in stock!':'✅ In Stock ('+stock+' available)') + '</div>';
+        } else { 
+            html += '<div style="padding:16px 0;text-align:center;color:#EF4444;font-weight:700;font-size:15px;"><i class="fas fa-ban"></i> Out of Stock</div>'; 
+        }
+        html += '</div>';
+        
+        if (currentShop) {
+            var shopDistance = null, isNearbyShop = false;
+            var userLat = parseFloat(localStorage.getItem('user_lat') || '0') || null;
+            var userLng = parseFloat(localStorage.getItem('user_lng') || '0') || null;
+            var ts = parseInt(localStorage.getItem('location_timestamp') || '0');
+            if (userLat && userLng && (Date.now() - ts) < 86400000 && currentShop.latitude && currentShop.longitude) {
+                shopDistance = Math.round(calculateDistance(userLat, userLng, currentShop.latitude, currentShop.longitude) * 10) / 10;
+                isNearbyShop = shopDistance <= (currentShop.delivery_radius_km || SERVICE_RADIUS_KM);
+            }
+            html += '<div class="shop-info-section' + (isNearbyShop ? ' nearby-shop' : '') + '"><div class="shop-header"><div class="shop-img">'+(currentShop.shop_image||currentShop.image_url?'<img src="'+getFullUrl(currentShop.shop_image||currentShop.image_url)+'" loading="lazy">':'<i class="fas fa-store" style="font-size:24px;color:var(--brand-green);"></i>')+'</div><div style="flex:1;"><div class="shop-name">'+esc(currentShop.shop_name||currentShop.name||'Unknown Shop'); if(isNearbyShop)html+=' <span class="nearby-tag">📍 Nearby</span>'; html+='</div><div class="shop-meta">📍 '+esc(currentShop.city||'')+' · ⭐ '+(currentShop.rating||'4.0'); if(shopDistance!==null)html+=' · 📏 '+shopDistance+' km'; html+='</div></div><button class="view-shop-btn" onclick="window.location.href=\'shop-details.html?id='+currentShop.id+'\'">🏪 View Shop</button></div></div>';
+        }
+        
+        html += '<div class="description-section"><h3 class="section-title"><i class="fas fa-align-left"></i> Description</h3><div class="description-text">'+esc(p.description||'No description available for this product.')+'</div></div>';
+        html += '<div class="related-section"><div class="related-header"><h3><i class="fas fa-link"></i> Related Products</h3><button class="view-all" onclick="window.location.href=\'products.html\'">View All →</button></div><div id="relatedContainer" class="products-grid"></div></div>';
+        
+        getEl('mainContent').innerHTML = html;
+        getEl('bottomBar').style.display = 'flex';
+        
+        if (isOut) { var ab=getEl('addToCartBtn'),bn=getEl('buyNowBtn'); if(ab){ab.classList.add('disabled');ab.innerHTML='<i class="fas fa-ban"></i> Out of Stock';} if(bn){bn.classList.add('disabled');bn.innerHTML='<i class="fas fa-ban"></i> Out of Stock';} }
+        updateAddToCartButtonText();
+        
+        setTimeout(function() { 
+            if (productSwiper) { try { productSwiper.destroy(); } catch(e) {} } 
+            if (productImages.length > 0) {
+                productSwiper = new Swiper('#productSwiper', { loop: productImages.length > 1, pagination: { el: '.slider-pagination .swiper-pagination', clickable: true }, on: { slideChange: function() { if(productImages.length>1) { var el=getEl('currentSlide'); if(el) el.textContent = this.realIndex+1; } } } }); 
+            }
+        }, 200);
+    }
+    
+    async function loadRelatedProducts() { 
+        var c = getEl('relatedContainer'); if (!c) return; if (!currentProduct) return;
+        try { var r = await sb.from('products').select('*').eq('is_active',true).neq('id',productId); if(currentProduct.category_id)r=r.eq('category_id',currentProduct.category_id); r=r.limit(6); var result=await r;
+            if(result.data&&result.data.length){ c.innerHTML=result.data.map(function(p){var img=getFullUrl((p.images&&p.images[0])||p.image_url||'');var prv=parseVariants(p),bv=prv[0];var priceInfo=getVariantPrice(bv);var op=priceInfo.price;return'<div class="mini-product-card" onclick="window.location.href=\'product-detail.html?id='+p.id+'\'"><div class="mini-product-img">'+(img?'<img src="'+img+'" loading="lazy">':'<i class="fas fa-box-open" style="font-size:36px;color:#D1D5DB;"></i>')+'</div><div class="mini-product-info"><div class="mini-product-name">'+esc(p.name)+'</div><div class="mini-product-price">₹'+Number(op).toLocaleString('en-IN')+'</div></div></div>';}).join(''); }
+            else{c.innerHTML='<div style="text-align:center;padding:20px;color:#6B7280;font-size:12px;grid-column:1/-1;">No related products found</div>';}
+        }catch(e){if(c)c.innerHTML='<div style="text-align:center;padding:20px;color:#6B7280;font-size:12px;grid-column:1/-1;">Could not load related products</div>';}
+    }
+    
+    window.changeQuantity = function(d) { var v=getSelectedVariant();if(!v)return;var stock=v.stock||0;var nq=quantity+d;if(nq>=1&&nq<=stock){quantity=nq;var qd=getEl('quantityDisplay');if(qd)qd.textContent=quantity;updateQuantityButtons(stock);updateAddToCartButtonText();}else if(nq>stock){showToast('⚠️ Only '+stock+' available in stock','warning');} };
+    window.addToCart = function() { if(!currentProduct)return;var v=getSelectedVariant();if(!v)return;var stock=v.stock||0;if(stock<=0){showToast('⚠️ This item is out of stock!','error');return;}if(quantity>stock){showToast('⚠️ Only '+stock+' available!','warning');return;}var cart=getCart();var cartKey=makeCartKey(currentProduct.id,v);var ex=cart.find(function(i){return i.cartKey===cartKey;});var img=(v.image_url?getFullUrl(v.image_url):'')||productImages[0]||'';var priceInfo=getVariantPrice(v);var variantLabel=variants.length>1?' - '+fmtWeight(v.weight,v.unit):'';var displayName=currentProduct.name+variantLabel;if(ex)ex.quantity+=quantity;else cart.push({id:currentProduct.id,cartKey:cartKey,name:displayName,price:priceInfo.price,image:img,quantity:quantity,stock:stock,variantKey:cartKey,variantWeight:v.weight,variantUnit:v.unit,shop_id:currentProduct.shop_id,shop_name:currentShop?(currentShop.shop_name||currentShop.name||''):''});saveCart(cart);updateCartBadge();updateAddToCartButtonText();showToast('🛒 '+displayName+' added to cart!','success'); };
+    window.buyNow = async function() { var v=getSelectedVariant();if(!v||(v.stock||0)<=0){showToast('⚠️ This item is out of stock','error');return;}window.addToCart();await checkUser();if(!currentUser){showToast('🔐 Please login to continue','warning');setTimeout(function(){goToLogin();},800);return;}window.location.href='checkout.html'; };
+    
+    function toggleWishlist() { if(!currentProduct)return;var wishlist=safeJSON(localStorage.getItem('zymart_wishlist'),[]);var idx=wishlist.findIndex(function(item){return(typeof item==='object'&&item.id===productId)||item===productId;});if(idx!==-1){wishlist.splice(idx,1);isInWishlist=false;showToast('💔 Removed from wishlist');}else{wishlist.push({id:currentProduct.id,name:currentProduct.name,price:getVariantPrice(getSelectedVariant()).price,image:productImages[0]||'',added_at:new Date().toISOString()});isInWishlist=true;showToast('❤️ Added to wishlist!','success');}try{localStorage.setItem('zymart_wishlist',JSON.stringify(wishlist));}catch(e){}updateWishlistUI(); }
+    function updateWishlistUI(){var btn=getEl('wishlistBtn'),icon=btn&&btn.querySelector('i');if(icon){icon.className=isInWishlist?'fas fa-heart':'far fa-heart';if(isInWishlist)btn.classList.add('liked');else btn.classList.remove('liked');}}
+    
+    document.addEventListener('DOMContentLoaded', async function() { await checkUser(); updateCartBadge(); if(productId){ loadProduct(); } else { getEl('mainContent').innerHTML='<div class="error-container"><i class="fas fa-box-open"></i><h3>Product Not Found</h3><p>No product ID provided in URL.</p><button onclick="window.location.href=\'products.html\'">🔙 Browse Products</button></div>'; showApp(); } });
+    
+    window.openFullscreen = openFullscreen;
+    window.shareProduct = shareProduct;
+    window.toggleWishlist = toggleWishlist;
+    window.goToLogin = goToLogin;
+})();
+</script>
+</body>
+</html>
