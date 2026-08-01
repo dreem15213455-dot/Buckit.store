@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Products - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    
+    <style>
+        :root { --brand-green: #0B5A31; --brand-green-dark: #083D21; --brand-orange: #F59E0B; --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB; --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444; --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-full: 9999px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter',-apple-system,sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); padding-bottom: 75px; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .top-bar { background: var(--brand-green); position: sticky; top: 0; width: 100%; z-index: 100; padding: 8px 12px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .top-row { display: flex; align-items: center; gap: 10px; }
+        .back-btn { width: 38px; height: 38px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; text-decoration: none; flex-shrink: 0; transition: background 0.15s ease; }
+        .back-btn:active { background: rgba(255,255,255,0.20); }
+        .brand-name { font-family: 'Poppins',sans-serif; font-size: 17px; font-weight: 700; display: flex; align-items: baseline; flex-shrink: 0; }
+        .brand-zy { color: #A3E635; } .brand-mart { color: #FDE047; }
+        .search-box { flex: 1; background: white; border-radius: var(--radius-full); display: flex; align-items: center; padding: 0 14px; gap: 8px; min-width: 0; }
+        .search-box i { color: #9CA3AF; font-size: 12px; flex-shrink: 0; }
+        .search-box input { flex: 1; border: none; outline: none; padding: 10px 0; font-size: 13px; font-family: 'Inter',sans-serif; background: transparent; min-width: 0; }
+        .search-box input::placeholder { color: #B0B8B4; }
+        .search-clear-inline { cursor: pointer; color: #9CA3AF; padding: 4px; border-radius: 50%; width: 20px; height: 20px; display: none; align-items: center; justify-content: center; font-size: 9px; background: #E5E7EB; border: none; flex-shrink: 0; }
+        .search-clear-inline.show { display: flex; }
+        .cart-btn { width: 38px; height: 38px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; position: relative; text-decoration: none; flex-shrink: 0; transition: background 0.15s ease; }
+        .cart-btn:active { background: rgba(255,255,255,0.20); }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--brand-orange); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--brand-green); font-weight: 700; }
+        
+        .location-bar { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: #EDF7F1; border-bottom: 1px solid #C8E6C9; font-size: 11px; color: #0B5A31; cursor: pointer; }
+        .nearby-badge { background: #0B5A31; color: white; font-size: 9px; padding: 2px 8px; border-radius: 9999px; font-weight: 600; margin-left: 6px; }
+        
+        .filter-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: white; border-bottom: 1px solid var(--neutral-border); position: sticky; top: 56px; z-index: 99; flex-wrap: wrap; gap: 8px; }
+        .filter-bar.with-location { top: 88px; }
+        .category-title { font-family: 'Poppins',sans-serif; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .category-title i { color: var(--brand-green); font-size: 16px; }
+        .result-count { font-size: 11px; color: var(--neutral-gray); margin-left: 4px; font-weight: 400; }
+        .clear-search { color: var(--danger); font-size: 11px; font-weight: 600; cursor: pointer; border: none; background: #FEF2F2; padding: 5px 12px; border-radius: var(--radius-full); font-family: 'Inter',sans-serif; transition: all 0.15s ease; }
+        .clear-search:active { background: #FEE2E2; transform: scale(0.96); }
+        .search-highlight { background: #FEF3C7; color: #92400E; font-weight: 700; padding: 1px 3px; border-radius: 3px; }
+        
+        .search-info-banner { background: #EFF6FF; padding: 8px 14px; font-size: 11px; color: #1E40AF; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #BFDBFE; }
+        .search-info-banner i { font-size: 14px; }
+        
+        .products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
+        .product-card { background: white; border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-xs); border: 1px solid var(--neutral-border); cursor: pointer; animation: fadeInUp 0.3s ease; position: relative; transition: all 0.15s ease; display: flex; flex-direction: column; }
+        .product-card:active { transform: scale(0.97); }
+        .product-card.nearby { border: 2px solid #0B5A31; box-shadow: 0 0 0 3px rgba(11,90,49,0.08); }
+        .product-card.from-shop-search { border-left: 3px solid #3B82F6; }
+        .product-img { width: 100%; aspect-ratio: 1/1; position: relative; overflow: hidden; background: #F3F4F6; display: flex; align-items: center; justify-content: center; }
+        .product-img img { width: 100%; height: 100%; object-fit: contain; padding: 8px; transition: transform 0.3s ease; }
+        .product-card:active .product-img img { transform: scale(1.05); }
+        .discount-tag { position: absolute; top: 6px; left: 6px; background: var(--brand-orange); color: white; font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: var(--radius-full); z-index: 1; box-shadow: var(--shadow-sm); }
+        .weight-tag { position: absolute; bottom: 6px; right: 6px; background: rgba(11,90,49,0.85); color: white; font-size: 8px; font-weight: 600; padding: 2px 6px; border-radius: var(--radius-full); z-index: 1; }
+        .nearby-tag { position: absolute; top: 6px; right: 6px; background: #0B5A31; color: white; font-size: 7px; font-weight: 700; padding: 2px 6px; border-radius: var(--radius-full); z-index: 1; }
+        .shop-match-tag { position: absolute; bottom: 6px; left: 6px; background: #3B82F6; color: white; font-size: 7px; font-weight: 700; padding: 2px 6px; border-radius: var(--radius-full); z-index: 1; }
+        .out-of-stock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2; }
+        .out-of-stock-overlay span { background: rgba(0,0,0,0.7); color: white; padding: 4px 10px; border-radius: var(--radius-full); font-size: 9px; font-weight: 700; }
+        
+        .product-info { padding: 7px 8px 5px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+        .product-name { font-size: 11px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+        .product-shop { font-size: 8px; color: var(--brand-green); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .product-price-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: auto; padding-top: 2px; }
+        .price-group { display: flex; align-items: baseline; gap: 3px; flex-wrap: wrap; }
+        .product-price { font-size: 13px; font-weight: 700; color: var(--brand-green-dark); }
+        .original-price { font-size: 9px; color: var(--neutral-gray); text-decoration: line-through; }
+        .discount-badge { font-size: 8px; font-weight: 700; color: #059669; background: #D1FAE5; padding: 1px 5px; border-radius: var(--radius-full); }
+        
+        .add-btn { background: var(--brand-green); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; flex-shrink: 0; transition: all 0.15s ease; box-shadow: 0 2px 8px rgba(11,90,49,0.2); }
+        .add-btn:active { background: var(--brand-green-dark); transform: scale(0.9); }
+        .add-btn.disabled { background: #D1D5DB; color: #9CA3AF; box-shadow: none; cursor: not-allowed; pointer-events: none; }
+        .qty-controls { display: flex; align-items: center; gap: 5px; }
+        .qty-btn { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--neutral-border); background: white; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--brand-green); display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; }
+        .qty-btn:active { background: #EDF7F1; border-color: var(--brand-green); transform: scale(0.92); }
+        .qty-count { font-size: 12px; font-weight: 700; min-width: 18px; text-align: center; color: var(--neutral-dark); }
+        
+        .load-more { text-align: center; padding: 16px; }
+        .load-more-btn { background: white; color: var(--brand-green); border: 2px solid var(--brand-green); padding: 10px 28px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter',sans-serif; transition: all 0.15s ease; }
+        .load-more-btn:active { background: var(--brand-green); color: white; transform: scale(0.96); }
+        .load-more-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state i { font-size: 56px; color: #D1D5DB; display: block; margin-bottom: 16px; }
+        .empty-state h3 { font-family: 'Poppins',sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .empty-state p { font-size: 12px; color: var(--neutral-gray); margin-bottom: 16px; }
+        .btn-primary { background: var(--brand-green); color: white; border: none; padding: 10px 24px; border-radius: var(--radius-full); font-weight: 600; font-size: 13px; cursor: pointer; font-family: 'Inter',sans-serif; display: inline-block; text-decoration: none; transition: all 0.15s ease; }
+        .btn-primary:active { background: var(--brand-green-dark); transform: scale(0.96); }
+        
+        .bottom-nav { background: white; position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; align-items: center; padding: 4px 8px 8px; box-shadow: 0 -4px 20px rgba(0,0,0,0.04); z-index: 100; border-top: 1px solid var(--neutral-border); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 9px; font-weight: 500; color: var(--neutral-gray); cursor: pointer; padding: 4px 10px; border-radius: var(--radius-full); border: none; background: transparent; font-family: 'Inter',sans-serif; text-decoration: none; position: relative; transition: all 0.15s ease; }
+        .nav-item:active { background: #EDF7F1; }
+        .nav-item.active { color: var(--brand-green); font-weight: 700; }
+        .nav-item i { font-size: 19px; margin-bottom: 2px; }
+        .nav-item .cart-count { position: absolute; top: 0; right: 2px; background: var(--brand-orange); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 8px; display: flex; align-items: center; justify-content: center; border: 2px solid white; font-weight: 700; }
+        
+        .toast-notification { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 200; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-md); transition: all 0.3s ease; }
+        .toast-notification.show { opacity: 1; visibility: visible; }
+        .toast-notification.error { background: #EF4444; }
+        .toast-notification.success { background: #059669; }
+        .toast-notification.warning { background: #F59E0B; color: #1A1A1A; }
+        .loading-spinner { display: flex; justify-content: center; padding: 30px; }
+        .loading-spinner div { width: 28px; height: 28px; border: 3px solid rgba(11,90,49,0.15); border-top-color: var(--brand-green); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        
+        .no-results-suggestions { padding: 12px; text-align: center; }
+        .no-results-suggestions h4 { font-size: 13px; margin-bottom: 8px; color: var(--neutral-dark); }
+        .suggestion-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+        .suggestion-tag { background: #EDF7F1; color: var(--brand-green); padding: 6px 14px; border-radius: var(--radius-full); font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid #C8E6C9; transition: all 0.15s ease; }
+        .suggestion-tag:active { background: var(--brand-green); color: white; transform: scale(0.95); }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="mainApp">
+    <div class="top-bar">
+        <div class="top-row">
+            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+            <div class="brand-name"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span></div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search products..." autocomplete="off">
+                <button class="search-clear-inline" id="searchClearInline" onclick="clearSearch()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <a href="cart.html" class="cart-btn"><i class="fas fa-shopping-bag"></i><span class="cart-badge" id="cartBadge">0</span></a>
+        </div>
+    </div>
+    
+    <div class="location-bar" id="locationBar" style="display:none;" onclick="findNearbyShopsTrigger()">
+        <i class="fas fa-map-marker-alt"></i>
+        <span id="locationText">📍 Set Location</span>
+    </div>
+    
+    <div class="search-info-banner" id="searchInfoBanner" style="display:none;">
+        <i class="fas fa-info-circle"></i>
+        <span id="searchInfoText"></span>
+    </div>
+    
+    <div class="filter-bar" id="filterBar">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+            <span class="category-title" id="categoryTitle"><i class="fas fa-box"></i> All Products</span>
+            <span class="result-count" id="resultCount"></span>
+            <button class="clear-search" id="clearSearchBtn" style="display:none;" onclick="clearSearch()">✕ Clear</button>
+        </div>
+    </div>
+    
+    <div class="products-grid" id="productsGrid">
+        <div class="loading-spinner"><div></div></div>
+    </div>
+    
+    <div class="load-more" id="loadMoreContainer" style="display:none;">
+        <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">📦 Load More</button>
+    </div>
+    
+    <nav class="bottom-nav">
+        <a class="nav-item" href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+        <a class="nav-item active" href="products.html"><i class="fas fa-search"></i><span>Browse</span></a>
+        <a class="nav-item" href="cart.html"><i class="fas fa-shopping-cart"></i><span>Cart</span><span class="cart-count" id="cartCount">0</span></a>
+        <a class="nav-item" href="orders.html"><i class="fas fa-receipt"></i><span>Orders</span></a>
+        <a class="nav-item" href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a>
+    </nav>
+</div>
+
+<div class="toast-notification" id="toastMsg"><span id="toastText"></span></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    window.addEventListener('error', function(e) { 
+        console.error('[Products]', e.message);
+        try { showToast('⚠️ Something went wrong. Please try again.', 'error'); } catch(_) {}
+    });
+    
+    window.addEventListener('unhandledrejection', function(e) {
+        console.error('[Products] Unhandled:', e.reason);
+        e.preventDefault();
+        try { showToast('⚠️ Network error. Please check your connection.', 'error'); } catch(_) {}
+    });
+
+    var sb = supabase.createClient(
+        'https://zwajyovemwdqtkecipeb.supabase.co', 
+        'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'
+    );
+    
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    
+    var TALUKAS = [
+        { name: 'Sillod', lat: 20.3030, lng: 75.6529 },
+        { name: 'Bhokardan', lat: 20.2691, lng: 75.7693 },
+        { name: 'Jamner', lat: 20.8076, lng: 75.7796 }
+    ];
+    var SERVICE_RADIUS_KM = 10;
+    
+    var products = [];
+    var page = 0;
+    var hasMore = true;
+    var loading = false;
+    var totalCount = 0;
+    var userLat = null;
+    var userLng = null;
+    var nearbyShopIds = [];
+    var shopDistances = {};
+    var shopNamesMap = {};
+    var locationChecked = false;
+    var initialLoadDone = false;
+    var currentSearch = '';
+    var currentCategoryId = '';
+    var currentCategoryName = '';
+    var searchTimer = null;
+    
+    function getEl(id) { return document.getElementById(id); }
+    
+    function getFullUrl(u) {
+        if (!u) return '';
+        if (u.indexOf('http') === 0 || u.indexOf('data:') === 0) return u;
+        return SUPABASE_URL + '/storage/v1/object/public/' + u;
+    }
+    
+    function esc(s) {
+        if (!s) return '';
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+    
+    function showToast(m, type) {
+        var t = getEl('toastMsg'), s = getEl('toastText');
+        if (!t || !s) return;
+        s.textContent = m;
+        t.className = 'toast-notification';
+        if (type === 'error') t.classList.add('error');
+        else if (type === 'success') t.classList.add('success');
+        else if (type === 'warning') t.classList.add('warning');
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function() { t.classList.remove('show', 'error', 'success', 'warning'); }, 2500);
+    }
+    
+    function getCart() {
+        try { return JSON.parse(localStorage.getItem('zymart_cart') || '[]'); } 
+        catch(e) { return []; }
+    }
+    
+    function saveCart(c) {
+        try { localStorage.setItem('zymart_cart', JSON.stringify(c)); } 
+        catch(e) {}
+    }
+    
+    function updateCartBadge() {
+        var c = getCart();
+        var n = c.reduce(function(a, i) { return a + (i.quantity || 1); }, 0);
+        var b = getEl('cartBadge');
+        var cc = getEl('cartCount');
+        if (b) b.textContent = n;
+        if (cc) cc.textContent = n;
+        return n;
+    }
+    
+    function fmtWeight(w, u) {
+        if (!w) return '';
+        if (u === 'gram' || u === 'g') return w >= 1000 ? (w/1000).toFixed(1).replace(/\.0$/, '') + ' kg' : w + ' g';
+        if (u === 'kg') return w + ' kg';
+        if (u === 'liter' || u === 'l') return w + ' L';
+        if (u === 'ml') return w + ' ml';
+        return w + ' ' + (u || 'pcs');
+    }
+    
+    function parseVariants(product) {
+        if (product.variants && Array.isArray(product.variants) && product.variants.length > 0) {
+            return product.variants;
+        }
+        if (product.weight || product.price) {
+            return [{
+                weight: product.weight || 1,
+                unit: product.weight_unit || product.unit || 'kg',
+                price: product.price || 0,
+                offer_price: product.offer_price || null,
+                stock: product.stock || 0
+            }];
+        }
+        return [{ weight: 1, unit: 'pcs', price: 0, offer_price: null, stock: 0 }];
+    }
+    
+    function getBestVariant(variants) {
+        if (!variants || !variants.length) return null;
+        var inStock = variants.filter(function(v) { return (v.stock || 0) > 0; });
+        if (inStock.length) {
+            return inStock.reduce(function(a, b) {
+                return (a.offer_price || a.price) < (b.offer_price || b.price) ? a : b;
+            });
+        }
+        return variants[0];
+    }
+    
+    function calculateDistance(lat1, lng1, lat2, lng2) {
+        var R = 6371;
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLng = (lng2 - lng1) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+                Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * 
+                Math.sin(dLng/2) * Math.sin(dLng/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+    
+    function isInServiceArea(lat, lng) {
+        if (!lat || !lng) return false;
+        for (var i = 0; i < TALUKAS.length; i++) {
+            var d = calculateDistance(lat, lng, TALUKAS[i].lat, TALUKAS[i].lng);
+            if (d <= SERVICE_RADIUS_KM) return true;
+        }
+        return false;
+    }
+    
+    function getUrlParams() {
+        var params = new URLSearchParams(window.location.search);
+        currentSearch = params.get('search') || '';
+        currentCategoryId = params.get('category_id') || '';
+        currentCategoryName = params.get('category_name') || '';
+        
+        var si = getEl('searchInput');
+        if (si && currentSearch) si.value = currentSearch;
+        
+        updateClearButtonVisibility();
+        
+        var ct = getEl('categoryTitle');
+        if (ct && currentCategoryId && currentCategoryName) {
+            ct.innerHTML = '<i class="fas fa-box"></i> ' + decodeURIComponent(currentCategoryName);
+        }
+        
+        if (currentSearch) {
+            var banner = getEl('searchInfoBanner');
+            var bannerText = getEl('searchInfoText');
+            if (banner && bannerText) {
+                banner.style.display = 'flex';
+                bannerText.textContent = 'Showing results for "' + currentSearch + '"';
+            }
+        }
+    }
+    
+    function updateClearButtonVisibility() {
+        var searchVal = currentSearch || (getEl('searchInput') ? getEl('searchInput').value.trim() : '');
+        var clearBtn = getEl('clearSearchBtn');
+        var clearInline = getEl('searchClearInline');
+        
+        if (clearBtn) clearBtn.style.display = searchVal ? 'inline-block' : 'none';
+        if (clearInline) {
+            if (searchVal) clearInline.classList.add('show');
+            else clearInline.classList.remove('show');
+        }
+    }
+    
+    window.clearSearch = function() {
+        currentSearch = '';
+        var si = getEl('searchInput');
+        if (si) si.value = '';
+        
+        var banner = getEl('searchInfoBanner');
+        if (banner) banner.style.display = 'none';
+        
+        updateClearButtonVisibility();
+        resetAndReload();
+        showToast('🔍 Showing all products', 'success');
+    };
+    
+    function resetAndReload() {
+        products = [];
+        page = 0;
+        hasMore = true;
+        totalCount = 0;
+        
+        var grid = getEl('productsGrid');
+        if (grid) grid.innerHTML = '<div class="loading-spinner"><div></div></div>';
+        
+        var rc = getEl('resultCount');
+        if (rc) rc.textContent = '';
+        
+        loadProducts();
+    }
+    
+    function findNearbyShopsTrigger() {
+        if (window.findNearbyShops && typeof window.findNearbyShops === 'function') {
+            window.findNearbyShops();
+        } else {
+            showToast('📍 Please enable location from Home page', 'warning');
+        }
+    }
+    window.findNearbyShopsTrigger = findNearbyShopsTrigger;
+    
+    async function findNearbyShops() {
+        if (!userLat || !userLng) return;
+        
+        if (!isInServiceArea(userLat, userLng)) {
+            showToast('⚠️ We only serve in Sillod, Bhokardan & Jamner (10km radius)', 'warning');
+            return;
+        }
+        
+        try {
+            var r = await sb.from('shops')
+                .select('id, shop_name, latitude, longitude, delivery_radius_km')
+                .eq('status', 'approved')
+                .eq('is_open', true);
+            
+            if (!r.data || !r.data.length) {
+                showToast('⚠️ No shops found in database', 'warning');
+                return;
+            }
+            
+            nearbyShopIds = [];
+            shopDistances = {};
+            shopNamesMap = {};
+            
+            for (var i = 0; i < r.data.length; i++) {
+                var sh = r.data[i];
+                shopNamesMap[sh.id] = sh.shop_name || 'Unknown Shop';
+                
+                if (!sh.latitude || !sh.longitude) continue;
+                
+                var d = calculateDistance(userLat, userLng, sh.latitude, sh.longitude);
+                if (d <= (sh.delivery_radius_km || SERVICE_RADIUS_KM)) {
+                    nearbyShopIds.push(sh.id);
+                    shopDistances[sh.id] = Math.round(d * 10) / 10;
+                }
+            }
+            
+            var lt = getEl('locationText');
+            if (nearbyShopIds.length > 0 && lt) {
+                var ls = localStorage.getItem('location_short') || 'Your Area';
+                lt.innerHTML = '📍 ' + ls + ' <span class="nearby-badge">' + nearbyShopIds.length + ' shops nearby</span>';
+                showToast('✅ Found ' + nearbyShopIds.length + ' shops near you!', 'success');
+            } else {
+                showToast('⚠️ No shops available in your area yet. Expanding soon!', 'warning');
+            }
+        } catch(e) {
+            console.error('[Products] findNearbyShops error:', e);
+            showToast('⚠️ Could not find nearby shops. Please try again.', 'error');
+        }
+    }
+    
+    async function loadProducts() {
+        if (loading || !hasMore) return;
+        loading = true;
+        
+        var lmBtn = getEl('loadMoreBtn');
+        if (lmBtn) {
+            lmBtn.disabled = true;
+            lmBtn.textContent = '⏳ Loading...';
+        }
+        
+        var loadMoreContainer = getEl('loadMoreContainer');
+        if (loadMoreContainer) loadMoreContainer.style.display = 'none';
+        
+        if (products.length === 0 && page === 0) {
+            var grid = getEl('productsGrid');
+            if (grid) grid.innerHTML = '<div class="loading-spinner"><div></div></div>';
+        }
+        
+        try {
+            var searchTerm = (currentSearch || '').trim();
+            
+            var q = sb.from('products')
+                .select('*', { count: 'exact' })
+                .eq('is_active', true)
+                .is('parent_id', null)
+                .eq('is_on_hold', false);
+            
+            if (searchTerm) {
+                q = q.ilike('name', '%' + searchTerm + '%');
+            }
+            
+            if (currentCategoryId) {
+                q = q.eq('category_id', currentCategoryId);
+            }
+            
+            if (locationChecked && nearbyShopIds.length > 0) {
+                q = q.in('shop_id', nearbyShopIds);
+            }
+            
+            q = q.order('created_at', { ascending: false })
+                .range(page * 12, (page + 1) * 12 - 1);
+            
+            var r = await q;
+            
+            if (r.error) {
+                console.error('[Products] Query error:', r.error);
+                throw new Error(r.error.message || 'Failed to load products');
+            }
+            
+            if (r.data && r.data.length) {
+                var unknownShopIds = [];
+                for (var i = 0; i < r.data.length; i++) {
+                    var sid2 = r.data[i].shop_id;
+                    if (sid2 && !shopNamesMap[sid2] && unknownShopIds.indexOf(sid2) === -1) {
+                        unknownShopIds.push(sid2);
+                    }
+                }
+                
+                if (unknownShopIds.length > 0) {
+                    try {
+                        var nameRes = await sb.from('shops')
+                            .select('id, shop_name')
+                            .in('id', unknownShopIds);
+                        
+                        if (nameRes.data) {
+                            for (var n = 0; n < nameRes.data.length; n++) {
+                                shopNamesMap[nameRes.data[n].id] = nameRes.data[n].shop_name || 'Unknown Shop';
+                            }
+                        }
+                    } catch(nameErr) {
+                        console.warn('[Products] Shop name fetch failed:', nameErr);
+                    }
+                }
+                
+                for (var j = 0; j < r.data.length; j++) {
+                    r.data[j]._shop_name = shopNamesMap[r.data[j].shop_id] || 'Unknown Shop';
+                }
+                
+                products = products.concat(r.data);
+                page++;
+                totalCount = r.count || 0;
+                hasMore = products.length < totalCount;
+                renderProducts();
+                
+                var rc = getEl('resultCount');
+                if (rc) rc.textContent = '(' + products.length + ' of ' + totalCount + ')';
+                
+            } else {
+                hasMore = false;
+                if (products.length === 0) {
+                    showNoResults(searchTerm);
+                }
+            }
+            
+            if (loadMoreContainer) {
+                loadMoreContainer.style.display = hasMore ? 'block' : 'none';
+            }
+            
+        } catch(e) {
+            console.error('[Products] Load error:', e);
+            if (products.length === 0) {
+                var grid = getEl('productsGrid');
+                if (grid) {
+                    grid.innerHTML = '<div class="empty-state">' +
+                        '<i class="fas fa-exclamation-circle"></i>' +
+                        '<h3>Failed to Load Products</h3>' +
+                        '<p>' + esc(e.message || 'Network error. Please check your connection and try again.') + '</p>' +
+                        '<button class="btn-primary" onclick="location.reload()">🔄 Retry</button>' +
+                        '</div>';
+                }
+            }
+            showToast('⚠️ Failed to load products. Please try again.', 'error');
+        }
+        
+        loading = false;
+        if (lmBtn) {
+            lmBtn.disabled = false;
+            lmBtn.textContent = '📦 Load More';
+        }
+    }
+    
+    function showNoResults(searchTerm) {
+        var grid = getEl('productsGrid');
+        if (!grid) return;
+        
+        var allSuggestions = [
+            'Milk', 'Bread', 'Rice', 'Atta', 'Oil', 'Sugar', 
+            'Tea', 'Soap', 'Shampoo', 'Dal', 'Apple', 'Banana',
+            'Badam', 'Kaju', 'Ghee', 'Paneer', 'Curd', 'Eggs'
+        ];
+        
+        var suggestionHTML = '';
+        if (searchTerm) {
+            var filteredSuggestions = allSuggestions.filter(function(s) {
+                return s.toLowerCase() !== searchTerm.toLowerCase();
+            });
+            
+            var shuffled = filteredSuggestions.sort(function() { return 0.5 - Math.random(); });
+            var displaySuggestions = shuffled.slice(0, 8);
+            
+            suggestionHTML = '<div class="no-results-suggestions">' +
+                '<h4>🔍 Try searching for:</h4>' +
+                '<div class="suggestion-tags">';
+            
+            for (var i = 0; i < displaySuggestions.length; i++) {
+                suggestionHTML += '<span class="suggestion-tag" onclick="quickSearch(\'' + 
+                    displaySuggestions[i].replace(/'/g, "\\'") + '\')">' + 
+                    displaySuggestions[i] + '</span>';
+            }
+            
+            suggestionHTML += '</div></div>';
+        }
+        
+        var message = searchTerm ? 'No products found for "' + esc(searchTerm) + '"' : 'No Products Available';
+        var subMessage = searchTerm ? 'Try different keywords or browse categories' : 'Check back later for new products';
+        
+        grid.innerHTML = '<div class="empty-state">' +
+            '<i class="fas fa-search"></i>' +
+            '<h3>' + message + '</h3>' +
+            '<p>' + subMessage + '</p>' +
+            suggestionHTML +
+            '<a href="index.html" class="btn-primary"><i class="fas fa-home"></i> Browse Categories</a>' +
+            '</div>';
+    }
+    
+    window.quickSearch = function(term) {
+        var si = getEl('searchInput');
+        if (si) si.value = term;
+        currentSearch = term;
+        
+        var banner = getEl('searchInfoBanner');
+        var bannerText = getEl('searchInfoText');
+        if (banner && bannerText) {
+            banner.style.display = 'flex';
+            bannerText.textContent = 'Showing results for "' + term + '"';
+        }
+        
+        updateClearButtonVisibility();
+        resetAndReload();
+    };
+    
+    window.addToCart = function(id, name, price, image, variantKey, stock) {
+        stock = stock || 0;
+        if (stock <= 0) {
+            showToast('⚠️ This item is out of stock!', 'error');
+            return;
+        }
+        var cart = getCart();
+        var cartKey = variantKey || id;
+        var ex = cart.find(function(x) { return x.cartKey === cartKey; });
+        var currentQty = ex ? (ex.quantity || 1) : 0;
+        
+        if (currentQty >= stock) {
+            showToast('⚠️ Only ' + stock + ' available in stock!', 'warning');
+            return;
+        }
+        
+        if (ex) ex.quantity += 1;
+        else cart.push({
+            id: id,
+            cartKey: cartKey,
+            name: name,
+            price: price,
+            image: image,
+            quantity: 1,
+            stock: stock,
+            variantKey: variantKey
+        });
+        
+        saveCart(cart);
+        updateCartBadge();
+        updateProductUI(cartKey, (ex ? ex.quantity : 1));
+        showToast('🛒 ' + (name || 'Item') + ' added to cart!', 'success');
+    };
+    
+    window.updateQty = function(cartKey, delta, stock) {
+        stock = stock || 0;
+        var cart = getCart();
+        var it = cart.find(function(x) { return x.cartKey === cartKey; });
+        if (!it) return;
+        
+        var nq = (it.quantity || 1) + delta;
+        if (nq <= 0) {
+            cart = cart.filter(function(x) { return x.cartKey !== cartKey; });
+            saveCart(cart);
+            updateProductUI(cartKey, 0);
+            updateCartBadge();
+            return;
+        }
+        
+        if (nq > stock) {
+            showToast('⚠️ Maximum available: ' + stock + ' items', 'warning');
+            return;
+        }
+        
+        it.quantity = nq;
+        saveCart(cart);
+        updateProductUI(cartKey, nq);
+        updateCartBadge();
+    };
+    
+    function updateProductUI(cartKey, qty) {
+        var ctls = document.querySelectorAll('.qty-controls[data-key="' + cartKey + '"]');
+        var adds = document.querySelectorAll('.add-btn[data-key="' + cartKey + '"]');
+        var cnts = document.querySelectorAll('.qty-count[data-key="' + cartKey + '"]');
+        
+        for (var i = 0; i < ctls.length; i++) ctls[i].style.display = qty > 0 ? 'flex' : 'none';
+        for (var j = 0; j < adds.length; j++) adds[j].style.display = qty > 0 ? 'none' : 'flex';
+        for (var k = 0; k < cnts.length; k++) cnts[k].textContent = qty;
+    }
+    
+    function highlightSearchTerm(text, search) {
+        if (!search || !text) return esc(text);
+        var escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        var regex = new RegExp('(' + escapedSearch + ')', 'gi');
+        return esc(text).replace(regex, '<span class="search-highlight">$1</span>');
+    }
+    
+    function renderProducts() {
+        var cart = getCart();
+        var h = '';
+        
+        for (var i = 0; i < products.length; i++) {
+            var p = products[i];
+            var variants = parseVariants(p);
+            var bestVariant = getBestVariant(variants);
+            var img = getFullUrl((p.images && p.images[0]) || p.image_url || '');
+            var sn = p._shop_name || shopNamesMap[p.shop_id] || '';
+            var isNearby = nearbyShopIds.indexOf(p.shop_id) !== -1;
+            var shopDist = shopDistances[p.shop_id] || null;
+            
+            if (!bestVariant) continue;
+            
+            var op = bestVariant.offer_price && bestVariant.offer_price < bestVariant.price 
+                ? bestVariant.offer_price : bestVariant.price;
+            var dp = bestVariant.offer_price && bestVariant.offer_price < bestVariant.price 
+                ? Math.round((1 - bestVariant.offer_price / bestVariant.price) * 100) : 0;
+            var totalStock = variants.reduce(function(s, v) { return s + (v.stock || 0); }, 0);
+            var isOut = totalStock <= 0;
+            var pn = esc(p.name || '');
+            var displayName = currentSearch ? highlightSearchTerm(p.name || '', currentSearch) : pn;
+            var defVariant = variants[0];
+            var cartKey = p.id + '_' + (defVariant.weight || '0') + '_' + (defVariant.unit || '');
+            var ci = cart.find(function(x) { return x.cartKey === cartKey; });
+            var cq = ci ? (ci.quantity || 1) : 0;
+            var vStock = defVariant.stock || 0;
+            var bestWeight = fmtWeight(bestVariant.weight, bestVariant.unit);
+            
+            h += '<div class="product-card' + 
+                (isNearby ? ' nearby' : '') + 
+                '" onclick="window.location.href=\'product-detail.html?id=' + p.id + '\'">';
+            
+            h += '<div class="product-img">';
+            if (dp > 0) h += '<div class="discount-tag">' + dp + '% OFF</div>';
+            if (isNearby) h += '<div class="nearby-tag">📍</div>';
+            if (bestWeight) h += '<div class="weight-tag">' + bestWeight + '</div>';
+            if (isOut) h += '<div class="out-of-stock-overlay"><span>Out of Stock</span></div>';
+            if (img) {
+                // ✅ FIXED: onerror with HTML entities
+                h += '<img src="' + img + '" loading="lazy" alt="' + pn + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';">';
+                h += '<i class="fas fa-box" style="font-size:32px;color:#D1D5DB;display:none;"></i>';
+            } else {
+                h += '<i class="fas fa-box" style="font-size:32px;color:#D1D5DB;"></i>';
+            }
+            h += '</div>';
+            
+            h += '<div class="product-info">';
+            h += '<div class="product-name" title="' + pn + '">' + displayName + '</div>';
+            if (sn) {
+                h += '<div class="product-shop">🏪 ' + esc(sn) + 
+                    (shopDist ? ' · ' + shopDist + 'km' : '') + '</div>';
+            }
+            
+            h += '<div class="product-price-row">';
+            h += '<div class="price-group">';
+            h += '<span class="product-price">₹' + Number(op).toLocaleString('en-IN') + '</span>';
+            if (dp > 0) {
+                h += '<span class="original-price">₹' + Number(bestVariant.price).toLocaleString('en-IN') + '</span>';
+                h += '<span class="discount-badge">' + dp + '%</span>';
+            }
+            h += '</div>';
+            
+            if (isOut) {
+                h += '<button class="add-btn disabled"><i class="fas fa-ban"></i></button>';
+            } else {
+                h += '<div class="qty-controls" data-key="' + cartKey + '" style="display:' + (cq > 0 ? 'flex' : 'none') + '">';
+                h += '<button class="qty-btn" onclick="event.stopPropagation();updateQty(\'' + cartKey + '\',-1,' + vStock + ')">−</button>';
+                h += '<span class="qty-count" data-key="' + cartKey + '">' + cq + '</span>';
+                h += '<button class="qty-btn" onclick="event.stopPropagation();updateQty(\'' + cartKey + '\',1,' + vStock + ')">+</button>';
+                h += '</div>';
+                h += '<button class="add-btn" data-key="' + cartKey + '" ' +
+                    'onclick="event.stopPropagation();addToCart(\'' + p.id + '\',\'' + 
+                    pn.replace(/'/g, "\\'") + '\',' + op + ',\'' + img + '\',\'' + 
+                    cartKey + '\',' + vStock + ')" ' +
+                    'style="display:' + (cq > 0 ? 'none' : 'flex') + '">' +
+                    '<i class="fas fa-plus"></i></button>';
+            }
+            h += '</div>';
+            h += '</div>';
+            h += '</div>';
+        }
+        
+        getEl('productsGrid').innerHTML = h;
+    }
+    
+    window.loadMore = function() {
+        loadProducts();
+    };
+    
+    async function initPage() {
+        if (initialLoadDone) return;
+        initialLoadDone = true;
+        
+        getUrlParams();
+        
+        var lat = parseFloat(localStorage.getItem('user_lat') || '0') || null;
+        var lng = parseFloat(localStorage.getItem('user_lng') || '0') || null;
+        var ts = parseInt(localStorage.getItem('location_timestamp') || '0');
+        
+        if (lat && lng && (Date.now() - ts) < 86400000) {
+            userLat = lat;
+            userLng = lng;
+            
+            if (!isInServiceArea(userLat, userLng)) {
+                showToast('⚠️ We only serve in Sillod, Bhokardan & Jamner (10km radius)', 'warning');
+            }
+            
+            var ls = localStorage.getItem('location_short') || '';
+            var lb = getEl('locationBar');
+            var lt = getEl('locationText');
+            var fb = getEl('filterBar');
+            
+            if (lb && lt && ls) {
+                lb.style.display = 'flex';
+                lt.textContent = '📍 ' + ls;
+                if (fb) fb.classList.add('with-location');
+            }
+            
+            await findNearbyShops();
+        } else {
+            showToast('📍 Enable location to see products near you', 'warning');
+        }
+        
+        locationChecked = true;
+        loadProducts();
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartBadge();
+        initPage();
+        
+        var si = getEl('searchInput');
+        if (si) {
+            si.addEventListener('input', function() {
+                updateClearButtonVisibility();
+                
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(function() {
+                    var v = si.value.trim();
+                    currentSearch = v;
+                    
+                    var banner = getEl('searchInfoBanner');
+                    if (banner) {
+                        if (v) {
+                            banner.style.display = 'flex';
+                            var bannerText = getEl('searchInfoText');
+                            if (bannerText) bannerText.textContent = 'Searching for "' + v + '"...';
+                        } else {
+                            banner.style.display = 'none';
+                        }
+                    }
+                    
+                    resetAndReload();
+                }, 350);
+            });
+            
+            si.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    clearTimeout(searchTimer);
+                    var v = si.value.trim();
+                    currentSearch = v;
+                    
+                    var banner = getEl('searchInfoBanner');
+                    if (banner && v) {
+                        banner.style.display = 'flex';
+                        var bannerText = getEl('searchInfoText');
+                        if (bannerText) bannerText.textContent = 'Showing results for "' + v + '"';
+                    }
+                    
+                    resetAndReload();
+                }
+            });
+            
+            if (currentSearch) {
+                setTimeout(function() { si.focus(); }, 500);
+            }
+        }
+        
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'zymart_cart') {
+                updateCartBadge();
+                if (products.length > 0) renderProducts();
+            }
+        });
+    });
+    
+})();
+</script>
+</body>
+</html>

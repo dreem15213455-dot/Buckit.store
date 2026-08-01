@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Offer Details - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root { --brand-green: #0B5A31; --brand-green-dark: #083D21; --brand-orange: #F59E0B; --brand-orange-dark: #E8890A; --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB; --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444; --success: #10B981; --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 12px rgba(0,0,0,0.1); --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px; --radius-full: 9999px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); padding-bottom: 40px; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+        @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--neutral-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: opacity 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 36px; height: 36px; border: 3px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.6s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; }
+        .loader-zy { color: var(--brand-green); } .loader-mart { color: var(--brand-orange); }
+        
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 12px rgba(11,90,49,0.3); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; text-decoration: none; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { font-family: 'Poppins', sans-serif; flex: 1; font-size: 17px; font-weight: 700; color: white; }
+        .main-content { padding-top: 58px; max-width: 600px; margin: 0 auto; min-height: 70vh; }
+        
+        .offer-hero { margin: 12px 14px; border-radius: var(--radius-xl); overflow: hidden; height: 200px; background: linear-gradient(135deg, var(--brand-orange), #E8890A); display: flex; align-items: flex-end; position: relative; animation: slideUp 0.3s ease; box-shadow: var(--shadow-md); }
+        .offer-hero img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+        .offer-hero-overlay { position: relative; z-index: 1; padding: 20px; background: linear-gradient(to top, rgba(0,0,0,0.75), transparent); width: 100%; color: white; }
+        .offer-hero h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .offer-hero .discount { font-size: 36px; font-weight: 900; text-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+        
+        .section { background: var(--neutral-white); margin: 10px 14px; border-radius: var(--radius-lg); padding: 16px; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-sm); animation: slideUp 0.3s ease; }
+        .section-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--neutral-dark); }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; color: var(--neutral-gray); border-bottom: 1px solid var(--neutral-border); }
+        .info-row:last-child { border-bottom: none; }
+        .info-row strong { color: var(--neutral-dark); font-weight: 600; }
+        
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
+        .product-card { background: var(--neutral-bg); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--neutral-border); cursor: pointer; transition: transform 0.15s; }
+        .product-card:active { transform: scale(0.96); }
+        .product-img { width: 100%; aspect-ratio: 1/1; background: #F3F4F6; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .product-img img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+        .product-img i { font-size: 32px; color: #9CA3AF; }
+        .product-info { padding: 8px; }
+        .product-name { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { font-size: 13px; font-weight: 700; color: var(--brand-green); }
+        .product-original { font-size: 10px; color: var(--neutral-gray); text-decoration: line-through; }
+        
+        .btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--brand-green); color: white; padding: 14px; border-radius: var(--radius-full); font-weight: 700; font-size: 14px; cursor: pointer; margin: 12px 14px; border: none; width: calc(100% - 28px); font-family: 'Inter', sans-serif; transition: all 0.15s; }
+        .btn-primary:active { background: var(--brand-green-dark); transform: scale(0.97); }
+        
+        .invite-banner { margin: 12px 14px; padding: 14px; background: linear-gradient(135deg, #FFF8EB, #FEF3C7); border: 1px solid #FDE68A; border-radius: var(--radius-lg); text-align: center; animation: slideUp 0.4s ease; }
+        .invite-banner .invite-title { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; color: #92400E; margin-bottom: 4px; }
+        .invite-banner .invite-subtitle { font-size: 11px; color: #A16207; margin-bottom: 10px; }
+        .btn-invite { background: var(--brand-orange); color: #1a1a1a; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .btn-invite:active { background: #E8890A; transform: scale(0.96); }
+        
+        .empty-state { text-align: center; padding: 60px 20px; animation: slideUp 0.3s ease; }
+        .empty-state i { font-size: 48px; color: #D1D5DB; margin-bottom: 12px; display: block; }
+        .empty-state h3 { font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .empty-state p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 14px; }
+        .empty-state button { background: var(--brand-green); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-md); transition: all 0.25s; }
+        .toast.show { opacity: 1; visibility: visible; }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+        
+        @media (max-width: 380px) { .offer-hero { height: 160px; } .offer-hero .discount { font-size: 28px; } }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div></div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <a href="offers.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <span class="top-title" id="topTitle">Offer Details</span>
+    </div>
+    <div class="main-content" id="mainContent">
+        <div style="text-align:center;padding:40px;"><div class="simple-spinner"></div><p style="font-size:12px;color:var(--neutral-gray);">Loading offer...</p></div>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg"><span id="toastText"></span></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    window.addEventListener('error', function(e) { console.error('[Offer Detail]', e.message); try { showToast('Something went wrong', 'error'); } catch(_) {} });
+    
+    function $(id) { return document.getElementById(id); }
+    function esc(str) { if (!str) return ''; var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+    
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var SUPABASE_URL = 'https://zwajyovemwdqtkecipeb.supabase.co';
+    var offerData = null, offerId = null;
+    
+    function getFullUrl(u) { if (!u || typeof u !== 'string') return ''; if (u.indexOf('http')===0 || u.indexOf('data:')===0) return u; return SUPABASE_URL + '/storage/v1/object/public/' + u; }
+    function showApp() { var l = $('simpleLoader'), a = $('mainApp'); if (a) a.style.display = ''; if (l) { l.classList.add('fade-out'); setTimeout(function() { if (l && l.parentNode) l.parentNode.removeChild(l); }, 300); } }
+    
+    function showToast(m, type) { 
+        var t = $('toastMsg'), s = $('toastText'); 
+        if (!t || !s) return; 
+        s.textContent = m; 
+        t.className = 'toast';
+        if (type === 'error') t.classList.add('error');
+        else if (type === 'success') t.classList.add('success');
+        t.classList.add('show'); 
+        clearTimeout(t._timer); 
+        t._timer = setTimeout(function(){ t.classList.remove('show','error','success'); }, 2500); 
+    }
+    
+    function fastNavigate(url) { window.location.href = url; }
+    
+    try { offerId = new URLSearchParams(window.location.search).get('id'); } catch(e) { offerId = null; }
+    
+    async function loadOffer() {
+        var c = $('mainContent');
+        if (!offerId) { 
+            if (c) c.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Offer Not Found</h3><p>No offer ID provided</p><a href="offers.html" style="background:var(--brand-green);color:white;border:none;padding:10px 20px;border-radius:var(--radius-full);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;text-decoration:none;">View All Offers</a></div>'; 
+            showApp();
+            return; 
+        }
+        try {
+            var result = await sb.from('offers').select('*').eq('id', offerId).single();
+            var data = (result && result.data) ? result.data : null;
+            if (!data) { 
+                if (c) c.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>Offer Not Found</h3><p>This offer may have expired</p><a href="offers.html" style="background:var(--brand-green);color:white;border:none;padding:10px 20px;border-radius:var(--radius-full);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;text-decoration:none;">View All Offers</a></div>'; 
+                showApp();
+                return; 
+            }
+            offerData = data;
+            $('topTitle').textContent = offerData.title || 'Offer Details';
+            document.title = (offerData.title || 'Offer') + ' - ZyMart+';
+            renderOffer();
+            showApp();
+        } catch(e) { 
+            console.error('[Offer Detail] Load error:', e);
+            if (c) c.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Failed to Load</h3><p>Please check your connection</p><button onclick="loadOffer()">🔄 Retry</button></div>'; 
+            showApp();
+        }
+    }
+    
+    function getApplyText(applyTo) {
+        var map = { global: 'All Products', category: 'Category', product: 'Product', shop: 'Shop' };
+        return map[applyTo] || 'All';
+    }
+    
+    function renderOffer() {
+        if (!offerData) return;
+        var heroImg = offerData.image_url ? getFullUrl(offerData.image_url) : '';
+        var discountText = offerData.discount_value + (offerData.discount_type === 'percentage' ? '% OFF' : '₹ OFF');
+        var html = '';
+        
+        html += '<div class="offer-hero">' + (heroImg ? '<img src="' + heroImg + '" loading="eager" alt="" onerror="this.style.display=\'none\'">' : '') + '<div class="offer-hero-overlay"><div class="discount">' + discountText + '</div><h2>' + esc(offerData.title || 'Special Offer') + '</h2></div></div>';
+        
+        html += '<div class="section"><div class="section-title"><i class="fas fa-info-circle"></i> Offer Details</div>';
+        html += '<div class="info-row"><span>Discount</span><strong>' + discountText + '</strong></div>';
+        if (offerData.subtitle || offerData.description) html += '<div class="info-row"><span>Description</span><strong>' + esc(offerData.subtitle || offerData.description) + '</strong></div>';
+        if (offerData.min_order_amount > 0) html += '<div class="info-row"><span>Minimum Order</span><strong>₹' + Number(offerData.min_order_amount).toLocaleString('en-IN') + '</strong></div>';
+        if (offerData.max_discount > 0) html += '<div class="info-row"><span>Max Discount</span><strong>₹' + Number(offerData.max_discount).toLocaleString('en-IN') + '</strong></div>';
+        html += '<div class="info-row"><span>Applicable On</span><strong>' + getApplyText(offerData.apply_to) + '</strong></div>';
+        if (offerData.valid_till) { 
+            var expiry = new Date(offerData.valid_till);
+            var daysLeft = Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24));
+            html += '<div class="info-row"><span>Valid Till</span><strong style="color:' + (daysLeft <= 3 ? '#EF4444' : '#0B5A31') + ';">' + expiry.toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) + (daysLeft > 0 ? ' (' + daysLeft + ' days left)' : ' (Expired)') + '</strong></div>'; 
+        }
+        html += '</div>';
+        
+        html += '<div class="section"><div class="section-title"><i class="fas fa-shopping-bag"></i> Applicable Products</div><div class="products-grid" id="productsGrid"><div style="grid-column:1/-1;text-align:center;padding:10px;"><div class="simple-spinner" style="width:20px;height:20px;margin:0 auto;"></div></div></div></div>';
+        html += '<button class="btn-primary" onclick="fastNavigate(\'products.html\')"><i class="fas fa-shopping-bag"></i> Shop Now <i class="fas fa-arrow-right"></i></button>';
+        html += '<div class="invite-banner"><div class="invite-title">🎁 Invite Friends & Earn ₹50!</div><div class="invite-subtitle">Get ₹50 for every friend\'s first order</div><button class="btn-invite" onclick="fastNavigate(\'invite-earn.html\')"><i class="fas fa-gift"></i> Invite Now</button></div>';
+        
+        $('mainContent').innerHTML = html;
+        
+        // Load applicable products
+        loadApplicableProducts();
+    }
+    
+    async function loadApplicableProducts() {
+        var grid = $('productsGrid'); if (!grid || !offerData) return;
+        try {
+            var query = sb.from('products').select('*').eq('is_active', true).eq('is_on_hold', false);
+            
+            if (offerData.apply_to === 'category' && offerData.target_id) query = query.eq('category_id', offerData.target_id);
+            else if (offerData.apply_to === 'product' && offerData.target_id) query = query.eq('id', offerData.target_id);
+            else if (offerData.apply_to === 'shop' && offerData.target_id) query = query.eq('shop_id', offerData.target_id);
+            // global: no filter
+            
+            query = query.limit(6);
+            var result = await query;
+            var products = (result && result.data) ? result.data : [];
+            
+            if (!products.length) { 
+                grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--neutral-gray);padding:20px;font-size:12px;">No products found for this offer</p>'; 
+                return; 
+            }
+            
+            var h = '';
+            for (var i = 0; i < products.length; i++) {
+                var p = products[i];
+                var img = getFullUrl((p.images && p.images[0]) || p.image_url || '');
+                var price = p.offer_price || p.price;
+                var original = p.offer_price && p.offer_price < p.price ? p.price : null;
+                
+                h += '<div class="product-card" onclick="fastNavigate(\'product-detail.html?id=' + p.id + '\')">';
+                h += '<div class="product-img">' + (img ? '<img src="' + img + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-box-open\\\'></i>\'">' : '<i class="fas fa-box-open"></i>') + '</div>';
+                h += '<div class="product-info"><div class="product-name">' + esc(p.name) + '</div>';
+                h += '<div class="product-price">₹' + Number(price).toLocaleString('en-IN') + (original ? ' <span class="product-original">₹' + Number(original).toLocaleString('en-IN') + '</span>' : '') + '</div>';
+                h += '</div></div>';
+            }
+            grid.innerHTML = h;
+        } catch(e) { 
+            grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--neutral-gray);padding:20px;font-size:12px;">Could not load products</p>'; 
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() { loadOffer(); });
+})();
+</script>
+</body>
+</html>
