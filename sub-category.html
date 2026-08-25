@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Products - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --brand-green: #0B5A31;
+            --brand-green-dark: #083D21;
+            --brand-orange: #F59E0B;
+            --neutral-white: #FFFFFF;
+            --neutral-bg: #F8FAF9;
+            --neutral-border: #E8ECEA;
+            --neutral-gray: #6B7280;
+            --neutral-dark: #1A1A1A;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.03);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-full: 9999px;
+            --status-bar-height: env(safe-area-inset-top, 0px);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--neutral-bg);
+            color: var(--neutral-dark);
+            overflow: hidden;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes cartBounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
+        
+        .skeleton {
+            background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+            background-size: 800px 104px;
+            animation: shimmer 1.5s infinite linear;
+        }
+        
+        .cart-badge.bounce { animation: cartBounce 0.3s ease; }
+        
+        .top-bar {
+            background: var(--brand-green);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 12px rgba(11,90,49,0.25);
+            flex-shrink: 0;
+            z-index: 100;
+            padding-top: calc(8px + var(--status-bar-height));
+        }
+        
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            background: rgba(255,255,255,0.10);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        
+        .back-btn:active { background: rgba(255,255,255,0.20); transform: scale(0.93); }
+        
+        .top-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 700;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .search-btn {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            background: rgba(255,255,255,0.10);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-size: 13px;
+        }
+        
+        .cart-icon-btn {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            background: rgba(255,255,255,0.10);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-size: 13px;
+            position: relative;
+            text-decoration: none;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--brand-orange);
+            color: white;
+            border-radius: 50%;
+            width: 17px;
+            height: 17px;
+            font-size: 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--brand-green);
+            font-weight: 700;
+        }
+        
+        .cart-badge.show { display: flex; }
+        
+        .search-bar {
+            padding: 8px 10px;
+            background: white;
+            border-bottom: 1px solid var(--neutral-border);
+            flex-shrink: 0;
+            display: none;
+        }
+        
+        .search-bar.show { display: block; }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--neutral-border);
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            background: var(--neutral-bg);
+        }
+        
+        .search-input:focus { border-color: var(--brand-orange); background: white; }
+        
+        .filter-chips {
+            display: flex;
+            gap: 6px;
+            padding: 8px 10px;
+            background: white;
+            border-bottom: 1px solid var(--neutral-border);
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex-shrink: 0;
+        }
+        
+        .filter-chips::-webkit-scrollbar { display: none; }
+        
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid var(--neutral-border);
+            background: white;
+            color: var(--neutral-gray);
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.15s ease;
+        }
+        
+        .filter-chip.active {
+            background: var(--brand-green);
+            color: white;
+            border-color: var(--brand-green);
+        }
+        
+        .body-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* LEFT SIDEBAR */
+        .left-sidebar {
+            width: 100px;
+            min-width: 100px;
+            background: white;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            border-right: 1px solid var(--neutral-border);
+            flex-shrink: 0;
+        }
+        
+        .left-sidebar::-webkit-scrollbar { display: none; }
+        
+        .sidebar-item {
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--neutral-gray);
+            border-bottom: 1px solid #F5F5F5;
+            transition: all 0.15s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .sidebar-item:active { background: #EDF7F1; }
+        
+        .sidebar-item.active {
+            background: #E8F5E9;
+            color: var(--brand-green);
+            font-weight: 700;
+        }
+        
+        .sidebar-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--brand-green);
+        }
+        
+        .sidebar-item-img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #F3F5F4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-size: 16px;
+            border: 2px solid #E8ECEA;
+        }
+        
+        .sidebar-item-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+        }
+        
+        .sidebar-item.active .sidebar-item-img { border-color: var(--brand-green); }
+        
+        .sidebar-item-all {
+            background: linear-gradient(135deg, #FFF8EB, #FEF3C7);
+            border: 2px solid var(--brand-orange);
+            margin-bottom: 4px;
+        }
+        
+        .sidebar-item-all .sidebar-item-img {
+            background: var(--brand-orange);
+            color: white;
+            border-color: var(--brand-orange);
+        }
+        
+        .sidebar-item-all.active {
+            background: var(--brand-orange);
+            color: white;
+        }
+        
+        .sidebar-item-all.active::before { background: var(--brand-orange); }
+        
+        /* RIGHT PRODUCTS */
+        .right-products {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px;
+            background: var(--neutral-bg);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: var(--shadow-xs);
+            border: 1px solid var(--neutral-border);
+            cursor: pointer;
+            animation: slideUp 0.3s ease;
+        }
+        
+        .product-card:active { transform: scale(0.97); }
+        
+        .product-img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #F9FAFB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 8px;
+            overflow: hidden;
+        }
+        
+        .product-img img { width: 85%; height: 85%; object-fit: contain; }
+        
+        .discount-tag {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: var(--brand-orange);
+            color: white;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+            z-index: 1;
+        }
+        
+        .offer-tag {
+            position: absolute;
+            top: 5px;
+            right: 32px;
+            background: #EF4444;
+            color: white;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+            z-index: 1;
+        }
+        
+        .weight-tag {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(11,90,49,0.85);
+            color: white;
+            font-size: 8px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+            z-index: 1;
+        }
+        
+        .wishlist-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 10px;
+            color: #9CA3AF;
+            z-index: 1;
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .product-info { padding: 8px 10px; }
+        
+        .product-name {
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 28px;
+            color: var(--neutral-dark);
+        }
+        
+        .product-brand {
+            font-size: 8px;
+            color: var(--brand-green);
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        
+        .product-weight {
+            font-size: 9px;
+            color: var(--neutral-gray);
+            margin-top: 1px;
+        }
+        
+        .product-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 5px;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        
+        .price-group {
+            display: flex;
+            align-items: baseline;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+        
+        .product-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--brand-green-dark);
+        }
+        
+        .original-price {
+            font-size: 9px;
+            color: #9CA3AF;
+            text-decoration: line-through;
+        }
+        
+        .add-btn {
+            background: white;
+            color: var(--brand-green);
+            border: 1.5px solid var(--brand-green);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            min-width: 50px;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.15s ease;
+        }
+        
+        .add-btn:active {
+            background: var(--brand-green);
+            color: white;
+            transform: scale(0.95);
+        }
+        
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--brand-green);
+            border-radius: 8px;
+            padding: 2px 4px;
+        }
+        
+        .qty-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qty-count {
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            grid-column: 1/-1;
+        }
+        
+        .empty-state i {
+            font-size: 40px;
+            color: #D1D5DB;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            font-size: 12px;
+            color: var(--neutral-gray);
+        }
+        
+        .loading-state {
+            text-align: center;
+            padding: 40px;
+            grid-column: 1/-1;
+        }
+        
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 2.5px solid #E5E7EB;
+            border-top-color: var(--brand-orange);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1A1A1A;
+            color: white;
+            padding: 10px 18px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            z-index: 10050;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .toast-notification.show { opacity: 1; visibility: visible; }
+        .toast-notification.success { background: #059669; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <span class="top-title" id="pageTitle">Products</span>
+    <button class="search-btn" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
+    <a href="cart.html" class="cart-icon-btn">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+    </a>
+</div>
+
+<div class="search-bar" id="searchBar">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search in this category..." onkeyup="handleSearch(this.value)">
+</div>
+
+<div class="filter-chips" id="filterChips">
+    <button class="filter-chip active" onclick="setSort('popular',this)">🔥 Popular</button>
+    <button class="filter-chip" onclick="setSort('price_low',this)">₹ Low to High</button>
+    <button class="filter-chip" onclick="setSort('price_high',this)">₹ High to Low</button>
+    <button class="filter-chip" onclick="setSort('discount',this)">% Discount</button>
+</div>
+
+<div class="body-container">
+    <div class="left-sidebar" id="leftSidebar">
+        <div style="text-align:center;padding:20px;">Loading...</div>
+    </div>
+    <div class="right-products" id="rightProducts">
+        <div class="products-grid" id="productsGrid">
+            <div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-notification" id="toastMsg"><span id="toastText"></span></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'
+    };
+    
+    var zymartDB = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    var SUPABASE_URL = CONFIG.SUPABASE_URL;
+    
+    var currentCategoryId = '';
+    var currentCategoryName = '';
+    var currentSubId = '';
+    var currentSubName = '';
+    var subCategories = [];
+    var products = [];
+    var currentSort = 'popular';
+    var searchTerm = '';
+    var isAllProducts = false;
+    
+    function $(id) { return document.getElementById(id); }
+    function esc(s) { if(!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    
+    function getFullUrl(u) {
+        if(!u) return '';
+        if(u.indexOf('http')===0 || u.indexOf('data:')===0) return u;
+        return SUPABASE_URL + '/storage/v1/object/public/' + u;
+    }
+    
+    function safeGet(k, f) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch(e) { return f; } }
+    function safeSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+    
+    function showToast(m) {
+        var t = $('toastMsg');
+        if(!t) return;
+        t.textContent = m;
+        t.className = 'toast-notification success';
+        t.classList.add('show');
+        clearTimeout(t._t);
+        t._t = setTimeout(function() { t.classList.remove('show'); }, 2000);
+    }
+    
+    // ==================== CART MANAGER ====================
+    var CartManager = {
+        getCart: function() {
+            return safeGet('zymart_cart', []);
+        },
+        
+        saveCart: function(cart) {
+            safeSet('zymart_cart', cart);
+            this.updateBadge();
+        },
+        
+        addToCart: function(product) {
+            var cart = this.getCart();
+            var existing = cart.find(function(item) { return item.id === product.id; });
+            
+            if (existing) {
+                existing.quantity = (existing.quantity || 1) + 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    quantity: 1
+                });
+            }
+            
+            this.saveCart(cart);
+            return cart;
+        },
+        
+        updateQuantity: function(productId, delta) {
+            var cart = this.getCart();
+            var item = cart.find(function(i) { return i.id === productId; });
+            
+            if (item) {
+                item.quantity = (item.quantity || 1) + delta;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(function(i) { return i.id !== productId; });
+                }
+            }
+            
+            this.saveCart(cart);
+            return cart;
+        },
+        
+        getTotalItems: function() {
+            var cart = this.getCart();
+            return cart.reduce(function(sum, item) { return sum + (item.quantity || 1); }, 0);
+        },
+        
+        updateBadge: function() {
+            var totalItems = this.getTotalItems();
+            var badge = $('cartBadge');
+            
+            if (badge) {
+                badge.textContent = totalItems;
+                
+                if (totalItems > 0) {
+                    badge.classList.add('show');
+                    badge.classList.add('bounce');
+                    setTimeout(function() { badge.classList.remove('bounce'); }, 300);
+                } else {
+                    badge.classList.remove('show');
+                }
+            }
+        }
+    };
+    
+    function fmtWeight(w, u) {
+        if(!w || w===0) return '';
+        var nw = parseFloat(w);
+        if(isNaN(nw)) return String(w);
+        
+        var unitLower = u ? u.toLowerCase() : '';
+        
+        if(unitLower === 'gram' || unitLower === 'g' || unitLower === 'gm' || unitLower === 'grams') {
+            if(nw >= 1000) return (nw/1000).toFixed(1).replace(/\.0$/,'') + ' kg';
+            return nw + ' g';
+        }
+        if(unitLower === 'kg' || unitLower === 'kilogram') return nw + ' kg';
+        if(unitLower === 'liter' || unitLower === 'l' || unitLower === 'litre') return nw + ' L';
+        if(unitLower === 'ml' || unitLower === 'milliliter') return nw + ' ml';
+        if(unitLower === 'piece' || unitLower === 'pcs' || unitLower === 'pc') return nw + ' pcs';
+        
+        return nw + ' ' + (u || '');
+    }
+    
+    function getUrlParams() {
+        var params = new URLSearchParams(window.location.search);
+        currentCategoryId = params.get('category_id') || '';
+        currentCategoryName = params.get('category_name') ? decodeURIComponent(params.get('category_name')) : '';
+        currentSubId = params.get('sub_id') || '';
+        currentSubName = params.get('sub_name') ? decodeURIComponent(params.get('sub_name')) : '';
+        $('pageTitle').textContent = currentSubName || currentCategoryName || 'Products';
+    }
+    
+    async function loadSubCategories() {
+        var sidebar = $('leftSidebar');
+        if(!sidebar) return;
+        
+        try {
+            var q = zymartDB.from('categories')
+                .select('id, name, image_url, category_icon')
+                .eq('is_active', true)
+                .eq('is_on_hold', false);
+            
+            if(currentCategoryId) {
+                q = q.eq('parent_id', currentCategoryId);
+            } else if(currentSubId) {
+                var parentRes = await zymartDB.from('categories')
+                    .select('parent_id')
+                    .eq('id', currentSubId)
+                    .single();
+                    
+                if(parentRes.data && parentRes.data.parent_id) {
+                    q = q.eq('parent_id', parentRes.data.parent_id);
+                } else {
+                    q = q.eq('parent_id', currentSubId);
+                }
+            } else {
+                q = q.not('parent_id', 'is', null);
+            }
+            
+            q = q.order('display_order');
+            var r = await q;
+            subCategories = r.data || [];
+            
+            if(subCategories.length === 0 && currentCategoryId) {
+                var pRes = await zymartDB.from('categories')
+                    .select('id, name, image_url')
+                    .eq('id', currentCategoryId)
+                    .single();
+                if(pRes.data) { 
+                    subCategories = [pRes.data]; 
+                }
+            }
+            
+            var html = '';
+            
+            html += '<div class="sidebar-item sidebar-item-all active" onclick="selectAllProducts()">';
+            html += '<div class="sidebar-item-img"><i class="fas fa-th-large"></i></div>';
+            html += '<span>All Products</span>';
+            html += '</div>';
+            
+            subCategories.forEach(function(sc, index) {
+                var scImg = getFullUrl(sc.image_url);
+                var nm = (sc.name || '').replace(/'/g, "\\'");
+                
+                html += '<div class="sidebar-item" onclick="selectSubCategory(\'' + sc.id + '\',\'' + nm + '\')">';
+                html += '<div class="sidebar-item-img">';
+                if(scImg) {
+                    html += '<img src="' + scImg + '" loading="lazy" alt="' + esc(sc.name) + '" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<i class=&#34;fas fa-shopping-basket&#34;></i>\'">';
+                } else {
+                    html += '<i class="fas fa-shopping-basket"></i>';
+                }
+                html += '</div>';
+                html += '<span>' + esc(sc.name) + '</span>';
+                html += '</div>';
+            });
+            
+            sidebar.innerHTML = html;
+            loadAllProducts();
+            
+        } catch(e) {
+            console.error('Error loading sub-categories:', e);
+            sidebar.innerHTML = '<div style="text-align:center;padding:20px;font-size:11px;color:#EF4444;">Failed to load</div>';
+        }
+    }
+    
+    window.selectAllProducts = function() {
+        isAllProducts = true;
+        currentSubId = '';
+        currentSubName = '';
+        $('pageTitle').textContent = currentCategoryName || 'All Products';
+        
+        var items = document.querySelectorAll('.sidebar-item');
+        items.forEach(function(item) {
+            item.classList.remove('active');
+        });
+        
+        if(items.length > 0) {
+            items[0].classList.add('active');
+        }
+        
+        loadAllProducts();
+    };
+    
+    // FIXED: loadAllProducts - proper category filter
+    async function loadAllProducts() {
+        var grid = $('productsGrid');
+        if(!grid) return;
+        
+        grid.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading products...</p></div>';
+        
+        try {
+            var q = zymartDB.from('products')
+                .select('*')
+                .eq('is_active', true)
+                .eq('is_on_hold', false)
+                .eq('delete_requested', false)
+                .is('parent_id', null);
+            
+            if(currentCategoryId && subCategories.length > 0) {
+                var subIds = subCategories.map(function(sc) { return sc.id; });
+                q = q.in('category_id', subIds);
+            } else if(currentCategoryId) {
+                q = q.eq('category_id', currentCategoryId);
+            } else if(currentSubId) {
+                q = q.eq('category_id', currentSubId);
+            }
+            
+            if(searchTerm) { 
+                q = q.ilike('name', '%' + searchTerm + '%'); 
+            }
+            
+            q = q.limit(100);
+            
+            var r = await q;
+            products = r.data || [];
+            
+            if(products.length === 0 && currentCategoryId) {
+                var fallbackQ = zymartDB.from('products')
+                    .select('*')
+                    .eq('is_active', true)
+                    .eq('is_on_hold', false)
+                    .eq('delete_requested', false)
+                    .eq('category_id', currentCategoryId)
+                    .is('parent_id', null)
+                    .limit(100);
+                
+                var fallbackR = await fallbackQ;
+                products = fallbackR.data || [];
+            }
+            
+            renderProducts();
+            
+        } catch(e) {
+            console.error('Error loading products:', e);
+            grid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Failed to load products</p></div>';
+        }
+    }
+    
+    window.selectSubCategory = function(scid, scname) {
+        isAllProducts = false;
+        currentSubId = scid;
+        currentSubName = scname;
+        $('pageTitle').textContent = scname;
+        
+        var items = document.querySelectorAll('.sidebar-item');
+        items.forEach(function(item, index) {
+            item.classList.remove('active');
+            if(index > 0 && subCategories[index - 1] && subCategories[index - 1].id === scid) {
+                item.classList.add('active');
+            }
+        });
+        
+        loadProducts(scid);
+    };
+    
+    // FIXED: Sirf selected category ke products dikhao
+    async function loadProducts(scid) {
+        var grid = $('productsGrid');
+        if(!grid) return;
+        
+        grid.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading products...</p></div>';
+        
+        try {
+            var q = zymartDB.from('products')
+                .select('*')
+                .eq('is_active', true)
+                .eq('is_on_hold', false)
+                .eq('delete_requested', false)
+                .is('parent_id', null);
+            
+            if(scid) { 
+                q = q.eq('category_id', scid); 
+            }
+            
+            if(searchTerm) { 
+                q = q.ilike('name', '%' + searchTerm + '%'); 
+            }
+            
+            q = q.limit(50);
+            
+            var r = await q;
+            products = r.data || [];
+            
+            renderProducts();
+            
+        } catch(e) {
+            console.error('Error loading products:', e);
+            grid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Failed to load products</p></div>';
+        }
+    }
+    
+    function renderProducts() {
+        var grid = $('productsGrid');
+        if(!grid) return;
+        
+        if(!products.length) {
+            grid.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>No products found</p></div>';
+            return;
+        }
+        
+        var sorted = products.slice();
+        
+        if(currentSort === 'price_low') {
+            sorted.sort(function(a,b) { return getPrice(a) - getPrice(b); });
+        } else if(currentSort === 'price_high') {
+            sorted.sort(function(a,b) { return getPrice(b) - getPrice(a); });
+        } else if(currentSort === 'discount') {
+            sorted.sort(function(a,b) { return getDiscount(b) - getDiscount(a); });
+        }
+        
+        var cart = CartManager.getCart();
+        var html = '';
+        
+        sorted.forEach(function(p) {
+            var variants = (p.variants && Array.isArray(p.variants)) ? p.variants : [];
+            var bestV = variants.length > 0 ? (variants.find(function(v) { return (v.stock||0) > 0; }) || variants[0]) : null;
+            var img = getFullUrl((p.images && p.images[0]) || p.image_url || '');
+            var price = bestV ? (bestV.offer_price || bestV.price) : (p.offer_price || p.price);
+            var original = bestV ? bestV.price : p.price;
+            var dis = price && original && price < original ? Math.round((1 - price/original) * 100) : 0;
+            var wt = bestV ? fmtWeight(bestV.weight, bestV.weight_unit || bestV.unit || p.weight_unit || p.unit) : fmtWeight(p.weight, p.weight_unit || p.unit);
+            var nm = (p.name || '').replace(/'/g, "\\'");
+            var ci = cart.find(function(x) { return x.id === p.id; });
+            var cq = ci ? (ci.quantity || 1) : 0;
+            var isOffer = p.is_offer === true;
+            
+            html += '<div class="product-card" onclick="openProduct(\'' + p.id + '\')">';
+            html += '<div class="product-img">';
+            if(dis > 0) html += '<span class="discount-tag">' + dis + '% OFF</span>';
+            if(isOffer) html += '<span class="offer-tag">🎁</span>';
+            if(wt) html += '<span class="weight-tag">' + wt + '</span>';
+            html += '<button class="wishlist-btn" onclick="event.stopPropagation();toggleWishlist(\'' + p.id + '\')"><i class="far fa-heart"></i></button>';
+            html += img ? '<img src="' + img + '" loading="lazy" alt="' + esc(p.name) + '">' : '<i class="fas fa-box" style="font-size:30px;color:#D1D5DB;"></i>';
+            html += '</div>';
+            html += '<div class="product-info">';
+            html += '<div class="product-name">' + esc(p.name) + '</div>';
+            if(p.brand_name) html += '<div class="product-brand">' + esc(p.brand_name) + '</div>';
+            if(wt) html += '<div class="product-weight">' + wt + '</div>';
+            html += '<div class="product-price-row">';
+            html += '<div class="price-group">';
+            html += '<span class="product-price">₹' + Number(price).toLocaleString('en-IN') + '</span>';
+            if(dis > 0) html += '<span class="original-price">₹' + Number(original).toLocaleString('en-IN') + '</span>';
+            html += '</div>';
+            
+            if(cq > 0) {
+                html += '<div class="qty-controls">';
+                html += '<button class="qty-btn" onclick="event.stopPropagation();updateQty(\'' + p.id + '\',-1)">−</button>';
+                html += '<span class="qty-count">' + cq + '</span>';
+                html += '<button class="qty-btn" onclick="event.stopPropagation();updateQty(\'' + p.id + '\',1)">+</button>';
+                html += '</div>';
+            } else {
+                html += '<button class="add-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\',\'' + nm + '\',' + price + ',\'' + img + '\')">ADD</button>';
+            }
+            
+            html += '</div></div></div>';
+        });
+        
+        grid.innerHTML = html;
+    }
+    
+    function getPrice(p) {
+        var variants = (p.variants && Array.isArray(p.variants)) ? p.variants : [];
+        var bestV = variants.length > 0 ? (variants.find(function(v) { return (v.stock||0) > 0; }) || variants[0]) : null;
+        return bestV ? (bestV.offer_price || bestV.price) : (p.offer_price || p.price);
+    }
+    
+    function getDiscount(p) {
+        var variants = (p.variants && Array.isArray(p.variants)) ? p.variants : [];
+        var bestV = variants.length > 0 ? (variants.find(function(v) { return (v.stock||0) > 0; }) || variants[0]) : null;
+        var price = bestV ? (bestV.offer_price || bestV.price) : (p.offer_price || p.price);
+        var original = bestV ? bestV.price : p.price;
+        return price && original && price < original ? Math.round((1 - price/original) * 100) : 0;
+    }
+    
+    window.addToCart = function(id, name, price, img) {
+        CartManager.addToCart({
+            id: id,
+            name: name,
+            price: price,
+            image: img
+        });
+        
+        renderProducts();
+        showToast('🛒 Added to cart!');
+    };
+    
+    window.updateQty = function(id, delta) {
+        CartManager.updateQuantity(id, delta);
+        renderProducts();
+    };
+    
+    window.setSort = function(sort, btn) {
+        currentSort = sort;
+        var chips = document.querySelectorAll('.filter-chip');
+        chips.forEach(function(c) { c.classList.remove('active'); });
+        if(btn) btn.classList.add('active');
+        renderProducts();
+    };
+    
+    function toggleSearch() {
+        var sb = $('searchBar');
+        if(sb) sb.classList.toggle('show');
+        if(sb.classList.contains('show')) $('searchInput').focus();
+    }
+    
+    function handleSearch(val) {
+        searchTerm = val.trim();
+        if(isAllProducts) {
+            loadAllProducts();
+        } else if(currentSubId) {
+            loadProducts(currentSubId);
+        } else {
+            loadAllProducts();
+        }
+    }
+    
+    function openProduct(id) { 
+        if(id) window.location.href = 'product-detail.html?id=' + id; 
+    }
+    
+    window.toggleWishlist = function(id) {
+        var wishlist = safeGet('zymart_wishlist', []);
+        var idx = wishlist.indexOf(id);
+        if(idx === -1) wishlist.push(id);
+        else wishlist.splice(idx, 1);
+        safeSet('zymart_wishlist', wishlist);
+        showToast(idx === -1 ? '❤️ Added to wishlist' : '💔 Removed from wishlist');
+    };
+    
+    // Initialize
+    getUrlParams();
+    loadSubCategories();
+    CartManager.updateBadge();
+    
+    window.addEventListener('storage', function(e) {
+        if(e.key === 'zymart_cart') {
+            CartManager.updateBadge();
+        }
+    });
+    
+    window.toggleSearch = toggleSearch;
+    window.handleSearch = handleSearch;
+    window.selectSubCategory = selectSubCategory;
+    window.selectAllProducts = selectAllProducts;
+    window.openProduct = openProduct;
+    window.addToCart = addToCart;
+    window.updateQty = updateQty;
+    window.setSort = setSort;
+    window.toggleWishlist = toggleWishlist;
+    window.CartManager = CartManager;
+    
+})();
+</script>
+</body>
+</html>
