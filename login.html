@@ -449,32 +449,22 @@
         $('warningMsg').style.display = 'none';
     }
     
-    // ==================== CART BADGE ====================
     function updateCartBadge() {
         try {
             var cart = JSON.parse(localStorage.getItem('zymart_cart') || '[]');
             var totalItems = cart.reduce(function(sum, item) { return sum + (item.quantity || 1); }, 0);
             var badge = $('cartBadge');
-            
             if (badge) {
                 badge.textContent = totalItems;
-                if (totalItems > 0) {
-                    badge.classList.add('show');
-                } else {
-                    badge.classList.remove('show');
-                }
+                if (totalItems > 0) badge.classList.add('show');
+                else badge.classList.remove('show');
             }
         } catch(e) {}
     }
     
-    // ==================== RATE LIMITING ====================
     function getRL(key) {
-        try { 
-            var d = JSON.parse(localStorage.getItem(key) || '{}'); 
-            return d; 
-        } catch(e) { 
-            return {}; 
-        }
+        try { return JSON.parse(localStorage.getItem(key) || '{}'); } 
+        catch(e) { return {}; }
     }
     
     function saveRL(key, data) {
@@ -484,27 +474,22 @@
     function canSendOTP(rlKey) {
         var rl = getRL(rlKey);
         var now = Date.now();
-        
         if (!rl.windowStart || (now - rl.windowStart) > 300000) {
             rl = { windowStart: now, sendCount: 0, lockedUntil: 0, attemptCount: 0 };
             saveRL(rlKey, rl);
         }
-        
         if (rl.lockedUntil && now < rl.lockedUntil) {
             var mins = Math.ceil((rl.lockedUntil - now) / 60000);
-            return { allowed: false, reason: '🔒 Account temporarily locked. Try again in ' + mins + ' minute' + (mins > 1 ? 's' : '') + '.', rl: rl };
+            return { allowed: false, reason: '🔒 Account temporarily locked. Try again in ' + mins + ' min.', rl: rl };
         }
-        
         if (rl.sendCount >= 3) {
             var waitMin = Math.ceil((rl.windowStart + 300000 - now) / 60000);
-            return { allowed: false, reason: '⚠️ Too many OTP requests. Please wait ' + waitMin + ' minute' + (waitMin > 1 ? 's' : '') + '.', rl: rl };
+            return { allowed: false, reason: '⚠️ Too many OTP requests. Wait ' + waitMin + ' min.', rl: rl };
         }
-        
         if (rl.lastSend && (now - rl.lastSend) < 30000) {
             var sec = Math.ceil((rl.lastSend + 30000 - now) / 1000);
-            return { allowed: false, reason: '⏳ Please wait ' + sec + ' seconds before requesting new OTP.', rl: rl };
+            return { allowed: false, reason: '⏳ Wait ' + sec + ' seconds.', rl: rl };
         }
-        
         return { allowed: true, rl: rl };
     }
     
@@ -515,28 +500,20 @@
     }
     
     function recordOTPAttempt(rlKey, rl, isCorrect) {
-        if (isCorrect) {
-            rl.attemptCount = 0;
-            rl.lockedUntil = 0;
-        } else {
+        if (isCorrect) { rl.attemptCount = 0; rl.lockedUntil = 0; }
+        else {
             rl.attemptCount = (rl.attemptCount || 0) + 1;
-            if (rl.attemptCount >= 3) {
-                rl.lockedUntil = Date.now() + 600000;
-            }
+            if (rl.attemptCount >= 3) rl.lockedUntil = Date.now() + 600000;
         }
         saveRL(rlKey, rl);
         return rl;
     }
     
-    function getAttemptsLeft(rl) {
-        return Math.max(0, 3 - (rl.attemptCount || 0));
-    }
+    function getAttemptsLeft(rl) { return Math.max(0, 3 - (rl.attemptCount || 0)); }
     
-    // ==================== TAB SWITCHING ====================
     window.switchTab = function(tab) {
         document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
         document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
-        
         if (tab === 'mobile') {
             document.querySelector('.tab:nth-child(1)').classList.add('active');
             $('mobileTab').classList.add('active');
@@ -547,12 +524,10 @@
         hideAll();
     };
     
-    // ==================== EDGE FUNCTION CALL ====================
     function callEdge(name, body, timeoutMs) {
         timeoutMs = timeoutMs || 15000;
         var controller = new AbortController();
         var timeout = setTimeout(function() { controller.abort(); }, timeoutMs);
-        
         return fetch(CONFIG.SUPABASE_URL + '/functions/v1/' + name, {
             method: 'POST',
             headers: {
@@ -565,30 +540,21 @@
         }).finally(function() { clearTimeout(timeout); });
     }
     
-    // ==================== REDIRECT ====================
     function redirectByRole(role) {
         var redirect = sessionStorage.getItem('zymart_redirect_after_login');
-        
         if (redirect) {
             sessionStorage.removeItem('zymart_redirect_after_login');
             window.location.href = redirect;
             return;
         }
-        
         if (role === '1' || role === 'admin') window.location.href = 'admin-panel.html';
         else if (role === '2' || role === 'shop_owner') window.location.href = 'shop-dashboard.html';
         else window.location.href = 'index.html';
     }
     
-    // ==================== SESSION MANAGEMENT ====================
     function saveSession(phone, userId, role) {
         try {
-            var session = {
-                userId: userId,
-                phone: phone,
-                role: role,
-                loginTime: new Date().toISOString()
-            };
+            var session = { userId: userId, phone: phone, role: role, loginTime: new Date().toISOString() };
             localStorage.setItem('zymart_session', JSON.stringify(session));
             if (phone) localStorage.setItem('zymart_user_phone', phone);
             localStorage.setItem('zymart_user_role', role);
@@ -604,40 +570,10 @@
         } catch(e) {}
     }
     
-    // ==================== FIXED: getOrCreateUser ====================
+    // ==================== FIXED: getOrCreateUser (Simple + Direct) ====================
     async function getOrCreateUser(phone, email) {
         try {
-            // Step 1: Supabase auth user check
-            try {
-                var authUser = await zymartDB.auth.getUser();
-                if (authUser && authUser.data && authUser.data.user) {
-                    var supabaseUserId = authUser.data.user.id;
-                    
-                    // Check if this Supabase user exists in users table
-                    var authUserCheck = await zymartDB.from('users').select('id, role').eq('id', supabaseUserId).maybeSingle();
-                    if (authUserCheck && authUserCheck.data && authUserCheck.data.id) {
-                        return authUserCheck.data.id;
-                    }
-                    
-                    // If not in users table, create entry with Supabase user ID
-                    var newAuthUser = {
-                        id: supabaseUserId,
-                        phone: phone || authUser.data.user.phone || null,
-                        email: email || authUser.data.user.email || null,
-                        name: phone ? 'User' + phone.slice(-4) : (email ? email.split('@')[0] : 'User'),
-                        role: '3',
-                        is_active: true,
-                        created_at: new Date().toISOString()
-                    };
-                    
-                    var insertAuth = await zymartDB.from('users').insert([newAuthUser]).select('id').single();
-                    if (insertAuth && insertAuth.data && insertAuth.data.id) return insertAuth.data.id;
-                    
-                    return supabaseUserId;
-                }
-            } catch(e) {}
-            
-            // Step 2: Check users table by phone/email
+            // Step 1: Pehle users table mein check karo
             var checkQuery = zymartDB.from('users').select('id, role');
             if (phone) checkQuery = checkQuery.eq('phone', phone);
             else if (email) checkQuery = checkQuery.eq('email', email);
@@ -645,7 +581,7 @@
             var check = await checkQuery.maybeSingle();
             if (check && check.data && check.data.id) return check.data.id;
             
-            // Step 3: Create new user only if not found anywhere
+            // Step 2: Naya user create karo
             var newUser = {
                 phone: phone || null,
                 email: email || null,
@@ -658,7 +594,7 @@
             var insert = await zymartDB.from('users').insert([newUser]).select('id').single();
             if (insert && insert.data && insert.data.id) return insert.data.id;
             
-            // Step 4: Retry find after insert
+            // Step 3: Agar insert fail hua toh retry find karo
             if (insert && insert.error) {
                 var retry = zymartDB.from('users').select('id');
                 if (phone) retry = retry.eq('phone', phone);
@@ -667,6 +603,14 @@
                 var retryResult = await retry.maybeSingle();
                 if (retryResult && retryResult.data && retryResult.data.id) return retryResult.data.id;
             }
+            
+            // Step 4: Supabase auth user check (agar abhi bhi null)
+            try {
+                var authUser = await zymartDB.auth.getUser();
+                if (authUser && authUser.data && authUser.data.user) {
+                    return authUser.data.user.id;
+                }
+            } catch(e) {}
             
             return null;
         } catch(e) {
@@ -679,16 +623,13 @@
         try {
             var check = await zymartDB.from('users').select('role').eq('id', userId).maybeSingle();
             return (check && check.data && check.data.role) ? String(check.data.role) : '3';
-        } catch(e) { 
-            return '3'; 
-        }
+        } catch(e) { return '3'; }
     }
     
     // ==================== MOBILE OTP ====================
     window.sendMobileOTP = async function() {
         hideAll();
         var phone = ($('mobileInput').value || '').trim();
-        
         if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
             $('mobileInput').classList.add('error');
             showError('Please enter a valid 10-digit mobile number starting with 6-9');
@@ -697,10 +638,7 @@
         $('mobileInput').classList.remove('error');
         
         var check = canSendOTP(RL_KEY_MOBILE);
-        if (!check.allowed) {
-            showError(check.reason);
-            return;
-        }
+        if (!check.allowed) { showError(check.reason); return; }
         
         var btn = $('mobileSendBtn');
         btn.disabled = true;
@@ -708,31 +646,22 @@
         
         try {
             var res = await callEdge('send-otp', { phone: phone });
-            
             if (!res.ok) {
-                var errText = 'Failed to send OTP';
-                try { 
-                    var errData = await res.json(); 
-                    errText = errData.message || errText; 
-                } catch(e) {}
-                showError('❌ ' + errText + '. Please try again.');
+                showError('❌ Failed to send OTP. Please try again.');
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
                 return;
             }
             
             var data = await res.json();
-            
             if (data.Status === 'Success' || data.status === 'success') {
                 recordOTPSend(RL_KEY_MOBILE, check.rl);
                 currentMobile = phone;
-                
                 $('mobileOtpDisplay').textContent = '+91 ' + phone;
                 $('mobileForm').style.display = 'none';
                 $('mobileOtpSection').style.display = 'block';
                 $('mobileOtpInput').value = '';
                 setTimeout(function() { $('mobileOtpInput').focus(); }, 200);
-                
                 showSuccess('✅ OTP sent successfully to +91 ' + phone);
                 startMobileTimer();
                 $('mobileAttemptsWarning').style.display = 'none';
@@ -742,8 +671,7 @@
                 btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
             }
         } catch(e) {
-            console.error('[Login] sendMobileOTP error:', e);
-            showError('⚠️ Network error. Please check your connection and try again.');
+            showError('⚠️ Network error. Please try again.');
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
         }
@@ -751,14 +679,9 @@
     
     window.verifyMobileOTP = async function() {
         hideAll();
-        if (!currentMobile) { 
-            showError('Session expired. Please request OTP again.'); 
-            goBackMobile(); 
-            return; 
-        }
+        if (!currentMobile) { showError('Session expired. Please request OTP again.'); goBackMobile(); return; }
         
         var otp = ($('mobileOtpInput').value || '').trim();
-        
         if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
             $('mobileOtpInput').classList.add('error');
             showError('Please enter the complete 6-digit OTP');
@@ -767,7 +690,6 @@
         $('mobileOtpInput').classList.remove('error');
         
         var rl = getRL(RL_KEY_MOBILE);
-        
         var btn = $('mobileVerifyBtn');
         btn.disabled = true;
         btn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
@@ -780,28 +702,10 @@
             if (res.ok && (data.Status === 'Success' || data.status === 'success')) {
                 recordOTPAttempt(RL_KEY_MOBILE, rl, true);
                 
-                // FIXED: Supabase auth session create/check karo
-                try {
-                    var authSession = await zymartDB.auth.getSession();
-                    if (!authSession || !authSession.data || !authSession.data.session) {
-                        // Try sign in with phone
-                        await zymartDB.auth.signInWithPassword({
-                            phone: currentMobile,
-                            password: 'zymart_' + currentMobile
-                        }).catch(async function() {
-                            // If fail, try sign up
-                            await zymartDB.auth.signUp({
-                                phone: currentMobile,
-                                password: 'zymart_' + currentMobile,
-                                options: { data: { phone: currentMobile } }
-                            }).catch(function() {});
-                        });
-                    }
-                } catch(e) {}
-                
+                // 🔥 FIXED: Direct user create (Supabase auth skip)
                 var userId = await getOrCreateUser(currentMobile, null);
                 if (!userId) {
-                    showError('⚠️ Unable to create account. Please try again or contact support.');
+                    showError('⚠️ Unable to create account. Please try again.');
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
                     return;
@@ -810,13 +714,11 @@
                 var role = await getUserRole(userId);
                 saveSession(currentMobile, userId, role);
                 showSuccess('✅ Login successful! Redirecting...');
-                
                 setTimeout(function() { redirectByRole(role); }, 600);
             } else {
                 rl = recordOTPAttempt(RL_KEY_MOBILE, rl, false);
                 $('mobileOtpInput').value = '';
                 $('mobileOtpInput').classList.add('error');
-                
                 var left = getAttemptsLeft(rl);
                 if (left <= 0) {
                     showError('🔒 Too many wrong attempts! Account locked for 10 minutes.');
@@ -824,28 +726,24 @@
                     $('mobileOtpSection').style.display = 'none';
                     if (mobileTimer) clearInterval(mobileTimer);
                 } else {
-                    showError('❌ Incorrect OTP. ' + left + ' attempt' + (left > 1 ? 's' : '') + ' remaining.');
-                    $('mobileAttemptsWarning').textContent = '⚠️ ' + left + ' attempt' + (left > 1 ? 's' : '') + ' remaining';
+                    showError('❌ Incorrect OTP. ' + left + ' attempt(s) remaining.');
+                    $('mobileAttemptsWarning').textContent = '⚠️ ' + left + ' attempt(s) remaining';
                     $('mobileAttemptsWarning').style.display = 'block';
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
                 }
             }
         } catch(e) {
-            console.error('[Login] verifyMobileOTP error:', e);
-            showError('⚠️ Verification failed. Please check your connection.');
+            showError('⚠️ Verification failed. Please try again.');
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
         }
     };
     
     window.resendMobileOTP = async function() {
-        if (mobileSeconds > 0) return;
-        if (!currentMobile) return;
-        
+        if (mobileSeconds > 0 || !currentMobile) return;
         var check = canSendOTP(RL_KEY_MOBILE);
         if (!check.allowed) { showError(check.reason); return; }
-        
         try {
             var res = await callEdge('send-otp', { phone: currentMobile });
             if (res.ok) {
@@ -855,12 +753,8 @@
                 $('mobileAttemptsWarning').style.display = 'none';
                 $('mobileOtpInput').value = '';
                 $('mobileOtpInput').focus();
-            } else {
-                showError('Failed to resend OTP');
-            }
-        } catch(e) {
-            showError('Network error');
-        }
+            } else { showError('Failed to resend OTP'); }
+        } catch(e) { showError('Network error'); }
     };
     
     function startMobileTimer() {
@@ -869,7 +763,6 @@
         btn.disabled = true;
         btn.style.display = 'block';
         if (mobileTimer) clearInterval(mobileTimer);
-        
         mobileTimer = setInterval(function() {
             mobileSeconds--;
             if (mobileSeconds <= 0) {
@@ -895,11 +788,10 @@
         btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
     };
     
-    // ==================== EMAIL OTP ====================
+    // ==================== EMAIL OTP (FIXED) ====================
     window.sendEmailOTP = async function() {
         hideAll();
         var email = ($('emailInput').value || '').trim().toLowerCase();
-        
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             $('emailInput').classList.add('error');
             showError('Please enter a valid email address');
@@ -908,39 +800,18 @@
         $('emailInput').classList.remove('error');
         
         var check = canSendOTP(RL_KEY_EMAIL);
-        if (!check.allowed) {
-            showError(check.reason);
-            return;
-        }
+        if (!check.allowed) { showError(check.reason); return; }
         
         var btn = $('emailSendBtn');
         btn.disabled = true;
         btn.innerHTML = '<span class="loading-spinner"></span> Sending OTP...';
         
         try {
-            // FIXED: shouldCreateUser false - existing user ko OTP bhejo
+            // 🔥 FIXED: shouldCreateUser TRUE - naye user bhi login kar sakte hain
             var res = await zymartDB.auth.signInWithOtp({
                 email: email,
-                options: { shouldCreateUser: false }
+                options: { shouldCreateUser: true }
             });
-            
-            // FIXED: Agar user nahi mila toh signUp karo
-            if (res.error && res.error.message && res.error.message.toLowerCase().indexOf('user') !== -1) {
-                res = await zymartDB.auth.signUp({
-                    email: email,
-                    password: 'zymart_' + Date.now(),
-                    options: { data: { email: email } }
-                });
-                
-                if (!res.error) {
-                    // User created, ab OTP bhejo
-                    await zymartDB.auth.signOut();
-                    res = await zymartDB.auth.signInWithOtp({
-                        email: email,
-                        options: { shouldCreateUser: false }
-                    });
-                }
-            }
             
             if (res.error) {
                 showError('❌ ' + (res.error.message || 'Failed to send OTP'));
@@ -951,18 +822,15 @@
             
             recordOTPSend(RL_KEY_EMAIL, check.rl);
             currentEmail = email;
-            
             $('emailOtpDisplay').textContent = email;
             $('emailForm').style.display = 'none';
             $('emailOtpSection').style.display = 'block';
             $('emailOtpInput').value = '';
             setTimeout(function() { $('emailOtpInput').focus(); }, 200);
-            
             showSuccess('✅ OTP sent to ' + email);
             startEmailTimer();
             $('emailAttemptsWarning').style.display = 'none';
         } catch(e) {
-            console.error('[Login] sendEmailOTP error:', e);
             showError('⚠️ Network error. Please try again.');
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
@@ -971,14 +839,9 @@
     
     window.verifyEmailOTP = async function() {
         hideAll();
-        if (!currentEmail) { 
-            showError('Session expired. Please request OTP again.'); 
-            goBackEmail(); 
-            return; 
-        }
+        if (!currentEmail) { showError('Session expired. Please request OTP again.'); goBackEmail(); return; }
         
         var otp = ($('emailOtpInput').value || '').trim();
-        
         if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
             $('emailOtpInput').classList.add('error');
             showError('Please enter the complete 6-digit OTP');
@@ -987,7 +850,6 @@
         $('emailOtpInput').classList.remove('error');
         
         var rl = getRL(RL_KEY_EMAIL);
-        
         var btn = $('emailVerifyBtn');
         btn.disabled = true;
         btn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
@@ -1003,7 +865,6 @@
                 rl = recordOTPAttempt(RL_KEY_EMAIL, rl, false);
                 $('emailOtpInput').value = '';
                 $('emailOtpInput').classList.add('error');
-                
                 var left = getAttemptsLeft(rl);
                 if (left <= 0) {
                     showError('🔒 Too many wrong attempts! Account locked for 10 minutes.');
@@ -1011,8 +872,8 @@
                     $('emailOtpSection').style.display = 'none';
                     if (emailTimer) clearInterval(emailTimer);
                 } else {
-                    showError('❌ Incorrect OTP. ' + left + ' attempt' + (left > 1 ? 's' : '') + ' remaining.');
-                    $('emailAttemptsWarning').textContent = '⚠️ ' + left + ' attempt' + (left > 1 ? 's' : '') + ' remaining';
+                    showError('❌ Incorrect OTP. ' + left + ' attempt(s) remaining.');
+                    $('emailAttemptsWarning').textContent = '⚠️ ' + left + ' attempt(s) remaining';
                     $('emailAttemptsWarning').style.display = 'block';
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
@@ -1030,7 +891,6 @@
                 var role = await getUserRole(userId || user.id);
                 saveSession(user.phone || '', userId || user.id, role);
                 showSuccess('✅ Login successful! Redirecting...');
-                
                 setTimeout(function() { redirectByRole(role); }, 600);
             } else {
                 showError('⚠️ Verification failed. Please try again.');
@@ -1038,24 +898,20 @@
                 btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
             }
         } catch(e) {
-            console.error('[Login] verifyEmailOTP error:', e);
-            showError('⚠️ Verification failed. Please check your connection.');
+            showError('⚠️ Verification failed. Please try again.');
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
         }
     };
     
     window.resendEmailOTP = async function() {
-        if (emailSeconds > 0) return;
-        if (!currentEmail) return;
-        
+        if (emailSeconds > 0 || !currentEmail) return;
         var check = canSendOTP(RL_KEY_EMAIL);
         if (!check.allowed) { showError(check.reason); return; }
-        
         try {
             var res = await zymartDB.auth.signInWithOtp({ 
                 email: currentEmail,
-                options: { shouldCreateUser: false }
+                options: { shouldCreateUser: true }
             });
             if (!res.error) {
                 recordOTPSend(RL_KEY_EMAIL, check.rl);
@@ -1064,12 +920,8 @@
                 $('emailAttemptsWarning').style.display = 'none';
                 $('emailOtpInput').value = '';
                 $('emailOtpInput').focus();
-            } else {
-                showError('Failed to resend OTP');
-            }
-        } catch(e) {
-            showError('Network error');
-        }
+            } else { showError('Failed to resend OTP'); }
+        } catch(e) { showError('Network error'); }
     };
     
     function startEmailTimer() {
@@ -1078,7 +930,6 @@
         btn.disabled = true;
         btn.style.display = 'block';
         if (emailTimer) clearInterval(emailTimer);
-        
         emailTimer = setInterval(function() {
             emailSeconds--;
             if (emailSeconds <= 0) {
@@ -1110,9 +961,7 @@
     });
     
     window.addEventListener('storage', function(e) {
-        if(e.key === 'zymart_cart') {
-            updateCartBadge();
-        }
+        if(e.key === 'zymart_cart') { updateCartBadge(); }
     });
     
     (function checkExistingSession() {
@@ -1121,14 +970,12 @@
             if (session && session.userId && session.loginTime) {
                 var loginTime = new Date(session.loginTime).getTime();
                 var now = Date.now();
-                
                 if (now - loginTime < 30 * 24 * 60 * 60 * 1000) {
                     var role = localStorage.getItem('zymart_user_role') || '3';
                     redirectByRole(role);
                     return;
                 }
             }
-            
             clearSession();
         } catch(e) {}
     })();
