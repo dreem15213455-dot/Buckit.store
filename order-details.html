@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Order Details - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; 
+            --brand-green-dark: #083D21;
+            --brand-orange: #F59E0B; 
+            --brand-orange-dark: #E8890A;
+            --neutral-white: #FFFFFF; 
+            --neutral-bg: #F9FAFB; 
+            --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; 
+            --neutral-dark: #1A1A1A; 
+            --danger: #EF4444; 
+            --success: #10B981;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); 
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08); 
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --radius-sm: 10px; 
+            --radius-md: 14px; 
+            --radius-lg: 18px; 
+            --radius-xl: 22px; 
+            --radius-full: 9999px;
+            --status-bar-height: env(safe-area-inset-top, 0px);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background: var(--neutral-bg); 
+            color: var(--neutral-dark); 
+            padding-bottom: 30px; 
+            -webkit-tap-highlight-color: transparent; 
+            -webkit-font-smoothing: antialiased; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            width: 100%; 
+            max-width: 100%; 
+        }
+        
+        #simpleLoader { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: var(--neutral-white); 
+            z-index: 10002; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 14px; 
+            transition: opacity 0.3s ease; 
+        }
+        
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        
+        .simple-spinner { 
+            width: 34px; 
+            height: 34px; 
+            border: 2.5px solid var(--neutral-border); 
+            border-top-color: var(--brand-orange); 
+            border-radius: 50%; 
+            animation: spin 0.7s linear infinite; 
+        }
+        
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; }
+        .loader-zy { color: #A3E635; } 
+        .loader-mart { color: #FDE047; }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes cartBounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        
+        .cart-badge.bounce { animation: cartBounce 0.3s ease; }
+        
+        .top-bar { 
+            background: var(--brand-green); 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            z-index: 1000; 
+            padding: 10px 14px; 
+            padding-top: calc(10px + var(--status-bar-height));
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            box-shadow: 0 2px 16px rgba(11,90,49,0.3); 
+        }
+        
+        .back-btn { 
+            width: 40px; 
+            height: 40px; 
+            min-width: 40px; 
+            background: rgba(255,255,255,0.10); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            border: none; 
+            color: white; 
+            font-size: 15px; 
+            text-decoration: none; 
+        }
+        
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        
+        .top-title { 
+            font-family: 'Poppins', sans-serif; 
+            flex: 1; 
+            font-size: 16px; 
+            font-weight: 700; 
+            color: white; 
+        }
+        
+        .brand-zy { color: #A3E635; } 
+        .brand-mart { color: #FDE047; }
+        
+        .cart-icon-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.10);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-size: 14px;
+            position: relative;
+            text-decoration: none;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--brand-orange);
+            color: white;
+            border-radius: 50%;
+            width: 17px;
+            height: 17px;
+            font-size: 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--brand-green);
+            font-weight: 700;
+        }
+        
+        .cart-badge.show { display: flex; }
+        
+        .share-btn { 
+            width: 40px; 
+            height: 40px; 
+            min-width: 40px; 
+            background: rgba(255,255,255,0.10); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            border: none; 
+            color: white; 
+            font-size: 14px; 
+        }
+        
+        .share-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        
+        .main-content { 
+            padding-top: 62px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            min-height: 70vh; 
+        }
+        
+        .holiday-strip {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #FEE2E2;
+            color: #DC2626;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 10px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid #FECACA;
+        }
+        
+        .holiday-strip.show { display: flex; }
+        
+        .status-banner { 
+            margin: 12px 14px; 
+            padding: 16px; 
+            border-radius: var(--radius-md); 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            animation: slideUp 0.3s ease; 
+        }
+        
+        .status-banner.pending { background: #FFF8EB; border: 1px solid #FDE68A; }
+        .status-banner.confirmed { background: #EFF6FF; border: 1px solid #BFDBFE; }
+        .status-banner.delivered { background: #EDF7F1; border: 1px solid #A7F3D0; }
+        .status-banner.cancelled { background: #FEF2F2; border: 1px solid #FECACA; }
+        .status-banner.shipped { background: #E0E7FF; border: 1px solid #A5B4FC; }
+        
+        .status-icon { 
+            width: 48px; 
+            height: 48px; 
+            min-width: 48px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px; 
+            flex-shrink: 0; 
+        }
+        
+        .pending .status-icon { background: #FDE68A; color: #D97706; }
+        .confirmed .status-icon { background: #BFDBFE; color: #2563EB; }
+        .delivered .status-icon { background: #A7F3D0; color: #059669; }
+        .cancelled .status-icon { background: #FECACA; color: #DC2626; }
+        .shipped .status-icon { background: #C7D2FE; color: #4F46E5; }
+        
+        .status-text { flex: 1; }
+        .status-title { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; line-height: 1.3; }
+        .status-subtitle { font-size: 12px; color: var(--neutral-gray); margin-top: 2px; line-height: 1.4; }
+        
+        .section { 
+            background: var(--neutral-white); 
+            margin: 10px 14px; 
+            border-radius: var(--radius-md); 
+            padding: 16px; 
+            border: 1px solid var(--neutral-border); 
+            box-shadow: var(--shadow-xs); 
+            animation: slideUp 0.3s ease; 
+        }
+        
+        .section-title { 
+            font-family: 'Poppins', sans-serif; 
+            font-size: 14px; 
+            font-weight: 700; 
+            margin-bottom: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        
+        .section-title i { color: var(--brand-green); width: 18px; font-size: 15px; text-align: center; }
+        
+        .info-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 6px 0; 
+            font-size: 13px; 
+        }
+        
+        .info-label { color: var(--neutral-gray); font-weight: 500; }
+        .info-value { font-weight: 600; text-align: right; max-width: 60%; word-break: break-word; font-size: 13px; }
+        
+        .info-value.order-id-display { 
+            font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace; 
+            font-size: 13px; 
+            font-weight: 600; 
+            letter-spacing: 0.5px; 
+            background: #F3F5F4; 
+            padding: 4px 10px; 
+            border-radius: 8px; 
+            color: #0B5A31; 
+            border: 1px solid #E5E7EB; 
+        }
+        
+        .gps-verified-badge { 
+            display: inline-block; 
+            background: #EDF7F1; 
+            color: #0B5A31; 
+            font-size: 9px; 
+            padding: 2px 8px; 
+            border-radius: 9999px; 
+            font-weight: 600; 
+            margin-left: 4px; 
+        }
+        
+        .order-item { 
+            display: flex; 
+            gap: 10px; 
+            padding: 10px 0; 
+            border-bottom: 1px solid var(--neutral-border); 
+            align-items: flex-start; 
+        }
+        
+        .order-item:last-child { border-bottom: none; }
+        
+        .item-img { 
+            width: 52px; 
+            height: 52px; 
+            min-width: 52px; 
+            border-radius: var(--radius-sm); 
+            background: var(--neutral-bg); 
+            flex-shrink: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+        }
+        
+        .item-img img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+        .item-img i { font-size: 20px; color: #D1D5DB; }
+        
+        .item-detail { flex: 1; min-width: 0; }
+        .item-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; line-height: 1.3; }
+        
+        .item-variant { 
+            display: inline-block; 
+            font-size: 10px; 
+            color: var(--brand-green); 
+            font-weight: 600; 
+            background: #EDF7F1; 
+            padding: 1px 6px; 
+            border-radius: 9999px; 
+            margin-top: 3px; 
+        }
+        
+        .item-meta { font-size: 11px; color: var(--neutral-gray); margin-top: 2px; }
+        .item-price { font-size: 14px; font-weight: 700; text-align: right; white-space: nowrap; }
+        
+        .bill-row { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 7px 0; 
+            font-size: 13px; 
+            color: var(--neutral-gray); 
+        }
+        
+        .bill-row.total { 
+            border-top: 2px solid var(--neutral-dark); 
+            padding-top: 12px; 
+            margin-top: 6px; 
+            font-size: 17px; 
+            font-weight: 800; 
+            color: var(--neutral-dark); 
+        }
+        
+        .bill-row.total .bill-amount { color: var(--brand-green); }
+        .free-tag { color: #10B981; font-weight: 700; }
+        
+        .address-card { font-size: 13px; line-height: 1.7; }
+        .address-card strong { font-family: 'Poppins', sans-serif; font-size: 14px; display: block; margin-bottom: 2px; }
+        .address-card .phone { color: var(--brand-green); font-weight: 600; }
+        .address-card p { color: var(--neutral-gray); margin-top: 2px; word-break: break-word; font-size: 12px; }
+        
+        .action-buttons { 
+            display: flex; 
+            gap: 10px; 
+            padding: 0 14px; 
+            margin-top: 16px; 
+            flex-wrap: wrap; 
+        }
+        
+        .action-btn { 
+            flex: 1; 
+            min-width: 100px; 
+            padding: 13px 10px; 
+            border-radius: var(--radius-full); 
+            font-size: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            text-align: center; 
+            transition: all 0.15s ease; 
+            border: none; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        
+        .btn-reorder { 
+            background: var(--brand-green); 
+            color: white; 
+            box-shadow: 0 4px 14px rgba(11,90,49,0.25); 
+        }
+        
+        .btn-reorder:active { background: var(--brand-green-dark); transform: scale(0.96); }
+        
+        .btn-cancel { 
+            background: #FEF2F2; 
+            color: #EF4444; 
+            border: 1px solid #FECACA; 
+        }
+        
+        .btn-cancel:active { background: #FECACA; transform: scale(0.96); }
+        
+        .btn-support { 
+            background: var(--neutral-bg); 
+            color: var(--neutral-dark); 
+            border: 1px solid var(--neutral-border); 
+        }
+        
+        .btn-support:active { background: var(--neutral-border); transform: scale(0.96); }
+        
+        .cancel-modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(8,61,33,0.75); 
+            backdrop-filter: blur(8px); 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 9990; 
+        }
+        
+        .cancel-modal.show { display: flex; }
+        
+        .cancel-card { 
+            background: white; 
+            border-radius: var(--radius-xl); 
+            padding: 28px 24px; 
+            width: 90%; 
+            max-width: 330px; 
+            text-align: center; 
+            animation: slideUp 0.3s ease; 
+            box-shadow: var(--shadow-lg); 
+        }
+        
+        .cancel-card .warn-icon { font-size: 40px; color: #EF4444; margin-bottom: 10px; }
+        .cancel-card h4 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .cancel-card p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 18px; line-height: 1.5; }
+        
+        .cancel-card button { 
+            width: 100%; 
+            padding: 13px; 
+            border-radius: var(--radius-full); 
+            font-size: 13px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            border: none; 
+            margin-bottom: 8px; 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        .cancel-confirm { background: #EF4444; color: white; }
+        .cancel-confirm:active { background: #DC2626; }
+        .cancel-dismiss { background: var(--neutral-bg); color: var(--neutral-dark); border: 1px solid var(--neutral-border); }
+        
+        .toast { 
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: var(--neutral-dark); 
+            color: white; 
+            padding: 11px 22px; 
+            border-radius: var(--radius-full); 
+            font-size: 12px; 
+            z-index: 10050; 
+            opacity: 0; 
+            visibility: hidden; 
+            white-space: nowrap; 
+            box-shadow: var(--shadow-lg); 
+            transition: all 0.3s ease; 
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .toast.show { opacity: 1; visibility: visible; }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+        
+        @media (max-width: 380px) {
+            .status-title { font-size: 15px; } 
+            .section-title { font-size: 13px; }
+            .item-name { font-size: 12px; } 
+            .item-price { font-size: 13px; }
+            .bill-row { font-size: 12px; } 
+            .bill-row.total { font-size: 16px; }
+            .action-btn { font-size: 11px; min-width: 85px; padding: 11px 8px; }
+            .section { padding: 14px; margin: 8px 10px; } 
+            .status-banner { margin: 8px 10px; padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader">
+    <div class="simple-spinner"></div>
+    <div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div>
+</div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <a href="orders.html" class="back-btn" aria-label="Back"><i class="fas fa-arrow-left"></i></a>
+        <span class="top-title"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span> Details</span>
+        <a href="cart.html" class="cart-icon-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <button class="share-btn" id="shareBtn" onclick="shareOrder()" aria-label="Share"><i class="fas fa-share-alt"></i></button>
+    </div>
+    
+    <div class="holiday-strip" id="holidayStrip">
+        <i class="fas fa-calendar-times"></i> 
+        <span id="holidayStripText">🏖️ आज डिलीवरी बंद है</span>
+    </div>
+    
+    <div class="main-content" id="mainContent">
+        <div style="text-align:center;padding:60px;">
+            <div class="simple-spinner" style="margin:0 auto 12px;"></div>
+            <p style="color:#6B7280;">Loading order...</p>
+        </div>
+    </div>
+</div>
+
+<div class="cancel-modal" id="cancelModal">
+    <div class="cancel-card">
+        <div class="warn-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <h4>Cancel Order?</h4>
+        <p>Are you sure you want to cancel this order? This action cannot be undone.</p>
+        <button class="cancel-confirm" id="cancelConfirmBtn" onclick="confirmCancel()">Yes, Cancel Order</button>
+        <button class="cancel-dismiss" onclick="closeCancelModal()">No, Keep It</button>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg"><span id="toastText"></span></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'
+    };
+    
+    var sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    var SUPABASE_URL = CONFIG.SUPABASE_URL;
+    
+    var orderData = null, orderId = null, currentUser = null, isCancelling = false;
+    var isHolidayToday = false;
+    var holidayReason = '';
+    
+    try { 
+        orderId = new URLSearchParams(window.location.search).get('id'); 
+    } catch(e) { 
+        orderId = null; 
+    }
+    
+    function getEl(id) { return document.getElementById(id); }
+    function safeJSON(s, f) { try { return s ? JSON.parse(s) : f; } catch(e) { return f; } }
+    function esc(str) { if (!str) return ''; var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+    
+    function getFullUrl(u) { 
+        if (!u || typeof u !== 'string') return ''; 
+        if (u.indexOf('http')===0 || u.indexOf('data:')===0) return u; 
+        return SUPABASE_URL + '/storage/v1/object/public/' + u; 
+    }
+    
+    function showApp() { 
+        var l = getEl('simpleLoader'), a = getEl('mainApp'); 
+        if (a) a.style.display = ''; 
+        if (l) { 
+            l.classList.add('fade-out'); 
+            setTimeout(function() { 
+                if (l && l.parentNode) l.parentNode.removeChild(l); 
+            }, 350); 
+        } 
+    }
+    
+    function showToast(m, type) { 
+        var t = getEl('toastMsg'), s = getEl('toastText'); 
+        if (!t || !s) return; 
+        s.textContent = m; 
+        t.className = 'toast';
+        if (type === 'error') t.classList.add('error');
+        else if (type === 'success') t.classList.add('success');
+        t.classList.add('show'); 
+        clearTimeout(t._timer); 
+        t._timer = setTimeout(function() { 
+            t.classList.remove('show','error','success'); 
+        }, 2500); 
+    }
+    
+    // ==================== CART MANAGER ====================
+    var CartManager = {
+        getCart: function() {
+            return safeJSON(localStorage.getItem('zymart_cart'), []);
+        },
+        
+        saveCart: function(cart) {
+            try { localStorage.setItem('zymart_cart', JSON.stringify(cart)); } catch(e) {}
+            this.updateBadge();
+        },
+        
+        getTotalItems: function() {
+            var cart = this.getCart();
+            return cart.reduce(function(sum, item) { return sum + (item.quantity || 1); }, 0);
+        },
+        
+        updateBadge: function() {
+            var totalItems = this.getTotalItems();
+            var badge = getEl('cartBadge');
+            
+            if (badge) {
+                badge.textContent = totalItems;
+                if (totalItems > 0) {
+                    badge.classList.add('show');
+                    badge.classList.add('bounce');
+                    setTimeout(function() { badge.classList.remove('bounce'); }, 300);
+                } else {
+                    badge.classList.remove('show');
+                }
+            }
+        }
+    };
+    
+    // ==================== HOLIDAY CHECK ====================
+    async function checkHoliday() {
+        try {
+            var r = await sb.from('delivery_settings')
+                .select('is_holiday, holiday_reason, holiday_date, is_open')
+                .eq('is_active', true)
+                .single();
+                
+            if(r.data) {
+                if(r.data.is_holiday) {
+                    var today = new Date().toISOString().split('T')[0];
+                    if(r.data.holiday_date === today) {
+                        isHolidayToday = true;
+                        holidayReason = r.data.holiday_reason || 'आज डिलीवरी बंद है';
+                    }
+                }
+                
+                if(r.data.is_open === false) {
+                    isHolidayToday = true;
+                    if(!holidayReason) {
+                        holidayReason = 'दुकान अभी बंद है';
+                    }
+                }
+                
+                if(isHolidayToday) {
+                    var strip = getEl('holidayStrip');
+                    if(strip) {
+                        strip.classList.add('show');
+                        getEl('holidayStripText').textContent = '🏖️ ' + holidayReason;
+                    }
+                }
+            }
+        } catch(e) {
+            console.error('Holiday check error:', e);
+        }
+    }
+    
+    function fmtWeight(w, u) {
+        if (!w) return '';
+        var nw = parseFloat(w);
+        if (isNaN(nw)) return String(w);
+        var unitLower = u ? u.toLowerCase() : '';
+        if (unitLower === 'gram' || unitLower === 'g') return nw >= 1000 ? (nw/1000).toFixed(1).replace(/\.0$/,'') + ' kg' : nw + ' g';
+        if (unitLower === 'kg') return nw + ' kg';
+        if (unitLower === 'liter' || unitLower === 'l') return nw + ' L';
+        if (unitLower === 'ml') return nw + ' ml';
+        return nw + ' ' + (u || '');
+    }
+    
+    function goToLogin() { 
+        try { sessionStorage.setItem('zymart_redirect_after_login', 'order-details.html?id=' + orderId); } catch(e) {}
+        window.location.href = 'login.html'; 
+    }
+    
+    async function checkUser() { 
+        try { 
+            var r = await sb.auth.getSession(); 
+            if (r && r.data && r.data.session) { 
+                currentUser = r.data.session.user; 
+                return true; 
+            } 
+        } catch(e) {}
+        
+        try { 
+            var session = JSON.parse(localStorage.getItem('zymart_session') || 'null'); 
+            if (session && session.userId) { 
+                currentUser = { id: session.userId, phone: session.phone }; 
+                return true; 
+            } 
+        } catch(e) {}
+        
+        currentUser = null; 
+        return false;
+    }
+    
+    function getStatusInfo(s) { 
+        var m = { 
+            'pending': { icon: 'fa-clock', title: 'Order Pending', subtitle: 'Waiting for shop confirmation', cls: 'pending' }, 
+            'confirmed': { icon: 'fa-check-circle', title: 'Order Confirmed', subtitle: 'Your order is being prepared', cls: 'confirmed' }, 
+            'shipped': { icon: 'fa-truck', title: 'On the Way! 🚀', subtitle: 'Your order will arrive soon', cls: 'shipped' }, 
+            'delivered': { icon: 'fa-box-check', title: 'Delivered! 🎉', subtitle: 'Enjoy your purchase!', cls: 'delivered' }, 
+            'cancelled': { icon: 'fa-times-circle', title: 'Order Cancelled', subtitle: 'This order has been cancelled', cls: 'cancelled' } 
+        }; 
+        return m[s] || m['pending']; 
+    }
+    
+    async function loadOrder() {
+        var c = getEl('mainContent');
+        
+        if (!orderId) { 
+            if (c) c.innerHTML = '<div style="text-align:center;padding:50px;"><i class="fas fa-exclamation-circle" style="font-size:52px;color:#D1D5DB;margin-bottom:12px;display:block;"></i><h3>Order Not Found</h3><p style="color:#6B7280;">No order ID provided</p><button onclick="window.location.href=\'orders.html\'" style="background:var(--brand-green);color:white;border:none;padding:11px 24px;border-radius:var(--radius-full);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">📋 View All Orders</button></div>'; 
+            showApp();
+            return; 
+        }
+        
+        try {
+            var r = await sb.from('orders').select('*').eq('id', orderId).single();
+            
+            if (r && r.data) { 
+                orderData = r.data; 
+                renderOrder(); 
+            } else if (c) { 
+                c.innerHTML = '<div style="text-align:center;padding:50px;"><i class="fas fa-search" style="font-size:52px;color:#D1D5DB;margin-bottom:12px;display:block;"></i><h3>Order Not Found</h3><p style="color:#6B7280;">This order may have been removed</p><button onclick="window.location.href=\'orders.html\'" style="background:var(--brand-green);color:white;border:none;padding:11px 24px;border-radius:var(--radius-full);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">📋 View All Orders</button></div>'; 
+            }
+            
+            showApp();
+            
+        } catch(e) { 
+            console.error('Load order error:', e);
+            if (c) c.innerHTML = '<div style="text-align:center;padding:50px;"><i class="fas fa-exclamation-circle" style="font-size:52px;color:#D1D5DB;margin-bottom:12px;display:block;"></i><h3>Failed to Load</h3><p style="color:#6B7280;">Please check your connection</p><button onclick="loadOrder()" style="background:var(--brand-green);color:white;border:none;padding:11px 24px;border-radius:var(--radius-full);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">🔄 Retry</button></div>'; 
+            showApp();
+        }
+    }
+    
+    function renderOrder() {
+        if (!orderData) return;
+        
+        var si = getStatusInfo(orderData.status);
+        var oid = '#' + (orderData.id || '').substring(0, 8).toUpperCase();
+        var date = orderData.created_at ? new Date(orderData.created_at).toLocaleDateString('en-IN', { 
+            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+        }) : '';
+        
+        var items = [];
+        try { 
+            items = typeof orderData.items === 'string' ? JSON.parse(orderData.items) : (orderData.items || []); 
+        } catch(e) { 
+            items = []; 
+        }
+        
+        var subtotal = parseFloat(orderData.subtotal) || 0;
+        var df = parseFloat(orderData.delivery_fee) || 0;
+        var total = parseFloat(orderData.total_amount) || (subtotal + df);
+        
+        var html = '';
+        
+        // Status banner
+        html += '<div class="status-banner ' + si.cls + '">';
+        html += '<div class="status-icon"><i class="fas ' + si.icon + '"></i></div>';
+        html += '<div class="status-text"><div class="status-title">' + si.title + '</div>';
+        html += '<div class="status-subtitle">' + si.subtitle + '</div></div></div>';
+        
+        // Order info
+        html += '<div class="section"><div class="section-title"><i class="fas fa-info-circle"></i> Order Information</div>';
+        html += '<div class="info-row"><span class="info-label">Order ID</span><span class="info-value order-id-display">' + oid + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">Date & Time</span><span class="info-value">' + esc(date) + '</span></div>';
+        html += '<div class="info-row"><span class="info-label">Payment Method</span><span class="info-value">' + (orderData.payment_method === 'cod' ? '💵 Cash on Delivery' : '📱 Online') + '</span></div>';
+        
+        if (orderData.location_verified) {
+            html += '<div class="info-row"><span class="info-label">Location</span><span class="info-value"><span class="gps-verified-badge">📍 GPS Verified</span></span></div>';
+        }
+        html += '</div>';
+        
+        // Items
+        html += '<div class="section"><div class="section-title"><i class="fas fa-shopping-bag"></i> Order Items (' + items.length + ')</div>';
+        
+        for (var i = 0; i < items.length; i++) { 
+            var item = items[i];
+            var qty = item.quantity || 1;
+            var price = parseFloat(item.price) || 0;
+            var img = getFullUrl(item.image || '');
+            var itemTotal = price * qty;
+            
+            var variantLabel = '';
+            if (item.variant_weight) {
+                variantLabel = '⚖️ ' + fmtWeight(item.variant_weight, item.variant_unit);
+            }
+            
+            html += '<div class="order-item">';
+            html += '<div class="item-img">';
+            
+            if(img) {
+                html += '<img src="' + img + '" loading="lazy" alt="" onerror="this.parentElement.innerHTML=\'<i class=&#34;fas fa-box-open&#34;></i>\'">';
+            } else {
+                html += '<i class="fas fa-box-open"></i>';
+            }
+            
+            html += '</div>';
+            html += '<div class="item-detail">';
+            html += '<div class="item-name">' + esc(item.product_name || item.name || 'Product') + '</div>';
+            if (variantLabel) html += '<span class="item-variant">' + variantLabel + '</span>';
+            html += '<div class="item-meta">' + qty + ' × ₹' + price.toLocaleString('en-IN') + '</div>';
+            html += '</div>';
+            html += '<div class="item-price">₹' + itemTotal.toLocaleString('en-IN') + '</div>';
+            html += '</div>'; 
+        }
+        html += '</div>';
+        
+        // Bill
+        html += '<div class="section"><div class="section-title"><i class="fas fa-receipt"></i> Bill Details</div>';
+        html += '<div class="bill-row"><span>Item Total</span><span>₹' + subtotal.toLocaleString('en-IN') + '</span></div>';
+        html += '<div class="bill-row"><span>Delivery Fee</span><span class="' + (df === 0 ? 'free-tag' : '') + '">' + (df === 0 ? '🎉 FREE' : '₹' + df.toLocaleString('en-IN')) + '</span></div>';
+        html += '<div class="bill-row total"><span>Total Amount</span><span class="bill-amount">₹' + total.toLocaleString('en-IN') + '</span></div>';
+        html += '</div>';
+        
+        // Address
+        html += '<div class="section"><div class="section-title"><i class="fas fa-map-marker-alt"></i> Delivery Address';
+        if (orderData.location_verified) html += '<span class="gps-verified-badge">📍 GPS Verified</span>';
+        html += '</div>';
+        html += '<div class="address-card"><strong>' + esc(orderData.customer_name || 'Customer') + '</strong> <span class="phone">📞 +91 ' + esc(orderData.customer_phone || '') + '</span>';
+        html += '<p>' + esc(orderData.customer_address || '') + ', ' + esc(orderData.customer_city || '') + ' - ' + esc(orderData.customer_pincode || '') + '</p>';
+        if (orderData.gps_address) html += '<p style="margin-top:4px;font-size:10px;"><i class="fas fa-satellite"></i> GPS: ' + esc(orderData.gps_address) + '</p>';
+        html += '</div></div>';
+        
+        // Actions
+        html += '<div class="action-buttons">';
+        
+        if(isHolidayToday) {
+            html += '<button class="action-btn btn-reorder" disabled><i class="fas fa-lock"></i> Delivery Closed</button>';
+        } else {
+            html += '<button class="action-btn btn-reorder" onclick="reorder()"><i class="fas fa-redo"></i> Reorder All</button>';
+        }
+        
+        if (orderData.status === 'pending') {
+            html += '<button class="action-btn btn-cancel" onclick="showCancelModal()"><i class="fas fa-times"></i> Cancel Order</button>';
+        }
+        
+        html += '<button class="action-btn btn-support" onclick="window.open(\'https://wa.me/918600252238\',\'_blank\')"><i class="fab fa-whatsapp"></i> Help</button>';
+        html += '</div>';
+        
+        getEl('mainContent').innerHTML = html;
+    }
+    
+    window.shareOrder = function() {
+        if (!orderData) return;
+        
+        var items = [];
+        try { 
+            items = typeof orderData.items === 'string' ? JSON.parse(orderData.items) : (orderData.items || []); 
+        } catch(e) {}
+        
+        var text = '🧾 ZyMart+ Order #' + (orderData.id || '').substring(0, 8).toUpperCase() + 
+                   '\n📦 ' + items.length + ' items | ₹' + (parseFloat(orderData.total_amount) || 0).toLocaleString('en-IN');
+        
+        if (navigator.share) { 
+            navigator.share({ title: 'ZyMart+ Order', text: text }).catch(function() {}); 
+        } else { 
+            navigator.clipboard.writeText(text).then(function() { 
+                showToast('📋 Order details copied!', 'success'); 
+            }); 
+        }
+    };
+    
+    // ==================== REORDER (FIXED) ====================
+    window.reorder = function() {
+        if(isHolidayToday) {
+            showToast('🏖️ ' + holidayReason, 'error');
+            return;
+        }
+        
+        if (!orderData || !orderData.items) { 
+            showToast('No items to reorder', 'error'); 
+            return; 
+        }
+        
+        var items = [];
+        try { 
+            items = typeof orderData.items === 'string' ? JSON.parse(orderData.items) : orderData.items; 
+        } catch(e) { 
+            items = []; 
+        }
+        
+        if (!items.length) { 
+            showToast('No items found', 'error'); 
+            return; 
+        }
+        
+        var cart = CartManager.getCart();
+        var addedCount = 0;
+        
+        for (var i = 0; i < items.length; i++) { 
+            var item = items[i];
+            var iid = item.product_id || item.id; 
+            if (!iid) continue;
+            
+            var cartKey = item.variant_key || iid;
+            var found = cart.find(function(c) { 
+                return c.cartKey === cartKey || c.id === iid; 
+            }); 
+            
+            if (found) {
+                found.quantity += (item.quantity || 1); 
+            } else {
+                cart.push({ 
+                    id: iid, 
+                    cartKey: cartKey, 
+                    name: item.product_name || item.name || 'Product', 
+                    price: item.price || 0, 
+                    image: getFullUrl(item.image || ''), 
+                    quantity: item.quantity || 1, 
+                    variantKey: item.variant_key || null,
+                    variantWeight: item.variant_weight || null,
+                    variantUnit: item.variant_unit || null,
+                    stock: 999
+                }); 
+            }
+            addedCount++;
+        }
+        
+        CartManager.saveCart(cart);
+        showToast('🛒 ' + addedCount + ' item(s) added to cart!', 'success');
+        
+        setTimeout(function() { 
+            window.location.href = 'cart.html'; 
+        }, 600);
+    };
+    
+    window.showCancelModal = function() { 
+        if (!isCancelling) getEl('cancelModal').classList.add('show'); 
+    };
+    
+    window.closeCancelModal = function() { 
+        if (!isCancelling) getEl('cancelModal').classList.remove('show'); 
+    };
+    
+    window.confirmCancel = async function() {
+        if (isCancelling) return; 
+        isCancelling = true;
+        
+        var btn = getEl('cancelConfirmBtn'); 
+        if (btn) { 
+            btn.disabled = true; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cancelling...'; 
+        }
+        
+        try {
+            if (!currentUser) { 
+                var li = await checkUser(); 
+                if (!li) { 
+                    showToast('🔐 Please login first', 'error'); 
+                    closeCancelModal(); 
+                    isCancelling = false; 
+                    if (btn) { 
+                        btn.disabled = false; 
+                        btn.innerHTML = 'Yes, Cancel Order'; 
+                    } 
+                    goToLogin(); 
+                    return; 
+                } 
+            }
+            
+            await sb.from('orders')
+                .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+                .eq('id', orderData.id)
+                .eq('user_id', currentUser.id);
+            
+            orderData.status = 'cancelled'; 
+            closeCancelModal(); 
+            renderOrder(); 
+            showToast('❌ Order cancelled successfully');
+            
+        } catch(e) { 
+            showToast('❌ Failed to cancel order', 'error'); 
+        }
+        
+        isCancelling = false; 
+        if (btn) { 
+            btn.disabled = false; 
+            btn.innerHTML = 'Yes, Cancel Order'; 
+        }
+    };
+    
+    // ==================== EVENT LISTENERS ====================
+    window.addEventListener('storage', function(e) {
+        if(e.key === 'zymart_cart') {
+            CartManager.updateBadge();
+        }
+    });
+    
+    document.addEventListener('visibilitychange', function() {
+        if(document.visibilityState === 'visible') {
+            CartManager.updateBadge();
+        }
+    });
+    
+    // ==================== INITIALIZATION ====================
+    async function init() {
+        await checkHoliday();
+        CartManager.updateBadge();
+        
+        var loggedIn = await checkUser();
+        
+        if (!loggedIn) { 
+            getEl('mainContent').innerHTML = '<div style="text-align:center;padding:50px;"><i class="fas fa-user-lock" style="font-size:52px;color:#D1D5DB;margin-bottom:12px;display:block;"></i><h3>Login Required</h3><p style="color:#6B7280;margin-bottom:16px;">Please login to view order details</p><button onclick="goToLogin()" style="background:#F59E0B;color:#1a1a1a;border:none;padding:12px 28px;border-radius:var(--radius-full);font-size:14px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-sign-in-alt"></i> Login / Register</button></div>'; 
+            showApp(); 
+            return; 
+        }
+        
+        await loadOrder(); 
+        showApp();
+    }
+    
+    document.addEventListener('DOMContentLoaded', init);
+    
+    // ==================== EXPOSE GLOBAL FUNCTIONS ====================
+    window.goToLogin = goToLogin;
+    window.shareOrder = shareOrder;
+    window.reorder = reorder;
+    window.showCancelModal = showCancelModal;
+    window.closeCancelModal = closeCancelModal;
+    window.confirmCancel = confirmCancel;
+    window.CartManager = CartManager;
+    
+})();
+</script>
+</body>
+</html>
