@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Franchise Partner Registration - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        :root { --brand-green: #0B5A31; --brand-green-dark: #083D21; --brand-orange: #F59E0B; --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB; --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444; --success: #22C55E; --warning: #F59E0B; --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --shadow-lg: 0 8px 30px rgba(0,0,0,0.12); --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-xl: 22px; --radius-2xl: 28px; --radius-full: 9999px; --status-bar-height: env(safe-area-inset-top, 0px); --top-bar-height: 60px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); -webkit-tap-highlight-color: transparent; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; width: 100%; max-width: 100%; -webkit-font-smoothing: antialiased; }
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--neutral-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; transition: opacity 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; }
+        .loader-zy { color: #A3E635; } .loader-mart { color: #FDE047; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(11,90,49,0.4); } 50% { box-shadow: 0 0 0 10px rgba(11,90,49,0); } }
+
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; padding-top: calc(10px + var(--status-bar-height)); display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .top-bar-spacer { height: var(--top-bar-height); display: block; width: 100%; }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; text-decoration: none; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .brand-name { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; display: flex; align-items: baseline; }
+        .brand-zy { color: #A3E635; } .brand-mart { color: #FDE047; }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 13px; color: white; }
+        .cart-icon-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; position: relative; text-decoration: none; }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--brand-orange); color: white; border-radius: 50%; width: 17px; height: 17px; font-size: 8px; display: none; align-items: center; justify-content: center; border: 2px solid var(--brand-green); font-weight: 700; }
+        .cart-badge.show { display: flex; }
+
+        .main-content { padding-bottom: 40px; max-width: 600px; margin: 0 auto; }
+        @media (min-width: 768px) { .main-content { max-width: 700px; } .form-body { padding: 24px 28px; } .hero-section { padding: 28px; } .hero-section h1 { font-size: 22px; } }
+        .hero-section { background: linear-gradient(135deg, var(--brand-green), var(--brand-green-dark)); margin: 12px 14px; padding: 20px; border-radius: var(--radius-2xl); animation: fadeInUp 0.4s ease; text-align: center; color: white; }
+        .hero-section h1 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; }
+        .hero-section p { font-size: 11px; opacity: 0.85; margin-top: 4px; }
+        .fee-badge { display: inline-block; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: var(--radius-full); font-weight: 700; font-size: 14px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.25); }
+        .fee-badge small { display: block; font-size: 10px; opacity: 0.85; font-weight: 500; margin-top: 2px; }
+        .form-card { background: white; margin: 0 14px 20px; border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; animation: fadeInUp 0.4s ease; }
+        .form-header { padding: 16px 20px; border-bottom: 1px solid var(--neutral-border); background: #EDF7F1; display: flex; align-items: center; gap: 8px; }
+        .form-header i { color: var(--brand-green); font-size: 18px; }
+        .form-header h2 { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; color: var(--brand-green-dark); }
+        .form-body { padding: 18px 20px; }
+        .form-group { margin-bottom: 14px; }
+        .form-label { font-weight: 600; font-size: 12px; margin-bottom: 4px; display: block; color: var(--neutral-dark); }
+        .form-label i { color: var(--brand-green); width: 16px; margin-right: 3px; }
+        .form-label .required { color: var(--danger); }
+        .form-label .optional { color: var(--neutral-gray); font-weight: 400; font-size: 10px; }
+        .form-control { width: 100%; padding: 12px 14px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; background: white; transition: all 0.15s ease; }
+        .form-control:focus { border-color: var(--brand-orange); box-shadow: 0 0 0 3px rgba(245,158,11,0.08); }
+        .form-control.locked { background: #D1FAE5; border: 1.5px solid #22C55E; }
+        select.form-control { -webkit-appearance: none; padding-right: 32px; }
+        textarea.form-control { resize: vertical; min-height: 60px; }
+        .image-upload-area { border: 2px dashed var(--brand-green); border-radius: var(--radius-sm); padding: 16px; text-align: center; cursor: pointer; background: #EDF7F1; transition: all 0.15s ease; }
+        .image-upload-area:active { background: #C8E6C9; }
+        .image-upload-area i { font-size: 24px; color: var(--brand-green); margin-bottom: 4px; }
+        .image-upload-area p { font-size: 11px; color: var(--brand-green); font-weight: 500; }
+        .image-preview { max-width: 100%; max-height: 120px; margin-top: 8px; border-radius: var(--radius-sm); display: none; }
+        .location-btn { width: 100%; padding: 14px; background: #EDF7F1; border: 2px solid var(--brand-green); border-radius: var(--radius-sm); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--brand-green); transition: all 0.2s ease; font-family: 'Inter', sans-serif; animation: pulse 2s infinite; box-shadow: 0 4px 15px rgba(11,90,49,0.2); }
+        .location-btn:active { background: #C8E6C9; transform: scale(0.97); }
+        .location-btn:disabled { opacity: 0.7; cursor: not-allowed; animation: none; box-shadow: none; }
+        .location-btn.success { background: #22C55E; color: white; border-color: #22C55E; animation: none; box-shadow: none; }
+        .location-status { font-size: 11px; padding: 10px 12px; border-radius: var(--radius-sm); background: #F3F5F4; margin-top: 10px; display: flex; align-items: center; gap: 6px; }
+        .location-status.success { color: #059669; background: #EDF7F1; border: 1px solid #A7F3D0; }
+        .gps-coords-display { font-size: 10px; color: var(--brand-green); font-weight: 600; margin-top: 6px; font-family: monospace; display: none; }
+        .gps-coords-display.show { display: block; }
+        .gps-address-display { font-size: 10px; color: var(--neutral-gray); margin-top: 4px; display: none; line-height: 1.3; }
+        .gps-address-display.show { display: block; }
+        .otp-section { background: #FFF8EB; border: 2px solid #FDE68A; border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px; display: none; }
+        .otp-section.show { display: block; }
+        .otp-section.verified { background: #D1FAE5; border: 2px solid #22C55E; }
+        .btn { width: 100%; padding: 14px; border-radius: var(--radius-full); font-weight: 600; font-size: 14px; cursor: pointer; border: none; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s ease; margin-bottom: 8px; }
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-green { background: var(--brand-green); color: white; }
+        .btn-orange { background: var(--brand-orange); color: white; box-shadow: 0 4px 14px rgba(245,158,11,0.25); }
+        .btn-outline { background: white; color: var(--brand-green); border: 1.5px solid var(--brand-green); }
+        .btn-gray { background: #F3F5F4; color: #374151; }
+        .fee-summary { background: #F3F5F4; border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 14px; border: 1px solid var(--neutral-border); }
+        .fee-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; align-items: center; }
+        .fee-row .fee-label { color: var(--neutral-dark); font-weight: 500; }
+        .fee-row .fee-value { font-weight: 600; color: var(--neutral-dark); }
+        .fee-row.gst .fee-label { color: var(--neutral-gray); font-size: 12px; }
+        .fee-row.gst .fee-value { color: var(--neutral-gray); font-size: 12px; }
+        .fee-row.total { border-top: 2px solid var(--brand-green); padding-top: 10px; margin-top: 6px; font-weight: 800; font-size: 16px; }
+        .fee-row.total .fee-value { color: var(--brand-green); font-size: 18px; }
+        .fee-row.gst-note { font-size: 10px; color: var(--neutral-gray); padding-top: 2px; margin-bottom: 0; }
+        .terms-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; background: #FFF8EB; border: 1.5px solid #FDE68A; border-radius: var(--radius-md); margin-bottom: 14px; cursor: pointer; transition: all 0.2s; }
+        .terms-row.accepted { background: #EDF7F1; border-color: #A7F3D0; }
+        .terms-checkbox { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--brand-green); border-radius: 6px; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0; margin-top: 1px; }
+        .terms-checkbox.checked { background: var(--brand-green); }
+        .terms-checkbox.checked::after { content: '✓'; color: white; font-weight: 800; font-size: 14px; }
+        .terms-text { flex: 1; font-size: 12px; line-height: 1.5; color: var(--neutral-dark); font-weight: 500; }
+        .terms-text a { color: var(--brand-green); font-weight: 700; text-decoration: underline; cursor: pointer; }
+
+        .terms-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8,61,33,0.75); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 10005; padding: 16px; }
+        .terms-modal.show { display: flex; }
+        .terms-modal-content { background: white; border-radius: var(--radius-2xl); max-width: 500px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; animation: fadeInUp 0.3s ease; overflow: hidden; }
+        .terms-modal-header { padding: 16px 20px; border-bottom: 1px solid var(--neutral-border); background: #EDF7F1; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .terms-modal-header h2 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: var(--brand-green-dark); display: flex; align-items: center; gap: 8px; }
+        .terms-modal-close { width: 32px; height: 32px; background: white; border: none; border-radius: 50%; cursor: pointer; font-size: 14px; color: var(--neutral-gray); display: flex; align-items: center; justify-content: center; }
+        .terms-modal-body { padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+        .terms-modal-body h3 { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; margin: 16px 0 8px; color: var(--brand-green-dark); }
+        .terms-modal-body h3:first-child { margin-top: 0; }
+        .terms-modal-body p { font-size: 12.5px; line-height: 1.6; color: #374151; margin-bottom: 10px; }
+        .terms-modal-footer { padding: 14px 20px; border-top: 1px solid var(--neutral-border); background: #F9FAFB; display: flex; gap: 10px; flex-shrink: 0; }
+        .terms-modal-footer .btn { margin-bottom: 0; }
+
+        .text-muted { color: var(--neutral-gray); font-size: 10px; text-align: center; margin-top: 8px; }
+        .error-msg { background: #FEF2F2; color: #DC2626; padding: 8px 12px; border-radius: 8px; font-size: 11px; margin-bottom: 10px; display: none; }
+        .error-msg.show { display: block; }
+        .success-msg { background: #D1FAE5; color: #059669; padding: 8px 12px; border-radius: 8px; font-size: 11px; margin-bottom: 10px; display: none; }
+        .success-msg.show { display: block; }
+        .verified-badge { display: none; background: #22C55E; color: white; padding: 8px 12px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; white-space: nowrap; }
+        .verified-badge.show { display: inline-block; }
+        .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-lg); transition: all 0.3s ease; max-width: 90%; overflow: hidden; text-overflow: ellipsis; }
+        .toast-notification.show { opacity: 1; visibility: visible; }
+        .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8,61,33,0.7); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 9990; padding: 16px; }
+        .alert-modal.show { display: flex; }
+        .alert-content { background: white; border-radius: var(--radius-xl); padding: 24px; max-width: 340px; width: 100%; text-align: center; animation: fadeInUp 0.3s ease; }
+        .alert-content i { font-size: 40px; display: block; margin-bottom: 10px; }
+        .alert-content h3 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .alert-content p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 14px; line-height: 1.5; white-space: pre-line; }
+        .alert-btn { background: var(--brand-green); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; width: 100%; font-size: 13px; font-family: 'Inter', sans-serif; margin-top: 6px; }
+        .alert-btn.orange { background: var(--brand-orange); color: #1a1a1a; }
+        .alert-btn.gray { background: #F3F5F4; color: #374151; }
+        .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+
+        /* ============ PREMIUM FRANCHISE SUCCESS POPUP ============ */
+        .franchise-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(11,90,49,0.96), rgba(8,61,33,0.99)); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 10099; padding: 16px; overflow-y: auto; }
+        .franchise-popup.show { display: flex; }
+        .franchise-popup-content { background: linear-gradient(180deg, #FFFCF0 0%, #FFFFFF 100%); border-radius: 28px; padding: 30px 22px 22px; max-width: 420px; width: 100%; text-align: center; border: 3px solid #F5B400; box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 6px rgba(245,180,0,0.15); animation: premiumZoomIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; margin: auto; }
+        .franchise-popup-content::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent 0deg, rgba(245,180,0,0.12) 60deg, transparent 120deg); animation: premiumRotate 8s linear infinite; pointer-events: none; }
+        @keyframes premiumRotate { to { transform: rotate(360deg); } }
+        @keyframes premiumZoomIn { 0% { opacity: 0; transform: scale(0.7); } 100% { opacity: 1; transform: scale(1); } }
+        .franchise-crown { width: 84px; height: 84px; background: linear-gradient(135deg, #FFD84D, #F5B400, #D89A00); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 42px; color: #FFFFFF; box-shadow: 0 10px 30px rgba(245,180,0,0.5), inset 0 -4px 8px rgba(0,0,0,0.15); position: relative; z-index: 1; animation: crownPulse 2s ease-in-out infinite; }
+        @keyframes crownPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .franchise-title { font-family: 'Poppins', sans-serif; font-size: 21px; font-weight: 800; color: #0B5A31; margin-bottom: 6px; line-height: 1.25; position: relative; z-index: 1; }
+        .franchise-subtitle { font-size: 12.5px; color: #4B5563; margin-bottom: 18px; line-height: 1.5; position: relative; z-index: 1; }
+        .franchise-details { background: linear-gradient(135deg, #F0F9F3, #E8F5EC); border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; border: 1px solid #A7F3D0; position: relative; z-index: 1; }
+        .franchise-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px dashed #A7F3D0; font-size: 12.5px; gap: 8px; }
+        .franchise-detail-row:last-child { border-bottom: none; }
+        .franchise-detail-label { color: #6B7280; font-weight: 500; white-space: nowrap; }
+        .franchise-detail-value { color: #0B5A31; font-weight: 800; font-family: 'Poppins', sans-serif; text-align: right; word-break: break-word; }
+        .franchise-next-steps { background: #FFF8E1; border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; text-align: left; border: 1px solid #FFE0B2; position: relative; z-index: 1; }
+        .franchise-next-steps h3 { font-family: 'Poppins', sans-serif; font-size: 13.5px; font-weight: 700; color: #B45309; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .franchise-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; font-size: 12px; color: #4B5563; line-height: 1.4; }
+        .franchise-step:last-child { margin-bottom: 0; }
+        .franchise-step-num { width: 20px; height: 20px; min-width: 20px; background: #F59E0B; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; margin-top: 1px; }
+        .franchise-whatsapp-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: #25D366; color: white; border: none; border-radius: 9999px; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; margin-bottom: 10px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 14px rgba(37,211,102,0.35); position: relative; z-index: 1; }
+        .franchise-home-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: #0B5A31; color: white; border: none; border-radius: 9999px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; box-shadow: 0 4px 14px rgba(11,90,49,0.3); position: relative; z-index: 1; }
+        .franchise-home-btn:active, .franchise-whatsapp-btn:active { transform: scale(0.97); }
+        .franchise-badge { display: inline-block; background: linear-gradient(135deg, #FFD84D, #F5B400); color: #5C4500; font-weight: 800; font-size: 10px; letter-spacing: 1px; padding: 5px 12px; border-radius: 9999px; margin-bottom: 10px; position: relative; z-index: 1; text-transform: uppercase; }
+        @media(max-width: 380px) { .hero-section h1 { font-size: 16px; } .form-body { padding: 14px; } .franchise-title { font-size: 18px; } .franchise-crown { width: 72px; height: 72px; font-size: 36px; } }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader">
+    <div class="simple-spinner"></div>
+    <div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div>
+</div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar" id="topBar">
+        <a href="index.html" class="back-btn" aria-label="Back"><i class="fas fa-arrow-left"></i></a>
+        <div class="brand-name"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span></div>
+        <div class="page-title">Franchise Partner</div>
+        <a href="cart.html" class="cart-icon-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+    </div>
+    <div class="top-bar-spacer" id="topBarSpacer"></div>
+    <div class="main-content" id="mainContent"></div>
+</div>
+
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<!-- Custom Alert -->
+<div id="customAlert" class="alert-modal">
+    <div class="alert-content">
+        <i id="alertIcon" class="fas fa-info-circle" style="color:var(--warning);"></i>
+        <h3 id="alertTitle">Notice</h3>
+        <p id="alertMessage"></p>
+        <div id="alertExtraButtons"></div>
+        <button class="alert-btn" onclick="closeAlert()">OK</button>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div id="termsModal" class="terms-modal">
+    <div class="terms-modal-content">
+        <div class="terms-modal-header">
+            <h2><i class="fas fa-file-contract"></i> Franchise Partner Terms</h2>
+            <button class="terms-modal-close" onclick="closeTermsModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="terms-modal-body">
+            <h3>1. Franchise Partnership</h3>
+            <p>By registering as a Franchise Partner on ZyMart+, you agree to operate as an authorized local partner in your designated area. You will provide accurate information about your business including valid ID proof, correct address, and genuine contact details.</p>
+            <h3>2. Investment & Fees</h3>
+            <p>The franchise registration fee is <strong>non-refundable</strong>. GST at applicable rates (currently 18%) is charged additionally. The fee covers platform access, franchise onboarding, and shop visibility on ZyMart+ for the agreed period.</p>
+            <h3>3. Product Listings</h3>
+            <p>As a Franchise Partner, you agree to list only genuine products with accurate descriptions, prices, and stock availability. Fake, misleading, or prohibited items will result in immediate termination of franchise agreement.</p>
+            <h3>4. Order Fulfillment</h3>
+            <p>You must fulfill confirmed orders within the promised time window. Repeated cancellations, delays, or non-fulfillment may lead to temporary or permanent franchise suspension.</p>
+            <h3>5. Customer Service</h3>
+            <p>As an authorized partner, maintain the highest standards of professionalism. Any harassment, fraud, or rude behavior reported by customers will result in permanent termination with no refund.</p>
+            <h3>6. Platform Commission</h3>
+            <p>ZyMart+ charges a commission on each order as communicated separately. Commission rates are subject to change with prior notice. Current rates will be shared via WhatsApp/email after onboarding.</p>
+            <h3>7. Data & Privacy</h3>
+            <p>Your business data will be used to operate the platform and connect you with customers. We do not share your data with third parties without consent, except as required by Indian law.</p>
+            <h3>8. Compliance</h3>
+            <p>You must comply with all applicable Indian laws including GST, FSSAI (if selling food), Shop & Establishment Act, and local municipal regulations. You are responsible for maintaining valid licenses.</p>
+            <h3>9. Termination</h3>
+            <p>ZyMart+ reserves the right to suspend or terminate any franchise without prior notice for policy violations, complaints, or suspicious activity. No refund will be provided in such cases.</p>
+            <h3>10. Disputes</h3>
+            <p>Any disputes arising from this agreement will be subject to the exclusive jurisdiction of courts in Maharashtra, India.</p>
+            <h3>11. Updates</h3>
+            <p>These terms may be updated from time to time. Continued use of the platform after changes constitutes acceptance of the revised terms.</p>
+            <p style="margin-top: 16px; padding: 12px; background: #EDF7F1; border-radius: 8px; font-size: 12px; color: var(--brand-green-dark); font-weight: 600;">
+                By clicking "I Accept", you confirm that you have read, understood, and agree to these Franchise Partner Terms & Conditions.
+            </p>
+        </div>
+        <div class="terms-modal-footer">
+            <button class="btn btn-gray" onclick="closeTermsModal()" style="flex: 1;">Close</button>
+            <button class="btn btn-green" onclick="acceptTermsFromModal()" style="flex: 1.5;">✓ I Accept</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== PREMIUM FRANCHISE SUCCESS POPUP ===== -->
+<div id="franchiseSuccessPopup" class="franchise-popup">
+    <div class="franchise-popup-content">
+        <div class="franchise-crown"><i class="fas fa-crown"></i></div>
+        <div class="franchise-badge">✨ Premium Partner ✨</div>
+        <h1 class="franchise-title">Welcome to ZyMart+<br>Franchise Family!</h1>
+        <p class="franchise-subtitle">Your franchise partner application has been submitted successfully. Our team will contact you shortly.</p>
+
+        <div class="franchise-details">
+            <div class="franchise-detail-row">
+                <span class="franchise-detail-label">Business Name</span>
+                <span class="franchise-detail-value" id="fpBusinessName">-</span>
+            </div>
+            <div class="franchise-detail-row">
+                <span class="franchise-detail-label">Partner Name</span>
+                <span class="franchise-detail-value" id="fpPartnerName">-</span>
+            </div>
+            <div class="franchise-detail-row">
+                <span class="franchise-detail-label">Amount Paid</span>
+                <span class="franchise-detail-value" id="fpAmountPaid">-</span>
+            </div>
+            <div class="franchise-detail-row">
+                <span class="franchise-detail-label">Application ID</span>
+                <span class="franchise-detail-value" id="fpAppId">-</span>
+            </div>
+        </div>
+
+        <div class="franchise-next-steps">
+            <h3><i class="fas fa-clock"></i> What's Next?</h3>
+            <div class="franchise-step">
+                <span class="franchise-step-num">1</span>
+                <span>Our franchise team will verify your application within 24-48 hours</span>
+            </div>
+            <div class="franchise-step">
+                <span class="franchise-step-num">2</span>
+                <span>You'll receive a WhatsApp message on successful verification</span>
+            </div>
+            <div class="franchise-step">
+                <span class="franchise-step-num">3</span>
+                <span>Access your Franchise Dashboard to add products & go live</span>
+            </div>
+        </div>
+
+        <a href="https://wa.me/918600252238?text=Namaste%20ZyMart%20Team!%20Maine%20Franchise%20Partner%20registration%20complete%20ki%20hai.%20Application%20ID:%20" id="franchiseWaBtn" class="franchise-whatsapp-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i> Contact Franchise Team
+        </a>
+        <button class="franchise-home-btn" onclick="closeFranchisePopup()">
+            <i class="fas fa-home"></i> Go to Home
+        </button>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1',
+        RAZORPAY_KEY_ID: 'rzp_live_SZqH2di86Njggl',
+        DEFAULT_REGISTRATION_FEE: 299,
+        GST_PERCENT: 18,
+        CLOUDINARY_CLOUD: 'b0zm0rac'
+    };
+
+    var sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+
+    var categories = [];
+    var selectedImageFile = null, selectedQrFile = null, selectedIdFile = null;
+    var isProcessing = false;
+    var isCapturingLocation = false;
+    var baseFee = CONFIG.DEFAULT_REGISTRATION_FEE;
+    var gstAmount = 0;
+    var totalFee = 0;
+    var paymentDone = false;
+    var otpVerified = false, currentOtpPhone = null;
+    var otpSendCount = 0, otpSendWindow = 0, otpAttemptCount = 0, otpLockedUntil = 0, otpTimer = null, otpSeconds = 0;
+    var termsAccepted = false;
+    var authUserId = null, authEmail = null, authPassword = null;
+    var _waitingForGps = false, _gpsRetryCount = 0;
+
+    function $(id) { return document.getElementById(id); }
+    function esc(s) { if (s === null || s === undefined) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    var CartManager = {
+        getCart: function() { try { return JSON.parse(localStorage.getItem('zymart_cart') || '[]'); } catch(e) { return []; } },
+        getTotalItems: function() { var cart = this.getCart(); return cart.reduce(function(sum, item) { return sum + (item.quantity || 1); }, 0); },
+        updateBadge: function() { var t = this.getTotalItems(); var b = $('cartBadge'); if (b) { b.textContent = t; if (t > 0) b.classList.add('show'); else b.classList.remove('show'); } }
+    };
+
+    function showApp() {
+        var l = $('simpleLoader'), a = $('mainApp');
+        if (a) a.style.display = '';
+        if (l) { l.classList.add('fade-out'); setTimeout(function() { if (l && l.parentNode) l.parentNode.removeChild(l); }, 300); }
+    }
+
+    function getOptimizedImage(url, size) {
+        if (!url) return '';
+        if (url.indexOf('data:') === 0) return url;
+        if (url.indexOf('res.cloudinary.com') > -1) {
+            if (url.indexOf('/image/fetch/f_') > -1 || url.indexOf('/image/upload/w_') > -1 || url.indexOf('/image/upload/f_') > -1) return url;
+            var t = 'f_auto,q_auto,w_300';
+            if (size === 'thumb') t = 'f_auto,q_auto,w_120';
+            else if (size === 'shop-big') t = 'f_auto,q_auto,w_600';
+            if (url.indexOf('/image/fetch/') > -1) return url.replace('/image/fetch/', '/image/fetch/' + t + '/');
+            if (url.indexOf('/image/upload/') > -1) return url.replace('/image/upload/', '/image/upload/' + t + '/');
+            return url;
+        }
+        var supabaseUrl;
+        if (url.indexOf('http') === 0) supabaseUrl = url;
+        else supabaseUrl = CONFIG.SUPABASE_URL + '/storage/v1/object/public/' + url;
+        var transform = 'f_auto,q_auto,w_300';
+        if (size === 'thumb') transform = 'f_auto,q_auto,w_120';
+        else if (size === 'shop-big') transform = 'f_auto,q_auto,w_600';
+        return 'https://res.cloudinary.com/' + CONFIG.CLOUDINARY_CLOUD + '/image/fetch/' + transform + '/' + supabaseUrl;
+    }
+
+    function showToast(m, e) {
+        var t = $('toastMsg'), s = $('toastText');
+        if (!t || !s) return;
+        s.textContent = m;
+        t.style.background = e ? '#EF4444' : '#1A1A1A';
+        t.classList.add('show');
+        clearTimeout(t._t);
+        t._t = setTimeout(function() { t.classList.remove('show'); }, 3000);
+    }
+
+    function showAlert(msg, title, icon, extraButtons) {
+        title = title || 'Notice'; icon = icon || 'warning';
+        var me = $('alertMessage'), te = $('alertTitle'), ie = $('alertIcon'), mo = $('customAlert');
+        if (me) me.textContent = msg;
+        if (te) te.textContent = title;
+        if (ie) {
+            ie.style.color = icon === 'success' ? '#22C55E' : icon === 'error' ? '#EF4444' : '#F59E0B';
+            ie.className = 'fas ' + (icon === 'success' ? 'fa-check-circle' : icon === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
+        }
+        var ex = $('alertExtraButtons');
+        if (ex) {
+            ex.innerHTML = '';
+            if (extraButtons && extraButtons.length) {
+                for (var i = 0; i < extraButtons.length; i++) {
+                    var b = extraButtons[i];
+                    var btn = document.createElement('button');
+                    btn.className = 'alert-btn ' + (b.cls || '');
+                    btn.textContent = b.text;
+                    btn.onclick = b.onClick;
+                    ex.appendChild(btn);
+                }
+            }
+        }
+        if (mo) mo.classList.add('show');
+    }
+
+    window.closeAlert = function() {
+        var m = $('customAlert');
+        if (m) m.classList.remove('show');
+        var ex = $('alertExtraButtons');
+        if (ex) ex.innerHTML = '';
+    };
+
+    function showFormError(msg) { var el = $('formError'); if (el) { el.innerHTML = msg; el.classList.add('show'); } var sc = $('formSuccess'); if (sc) sc.classList.remove('show'); }
+    function showFormSuccess(msg) { var el = $('formSuccess'); if (el) { el.innerHTML = msg; el.classList.add('show'); } var er = $('formError'); if (er) er.classList.remove('show'); }
+
+    function saveFormData() {
+        var data = {}, fields = ['ownerName','ownerEmail','ownerPhone','ownerWhatsapp','shopName','shopCategory','shopAddress','shopCity','shopPincode','shopDesc','idNumber'];
+        for (var i = 0; i < fields.length; i++) { var el = $(fields[i]); if (el) data[fields[i]] = el.value; }
+        try { localStorage.setItem('zm_shop_draft', JSON.stringify(data)); } catch(e) {}
+    }
+
+    function loadFormData() {
+        try {
+            var raw = localStorage.getItem('zm_shop_draft');
+            if (!raw) return;
+            var data = JSON.parse(raw);
+            for (var key in data) { if (!data.hasOwnProperty(key)) continue; var el = $(key); if (el && data[key]) el.value = data[key]; }
+        } catch(e) {}
+    }
+
+    function clearFormData() { try { localStorage.removeItem('zm_shop_draft'); } catch(e) {} }
+
+    async function fetchRegistrationFee() {
+        try {
+            var r = await sb.from('app_settings').select('value').eq('key', 'registration_fee').maybeSingle();
+            if (r && r.data && r.data.value) baseFee = parseInt(r.data.value) || CONFIG.DEFAULT_REGISTRATION_FEE;
+            else baseFee = CONFIG.DEFAULT_REGISTRATION_FEE;
+        } catch(e) { baseFee = CONFIG.DEFAULT_REGISTRATION_FEE; }
+        gstAmount = Math.round(baseFee * CONFIG.GST_PERCENT / 100);
+        totalFee = baseFee + gstAmount;
+        console.log('[Fee] Base: ₹' + baseFee + ', GST ' + CONFIG.GST_PERCENT + '%: ₹' + gstAmount + ', Total: ₹' + totalFee);
+    }
+
+    async function loadCategories() {
+        try {
+            var r = await sb.from('categories').select('id, name').eq('is_active', true).order('name');
+            categories = (r && r.data) ? r.data : [];
+        } catch(e) { categories = []; }
+    }
+
+    async function compressImage(file) {
+        if (!file || !file.type || file.type.indexOf('image/') !== 0) return file;
+        if (file.size < 80 * 1024) return file;
+        return new Promise(function(resolve) {
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                var img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    var w = img.width, h = img.height, maxDim = 800;
+                    if (w > maxDim || h > maxDim) { if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; } else { w = Math.round((w * maxDim) / h); h = maxDim; } }
+                    var canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    canvas.toBlob(function(blob) { resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' })); }, 'image/jpeg', 0.55);
+                };
+            };
+        });
+    }
+
+    async function uploadImage(file, folder) {
+        if (!file) return null;
+        var compressed = await compressImage(file);
+        var fn = Date.now() + '_' + Math.random().toString(36).substr(2, 6) + '.jpg';
+        var uploadResult = await sb.storage.from('shop-images').upload(folder + '/' + fn, compressed, { cacheControl: '3600', upsert: true });
+        if (uploadResult.error) throw new Error('Upload failed');
+        return sb.storage.from('shop-images').getPublicUrl(folder + '/' + fn).data.publicUrl;
+    }
+
+    window.openTermsModal = function() { var m = $('termsModal'); if (m) m.classList.add('show'); document.body.style.overflow = 'hidden'; };
+    window.closeTermsModal = function() { var m = $('termsModal'); if (m) m.classList.remove('show'); document.body.style.overflow = ''; };
+    window.acceptTermsFromModal = function() {
+        termsAccepted = true;
+        var row = $('termsRow'); var cb = $('termsCheckbox');
+        if (row) row.classList.add('accepted');
+        if (cb) cb.classList.add('checked');
+        closeTermsModal();
+        updatePayButtonState();
+        showToast('✅ Terms accepted!');
+    };
+    window.toggleTerms = function() {
+        if (!termsAccepted) { openTermsModal(); return; }
+        termsAccepted = false;
+        var row = $('termsRow'); var cb = $('termsCheckbox');
+        if (row) row.classList.remove('accepted');
+        if (cb) cb.classList.remove('checked');
+        updatePayButtonState();
+    };
+
+    function updatePayButtonState() {
+        var btn = $('payBtn');
+        if (!btn) return;
+        var canPay = otpVerified && termsAccepted && !paymentDone;
+        if (canPay) { btn.disabled = false; btn.style.opacity = '1'; btn.innerHTML = '<i class="fas fa-lock"></i> Pay ₹' + totalFee + ' & Register Franchise'; }
+        else {
+            btn.disabled = true; btn.style.opacity = '0.6';
+            if (!otpVerified && !termsAccepted) btn.innerHTML = '<i class="fas fa-lock"></i> Verify Mobile & Accept Terms';
+            else if (!otpVerified) btn.innerHTML = '<i class="fas fa-lock"></i> Verify Mobile to Continue';
+            else if (!termsAccepted) btn.innerHTML = '<i class="fas fa-lock"></i> Accept Terms to Continue';
+            else btn.innerHTML = '<i class="fas fa-lock"></i> Pay ₹' + totalFee + ' & Register Franchise';
+        }
+    }
+
+    window.captureShopLocation = function() {
+        if (isCapturingLocation) { showToast('⚠️ GPS already searching...', true); return; }
+        _gpsRetryCount = 0;
+        if (window.Android && typeof window.Android.requestLocation === 'function') {
+            isCapturingLocation = true;
+            updateLocationButton('loading');
+            window.Android.requestLocation();
+            window._gpsShopTimeout = setTimeout(function() { if (isCapturingLocation) tryBrowserGPS(); }, 12000);
+            return;
+        }
+        tryBrowserGPS();
+    };
+
+    function tryBrowserGPS() {
+        if (window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout);
+        if (!navigator.geolocation) { isCapturingLocation = false; updateLocationButton('retry'); showAlert('GPS not supported on this device.', 'Error', 'error'); return; }
+        updateLocationButton('loading');
+        var gotFastResult = false, bestPos = null, isDone = false;
+        function finish(lat, lng, accuracy, silent) { if (isDone && silent) return; isDone = true; isCapturingLocation = false; _waitingForGps = false; if (window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout); setLocationData(lat, lng, null, accuracy); }
+        try {
+            navigator.geolocation.getCurrentPosition(
+                function(pos) { gotFastResult = true; bestPos = pos; finish(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, false); refineLocationInBackground(bestPos, finish); },
+                function(err) { if (!gotFastResult) tryHighAccuracy(finish); },
+                { enableHighAccuracy: false, timeout: 6000, maximumAge: 300000 }
+            );
+        } catch(e) { tryHighAccuracy(finish); }
+    }
+
+    function refineLocationInBackground(initialPos, finish) {
+        try {
+            navigator.geolocation.getCurrentPosition(
+                function(pos) { if (!initialPos || pos.coords.accuracy < (initialPos.coords.accuracy - 20)) { console.log('[GPS] Refined: ' + pos.coords.accuracy + 'm'); setLocationData(pos.coords.latitude, pos.coords.longitude, null, pos.coords.accuracy); showToast('📍 Location refined (±' + Math.round(pos.coords.accuracy) + 'm)'); } },
+                function(err) {},
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+            );
+        } catch(e) {}
+    }
+
+    function tryHighAccuracy(finish) {
+        try {
+            navigator.geolocation.getCurrentPosition(
+                function(pos) { finish(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, false); },
+                function(err) { isCapturingLocation = false; updateLocationButton('retry'); handleGpsError(err); },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+            );
+        } catch(e) { isCapturingLocation = false; updateLocationButton('retry'); handleGpsError({ code: 2 }); }
+    }
+
+    function handleGpsError(err) {
+        var code = err && err.code;
+        if (code === 1) showAlert('🚫 Location permission blocked!\n\nKripya browser settings mein jaake is site ko location allow karein.\n\nChrome: ⋮ Menu → Settings → Site Settings → Location → Allow\n\nPhir wapas aake button dabayein.', 'Location Permission Denied', 'error');
+        else if (code === 2) {
+            if (window.Android && typeof window.Android.openLocationSettings === 'function') { try { window.Android.openLocationSettings(); } catch(e) {} }
+            _waitingForGps = true;
+            showAlert('📴 GPS is OFF!\n\nKripya phone ki settings mein Location/GPS ON karein:\n\nSettings → Location → ON\n\nPhir wapas aake "Retry GPS" dabayein.', 'GPS Off — Enable Karo', 'error', [
+                { text: '📴 Open Settings', cls: 'orange', onClick: function() { if (window.Android && typeof window.Android.openLocationSettings === 'function') { try { window.Android.openLocationSettings(); } catch(e) {} } else { showToast('Phone settings manually kholo aur Location ON karo', true); } closeAlert(); } },
+                { text: '🔄 Retry GPS', cls: 'gray', onClick: function() { closeAlert(); setTimeout(function() { captureShopLocation(); }, 300); } }
+            ]);
+        } else if (code === 3) showAlert('⏱️ Location nahi mil rahi.\n\nKripya khule area mein jaayein aur phir retry karein.', 'Location Timeout', 'error', [{ text: '🔄 Retry GPS', cls: 'gray', onClick: function() { closeAlert(); setTimeout(function() { captureShopLocation(); }, 300); } }]);
+        else showAlert('❌ Location nahi mil rahi. Kripya GPS ON karein aur retry karein.', 'GPS Failed', 'error', [{ text: '🔄 Retry GPS', cls: 'gray', onClick: function() { closeAlert(); setTimeout(function() { captureShopLocation(); }, 300); } }]);
+    }
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible' && _waitingForGps) {
+            setTimeout(function() { if (_waitingForGps && !isCapturingLocation) { console.log('[GPS] Auto-retry'); captureShopLocation(); } }, 1500);
+        }
+    });
+
+    window.setLocationFromAndroid = function(lat, lng, address) {
+        if (!lat || !lng || lat === 0 || lng === 0) return;
+        if (window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout);
+        setLocationData(parseFloat(lat), parseFloat(lng), address);
+    };
+    window.onLocationError = function(errorMsg) { isCapturingLocation = false; if (window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout); updateLocationButton('retry'); handleGpsError({ code: 2 }); };
+
+    function setLocationData(lat, lng, address, accuracy) {
+        isCapturingLocation = false; _waitingForGps = false;
+        if (window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout);
+        var latEl = $('shopLatitude'), lngEl = $('shopLongitude');
+        if (latEl) latEl.value = lat;
+        if (lngEl) lngEl.value = lng;
+        var ce = $('locationCoords');
+        if (ce) { var accText = accuracy ? ' (±' + Math.round(accuracy) + 'm)' : ''; ce.textContent = '📍 ' + Number(lat).toFixed(6) + ', ' + Number(lng).toFixed(6) + accText; ce.classList.add('show'); }
+        updateLocationButton('success');
+        var sd = $('locationStatus');
+        if (sd) { var accuracyNote = ''; if (accuracy && accuracy > 100) accuracyNote = ' (Low accuracy — refining...)'; sd.innerHTML = '<i class="fas fa-check-circle"></i> ✅ GPS Location Captured!' + accuracyNote; sd.className = 'location-status success'; }
+        if (address) { var ae = $('locationAddress'); if (ae) { ae.innerHTML = '<i class="fas fa-map-pin"></i> ' + (address || '').substring(0, 180); ae.classList.add('show'); } autoFillCityFromAddress(address); }
+        else { fetchAddressFromCoords(lat, lng); }
+        saveFormData();
+        showToast('📍 Location captured!');
+    }
+
+    async function fetchAddressFromCoords(lat, lng) {
+        try {
+            var c = new AbortController();
+            var t = setTimeout(function() { c.abort(); }, 7000);
+            var url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1';
+            var r = await fetch(url, { headers: { 'User-Agent': 'ZyMartApp/1.0' }, signal: c.signal });
+            clearTimeout(t);
+            var d = await r.json();
+            var addr = d.display_name || '';
+            var detailedAddr = '';
+            var addrObj = d.address || {};
+            var parts = [];
+            if (addrObj.house_number) parts.push(addrObj.house_number);
+            if (addrObj.road || addrObj.street) parts.push(addrObj.road || addrObj.street);
+            if (addrObj.neighbourhood || addrObj.suburb || addrObj.quarter || addrObj.hamlet) parts.push(addrObj.neighbourhood || addrObj.suburb || addrObj.quarter || addrObj.hamlet);
+            if (addrObj.city || addrObj.town || addrObj.village || addrObj.municipality || addrObj.state_district) parts.push(addrObj.city || addrObj.town || addrObj.village || addrObj.municipality || addrObj.state_district);
+            if (addrObj.state) parts.push(addrObj.state);
+            if (addrObj.postcode) parts.push(addrObj.postcode);
+            detailedAddr = parts.length > 0 ? parts.join(', ') : addr;
+            var ae = $('locationAddress');
+            if (ae && detailedAddr) { ae.innerHTML = '<i class="fas fa-map-pin"></i> ' + detailedAddr.substring(0, 180); ae.classList.add('show'); }
+            autoFillCityFromAddress(detailedAddr, addrObj);
+        } catch(e) { console.error('Reverse geocode failed:', e); }
+    }
+
+    function autoFillCityFromAddress(displayName, addressObj) {
+        var ci = $('shopCity'); if (!ci) return;
+        var city = '', area = '';
+        if (addressObj) { city = addressObj.city || addressObj.town || addressObj.municipality || addressObj.village || addressObj.state_district || ''; area = addressObj.neighbourhood || addressObj.suburb || addressObj.quarter || addressObj.hamlet || ''; }
+        if (!city && displayName) { var parts = displayName.split(','); for (var i = 0; i < parts.length; i++) { var part = parts[i].trim(); if (part && part.length > 2 && part.length < 30 && part.indexOf('Maharashtra') === -1 && part.indexOf('India') === -1) { city = part; break; } } }
+        if (city && !ci.value) { ci.value = city; showToast('🏙️ City: ' + city); saveFormData(); }
+        var ad = $('shopAddress'); if (ad && area && !ad.value) { ad.value = area; saveFormData(); }
+        var pi = $('shopPincode'); if (pi && addressObj && addressObj.postcode && !pi.value) { var pc = String(addressObj.postcode).replace(/\D/g, '').substring(0, 6); if (pc.length === 6) { pi.value = pc; saveFormData(); } }
+    }
+
+    function updateLocationButton(state) {
+        var btn = $('locationBtn'); if (!btn) return;
+        if (state === 'loading') { btn.innerHTML = '<span class="loading-spinner"></span> Detecting GPS...'; btn.className = 'location-btn'; btn.disabled = true; }
+        else if (state === 'success') { btn.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Location Captured!'; btn.className = 'location-btn success'; btn.disabled = false; }
+        else if (state === 'retry') { btn.innerHTML = '<i class="fas fa-redo"></i> Retry GPS'; btn.className = 'location-btn'; btn.disabled = false; }
+        else { btn.innerHTML = '<i class="fas fa-location-dot"></i> 📍 Capture GPS Location'; btn.className = 'location-btn'; btn.disabled = false; }
+    }
+
+    function scrollToField(id) {
+        var el = $(id); if (!el) return;
+        setTimeout(function() {
+            try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) { el.scrollIntoView(); }
+            setTimeout(function() { try { el.focus({ preventScroll: true }); } catch(e) { try { el.focus(); } catch(e2) {} } var oldOutline = el.style.outline; el.style.outline = '3px solid #F59E0B'; setTimeout(function() { el.style.outline = oldOutline || ''; }, 1500); }, 400);
+        }, 100);
+    }
+
+    async function validateFullForm() {
+        var on = $('ownerName')?.value.trim(), oe = $('ownerEmail')?.value.trim(), op = $('ownerPhone')?.value.trim(),
+            ow = $('ownerWhatsapp')?.value.trim(), sn = $('shopName')?.value.trim(), cat = $('shopCategory')?.value || '',
+            ad = $('shopAddress')?.value.trim(), ci = $('shopCity')?.value.trim(), pi = $('shopPincode')?.value.trim(),
+            lat = $('shopLatitude')?.value || '', lng = $('shopLongitude')?.value || '', idn = $('idNumber')?.value.trim();
+        if (!on || on.length < 2) { showFormError('❌ Enter business owner full name (min 2 characters)'); scrollToField('ownerName'); return false; }
+        if (!oe || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(oe)) { showFormError('❌ Enter a valid email address'); scrollToField('ownerEmail'); return false; }
+        if (!op || !/^[6-9]\d{9}$/.test(op)) { showFormError('❌ Enter valid 10-digit mobile number'); scrollToField('ownerPhone'); return false; }
+        if (!ow || !/^[6-9]\d{9}$/.test(ow)) { showFormError('❌ Enter valid 10-digit WhatsApp number'); scrollToField('ownerWhatsapp'); return false; }
+        if (!sn || sn.length < 3) { showFormError('❌ Enter business name (min 3 characters)'); scrollToField('shopName'); return false; }
+        if (!cat) { showFormError('❌ Select a business category'); scrollToField('shopCategory'); return false; }
+        if (!ad || ad.length < 10) { showFormError('❌ Enter full business address (min 10 characters)'); scrollToField('shopAddress'); return false; }
+        if (!ci || ci.length < 2) { showFormError('❌ Enter city name'); scrollToField('shopCity'); return false; }
+        if (!pi || !/^\d{6}$/.test(pi)) { showFormError('❌ Enter valid 6-digit pincode'); scrollToField('shopPincode'); return false; }
+        if (!lat || !lng) { showFormError('❌ Please capture GPS location first!'); scrollToField('locationBtn'); return false; }
+        if (idn && idn.length < 8) { showFormError('❌ ID number must be at least 8 characters'); scrollToField('idNumber'); return false; }
+        if (!otpVerified) { showFormError('❌ Please verify your mobile number first!'); scrollToField('ownerPhone'); return false; }
+        if (!termsAccepted) { showFormError('❌ Please accept Franchise Terms & Conditions to continue'); scrollToField('termsRow'); return false; }
+        var dup = await checkDuplicates(oe, op, idn);
+        if (dup) { showFormError(dup); return false; }
+        return true;
+    }
+
+    async function checkDuplicates(email, phone, idNumber) {
+        if (email) {
+            var eu = await sb.from('users').select('id').eq('email', email).maybeSingle();
+            if (eu && eu.data) return '❌ This email is already registered as a user';
+            var es = await sb.from('shops').select('id').eq('owner_email', email).maybeSingle();
+            if (es && es.data) return '❌ This email is already registered with another franchise';
+        }
+        if (phone) {
+            var ps = await sb.from('shops').select('id').eq('owner_phone', phone).maybeSingle();
+            if (ps && ps.data) return '❌ This mobile number is already registered with another franchise';
+        }
+        if (idNumber && idNumber.length >= 8) {
+            var ids = await sb.from('shops').select('id').eq('id_number', idNumber).maybeSingle();
+            if (ids && ids.data) return '❌ This ID number is already used by another franchise';
+        }
+        return null;
+    }
+
+    window.sendVerificationOTP = async function() {
+        showFormError(''); showFormSuccess('');
+        var phone = $('ownerPhone')?.value.trim();
+        if (!phone || !/^[6-9]\d{9}$/.test(phone)) { showFormError('❌ Enter valid mobile number first'); scrollToField('ownerPhone'); return; }
+        if (otpLockedUntil > 0) { var remaining = Math.ceil((otpLockedUntil - Date.now()) / 60000); if (remaining > 0) { showFormError('🔒 Too many wrong OTP attempts! Try again in ' + remaining + ' minutes.'); return; } else { otpLockedUntil = 0; otpAttemptCount = 0; } }
+        var now = Date.now();
+        if (now - otpSendWindow > 300000) { otpSendCount = 0; otpSendWindow = now; }
+        if (otpSendCount >= 3) { showFormError('⚠️ Too many OTP requests. Wait 5 minutes.'); return; }
+        if (otpVerified && currentOtpPhone === phone) { showFormSuccess('✅ Already verified!'); return; }
+        if (currentOtpPhone && currentOtpPhone !== phone) { otpVerified = false; $('otpVerifiedBadge').classList.remove('show'); updatePayButtonState(); }
+        var btn = $('sendOtpBtn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Sending...'; }
+        try {
+            var res = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/send-otp', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': CONFIG.SUPABASE_KEY, 'Authorization': 'Bearer ' + CONFIG.SUPABASE_KEY }, body: JSON.stringify({ phone: phone }) });
+            var data = await res.json();
+            if (data.Status === 'Success' || data.status === 'success' || data.success === true) {
+                otpSendCount++; currentOtpPhone = phone;
+                $('otpSection').classList.add('show');
+                $('otpSection').classList.remove('verified');
+                $('otpPhoneDisplay').textContent = '+91 ' + phone;
+                $('otpInput').value = '';
+                showFormSuccess('✅ OTP sent to +91 ' + phone);
+                if (btn) btn.style.display = 'none';
+                startOtpTimer();
+            } else { showFormError('❌ Failed to send OTP. Try again.'); if (btn) { btn.disabled = false; btn.innerHTML = '📱 Send OTP'; } }
+        } catch(e) { showFormError('❌ Network error'); if (btn) { btn.disabled = false; btn.innerHTML = '📱 Send OTP'; } }
+    };
+
+    function startOtpTimer() {
+        otpSeconds = 30;
+        var rb = $('resendOtpBtn');
+        if (rb) { rb.disabled = true; rb.style.display = 'block'; }
+        if (otpTimer) clearInterval(otpTimer);
+        otpTimer = setInterval(function() {
+            otpSeconds--;
+            if (otpSeconds <= 0) { clearInterval(otpTimer); if (rb) { rb.disabled = false; rb.textContent = '🔄 Resend OTP'; } }
+            else { if (rb) rb.textContent = '🔄 Resend OTP (' + otpSeconds + 's)'; }
+        }, 1000);
+    }
+
+    window.verifyOTP = async function() {
+        showFormError(''); showFormSuccess('');
+        if (otpLockedUntil > 0) { var remaining = Math.ceil((otpLockedUntil - Date.now()) / 60000); if (remaining > 0) { showFormError('🔒 Too many wrong attempts! Try again in ' + remaining + ' minutes.'); return; } else { otpLockedUntil = 0; otpAttemptCount = 0; } }
+        var otp = $('otpInput')?.value.trim();
+        if (!otp || otp.length < 4) { showFormError('❌ Enter complete OTP'); return; }
+        var btn = $('verifyOtpBtn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Verifying...'; }
+        try {
+            var res = await fetch(CONFIG.SUPABASE_URL + '/functions/v1/verify-otp', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': CONFIG.SUPABASE_KEY, 'Authorization': 'Bearer ' + CONFIG.SUPABASE_KEY }, body: JSON.stringify({ phone: currentOtpPhone, otp: otp }) });
+            var data = await res.json();
+            if (data.Status === 'Success' || data.status === 'success' || data.success === true) {
+                if (data.email && data.password) {
+                    btn.innerHTML = '<span class="loading-spinner"></span> Creating session...';
+                    var signInRes = await sb.auth.signInWithPassword({ email: data.email, password: data.password });
+                    if (signInRes.error) { showFormError('⚠️ Auth session failed: ' + signInRes.error.message); btn.disabled = false; btn.innerHTML = '✓ Verify OTP'; return; }
+                    if (signInRes.data && signInRes.data.session) { authUserId = signInRes.data.session.user.id; authEmail = data.email; authPassword = data.password; }
+                }
+                otpAttemptCount = 0; otpLockedUntil = 0; otpVerified = true;
+                $('otpSection').classList.add('verified');
+                $('otpVerifiedBadge').classList.add('show');
+                var pi = $('ownerPhone'); if (pi) { pi.readOnly = true; pi.classList.add('locked'); }
+                $('otpSection').style.display = 'none';
+                $('resendOtpBtn').style.display = 'none';
+                if (otpTimer) clearInterval(otpTimer);
+                showFormSuccess('✅ Mobile verified!');
+                updatePayButtonState();
+            } else {
+                otpAttemptCount++;
+                $('otpInput').value = '';
+                if (otpAttemptCount >= 3) { otpLockedUntil = Date.now() + 600000; showFormError('🔒 3 wrong attempts! Locked for 10 minutes.'); $('otpSection').style.display = 'none'; $('resendOtpBtn').style.display = 'none'; if (otpTimer) clearInterval(otpTimer); }
+                else { var left = 3 - otpAttemptCount; showFormError('❌ Wrong OTP! ' + left + ' attempt' + (left > 1 ? 's' : '') + ' left.'); }
+            }
+        } catch(e) { showFormError('❌ Verification failed'); }
+        if (btn) { btn.disabled = false; btn.innerHTML = '✓ Verify OTP'; }
+    };
+
+    window.changeMobileNumber = function() {
+        otpVerified = false; currentOtpPhone = null;
+        otpSendCount = 0; otpSendWindow = 0; otpAttemptCount = 0; otpLockedUntil = 0;
+        if (otpTimer) clearInterval(otpTimer);
+        var ots = $('otpSection'); if (ots) { ots.classList.remove('show', 'verified'); ots.style.display = 'none'; }
+        var pi = $('ownerPhone'); if (pi) { pi.readOnly = false; pi.classList.remove('locked'); pi.value = ''; }
+        var sendBtn = $('sendOtpBtn'); if (sendBtn) { sendBtn.style.display = 'block'; sendBtn.disabled = false; sendBtn.innerHTML = '📱 Send OTP'; }
+        var badge = $('otpVerifiedBadge'); if (badge) badge.classList.remove('show');
+        showFormError(''); showFormSuccess('');
+        scrollToField('ownerPhone');
+        updatePayButtonState();
+        showToast('📱 Enter new mobile number');
+    };
+
+    window.startRazorpayPayment = async function() {
+        if (!await validateFullForm()) return;
+        if (paymentDone) { showToast('✅ Payment already done!'); return; }
+        var on = $('ownerName')?.value.trim(), oe = $('ownerEmail')?.value.trim(), op = $('ownerPhone')?.value.trim();
+        var options = {
+            key: CONFIG.RAZORPAY_KEY_ID, amount: totalFee * 100, currency: 'INR', name: 'ZyMart+',
+            description: 'Franchise Partner Registration - ₹' + totalFee + ' (incl. GST)',
+            prefill: { name: on, email: oe, contact: op },
+            theme: { color: '#0B5A31' },
+            method: { upi: true, card: true, netbanking: true, wallet: true, emi: false, paylater: false },
+            retry: { enabled: false }, timeout: 300, remember_customer: true,
+            notes: { base_fee: String(baseFee), gst_amount: String(gstAmount), gst_percent: String(CONFIG.GST_PERCENT), total_fee: String(totalFee), type: 'franchise_partner' },
+            handler: function(r) { paymentDone = true; showToast('✅ ₹' + totalFee + ' Payment Successful!'); registerFranchiseAfterPayment(r); },
+            modal: { ondismiss: function() { showToast('⚠️ Payment incomplete', true); }, escape: false, handleback: false }
+        };
+        try {
+            var rzp = new Razorpay(options);
+            rzp.on('payment.failed', function(r) { showAlert('Payment Failed: ' + (r.error.description || 'Try again') + '\n\nNo amount deducted.', 'Payment Failed', 'error'); });
+            rzp.open();
+        } catch(e) { showAlert('Failed to open payment gateway.', 'Error', 'error'); }
+    };
+
+    async function registerFranchiseAfterPayment(pr) {
+        isProcessing = true;
+        var btn = $('payBtn');
+        if (btn) { btn.innerHTML = '<span class="loading-spinner"></span> Registering...'; btn.disabled = true; }
+
+        var on = $('ownerName')?.value.trim(), oe = $('ownerEmail')?.value.trim(), op = $('ownerPhone')?.value.trim(),
+            ow = $('ownerWhatsapp')?.value.trim(), sn = $('shopName')?.value.trim(), cat = $('shopCategory')?.value || '',
+            ad = $('shopAddress')?.value.trim(), ci = $('shopCity')?.value.trim(), pi = $('shopPincode')?.value.trim(),
+            desc = $('shopDesc')?.value.trim(), lat = $('shopLatitude')?.value || '', lng = $('shopLongitude')?.value || '',
+            idn = $('idNumber')?.value.trim();
+
+        try {
+            var shopImageUrl = null, qrImageUrl = null, idImageUrl = null;
+            if (selectedImageFile) shopImageUrl = await uploadImage(selectedImageFile, 'shops');
+            if (selectedQrFile) qrImageUrl = await uploadImage(selectedQrFile, 'qrcodes');
+            if (selectedIdFile) idImageUrl = await uploadImage(selectedIdFile, 'idproofs');
+
+            var appId = 'ZYM' + Date.now().toString(36).toUpperCase().slice(-6);
+
+            var insertData = {
+                owner_email: oe, owner_name: on, owner_phone: op, owner_whatsapp: ow,
+                name: sn, category: cat, phone: op, whatsapp: ow,
+                address: ad, city: ci, pincode: pi, description: desc || null,
+                latitude: parseFloat(lat), longitude: parseFloat(lng),
+                image_url: shopImageUrl, qr_code_url: qrImageUrl,
+                id_number: idn || null, id_image_url: idImageUrl || null,
+                status: 'pending', is_open: false, rating: 0,
+                location_verified: true,
+                payment_id: pr.razorpay_payment_id, payment_order_id: pr.razorpay_order_id || null,
+                payment_amount: totalFee, payment_status: 'paid',
+                base_fee: baseFee, gst_amount: gstAmount, gst_percent: CONFIG.GST_PERCENT,
+                terms_accepted: true, terms_accepted_at: new Date().toISOString(),
+                created_at: new Date().toISOString()
+            };
+
+            if (authUserId) insertData.owner_id = authUserId;
+
+            console.log('[Franchise] Inserting shop with data:', insertData);
+
+            // ✅ CRITICAL FIX: .select() + error check — pehle ye missing tha
+            var insertResult = await sb.from('shops').insert([insertData]).select();
+
+            if (insertResult.error) {
+                console.error('[Franchise] Insert error:', insertResult.error);
+                throw new Error(insertResult.error.message || 'Insert failed');
+            }
+
+            console.log('[Franchise] Insert success:', insertResult.data);
+
+            // Update user role
+            try {
+                var userCheck = await sb.from('users').select('id').eq('email', oe).maybeSingle();
+                if (userCheck && userCheck.data) { await sb.from('users').update({ role: 'shop_owner' }).eq('id', userCheck.data.id); }
+            } catch(e) { console.warn('User role update failed (non-critical):', e); }
+
+            clearFormData();
+
+            // Show premium popup
+            showFranchisePopup({
+                businessName: sn,
+                partnerName: on,
+                amountPaid: totalFee,
+                appId: appId
+            });
+
+            if (btn) btn.innerHTML = '<i class="fas fa-check-circle"></i> Submitted!';
+
+        } catch(e) {
+            isProcessing = false;
+            console.error('[Franchise] Registration failed:', e);
+            if (btn) { btn.innerHTML = '💰 Pay ₹' + totalFee + ' & Register Franchise'; btn.disabled = false; }
+            showAlert('Registration failed: ' + (e.message || 'Please try again') + '\n\nAgar amount cut hua hai to WhatsApp par contact karein.', 'Error', 'error', [
+                { text: '💬 WhatsApp Support', cls: 'orange', onClick: function() { window.open('https://wa.me/918600252238?text=Franchise%20registration%20issue', '_blank'); closeAlert(); } }
+            ]);
+        }
+    }
+
+    function showFranchisePopup(data) {
+        var p = $('franchiseSuccessPopup');
+        if (!p) return;
+        var bn = $('fpBusinessName'), pn = $('fpPartnerName'), ap = $('fpAmountPaid'), ai = $('fpAppId');
+        if (bn) bn.textContent = data.businessName || '-';
+        if (pn) pn.textContent = data.partnerName || '-';
+        if (ap) ap.textContent = '₹' + (data.amountPaid || 0).toLocaleString('en-IN');
+        if (ai) ai.textContent = data.appId || '-';
+        var waBtn = $('franchiseWaBtn');
+        if (waBtn && data.appId) {
+            waBtn.href = 'https://wa.me/918600252238?text=Namaste%20ZyMart%20Team!%20Maine%20Franchise%20Partner%20registration%20complete%20ki%20hai.%20Application%20ID:%20' + encodeURIComponent(data.appId);
+        }
+        p.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    window.closeFranchisePopup = function() {
+        var p = $('franchiseSuccessPopup');
+        if (p) p.classList.remove('show');
+        document.body.style.overflow = '';
+        setTimeout(function() { window.location.href = 'index.html?franchise_registered=1'; }, 300);
+    };
+
+    function setupImageUpload(ai, ii, pi, fv) {
+        var a = $(ai), inp = $(ii), pre = $(pi);
+        if (!a || !inp) return;
+        a.onclick = function() { inp.click(); };
+        inp.onchange = async function(e) {
+            var file = e.target.files[0]; if (!file) return;
+            if (file.size > 5 * 1024 * 1024) { showAlert('Image too large! Max 5MB.', 'File Too Large', 'error'); return; }
+            var compressed = await compressImage(file);
+            if (fv === 'selectedImageFile') selectedImageFile = compressed;
+            else if (fv === 'selectedQrFile') selectedQrFile = compressed;
+            else if (fv === 'selectedIdFile') selectedIdFile = compressed;
+            var reader = new FileReader();
+            reader.onload = function(ev) { if (pre) { pre.src = ev.target.result; pre.style.display = 'block'; } };
+            reader.readAsDataURL(compressed);
+            showToast('📸 Image ready!');
+        };
+    }
+
+    async function renderForm() {
+        await fetchRegistrationFee();
+        await loadCategories();
+        var co = '<option value="">Select Business Category</option>';
+        for (var i = 0; i < categories.length; i++) { co += '<option value="' + esc(categories[i].name) + '">' + esc(categories[i].name) + '</option>'; }
+        var c = $('mainContent'); if (!c) return;
+
+        c.innerHTML =
+            '<div class="hero-section"><h1>👑 Become a ZyMart+ Franchise Partner</h1><p>Own your local market with India\'s fastest growing grocery platform</p>' +
+            '<div class="fee-badge"><i class="fas fa-tag"></i> ₹' + totalFee + '/year<small>(₹' + baseFee + ' + ₹' + gstAmount + ' GST)</small></div></div>' +
+            '<div class="form-card"><div class="form-header"><i class="fas fa-handshake"></i><h2>Franchise Partner Registration</h2></div><div class="form-body">' +
+            '<div class="error-msg" id="formError"></div><div class="success-msg" id="formSuccess"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-camera"></i> Business Photo <span class="required">*</span></label>' +
+            '<div class="image-upload-area" id="imageUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Tap to upload business photo</p>' +
+            '<input type="file" id="shopImageInput" accept="image/*" style="display:none"><img id="imagePreview" class="image-preview"></div></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-user"></i> Business Owner Name <span class="required">*</span></label>' +
+            '<input type="text" id="ownerName" class="form-control" placeholder="Full name of business owner" autocomplete="name" oninput="saveFormData()"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>' +
+            '<input type="email" id="ownerEmail" class="form-control" placeholder="your@email.com" autocomplete="email" oninput="saveFormData()"></div>' +
+            '<div class="form-group" style="background:#EDF7F1;padding:12px;border-radius:var(--radius-sm);border:2px dashed var(--brand-green);">' +
+            '<label class="form-label"><i class="fas fa-mobile-alt"></i> 📱 Owner Mobile for Login & OTP <span class="required">*</span></label>' +
+            '<input type="tel" id="ownerPhone" class="form-control" placeholder="10-digit mobile number" maxlength="10" style="margin-bottom:8px;" oninput="saveFormData()">' +
+            '<div style="display:flex;gap:8px;align-items:center;">' +
+            '<button class="btn btn-outline" id="sendOtpBtn" onclick="sendVerificationOTP()" style="flex:1;margin:0;padding:10px;font-size:12px;">📱 Send OTP</button>' +
+            '<span class="verified-badge" id="otpVerifiedBadge"><i class="fas fa-check-circle"></i> Verified</span></div>' +
+            '<div class="otp-section" id="otpSection">' +
+            '<p style="font-size:11px;margin-bottom:8px;text-align:center;">OTP sent to <strong id="otpPhoneDisplay"></strong></p>' +
+            '<input type="text" id="otpInput" placeholder="000000" maxlength="6" inputmode="numeric" style="width:100%;padding:12px;border:1.5px solid var(--neutral-border);border-radius:var(--radius-sm);font-size:18px;text-align:center;letter-spacing:6px;font-family:Inter,sans-serif;font-weight:600;margin-bottom:10px;box-sizing:border-box;">' +
+            '<button class="btn btn-green" id="verifyOtpBtn" onclick="verifyOTP()" style="width:100%;padding:13px;font-size:14px;font-weight:700;margin:0 0 8px 0;">✓ Verify OTP</button>' +
+            '<button class="btn btn-gray" id="resendOtpBtn" onclick="sendVerificationOTP()" style="width:100%;font-size:12px;padding:10px;margin:0 0 8px 0;display:none;">🔄 Resend OTP</button>' +
+            '<button class="btn btn-gray" onclick="changeMobileNumber()" style="width:100%;font-size:12px;padding:10px;margin:0;">🔄 Change Mobile Number</button>' +
+            '</div></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fab fa-whatsapp"></i> 💬 Business WhatsApp Number <span class="required">*</span></label>' +
+            '<input type="tel" id="ownerWhatsapp" class="form-control" placeholder="10-digit WhatsApp number" maxlength="10" oninput="saveFormData()">' +
+            '<small style="color:#6B7280;font-size:10px;">For order updates & broadcast messages</small></div>' +
+            '<hr style="margin:18px 0;border:none;border-top:1px dashed var(--neutral-border);">' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-briefcase"></i> Business Name <span class="required">*</span></label>' +
+            '<input type="text" id="shopName" class="form-control" placeholder="Your business / store name (min 3 chars)" oninput="saveFormData()"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-tags"></i> Business Category <span class="required">*</span></label>' +
+            '<select id="shopCategory" class="form-control" onchange="saveFormData()">' + co + '</select></div>' +
+            '<div class="form-group" style="background:#EDF7F1;padding:14px;border-radius:var(--radius-sm);border:2px dashed var(--brand-green);">' +
+            '<label class="form-label" style="font-size:14px;"><i class="fas fa-map-marker-alt" style="color:var(--brand-green);"></i> 📍 Business Location <span class="required">*</span></label>' +
+            '<button type="button" class="location-btn" id="locationBtn" onclick="captureShopLocation()"><i class="fas fa-location-dot"></i> 📍 Capture GPS Location</button>' +
+            '<div id="locationStatus" class="location-status"><i class="fas fa-info-circle"></i> Press GPS button — mandatory</div>' +
+            '<div id="locationCoords" class="gps-coords-display"></div><div id="locationAddress" class="gps-address-display"></div>' +
+            '<input type="hidden" id="shopLatitude"><input type="hidden" id="shopLongitude"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-address-card"></i> Business Address <span class="required">*</span></label>' +
+            '<textarea id="shopAddress" class="form-control" rows="2" placeholder="Building, Street, Area, Landmark" oninput="saveFormData()"></textarea></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-city"></i> City <span class="required">*</span></label>' +
+            '<input type="text" id="shopCity" class="form-control" placeholder="Auto-detected from GPS" oninput="saveFormData()"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-map-pin"></i> Pincode <span class="required">*</span></label>' +
+            '<input type="text" id="shopPincode" class="form-control" placeholder="6-digit" maxlength="6" oninput="saveFormData()"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-align-left"></i> Business Description <span class="optional">(Optional)</span></label>' +
+            '<textarea id="shopDesc" class="form-control" rows="2" placeholder="Tell us about your business"></textarea></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-qrcode"></i> Payment QR Code <span class="optional">(Optional)</span></label>' +
+            '<div class="image-upload-area" id="qrUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Upload UPI QR code</p>' +
+            '<input type="file" id="qrImageInput" accept="image/*" style="display:none"><img id="qrPreview" class="image-preview"></div></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-id-card"></i> Business ID Proof <span class="optional">(Optional)</span></label>' +
+            '<input type="text" id="idNumber" class="form-control" placeholder="Aadhaar/PAN/Voter ID number" maxlength="20" oninput="saveFormData()">' +
+            '<small style="color:#6B7280;font-size:10px;">For business verification</small><br>' +
+            '<div class="image-upload-area" id="idUploadArea" style="margin-top:8px;"><i class="fas fa-cloud-upload-alt"></i><p>Upload ID photo</p>' +
+            '<input type="file" id="idImageInput" accept="image/*" style="display:none"><img id="idPreview" class="image-preview"></div></div>' +
+            '<div class="fee-summary">' +
+            '<div class="fee-row"><span class="fee-label">Franchise Registration Fee</span><span class="fee-value">₹' + baseFee + '</span></div>' +
+            '<div class="fee-row gst"><span class="fee-label">GST (' + CONFIG.GST_PERCENT + '%)</span><span class="fee-value">+ ₹' + gstAmount + '</span></div>' +
+            '<div class="fee-row total"><span class="fee-label">Total Payable</span><span class="fee-value">₹' + totalFee + '</span></div>' +
+            '<div class="fee-row gst-note"><span style="width:100%;text-align:right;">Inclusive of all taxes</span></div></div>' +
+            '<div class="terms-row" id="termsRow" onclick="toggleTerms()">' +
+            '<div class="terms-checkbox" id="termsCheckbox"></div>' +
+            '<div class="terms-text">I have read and agree to the <a onclick="event.stopPropagation();openTermsModal()">Franchise Partner Terms & Conditions</a> and Privacy Policy of ZyMart+.</div>' +
+            '</div>' +
+            '<button class="btn btn-orange" id="payBtn" onclick="startRazorpayPayment()" disabled style="opacity:0.6;">' +
+            '<i class="fas fa-lock"></i> Verify Mobile & Accept Terms</button>' +
+            '<p class="text-muted"><i class="fas fa-shield-alt"></i> Secured by Razorpay • UPI, Card, Netbanking</p></div></div>';
+
+        setupImageUpload('imageUploadArea', 'shopImageInput', 'imagePreview', 'selectedImageFile');
+        setupImageUpload('qrUploadArea', 'qrImageInput', 'qrPreview', 'selectedQrFile');
+        setupImageUpload('idUploadArea', 'idImageInput', 'idPreview', 'selectedIdFile');
+        loadFormData();
+        updatePayButtonState();
+    }
+
+    function adjustTopBarHeight() {
+        var tb = $('topBar'); if (!tb) return;
+        var h = tb.getBoundingClientRect().height;
+        if (h > 0) document.documentElement.style.setProperty('--top-bar-height', Math.ceil(h) + 'px');
+    }
+    window.addEventListener('resize', adjustTopBarHeight);
+    window.addEventListener('orientationchange', function() { setTimeout(adjustTopBarHeight, 200); });
+
+    window.addEventListener('storage', function(e) { if (e.key === 'zymart_cart') { CartManager.updateBadge(); } });
+    document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'visible') { CartManager.updateBadge(); } });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        adjustTopBarHeight();
+        setTimeout(adjustTopBarHeight, 300);
+        setTimeout(adjustTopBarHeight, 1000);
+        CartManager.updateBadge();
+        renderForm();
+        showApp();
+    });
+
+    window.startRazorpayPayment = startRazorpayPayment;
+    window.captureShopLocation = captureShopLocation;
+    window.sendVerificationOTP = sendVerificationOTP;
+    window.verifyOTP = verifyOTP;
+    window.changeMobileNumber = changeMobileNumber;
+    window.closeAlert = closeAlert;
+    window.setLocationFromAndroid = setLocationFromAndroid;
+    window.onLocationError = onLocationError;
+    window.saveFormData = saveFormData;
+    window.openTermsModal = openTermsModal;
+    window.closeTermsModal = closeTermsModal;
+    window.acceptTermsFromModal = acceptTermsFromModal;
+    window.toggleTerms = toggleTerms;
+    window.CartManager = CartManager;
+
+})();
+</script>
+</body>
+</html>
