@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Register Shop - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-green-dark: #083D21; --brand-orange: #F59E0B;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444;
+            --success: #22C55E; --warning: #F59E0B;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-xl: 22px;
+            --radius-2xl: 28px; --radius-full: 9999px;
+            --status-bar-height: env(safe-area-inset-top, 0px);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); -webkit-tap-highlight-color: transparent; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; width: 100%; max-width: 100%; -webkit-font-smoothing: antialiased; }
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--neutral-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; transition: opacity 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; }
+        .loader-zy { color: #A3E635; } .loader-mart { color: #FDE047; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(11,90,49,0.4); } 50% { box-shadow: 0 0 0 10px rgba(11,90,49,0); } }
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; padding-top: calc(10px + var(--status-bar-height)); display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; text-decoration: none; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .brand-name { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; display: flex; align-items: baseline; }
+        .brand-zy { color: #A3E635; } .brand-mart { color: #FDE047; }
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 14px; color: white; }
+        .cart-icon-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; position: relative; text-decoration: none; }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--brand-orange); color: white; border-radius: 50%; width: 17px; height: 17px; font-size: 8px; display: none; align-items: center; justify-content: center; border: 2px solid var(--brand-green); font-weight: 700; }
+        .cart-badge.show { display: flex; }
+        .main-content { padding-top: 60px; padding-bottom: 40px; max-width: 600px; margin: 0 auto; }
+        @media (min-width: 768px) { .main-content { max-width: 700px; } .form-body { padding: 24px 28px; } .hero-section { padding: 28px; } .hero-section h1 { font-size: 22px; } }
+        .hero-section { background: linear-gradient(135deg, var(--brand-green), var(--brand-green-dark)); margin: 12px 14px; padding: 20px; border-radius: var(--radius-2xl); animation: fadeInUp 0.4s ease; text-align: center; color: white; }
+        .hero-section h1 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; }
+        .hero-section p { font-size: 11px; opacity: 0.85; margin-top: 4px; }
+        .fee-badge { display: inline-block; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: var(--radius-full); font-weight: 700; font-size: 14px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.25); }
+        .form-card { background: white; margin: 0 14px 20px; border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; animation: fadeInUp 0.4s ease; }
+        .form-header { padding: 16px 20px; border-bottom: 1px solid var(--neutral-border); background: #EDF7F1; display: flex; align-items: center; gap: 8px; }
+        .form-header i { color: var(--brand-green); font-size: 18px; }
+        .form-header h2 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: var(--brand-green-dark); }
+        .form-body { padding: 18px 20px; }
+        .form-group { margin-bottom: 14px; }
+        .form-label { font-weight: 600; font-size: 12px; margin-bottom: 4px; display: block; color: var(--neutral-dark); }
+        .form-label i { color: var(--brand-green); width: 16px; margin-right: 3px; }
+        .form-label .required { color: var(--danger); }
+        .form-label .optional { color: var(--neutral-gray); font-weight: 400; font-size: 10px; }
+        .form-control { width: 100%; padding: 12px 14px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; background: white; transition: all 0.15s ease; }
+        .form-control:focus { border-color: var(--brand-orange); box-shadow: 0 0 0 3px rgba(245,158,11,0.08); }
+        .form-control.error { border-color: var(--danger); background: #FEF2F2; }
+        .form-control.locked { background: #D1FAE5; border: 1.5px solid #22C55E; }
+        select.form-control { -webkit-appearance: none; padding-right: 32px; }
+        textarea.form-control { resize: vertical; min-height: 60px; }
+        .image-upload-area { border: 2px dashed var(--brand-green); border-radius: var(--radius-sm); padding: 16px; text-align: center; cursor: pointer; background: #EDF7F1; transition: all 0.15s ease; }
+        .image-upload-area:active { background: #C8E6C9; }
+        .image-upload-area i { font-size: 24px; color: var(--brand-green); margin-bottom: 4px; }
+        .image-upload-area p { font-size: 11px; color: var(--brand-green); font-weight: 500; }
+        .image-preview { max-width: 100%; max-height: 120px; margin-top: 8px; border-radius: var(--radius-sm); display: none; }
+        .location-btn { width: 100%; padding: 14px; background: #EDF7F1; border: 2px solid var(--brand-green); border-radius: var(--radius-sm); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--brand-green); transition: all 0.2s ease; font-family: 'Inter', sans-serif; animation: pulse 2s infinite; box-shadow: 0 4px 15px rgba(11,90,49,0.2); }
+        .location-btn:active { background: #C8E6C9; transform: scale(0.97); }
+        .location-btn:disabled { opacity: 0.7; cursor: not-allowed; animation: none; box-shadow: none; }
+        .location-btn.success { background: #22C55E; color: white; border-color: #22C55E; animation: none; box-shadow: none; }
+        .location-status { font-size: 11px; padding: 10px 12px; border-radius: var(--radius-sm); background: #F3F5F4; margin-top: 10px; display: flex; align-items: center; gap: 6px; }
+        .location-status.success { color: #059669; background: #EDF7F1; border: 1px solid #A7F3D0; }
+        .gps-coords-display { font-size: 10px; color: var(--brand-green); font-weight: 600; margin-top: 6px; font-family: monospace; display: none; }
+        .gps-coords-display.show { display: block; }
+        .gps-address-display { font-size: 10px; color: var(--neutral-gray); margin-top: 4px; display: none; line-height: 1.3; }
+        .gps-address-display.show { display: block; }
+        .otp-section { background: #FFF8EB; border: 2px solid #FDE68A; border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px; display: none; }
+        .otp-section.show { display: block; }
+        .otp-section.verified { background: #D1FAE5; border: 2px solid #22C55E; }
+        .otp-input-row { display: flex; gap: 8px; align-items: center; }
+        .otp-input-row input { flex: 1; padding: 12px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-sm); font-size: 18px; text-align: center; letter-spacing: 6px; font-family: 'Inter', sans-serif; font-weight: 600; }
+        .btn { width: 100%; padding: 14px; border-radius: var(--radius-full); font-weight: 600; font-size: 14px; cursor: pointer; border: none; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s ease; margin-bottom: 8px; }
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-green { background: var(--brand-green); color: white; }
+        .btn-orange { background: var(--brand-orange); color: white; box-shadow: 0 4px 14px rgba(245,158,11,0.25); }
+        .btn-outline { background: white; color: var(--brand-green); border: 1.5px solid var(--brand-green); }
+        .btn-gray { background: #F3F5F4; color: #374151; }
+        .fee-summary { background: #F3F5F4; border-radius: var(--radius-lg); padding: 12px 14px; margin-bottom: 14px; border: 1px solid var(--neutral-border); }
+        .fee-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
+        .fee-row.total { border-top: 1px solid var(--neutral-border); padding-top: 8px; font-weight: 700; font-size: 15px; }
+        .text-muted { color: var(--neutral-gray); font-size: 10px; text-align: center; margin-top: 8px; }
+        .error-msg { background: #FEF2F2; color: #DC2626; padding: 8px 12px; border-radius: 8px; font-size: 11px; margin-bottom: 10px; display: none; }
+        .error-msg.show { display: block; }
+        .success-msg { background: #D1FAE5; color: #059669; padding: 8px 12px; border-radius: 8px; font-size: 11px; margin-bottom: 10px; display: none; }
+        .success-msg.show { display: block; }
+        .verified-badge { display: none; background: #22C55E; color: white; padding: 8px 12px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; white-space: nowrap; }
+        .verified-badge.show { display: inline-block; }
+        .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-lg); transition: all 0.3s ease; max-width: 90%; overflow: hidden; text-overflow: ellipsis; }
+        .toast-notification.show { opacity: 1; visibility: visible; }
+        .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8,61,33,0.7); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 9990; padding: 20px; }
+        .alert-modal.show { display: flex; }
+        .alert-content { background: white; border-radius: var(--radius-xl); padding: 24px; max-width: 380px; width: 100%; text-align: center; animation: fadeInUp 0.3s ease; max-height: 85vh; overflow-y: auto; }
+        .alert-content i.alert-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+        .alert-content h3 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .alert-content p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 14px; line-height: 1.5; white-space: pre-line; text-align: left; }
+        .alert-btn { background: var(--brand-green); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; width: 100%; font-size: 13px; font-family: 'Inter', sans-serif; margin-top: 6px; }
+        .alert-btn.orange { background: var(--brand-orange); color: #1a1a1a; }
+        .alert-btn.gray { background: #F3F5F4; color: #374151; }
+        .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .terms-compact { background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px; }
+        .terms-compact-row { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+        .terms-compact-row input[type="checkbox"] { width: 20px; height: 20px; min-width: 20px; margin-top: 2px; cursor: pointer; accent-color: var(--brand-green); }
+        .terms-compact-text { font-size: 12px; color: #78350F; line-height: 1.55; flex: 1; }
+        .terms-compact-text strong { color: #92400E; }
+        .terms-link { color: var(--brand-green); font-weight: 700; text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; font-size: 12px; }
+        .terms-link:hover { color: var(--brand-green-dark); }
+        .terms-accepted-badge { display: none; align-items: center; gap: 6px; background: #D1FAE5; border: 1px solid #A7F3D0; color: #059669; font-size: 11px; font-weight: 600; padding: 8px 12px; border-radius: var(--radius-sm); margin-top: 8px; }
+        .terms-accepted-badge.show { display: flex; }
+        .terms-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 10000; display: none; align-items: flex-end; justify-content: center; }
+        .terms-modal.show { display: flex; }
+        .terms-sheet { background: white; width: 100%; max-width: 600px; max-height: 92vh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; animation: slideUpSheet 0.3s ease; }
+        @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .terms-sheet-header { padding: 16px 20px; border-bottom: 1px solid var(--neutral-border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .terms-sheet-header h3 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: var(--brand-green-dark); flex: 1; }
+        .terms-sheet-close { width: 32px; height: 32px; background: #F3F5F4; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #6B7280; }
+        .terms-sheet-body { padding: 18px 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+        .terms-sheet-footer { padding: 14px 20px; border-top: 1px solid var(--neutral-border); background: #F9FAFB; flex-shrink: 0; }
+        .terms-sheet-footer .btn { margin-bottom: 0; }
+        .terms-content { font-size: 13px; color: #374151; line-height: 1.7; }
+        .terms-content .terms-intro { background: #EFF6FF; border-left: 3px solid #2563EB; padding: 12px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 12px; color: #1E40AF; }
+        .terms-content h4 { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; color: var(--brand-green-dark); margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; gap: 6px; }
+        .terms-content h4:first-of-type { margin-top: 0; }
+        .terms-content h4 .num { background: var(--brand-green); color: white; width: 22px; height: 22px; min-width: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+        .terms-content p { margin-bottom: 10px; }
+        .terms-content ol, .terms-content ul { padding-left: 22px; margin-bottom: 10px; }
+        .terms-content li { margin-bottom: 6px; }
+        .terms-content .highlight-danger { background: #FEF2F2; border: 1px solid #FECACA; border-left: 4px solid #DC2626; padding: 12px 14px; border-radius: 6px; color: #991B1B; font-weight: 600; font-size: 12px; margin: 12px 0; }
+        .terms-content .highlight-info { background: #F0FDF4; border: 1px solid #BBF7D0; border-left: 4px solid #16A34A; padding: 12px 14px; border-radius: 6px; color: #166534; font-size: 12px; margin: 12px 0; }
+        .terms-content strong { color: #111827; font-weight: 600; }
+        .terms-content .consent-block { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 14px; margin-top: 16px; font-size: 12px; color: #78350F; }
+        .terms-content .consent-block strong { color: #92400E; }
+        .terms-content .fee-table { background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 12px 14px; margin: 12px 0; }
+        .terms-content .fee-table-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; border-bottom: 1px dashed #E5E7EB; }
+        .terms-content .fee-table-row:last-child { border-bottom: none; font-weight: 700; font-size: 14px; color: var(--brand-green-dark); padding-top: 10px; border-top: 1px solid #E5E7EB; }
+        @media(max-width: 380px) { .hero-section h1 { font-size: 16px; } .form-body { padding: 14px; } }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader">
+    <div class="simple-spinner"></div>
+    <div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div>
+</div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <a href="index.html" class="back-btn" aria-label="Back"><i class="fas fa-arrow-left"></i></a>
+        <div class="brand-name"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span></div>
+        <div class="page-title">Register Shop</div>
+        <a href="cart.html" class="cart-icon-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+    </div>
+    <div class="main-content" id="mainContent"></div>
+</div>
+
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<div id="customAlert" class="alert-modal">
+    <div class="alert-content">
+        <i id="alertIcon" class="fas fa-info-circle alert-icon" style="color:var(--warning);"></i>
+        <h3 id="alertTitle">Notice</h3>
+        <p id="alertMessage"></p>
+        <div id="alertExtraButtons"></div>
+        <button class="alert-btn" onclick="closeAlert()">OK</button>
+    </div>
+</div>
+
+<div id="termsModal" class="terms-modal">
+    <div class="terms-sheet">
+        <div class="terms-sheet-header">
+            <h3><i class="fas fa-file-contract" style="color:var(--brand-green);"></i> Terms & Conditions</h3>
+            <button class="terms-sheet-close" onclick="closeTermsModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="terms-sheet-body">
+            <div class="terms-content" id="termsContentBody"></div>
+        </div>
+        <div class="terms-sheet-footer">
+            <button class="btn btn-green" id="termsAcceptBtn" onclick="acceptTermsFromModal()">
+                <i class="fas fa-check-circle"></i> I Accept These Terms
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1',
+        CLOUDINARY_CLOUD_NAME: 'b0zm0rac',
+        CLOUDINARY_ENABLED: true,
+        RAZORPAY_KEY_ID: 'rzp_live_SZqH2di86Njggl',
+        DEFAULT_REGISTRATION_FEE: 299,
+        GST_PERCENT: 18,
+        TERMS_VERSION: 'v1.0',
+        COMPANY_NAME: 'ZyMart+'
+    };
+    
+    var sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    var SUPABASE_URL = CONFIG.SUPABASE_URL;
+    
+    var categories = [];
+    var selectedImageFile = null, selectedQrFile = null, selectedIdFile = null;
+    var isProcessing = false;
+    var isCapturingLocation = false;
+    var baseFee = CONFIG.DEFAULT_REGISTRATION_FEE;
+    var gstAmount = 0;
+    var totalFee = 0;
+    var paymentDone = false;
+    var otpVerified = false, currentOtpPhone = null;
+    var otpSendCount = 0, otpSendWindow = 0, otpAttemptCount = 0, otpLockedUntil = 0, otpTimer = null, otpSeconds = 0;
+    var termsAccepted = false;
+    var authUserId = null;
+    var authEmail = null;
+    var authPassword = null;
+    var _waitingForGps = false;
+    
+    function $(id) { return document.getElementById(id); }
+    function esc(s) { if(!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    
+    function getFullUrl(u, width) {
+        if(!u || typeof u !== 'string') return '';
+        var fullUrl;
+        if(u.indexOf('http')===0 || u.indexOf('data:')===0) { fullUrl = u; }
+        else { fullUrl = SUPABASE_URL + '/storage/v1/object/public/' + u; }
+        if(fullUrl.indexOf('res.cloudinary.com')===0) return fullUrl;
+        if(!CONFIG.CLOUDINARY_ENABLED) return fullUrl;
+        var w = width || 150;
+        return 'https://res.cloudinary.com/' + CONFIG.CLOUDINARY_CLOUD_NAME + '/image/fetch/w_' + w + ',q_auto,f_auto/' + fullUrl;
+    }
+    
+    function calcGst(base) {
+        var gst = Math.round((base * CONFIG.GST_PERCENT / 100) * 100) / 100;
+        var total = Math.round((base + gst) * 100) / 100;
+        return { base: base, gst: gst, total: total };
+    }
+    
+    function formatRupees(n) {
+        return '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    
+    var CartManager = {
+        getCart: function() { try { return JSON.parse(localStorage.getItem('zymart_cart') || '[]'); } catch(e) { return []; } },
+        getTotalItems: function() { var cart = this.getCart(); return cart.reduce(function(sum, item) { return sum + (item.quantity || 1); }, 0); },
+        updateBadge: function() {
+            var totalItems = this.getTotalItems();
+            var badge = $('cartBadge');
+            if (badge) { badge.textContent = totalItems; if (totalItems > 0) badge.classList.add('show'); else badge.classList.remove('show'); }
+        }
+    };
+    
+    function showApp() { 
+        var l = $('simpleLoader'), a = $('mainApp'); 
+        if(a) a.style.display = ''; 
+        if(l) { l.classList.add('fade-out'); setTimeout(function() { if(l && l.parentNode) l.parentNode.removeChild(l); }, 300); } 
+    }
+    
+    function showToast(m, e) { 
+        var t = $('toastMsg'), s = $('toastText'); 
+        if(!t || !s) return; 
+        s.textContent = m; 
+        t.style.background = e ? '#EF4444' : '#1A1A1A'; 
+        t.classList.add('show'); 
+        clearTimeout(t._t); 
+        t._t = setTimeout(function() { t.classList.remove('show'); }, 3000); 
+    }
+    
+    function showAlert(msg, title, icon, extraButtons) { 
+        title = title || 'Notice'; 
+        icon = icon || 'warning'; 
+        var me = $('alertMessage'), te = $('alertTitle'), ie = $('alertIcon'), mo = $('customAlert'); 
+        if(me) me.textContent = msg; 
+        if(te) te.textContent = title; 
+        if(ie) { 
+            ie.style.color = icon === 'success' ? '#22C55E' : icon === 'error' ? '#EF4444' : '#F59E0B'; 
+            ie.className = 'fas ' + (icon === 'success' ? 'fa-check-circle' : icon === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle') + ' alert-icon'; 
+        } 
+        var ex = $('alertExtraButtons');
+        if(ex) {
+            ex.innerHTML = '';
+            if(extraButtons && extraButtons.length) {
+                for(var i = 0; i < extraButtons.length; i++) {
+                    var b = extraButtons[i];
+                    var btn = document.createElement('button');
+                    btn.className = 'alert-btn ' + (b.cls || '');
+                    btn.textContent = b.text;
+                    btn.onclick = b.onClick;
+                    ex.appendChild(btn);
+                }
+            }
+        }
+        if(mo) mo.classList.add('show'); 
+    }
+    
+    window.closeAlert = function() { 
+        var m = $('customAlert'); 
+        if(m) m.classList.remove('show'); 
+        var ex = $('alertExtraButtons');
+        if(ex) ex.innerHTML = '';
+    };
+    
+    function showFormError(msg) { 
+        var el = $('formError'); 
+        if(el) { el.innerHTML = msg; el.classList.add('show'); } 
+        var sc = $('formSuccess'); 
+        if(sc) sc.classList.remove('show'); 
+    }
+    
+    function showFormSuccess(msg) { 
+        var el = $('formSuccess'); 
+        if(el) { el.innerHTML = msg; el.classList.add('show'); } 
+        var er = $('formError'); 
+        if(er) er.classList.remove('show'); 
+    }
+    
+    function saveFormData() { 
+        var data = {}, fields = ['ownerName','ownerEmail','ownerPhone','ownerWhatsapp','shopName','shopCategory','shopAddress','shopCity','shopPincode','shopDesc','idNumber']; 
+        for(var i = 0; i < fields.length; i++) { 
+            var el = $(fields[i]); 
+            if(el) data[fields[i]] = el.value; 
+        } 
+        try { localStorage.setItem('zm_shop_draft', JSON.stringify(data)); } catch(e) {} 
+    }
+    
+    function loadFormData() { 
+        try { 
+            var raw = localStorage.getItem('zm_shop_draft'); 
+            if(!raw) return; 
+            var data = JSON.parse(raw); 
+            for(var key in data) { 
+                if(!data.hasOwnProperty(key)) continue; 
+                var el = $(key); 
+                if(el && data[key]) el.value = data[key]; 
+            } 
+        } catch(e) {} 
+    }
+    
+    function clearFormData() { 
+        try { localStorage.removeItem('zm_shop_draft'); } catch(e) {} 
+    }
+    
+    async function fetchRegistrationFee() { 
+        try { 
+            var r = await sb.from('app_settings').select('value').eq('key', 'registration_fee').maybeSingle(); 
+            if(r && r.data && r.data.value) baseFee = parseInt(r.data.value) || CONFIG.DEFAULT_REGISTRATION_FEE; 
+            else baseFee = CONFIG.DEFAULT_REGISTRATION_FEE;
+        } catch(e) { baseFee = CONFIG.DEFAULT_REGISTRATION_FEE; } 
+        var gst = calcGst(baseFee);
+        gstAmount = gst.gst;
+        totalFee = gst.total;
+    }
+    
+    async function loadCategories() { 
+        try { 
+            var r = await sb.from('categories').select('id, name').eq('is_active', true).order('name'); 
+            categories = (r && r.data) ? r.data : []; 
+        } catch(e) { categories = []; } 
+    }
+    
+    async function compressImage(file) {
+        if(!file || !file.type || file.type.indexOf('image/') !== 0) return file;
+        if(file.size < 80 * 1024) return file;
+        return new Promise(function(resolve) {
+            var reader = new FileReader(); 
+            reader.readAsDataURL(file);
+            reader.onload = function(e) { 
+                var img = new Image(); 
+                img.src = e.target.result;
+                img.onload = function() { 
+                    var w = img.width, h = img.height, maxDim = 800;
+                    if(w > maxDim || h > maxDim) { 
+                        if(w > h) { h = Math.round((h * maxDim) / w); w = maxDim; } 
+                        else { w = Math.round((w * maxDim) / h); h = maxDim; } 
+                    }
+                    var canvas = document.createElement('canvas'); 
+                    canvas.width = w; 
+                    canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    canvas.toBlob(function(blob) { 
+                        resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' })); 
+                    }, 'image/jpeg', 0.55);
+                }; 
+            }; 
+        }); 
+    }
+    
+    async function uploadImage(file, folder) {
+        if(!file) return null;
+        var compressed = await compressImage(file);
+        var fn = Date.now() + '_' + Math.random().toString(36).substr(2, 6) + '.jpg';
+        var uploadResult = await sb.storage.from('shop-images').upload(folder + '/' + fn, compressed, { cacheControl: '3600', upsert: true });
+        if(uploadResult.error) throw new Error('Upload failed');
+        return sb.storage.from('shop-images').getPublicUrl(folder + '/' + fn).data.publicUrl; 
+    }
+    
+    // ==================== GPS LOCATION ====================
+    window.captureShopLocation = function() {
+        if(isCapturingLocation) { showToast('⚠️ GPS already searching...', true); return; }
+        if(window.Android && typeof window.Android.requestLocation === 'function') { 
+            isCapturingLocation = true; 
+            updateLocationButton('loading'); 
+            window.Android.requestLocation(); 
+            window._gpsShopTimeout = setTimeout(function() { if(isCapturingLocation) tryBrowserGPS(); }, 12000); 
+            return; 
+        }
+        tryBrowserGPS(); 
+    };
+    
+    function tryBrowserGPS() {
+        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout);
+        if(!navigator.geolocation) { 
+            isCapturingLocation = false; 
+            updateLocationButton('retry'); 
+            showAlert('GPS is not supported on this device.', 'Error', 'error'); 
+            return; 
+        }
+        updateLocationButton('loading');
+        var attempts = 0;
+        var bestPosition = null;
+        var maxAttempts = 2;
+        
+        function getBestLocation() {
+            attempts++;
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    if(!bestPosition || pos.coords.accuracy < bestPosition.coords.accuracy) { bestPosition = pos; }
+                    if(bestPosition.coords.accuracy <= 50 || attempts >= maxAttempts) {
+                        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout); 
+                        isCapturingLocation = false;
+                        _waitingForGps = false;
+                        setLocationData(bestPosition.coords.latitude, bestPosition.coords.longitude, null, bestPosition.coords.accuracy);
+                    } else { getBestLocation(); }
+                },
+                function(err) {
+                    if(!bestPosition) {
+                        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout);
+                        isCapturingLocation = false;
+                        updateLocationButton('retry');
+                        handleGpsError(err);
+                    } else {
+                        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout); 
+                        isCapturingLocation = false;
+                        _waitingForGps = false;
+                        setLocationData(bestPosition.coords.latitude, bestPosition.coords.longitude, null, bestPosition.coords.accuracy);
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+            );
+        }
+        getBestLocation();
+    }
+    
+    function handleGpsError(err) {
+        var code = err && err.code;
+        if(code === 1) {
+            showAlert('Location permission was denied.\n\nPlease allow location access from your browser settings and try again.', 'Permission Denied', 'error');
+        } else if(code === 2) {
+            if(window.Android && typeof window.Android.openLocationSettings === 'function') {
+                try { window.Android.openLocationSettings(); } catch(e) {}
+            }
+            _waitingForGps = true;
+            showAlert('GPS is turned off.\n\nPlease enable Location from your phone settings and try again.', 'GPS Off', 'error',
+                [
+                    { text: 'Open Settings', cls: 'orange', onClick: function() {
+                        if(window.Android && typeof window.Android.openLocationSettings === 'function') {
+                            try { window.Android.openLocationSettings(); } catch(e) {}
+                        }
+                        closeAlert();
+                    }},
+                    { text: 'Retry GPS', cls: 'gray', onClick: function() { closeAlert(); setTimeout(function() { captureShopLocation(); }, 300); }}
+                ]
+            );
+        } else if(code === 3) {
+            showAlert('Location request timed out.\n\nPlease move to an open area and try again.', 'Timeout', 'error',
+                [{ text: 'Retry GPS', cls: 'gray', onClick: function() { closeAlert(); setTimeout(function() { captureShopLocation(); }, 300); }}]
+            );
+        } else {
+            showAlert('Unable to get location. Please enable GPS and try again.', 'GPS Failed', 'error',
+                [{ text: 'Retry GPS', cls: 'gray', onClick: function() { closeAlert(); setTimeout(function() { captureShopLocation(); }, 300); }}]
+            );
+        }
+    }
+    
+    document.addEventListener('visibilitychange', function() {
+        if(document.visibilityState === 'visible' && _waitingForGps) {
+            setTimeout(function() { if(_waitingForGps && !isCapturingLocation) captureShopLocation(); }, 1500);
+        }
+    });
+    
+    window.setLocationFromAndroid = function(lat, lng, address) { 
+        if(!lat || !lng || lat === 0 || lng === 0) return; 
+        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout); 
+        setLocationData(parseFloat(lat), parseFloat(lng), address); 
+    };
+    
+    window.onLocationError = function(errorMsg) { 
+        isCapturingLocation = false; 
+        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout); 
+        updateLocationButton('retry'); 
+        handleGpsError({ code: 2 }); 
+    };
+    
+    function setLocationData(lat, lng, address, accuracy) {
+        isCapturingLocation = false; 
+        _waitingForGps = false;
+        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout);
+        $('shopLatitude').value = lat; 
+        $('shopLongitude').value = lng;
+        var ce = $('locationCoords'); 
+        if(ce) { 
+            var accText = accuracy ? ' (±' + Math.round(accuracy) + 'm)' : '';
+            ce.textContent = '📍 ' + Number(lat).toFixed(6) + ', ' + Number(lng).toFixed(6) + accText; 
+            ce.style.display = 'block'; 
+        }
+        updateLocationButton('success');
+        var sd = $('locationStatus'); 
+        if(sd) { 
+            sd.innerHTML = '<i class="fas fa-check-circle"></i> Location captured successfully'; 
+            sd.className = 'location-status success'; 
+        }
+        if(address) { 
+            var ae = $('locationAddress'); 
+            if(ae) { ae.innerHTML = '<i class="fas fa-map-pin"></i> ' + (address || '').substring(0, 180); ae.style.display = 'block'; } 
+            autoFillCityFromAddress(address); 
+        } else { fetchAddressFromCoords(lat, lng); }
+        saveFormData(); 
+        showToast('📍 Location captured'); 
+    }
+    
+    async function fetchAddressFromCoords(lat, lng) {
+        try { 
+            var c = new AbortController(); 
+            var t = setTimeout(function() { c.abort(); }, 7000);
+            var url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1';
+            var r = await fetch(url, { headers: { 'User-Agent': 'ZyMartApp/1.0' }, signal: c.signal });
+            clearTimeout(t); 
+            var d = await r.json(); 
+            var addr = d.display_name || '';
+            var detailedAddr = '';
+            var addrObj = d.address || {};
+            var parts = [];
+            if(addrObj.house_number) parts.push(addrObj.house_number);
+            if(addrObj.road || addrObj.street) parts.push(addrObj.road || addrObj.street);
+            if(addrObj.neighbourhood || addrObj.suburb || addrObj.quarter || addrObj.hamlet) parts.push(addrObj.neighbourhood || addrObj.suburb || addrObj.quarter || addrObj.hamlet);
+            if(addrObj.city || addrObj.town || addrObj.village || addrObj.municipality || addrObj.state_district) parts.push(addrObj.city || addrObj.town || addrObj.village || addrObj.municipality || addrObj.state_district);
+            if(addrObj.state) parts.push(addrObj.state);
+            if(addrObj.postcode) parts.push(addrObj.postcode);
+            detailedAddr = parts.length > 0 ? parts.join(', ') : addr;
+            var ae = $('locationAddress'); 
+            if(ae && detailedAddr) { ae.innerHTML = '<i class="fas fa-map-pin"></i> ' + detailedAddr.substring(0, 180); ae.style.display = 'block'; }
+            autoFillCityFromAddress(detailedAddr, addrObj); 
+        } catch(e) { console.error('Reverse geocode failed:', e); } 
+    }
+    
+    function autoFillCityFromAddress(displayName, addressObj) {
+        var ci = $('shopCity'); 
+        if(!ci) return;
+        var city = '';
+        var area = '';
+        if(addressObj) { 
+            city = addressObj.city || addressObj.town || addressObj.municipality || addressObj.village || addressObj.state_district || ''; 
+            area = addressObj.neighbourhood || addressObj.suburb || addressObj.quarter || addressObj.hamlet || '';
+        }
+        if(!city && displayName) { 
+            var parts = displayName.split(','); 
+            for(var i = 0; i < parts.length; i++) { 
+                var part = parts[i].trim(); 
+                if(part && part.length > 2 && part.length < 30 && part.indexOf('Maharashtra') === -1 && part.indexOf('India') === -1) { city = part; break; } 
+            } 
+        }
+        if(city && !ci.value) { ci.value = city; showToast('City: ' + city); saveFormData(); }
+        var ad = $('shopAddress');
+        if(ad && area && !ad.value) { ad.value = area; saveFormData(); }
+        var pi = $('shopPincode');
+        if(pi && addressObj && addressObj.postcode && !pi.value) {
+            var pc = String(addressObj.postcode).replace(/\D/g, '').substring(0, 6);
+            if(pc.length === 6) { pi.value = pc; saveFormData(); }
+        }
+    }
+    
+    function updateLocationButton(state) {
+        var btn = $('locationBtn'); 
+        if(!btn) return;
+        if(state === 'loading') { btn.innerHTML = '<span class="loading-spinner"></span> Detecting GPS...'; btn.className = 'location-btn'; btn.disabled = true; }
+        else if(state === 'success') { btn.innerHTML = '<i class="fas fa-check-circle"></i> Location Captured'; btn.className = 'location-btn success'; btn.disabled = false; }
+        else if(state === 'retry') { btn.innerHTML = '<i class="fas fa-redo"></i> Retry GPS'; btn.className = 'location-btn'; btn.disabled = false; }
+        else { btn.innerHTML = '<i class="fas fa-location-dot"></i> Capture GPS Location'; btn.className = 'location-btn'; btn.disabled = false; } 
+    }
+    
+    function scrollToField(id) {
+        var el = $(id);
+        if(!el) return;
+        setTimeout(function() {
+            try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) { el.scrollIntoView(); }
+            setTimeout(function() {
+                try { el.focus({ preventScroll: true }); } catch(e) { try { el.focus(); } catch(e2) {} }
+                var oldOutline = el.style.outline;
+                el.style.outline = '3px solid #F59E0B';
+                setTimeout(function() { el.style.outline = oldOutline || ''; }, 1500);
+            }, 400);
+        }, 100);
+    }
+    
+    async function validateFullForm() {
+        var on = $('ownerName')?.value.trim(), oe = $('ownerEmail')?.value.trim(), op = $('ownerPhone')?.value.trim(),
+            ow = $('ownerWhatsapp')?.value.trim(), sn = $('shopName')?.value.trim(), cat = $('shopCategory')?.value || '',
+            ad = $('shopAddress')?.value.trim(), ci = $('shopCity')?.value.trim(), pi = $('shopPincode')?.value.trim(),
+            lat = $('shopLatitude')?.value || '', lng = $('shopLongitude')?.value || '', idn = $('idNumber')?.value.trim();
+        
+        if(!on || on.length < 2) { showFormError('Please enter your full name.'); scrollToField('ownerName'); return false; }
+        if(!oe || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(oe)) { showFormError('Please enter a valid email address.'); scrollToField('ownerEmail'); return false; }
+        if(!op || !/^[6-9]\d{9}$/.test(op)) { showFormError('Please enter a valid 10-digit mobile number.'); scrollToField('ownerPhone'); return false; }
+        if(!ow || !/^[6-9]\d{9}$/.test(ow)) { showFormError('Please enter a valid 10-digit WhatsApp number.'); scrollToField('ownerWhatsapp'); return false; }
+        if(!sn || sn.length < 3) { showFormError('Shop name must be at least 3 characters.'); scrollToField('shopName'); return false; }
+        if(!cat) { showFormError('Please select a category.'); scrollToField('shopCategory'); return false; }
+        if(!ad || ad.length < 10) { showFormError('Please enter your full shop address (min 10 characters).'); scrollToField('shopAddress'); return false; }
+        if(!ci || ci.length < 2) { showFormError('Please enter city name.'); scrollToField('shopCity'); return false; }
+        if(!pi || !/^\d{6}$/.test(pi)) { showFormError('Please enter a valid 6-digit pincode.'); scrollToField('shopPincode'); return false; }
+        if(!lat || !lng) { showFormError('Please capture GPS location first.'); scrollToField('locationBtn'); return false; }
+        if(idn && idn.length < 8) { showFormError('ID number must be at least 8 characters.'); scrollToField('idNumber'); return false; }
+        if(!otpVerified) { showFormError('Please verify your mobile number via OTP.'); scrollToField('ownerPhone'); return false; }
+        if(!termsAccepted) { showFormError('Please accept the Terms & Conditions to proceed.'); scrollToField('termsCompact'); return false; }
+        if(!authUserId) { showFormError('Session expired. Please re-verify your mobile number.'); scrollToField('sendOtpBtn'); return false; }
+        
+        var dup = await checkDuplicates(oe, op, idn); 
+        if(dup) { showFormError(dup); return false; }
+        return true; 
+    }
+    
+    async function checkDuplicates(email, phone, idNumber) {
+        if(email) { 
+            var eu = await sb.from('users').select('id').eq('email', email).maybeSingle(); 
+            if(eu && eu.data) return 'This email is already registered.'; 
+            var es = await sb.from('shops').select('id').eq('owner_email', email).maybeSingle(); 
+            if(es && es.data) return 'This email is already linked to another shop.'; 
+        }
+        if(phone) { 
+            var ps = await sb.from('shops').select('id').eq('owner_phone', phone).maybeSingle(); 
+            if(ps && ps.data) return 'This mobile number is already registered with another shop.'; 
+        }
+        if(idNumber && idNumber.length >= 8) { 
+            var ids = await sb.from('shops').select('id').eq('id_number', idNumber).maybeSingle(); 
+            if(ids && ids.data) return 'This ID number is already used by another shop.'; 
+        }
+        return null; 
+    }
+    
+    // ==================== TERMS ====================
+    window.openTermsModal = function() {
+        var modal = $('termsModal');
+        if(modal) modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    };
+    
+    window.closeTermsModal = function() {
+        var modal = $('termsModal');
+        if(modal) modal.classList.remove('show');
+        document.body.style.overflow = '';
+    };
+    
+    window.acceptTermsFromModal = function() {
+        var cb = $('termsCheckbox');
+        if(cb) { cb.checked = true; toggleTerms(); }
+        closeTermsModal();
+        showToast('Terms & Conditions accepted');
+    };
+    
+    window.toggleTerms = function() {
+        var cb = $('termsCheckbox');
+        if(!cb) return;
+        termsAccepted = cb.checked;
+        var badge = $('termsAcceptedBadge');
+        if(badge) {
+            if(termsAccepted) badge.classList.add('show');
+            else badge.classList.remove('show');
+        }
+        updatePayButton();
+    };
+    
+    function updatePayButton() {
+        var btn = $('payBtn');
+        if(!btn) return;
+        if(otpVerified && termsAccepted && authUserId) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        } else {
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+        }
+    }
+    
+    // ==================== OTP ====================
+    window.sendVerificationOTP = async function() {
+        showFormError(''); showFormSuccess('');
+        var phone = $('ownerPhone')?.value.trim();
+        if(!phone || !/^[6-9]\d{9}$/.test(phone)) { showFormError('Please enter a valid 10-digit mobile number first.'); scrollToField('ownerPhone'); return; }
+        
+        if(otpLockedUntil > 0) { 
+            var remaining = Math.ceil((otpLockedUntil - Date.now()) / 60000); 
+            if(remaining > 0) { showFormError('Too many incorrect attempts. Please try again in ' + remaining + ' minute(s).'); return; } 
+            else { otpLockedUntil = 0; otpAttemptCount = 0; } 
+        }
+        var now = Date.now(); 
+        if(now - otpSendWindow > 300000) { otpSendCount = 0; otpSendWindow = now; }
+        if(otpSendCount >= 3) { showFormError('Too many OTP requests. Please wait 5 minutes.'); return; }
+        if(otpVerified && currentOtpPhone === phone) { showFormSuccess('Number already verified.'); return; }
+        if(currentOtpPhone && currentOtpPhone !== phone) { 
+            otpVerified = false; 
+            $('otpVerifiedBadge').classList.remove('show'); 
+            updatePayButton();
+        }
+        var btn = $('sendOtpBtn'); 
+        if(btn) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Sending...'; }
+        try {
+            var res = await fetch(SUPABASE_URL + '/functions/v1/send-otp', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json', 'apikey': CONFIG.SUPABASE_KEY, 'Authorization': 'Bearer ' + CONFIG.SUPABASE_KEY }, 
+                body: JSON.stringify({ phone: phone }) 
+            });
+            var data = await res.json();
+            if(data.Status === 'Success' || data.status === 'success' || data.success === true) { 
+                otpSendCount++; 
+                currentOtpPhone = phone;
+                $('otpSection').classList.add('show'); 
+                $('otpSection').classList.remove('verified');
+                $('otpPhoneDisplay').textContent = '+91 ' + phone; 
+                $('otpInput').value = '';
+                showFormSuccess('OTP sent to +91 ' + phone);
+                if(btn) btn.style.display = 'none'; 
+                startOtpTimer(); 
+            } else { 
+                showFormError('Failed to send OTP. Please try again.'); 
+                if(btn) { btn.disabled = false; btn.innerHTML = 'Send OTP'; } 
+            }
+        } catch(e) { 
+            showFormError('Network error. Please try again.'); 
+            if(btn) { btn.disabled = false; btn.innerHTML = 'Send OTP'; } 
+        }
+    };
+    
+    function startOtpTimer() { 
+        otpSeconds = 30; 
+        var rb = $('resendOtpBtn'); 
+        if(rb) { rb.disabled = true; rb.style.display = 'block'; } 
+        if(otpTimer) clearInterval(otpTimer);
+        otpTimer = setInterval(function() { 
+            otpSeconds--; 
+            if(otpSeconds <= 0) { clearInterval(otpTimer); if(rb) { rb.disabled = false; rb.textContent = 'Resend OTP'; } } 
+            else { if(rb) rb.textContent = 'Resend OTP (' + otpSeconds + 's)'; } 
+        }, 1000); 
+    }
+    
+    window.verifyOTP = async function() {
+        showFormError(''); showFormSuccess('');
+        if(otpLockedUntil > 0) { 
+            var remaining = Math.ceil((otpLockedUntil - Date.now()) / 60000); 
+            if(remaining > 0) { showFormError('Too many incorrect attempts. Please try again in ' + remaining + ' minute(s).'); return; } 
+            else { otpLockedUntil = 0; otpAttemptCount = 0; } 
+        }
+        var otp = $('otpInput')?.value.trim();
+        if(!otp || otp.length < 4) { showFormError('Please enter the complete OTP.'); return; }
+        var btn = $('verifyOtpBtn'); 
+        if(btn) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Verifying...'; }
+        try {
+            var res = await fetch(SUPABASE_URL + '/functions/v1/verify-otp', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json', 'apikey': CONFIG.SUPABASE_KEY, 'Authorization': 'Bearer ' + CONFIG.SUPABASE_KEY }, 
+                body: JSON.stringify({ phone: currentOtpPhone, otp: otp }) 
+            });
+            var data = await res.json();
+            if(data.Status === 'Success' || data.status === 'success' || data.success === true) {
+                if(data.email && data.password) {
+                    btn.innerHTML = '<span class="loading-spinner"></span> Creating session...';
+                    var signInRes = await sb.auth.signInWithPassword({ email: data.email, password: data.password });
+                    if(signInRes.error) {
+                        console.error('Auth sign-in error:', signInRes.error);
+                        showFormError('Session creation failed: ' + signInRes.error.message);
+                        btn.disabled = false;
+                        btn.innerHTML = 'Verify OTP';
+                        return;
+                    }
+                    if(signInRes.data && signInRes.data.session) {
+                        authUserId = signInRes.data.session.user.id;
+                        authEmail = data.email;
+                        authPassword = data.password;
+                        console.log('[Auth] Session created:', authUserId);
+                    } else {
+                        showFormError('Session not created. Please try again.');
+                        btn.disabled = false;
+                        btn.innerHTML = 'Verify OTP';
+                        return;
+                    }
+                } else {
+                    showFormError('Auth session missing from server. Please contact support.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Verify OTP';
+                    return;
+                }
+                
+                otpAttemptCount = 0; 
+                otpLockedUntil = 0; 
+                otpVerified = true;
+                $('otpSection').classList.add('verified'); 
+                $('otpVerifiedBadge').classList.add('show');
+                var pi = $('ownerPhone'); 
+                if(pi) { pi.readOnly = true; pi.classList.add('locked'); }
+                $('otpSection').style.display = 'none'; 
+                $('resendOtpBtn').style.display = 'none';
+                if(otpTimer) clearInterval(otpTimer);
+                showFormSuccess('Mobile verified successfully. Please accept the Terms & Conditions to continue.');
+                updatePayButton();
+            } else {
+                otpAttemptCount++; 
+                $('otpInput').value = '';
+                if(otpAttemptCount >= 3) { 
+                    otpLockedUntil = Date.now() + 600000; 
+                    showFormError('3 incorrect attempts. Locked for 10 minutes.'); 
+                    $('otpSection').style.display = 'none'; 
+                    $('resendOtpBtn').style.display = 'none'; 
+                    if(otpTimer) clearInterval(otpTimer); 
+                } else { 
+                    var left = 3 - otpAttemptCount; 
+                    showFormError('Incorrect OTP. ' + left + ' attempt' + (left > 1 ? 's' : '') + ' remaining.'); 
+                }
+            }
+        } catch(e) { 
+            console.error('OTP verify error:', e);
+            showFormError('Verification failed. Please try again.'); 
+        }
+        if(btn) { btn.disabled = false; btn.innerHTML = 'Verify OTP'; }
+    };
+    
+    // ==================== PAYMENT ====================
+    window.startRazorpayPayment = async function() {
+        if(!termsAccepted) {
+            showAlert('Please accept the Terms & Conditions before proceeding with payment.', 'Terms Required', 'warning');
+            scrollToField('termsCompact');
+            return;
+        }
+        if(!authUserId) {
+            showAlert('Your verification session has expired. Please re-verify your mobile number.', 'Session Expired', 'error');
+            scrollToField('ownerPhone');
+            return;
+        }
+        if(!await validateFullForm()) return;
+        if(paymentDone) { showToast('Payment already completed.'); return; }
+        
+        var on = $('ownerName')?.value.trim(), oe = $('ownerEmail')?.value.trim(), op = $('ownerPhone')?.value.trim();
+        var amountInPaise = Math.round(totalFee * 100);
+        
+        var options = { 
+            key: CONFIG.RAZORPAY_KEY_ID, 
+            amount: amountInPaise, 
+            currency: 'INR', 
+            name: 'ZyMart+', 
+            description: 'Shop Registration — Base ' + formatRupees(baseFee) + ' + GST 18% = ' + formatRupees(totalFee), 
+            prefill: { name: on, email: oe, contact: op }, 
+            theme: { color: '#0B5A31' }, 
+            method: { upi: true, card: true, netbanking: true, wallet: true, emi: false, paylater: false }, 
+            retry: { enabled: false }, 
+            timeout: 300, 
+            remember_customer: true,
+            notes: {
+                gst_applicable: 'yes',
+                gst_percent: String(CONFIG.GST_PERCENT),
+                base_amount: String(baseFee),
+                gst_amount: String(gstAmount),
+                total_amount: String(totalFee)
+            },
+            handler: function(r) { 
+                paymentDone = true; 
+                showToast('Payment successful — ' + formatRupees(totalFee)); 
+                registerShopAfterPayment(r); 
+            },
+            modal: { ondismiss: function() { showToast('Payment cancelled.', true); }, escape: false, handleback: false } 
+        };
+        
+        try { 
+            var rzp = new Razorpay(options); 
+            rzp.on('payment.failed', function(r) { 
+                showAlert('Payment failed: ' + (r.error.description || 'Please try again.') + '\n\nNo amount has been deducted.', 'Payment Failed', 'error'); 
+            }); 
+            rzp.open(); 
+        } catch(e) { 
+            showAlert('Failed to open payment gateway. Please try again.', 'Error', 'error'); 
+        }
+    };
+    
+    // ═══════════════════════════════════════════════════════════
+    // ═══ UPDATED: registerShopAfterPayment with error checks ═══
+    // ═══════════════════════════════════════════════════════════
+    async function registerShopAfterPayment(pr) {
+        isProcessing = true; 
+        var btn = $('payBtn'); 
+        if(btn) { btn.innerHTML = '<span class="loading-spinner"></span> Registering...'; btn.disabled = true; }
+        
+        var on = $('ownerName')?.value.trim(), oe = $('ownerEmail')?.value.trim(), op = $('ownerPhone')?.value.trim(),
+            ow = $('ownerWhatsapp')?.value.trim(), sn = $('shopName')?.value.trim(), cat = $('shopCategory')?.value || '',
+            ad = $('shopAddress')?.value.trim(), ci = $('shopCity')?.value.trim(), pi = $('shopPincode')?.value.trim(),
+            desc = $('shopDesc')?.value.trim(), lat = $('shopLatitude')?.value || '', lng = $('shopLongitude')?.value || '', 
+            idn = $('idNumber')?.value.trim();
+        
+        // Final safety check
+        if(!authUserId) {
+            isProcessing = false;
+            if(btn) { btn.innerHTML = '<i class="fas fa-lock"></i> Pay ' + formatRupees(totalFee) + ' & Register'; btn.disabled = false; }
+            showAlert('Session expired during payment. Please re-verify your mobile number and try again.', 'Session Error', 'error');
+            return;
+        }
+        
+        try {
+            var shopImageUrl = null, qrImageUrl = null, idImageUrl = null;
+            if(selectedImageFile) { shopImageUrl = await uploadImage(selectedImageFile, 'shops'); }
+            if(selectedQrFile) { qrImageUrl = await uploadImage(selectedQrFile, 'qrcodes'); }
+            if(selectedIdFile) { idImageUrl = await uploadImage(selectedIdFile, 'idproofs'); }
+            
+            var insertData = { 
+                owner_id: authUserId,
+                owner_email: oe, 
+                owner_name: on, 
+                owner_phone: op, 
+                owner_whatsapp: ow, 
+                name: sn, 
+                category: cat, 
+                phone: op, 
+                whatsapp: ow, 
+                address: ad, 
+                city: ci, 
+                pincode: pi, 
+                description: desc || null, 
+                latitude: parseFloat(lat), 
+                longitude: parseFloat(lng), 
+                image_url: shopImageUrl, 
+                qr_code_url: qrImageUrl, 
+                id_number: idn || null, 
+                id_image_url: idImageUrl || null, 
+                status: 'pending', 
+                is_open: false, 
+                rating: 0, 
+                location_verified: true, 
+                payment_id: pr.razorpay_payment_id, 
+                payment_order_id: pr.razorpay_order_id, 
+                base_amount: baseFee,
+                gst_percent: CONFIG.GST_PERCENT,
+                gst_amount: gstAmount,
+                payment_amount: totalFee, 
+                payment_status: 'paid', 
+                terms_accepted: true,
+                terms_accepted_at: new Date().toISOString(),
+                terms_version: CONFIG.TERMS_VERSION,
+                created_at: new Date().toISOString() 
+            };
+            
+            console.log('[Shop Register] Inserting:', { owner_id: authUserId, name: sn });
+            
+            // ✅ FIXED: Insert with .select() and error check
+            var insertRes = await sb.from('shops').insert([insertData]).select();
+            
+            if(insertRes.error) {
+                console.error('[Shop Register] Insert error:', insertRes.error);
+                throw new Error('Shop save failed: ' + insertRes.error.message);
+            }
+            
+            if(!insertRes.data || insertRes.data.length === 0) {
+                console.error('[Shop Register] Insert returned no data — RLS might have silently blocked');
+                throw new Error('Shop save failed — policy blocked. Please contact support with payment ID: ' + pr.razorpay_payment_id);
+            }
+            
+            console.log('[Shop Register] Shop created:', insertRes.data[0].id);
+            
+            // Try to upgrade user role to shop_owner (best effort)
+            try { 
+                var userCheck = await sb.from('users').select('id').eq('email', oe).maybeSingle(); 
+                if(userCheck && userCheck.data) { 
+                    await sb.from('users').update({ role: 'shop_owner' }).eq('id', userCheck.data.id); 
+                } 
+            } catch(e) { console.warn('[Shop Register] Role update skipped:', e); }
+            
+            clearFormData();
+            
+            var successMsg = 'Your shop has been registered successfully.\n\n' +
+                             'Base Fee: ' + formatRupees(baseFee) + '\n' +
+                             'GST @ 18%: ' + formatRupees(gstAmount) + '\n' +
+                             'Total Paid: ' + formatRupees(totalFee) + '\n\n' +
+                             'GPS Location: Verified\n' +
+                             'Admin Review: Within 24 hours\n' +
+                             'Login Credentials: ' + oe + ' / ' + op + '\n\n' +
+                             'Note: The registration fee is non-refundable.';
+            
+            showAlert(successMsg, 'Registration Successful', 'success');
+            
+            if(btn) btn.innerHTML = '<i class="fas fa-check-circle"></i> Submitted';
+            setTimeout(function() { window.location.href = 'index.html?registered=1'; }, 5000);
+            
+        } catch(e) { 
+            console.error('[Shop Register] FATAL:', e);
+            isProcessing = false; 
+            if(btn) { btn.innerHTML = '<i class="fas fa-lock"></i> Pay ' + formatRupees(totalFee) + ' & Register'; btn.disabled = false; }
+            showAlert(
+                'Registration failed: ' + (e.message || 'Please try again.') + 
+                '\n\n⚠️ IMPORTANT: Your payment was successful.\nPayment ID: ' + pr.razorpay_payment_id + 
+                '\n\nPlease contact support with this ID. We will complete your registration manually.',
+                'Registration Error',
+                'error'
+            );
+        }
+    }
+    
+    function setupImageUpload(ai, ii, pi, fv) { 
+        var a = $(ai), inp = $(ii), pre = $(pi); 
+        if(!a || !inp) return; 
+        a.onclick = function() { inp.click(); }; 
+        inp.onchange = async function(e) { 
+            var file = e.target.files[0]; 
+            if(!file) return; 
+            if(file.size > 5 * 1024 * 1024) { showAlert('Image is too large. Maximum size is 5MB.', 'File Too Large', 'error'); return; }
+            var compressed = await compressImage(file);
+            if(fv === 'selectedImageFile') selectedImageFile = compressed; 
+            else if(fv === 'selectedQrFile') selectedQrFile = compressed; 
+            else if(fv === 'selectedIdFile') selectedIdFile = compressed;
+            var reader = new FileReader(); 
+            reader.onload = function(ev) { if(pre) { pre.src = ev.target.result; pre.style.display = 'block'; } }; 
+            reader.readAsDataURL(compressed); 
+            showToast('Image ready'); 
+        }; 
+    }
+    
+    function renderTermsContent() {
+        return '' +
+            '<div class="terms-intro">' +
+            '<strong>Please read these Terms & Conditions carefully.</strong> By registering as a shop on ' + CONFIG.COMPANY_NAME + ', you acknowledge that you have read, understood, and agreed to be bound by these terms.' +
+            '</div>' +
+            '<h4><span class="num">1</span> Registration Fee & Taxes</h4>' +
+            '<p>The applicable registration fee for listing your shop on the ' + CONFIG.COMPANY_NAME + ' platform is as follows:</p>' +
+            '<div class="fee-table">' +
+            '<div class="fee-table-row"><span>Registration Fee (Annual)</span><span>' + formatRupees(baseFee) + '</span></div>' +
+            '<div class="fee-table-row"><span>GST @ ' + CONFIG.GST_PERCENT + '%</span><span>' + formatRupees(gstAmount) + '</span></div>' +
+            '<div class="fee-table-row"><span>Total Payable</span><span>' + formatRupees(totalFee) + '</span></div>' +
+            '</div>' +
+            '<p>The registration fee is charged for a period of one (1) year from the date of approval. Renewal will be subject to the fee prevailing at that time.</p>' +
+            '<h4><span class="num">2</span> No-Refund Policy</h4>' +
+            '<div class="highlight-danger">' +
+            '<strong>IMPORTANT:</strong> All payments made towards shop registration, including the base fee and applicable GST, are strictly <strong>NON-REFUNDABLE</strong> under all circumstances. This includes, but is not limited to:<br><br>' +
+            '• Rejection of shop registration by ' + CONFIG.COMPANY_NAME + '<br>' +
+            '• Voluntary cancellation of registration by the shop owner<br>' +
+            '• Suspension or termination of the shop account for violation of platform policies<br>' +
+            '• Closure of business or discontinuation of services<br>' +
+            '• Any other reason whatsoever<br><br>' +
+            'No refund request shall be entertained once the payment has been successfully processed.' +
+            '</div>' +
+            '<h4><span class="num">3</span> Owner\'s Declaration & Consent</h4>' +
+            '<p>By registering, you hereby declare and consent that:</p>' +
+            '<ol>' +
+            '<li>You are providing your <strong>free, voluntary, and informed consent</strong> to register on the platform.</li>' +
+            '<li>All information submitted by you is <strong>true, accurate, and complete</strong> to the best of your knowledge.</li>' +
+            '<li>You are the authorized owner or representative of the shop being registered.</li>' +
+            '<li>Submission of any false, misleading, or forged information will result in immediate cancellation of the registration <strong>without any refund</strong>.</li>' +
+            '<li>You agree to comply with all applicable laws, including but not limited to GST regulations, FSSAI (where applicable), and local municipal requirements.</li>' +
+            '</ol>' +
+            '<h4><span class="num">4</span> Platform Terms</h4>' +
+            '<ol>' +
+            '<li>' + CONFIG.COMPANY_NAME + ' acts solely as a technology platform connecting customers with local shops. We are <strong>not</strong> a party to any transaction between the shop and the customer.</li>' +
+            '<li>The shop owner is solely responsible for product quality, pricing, order fulfillment, delivery, and customer service.</li>' +
+            '<li>' + CONFIG.COMPANY_NAME + ' reserves the absolute right to approve, reject, suspend, or terminate any shop registration at its sole discretion, without assigning any reason.</li>' +
+            '<li>' + CONFIG.COMPANY_NAME + ' may modify platform policies, commission structures, or service terms at any time with prior notice.</li>' +
+            '</ol>' +
+            '<h4><span class="num">5</span> Payment Terms</h4>' +
+            '<ol>' +
+            '<li>All payments are processed securely through Razorpay. ' + CONFIG.COMPANY_NAME + ' does not store any card or banking information.</li>' +
+            '<li>The registration is confirmed only after successful payment verification.</li>' +
+            '<li>GST at the rate of ' + CONFIG.GST_PERCENT + '% is applicable on the registration fee as per Indian tax laws.</li>' +
+            '<li>A GST invoice can be requested by contacting our support team.</li>' +
+            '</ol>' +
+            '<h4><span class="num">6</span> Data & Privacy</h4>' +
+            '<ol>' +
+            '<li>Your personal and business information will be stored securely in our database.</li>' +
+            '<li>This information may be shared with customers and administrators solely for the purpose of order fulfillment and platform operations.</li>' +
+            '<li>GPS location data captured during registration is used for verification and delivery logistics.</li>' +
+            '<li>We respect your privacy and will not sell your data to third parties.</li>' +
+            '</ol>' +
+            '<h4><span class="num">7</span> Cancellation & Termination</h4>' +
+            '<ol>' +
+            '<li>You may request closure of your shop account at any time by contacting our support team.</li>' +
+            '<li>Upon closure, <strong>the registration fee will not be refunded</strong>.</li>' +
+            '<li>' + CONFIG.COMPANY_NAME + ' may terminate your account immediately if you violate any of these terms.</li>' +
+            '</ol>' +
+            '<div class="consent-block">' +
+            '<strong>Declaration:</strong><br><br>' +
+            'I hereby declare that I have read, understood, and voluntarily accept all the terms and conditions mentioned above. I confirm that the registration fee is non-refundable and I am registering at my own free will and consent.' +
+            '</div>';
+    }
+    
+    async function renderForm() {
+        await fetchRegistrationFee(); 
+        await loadCategories();
+        
+        var co = '<option value="">Select Category</option>';
+        for(var i = 0; i < categories.length; i++) { 
+            co += '<option value="' + esc(categories[i].name) + '">' + esc(categories[i].name) + '</option>'; 
+        }
+        
+        var c = $('mainContent'); 
+        if(!c) return;
+        
+        c.innerHTML =
+            '<div class="hero-section"><h1>Join ZyMart+ — Grow Your Business</h1><p>Reach thousands of local customers</p>' +
+            '<div class="fee-badge"><i class="fas fa-tag"></i> ' + formatRupees(baseFee) + '/year + 18% GST</div></div>' +
+            '<div class="form-card"><div class="form-header"><i class="fas fa-clipboard-list"></i><h2>Shop Registration</h2></div><div class="form-body">' +
+            '<div class="error-msg" id="formError"></div><div class="success-msg" id="formSuccess"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-camera"></i> Shop Photo <span class="required">*</span></label>' +
+            '<div class="image-upload-area" id="imageUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Tap to upload shop photo</p>' +
+            '<input type="file" id="shopImageInput" accept="image/*" style="display:none"><img id="imagePreview" class="image-preview"></div></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-user"></i> Owner Full Name <span class="required">*</span></label>' +
+            '<input type="text" id="ownerName" class="form-control" placeholder="Enter your full name" autocomplete="name" oninput="saveFormData()"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>' +
+            '<input type="email" id="ownerEmail" class="form-control" placeholder="your@email.com" autocomplete="email" oninput="saveFormData()"></div>' +
+            '<div class="form-group" style="background:#EDF7F1;padding:12px;border-radius:var(--radius-sm);border:2px dashed var(--brand-green);">' +
+            '<label class="form-label"><i class="fas fa-mobile-alt"></i> Mobile Number (for Login & OTP) <span class="required">*</span></label>' +
+            '<input type="tel" id="ownerPhone" class="form-control" placeholder="10-digit mobile number" maxlength="10" style="margin-bottom:8px;" oninput="saveFormData()">' +
+            '<div style="display:flex;gap:8px;align-items:center;">' +
+            '<button class="btn btn-outline" id="sendOtpBtn" onclick="sendVerificationOTP()" style="flex:1;margin:0;padding:10px;font-size:12px;">Send OTP</button>' +
+            '<span class="verified-badge" id="otpVerifiedBadge"><i class="fas fa-check-circle"></i> Verified</span></div>' +
+            '<div class="otp-section" id="otpSection"><p style="font-size:11px;margin-bottom:6px;">OTP sent to <strong id="otpPhoneDisplay"></strong></p>' +
+            '<div class="otp-input-row"><input type="text" id="otpInput" placeholder="000000" maxlength="6" inputmode="numeric">' +
+            '<button class="btn btn-green" id="verifyOtpBtn" onclick="verifyOTP()" style="width:auto;padding:10px 16px;font-size:12px;margin:0;">Verify</button></div>' +
+            '<button class="btn btn-gray" id="resendOtpBtn" onclick="sendVerificationOTP()" style="font-size:11px;padding:8px;margin-top:6px;display:none;">Resend OTP</button></div></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fab fa-whatsapp"></i> WhatsApp Number <span class="required">*</span></label>' +
+            '<input type="tel" id="ownerWhatsapp" class="form-control" placeholder="10-digit WhatsApp number" maxlength="10" oninput="saveFormData()">' +
+            '<small style="color:#6B7280;font-size:10px;">For order updates and business communications</small></div>' +
+            '<hr style="margin:18px 0;border:none;border-top:1px dashed var(--neutral-border);">' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-store"></i> Shop Name <span class="required">*</span></label>' +
+            '<input type="text" id="shopName" class="form-control" placeholder="Your shop name (min 3 characters)" oninput="saveFormData()"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-tags"></i> Category <span class="required">*</span></label>' +
+            '<select id="shopCategory" class="form-control" onchange="saveFormData()">' + co + '</select></div>' +
+            '<div class="form-group" style="background:#EDF7F1;padding:14px;border-radius:var(--radius-sm);border:2px dashed var(--brand-green);">' +
+            '<label class="form-label" style="font-size:14px;"><i class="fas fa-map-marker-alt" style="color:var(--brand-green);"></i> Shop Location <span class="required">*</span></label>' +
+            '<button type="button" class="location-btn" id="locationBtn" onclick="captureShopLocation()"><i class="fas fa-location-dot"></i> Capture GPS Location</button>' +
+            '<div id="locationStatus" class="location-status"><i class="fas fa-info-circle"></i> GPS verification is mandatory for registration</div>' +
+            '<div id="locationCoords" class="gps-coords-display"></div><div id="locationAddress" class="gps-address-display"></div>' +
+            '<input type="hidden" id="shopLatitude"><input type="hidden" id="shopLongitude"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-address-card"></i> Full Address <span class="required">*</span></label>' +
+            '<textarea id="shopAddress" class="form-control" rows="2" placeholder="Building, Street, Area, Landmark" oninput="saveFormData()"></textarea></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-city"></i> City <span class="required">*</span></label>' +
+            '<input type="text" id="shopCity" class="form-control" placeholder="Auto-detected from GPS" oninput="saveFormData()"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-map-pin"></i> Pincode <span class="required">*</span></label>' +
+            '<input type="text" id="shopPincode" class="form-control" placeholder="6-digit pincode" maxlength="6" oninput="saveFormData()"></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-align-left"></i> Description <span class="optional">(Optional)</span></label>' +
+            '<textarea id="shopDesc" class="form-control" rows="2" placeholder="Brief description about your shop"></textarea></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-qrcode"></i> Payment QR Code <span class="optional">(Optional)</span></label>' +
+            '<div class="image-upload-area" id="qrUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Upload UPI QR code</p>' +
+            '<input type="file" id="qrImageInput" accept="image/*" style="display:none"><img id="qrPreview" class="image-preview"></div></div>' +
+            '<div class="form-group"><label class="form-label"><i class="fas fa-id-card"></i> ID Proof <span class="optional">(Optional)</span></label>' +
+            '<input type="text" id="idNumber" class="form-control" placeholder="Aadhaar / PAN / Voter ID number" maxlength="20" oninput="saveFormData()">' +
+            '<small style="color:#6B7280;font-size:10px;">For identity verification</small><br>' +
+            '<div class="image-upload-area" id="idUploadArea" style="margin-top:8px;"><i class="fas fa-cloud-upload-alt"></i><p>Upload ID photo</p>' +
+            '<input type="file" id="idImageInput" accept="image/*" style="display:none"><img id="idPreview" class="image-preview"></div></div>' +
+            '<div class="terms-compact" id="termsCompact">' +
+            '<label class="terms-compact-row" for="termsCheckbox">' +
+            '<input type="checkbox" id="termsCheckbox" onchange="toggleTerms()">' +
+            '<span class="terms-compact-text">' +
+            '<strong>I accept the Terms & Conditions</strong> of ZyMart+. ' +
+            'I understand that the registration fee of <strong>' + formatRupees(totalFee) + '</strong> ' +
+            '(including GST) is <strong>non-refundable</strong>. ' +
+            '<button type="button" class="terms-link" onclick="event.preventDefault();openTermsModal()">Read full terms →</button>' +
+            '</span>' +
+            '</label>' +
+            '<div class="terms-accepted-badge" id="termsAcceptedBadge">' +
+            '<i class="fas fa-check-circle"></i> Terms & Conditions accepted' +
+            '</div>' +
+            '</div>' +
+            '<div class="fee-summary">' +
+            '<div class="fee-row"><span>Registration Fee (Base)</span><span style="font-weight:700;">' + formatRupees(baseFee) + '</span></div>' +
+            '<div class="fee-row"><span>GST @ ' + CONFIG.GST_PERCENT + '%</span><span style="font-weight:700;">' + formatRupees(gstAmount) + '</span></div>' +
+            '<div class="fee-row total"><span>Total Payable</span><span style="color:var(--brand-green);">' + formatRupees(totalFee) + '</span></div>' +
+            '</div>' +
+            '<button class="btn btn-orange" id="payBtn" onclick="startRazorpayPayment()" disabled style="opacity:0.6;">' +
+            '<i class="fas fa-lock"></i> Pay ' + formatRupees(totalFee) + ' & Register</button>' +
+            '<p class="text-muted"><i class="fas fa-shield-alt"></i> Secured by Razorpay • UPI, Card & Netbanking<br>' +
+            'Verify OTP and accept Terms to enable payment</p></div></div>';
+        
+        var tb = $('termsContentBody');
+        if(tb) tb.innerHTML = renderTermsContent();
+        
+        setupImageUpload('imageUploadArea', 'shopImageInput', 'imagePreview', 'selectedImageFile');
+        setupImageUpload('qrUploadArea', 'qrImageInput', 'qrPreview', 'selectedQrFile');
+        setupImageUpload('idUploadArea', 'idImageInput', 'idPreview', 'selectedIdFile');
+        loadFormData(); 
+    }
+    
+    window.addEventListener('storage', function(e) {
+        if(e.key === 'zymart_cart') { CartManager.updateBadge(); }
+    });
+    
+    document.addEventListener('visibilitychange', function() {
+        if(document.visibilityState === 'visible') { CartManager.updateBadge(); }
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() { 
+        CartManager.updateBadge();
+        renderForm(); 
+        showApp(); 
+    });
+    
+    window.startRazorpayPayment = startRazorpayPayment;
+    window.captureShopLocation = captureShopLocation;
+    window.sendVerificationOTP = sendVerificationOTP;
+    window.verifyOTP = verifyOTP;
+    window.closeAlert = closeAlert;
+    window.setLocationFromAndroid = setLocationFromAndroid;
+    window.onLocationError = onLocationError;
+    window.saveFormData = saveFormData;
+    window.toggleTerms = toggleTerms;
+    window.openTermsModal = openTermsModal;
+    window.closeTermsModal = closeTermsModal;
+    window.acceptTermsFromModal = acceptTermsFromModal;
+    window.CartManager = CartManager;
+    
+})();
+</script>
+</body>
+</html>
