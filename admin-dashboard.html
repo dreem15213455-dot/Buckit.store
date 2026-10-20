@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Admin Dashboard - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root { --brand-green: #0B5A31; --brand-green-dark: #083D21; --brand-orange: #F59E0B; --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB; --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444; --success: #22C55E; --warning: #F59E0B; --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --shadow-lg: 0 8px 30px rgba(0,0,0,0.12); --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-xl: 22px; --radius-full: 9999px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); min-height: 100vh; overflow-x: hidden; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--neutral-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; }
+        .loader-zy { color: #A3E635; } .loader-mart { color: #FDE047; }
+        
+        .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #EDF7F1, #F9FAFB, #FFFFFF); padding: 20px; }
+        .login-card { background: white; border-radius: var(--radius-xl); padding: 36px 28px; width: 100%; max-width: 400px; box-shadow: var(--shadow-lg); text-align: center; }
+        .login-logo { font-family: 'Poppins', sans-serif; font-size: 32px; font-weight: 700; }
+        .login-zy { color: #A3E635; } .login-mart { color: #FDE047; }
+        .login-subtitle { color: var(--neutral-gray); font-size: 13px; margin-bottom: 24px; }
+        .login-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-sm); font-size: 14px; margin-bottom: 12px; font-family: 'Inter', sans-serif; outline: none; background: var(--neutral-bg); }
+        .login-input:focus { border-color: var(--brand-orange); }
+        .login-error { background: #FEF2F2; color: #EF4444; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 14px; display: none; }
+        .login-btn { width: 100%; padding: 13px; background: var(--brand-green); color: white; border: none; border-radius: var(--radius-full); font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; margin-bottom: 8px; }
+        .login-btn:active { background: var(--brand-green-dark); transform: scale(0.98); }
+        .login-btn:disabled { opacity: 0.6; }
+        .login-back { background: none; border: none; color: var(--brand-green); cursor: pointer; margin-top: 10px; font-size: 13px; font-weight: 600; }
+        
+        .sidebar { position: fixed; left: 0; top: 0; width: 260px; height: 100vh; background: white; border-right: 1px solid var(--neutral-border); z-index: 100; overflow-y: auto; box-shadow: var(--shadow-sm); transition: transform 0.3s ease; }
+        .sidebar-header { padding: 18px 14px; border-bottom: 1px solid var(--neutral-border); background: linear-gradient(135deg, #EDF7F1, white); }
+        .sidebar-logo { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; }
+        .sidebar-zy { color: #A3E635; } .sidebar-mart { color: #FDE047; }
+        .sidebar-version { font-size: 10px; color: var(--neutral-gray); }
+        .sidebar-menu { padding: 8px 6px; }
+        .menu-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: var(--radius-md); cursor: pointer; color: var(--neutral-gray); font-weight: 500; font-size: 12px; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; font-family: 'Inter', sans-serif; }
+        .menu-item:hover { background: #EDF7F1; }
+        .menu-item.active { background: var(--brand-green); color: white; }
+        .menu-item i { width: 18px; text-align: center; font-size: 13px; }
+        .menu-divider { height: 1px; background: var(--neutral-border); margin: 6px 0; }
+        .menu-badge { margin-left: auto; background: var(--danger); color: white; padding: 2px 7px; border-radius: var(--radius-full); font-size: 9px; font-weight: 700; }
+        .switch-panel-btn { width: calc(100% - 12px); margin: 8px 6px; padding: 12px; background: linear-gradient(135deg, #F59E0B, #EA580C); color: white; border: none; border-radius: var(--radius-md); font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(245,158,11,0.25); }
+        .switch-panel-btn:active { transform: scale(0.97); }
+        .sidebar-toggle { position: fixed; top: 10px; left: 10px; z-index: 101; width: 36px; height: 36px; background: var(--brand-green); color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; border: none; font-size: 15px; box-shadow: var(--shadow-md); }
+        
+        .main-content { margin-left: 260px; padding: 16px 18px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .page-title { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; }
+        .admin-info { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 12px; border-radius: var(--radius-full); border: 1px solid var(--neutral-border); font-size: 12px; }
+        .admin-avatar { width: 28px; height: 28px; background: linear-gradient(135deg, var(--brand-green), #22C55E); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
+        .refresh-btn { width: 32px; height: 32px; background: #EDF7F1; color: var(--brand-green); border: 1px solid #C8E6C9; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .refresh-btn:hover { background: var(--brand-green); color: white; }
+        .refresh-btn.spinning i { animation: spin 0.8s linear infinite; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+        .stat-card { background: white; border-radius: var(--radius-lg); padding: 14px 12px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-xs); cursor: pointer; }
+        .stat-icon { width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; }
+        .stat-icon.green { background: linear-gradient(135deg, #22C55E, #16A34A); }
+        .stat-icon.blue { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+        .stat-icon.orange { background: linear-gradient(135deg, #F59E0B, #EA580C); }
+        .stat-icon.purple { background: linear-gradient(135deg, #8B5CF6, #6D28D9); }
+        .stat-info h3 { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; }
+        .stat-info p { font-size: 10px; color: var(--neutral-gray); }
+        
+        .content-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--neutral-border); overflow: hidden; margin-bottom: 14px; box-shadow: var(--shadow-xs); }
+        .card-header { padding: 12px 14px; border-bottom: 1px solid var(--neutral-border); display: flex; justify-content: space-between; align-items: center; background: #FAFAFA; flex-wrap: wrap; gap: 8px; }
+        .card-header h2 { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; }
+        
+        .btn { padding: 7px 13px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 4px; font-family: 'Inter', sans-serif; white-space: nowrap; transition: all 0.2s; }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary { background: var(--brand-green); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--brand-orange); color: white; }
+        .btn-outline { background: white; color: var(--neutral-dark); border: 1px solid var(--neutral-border); }
+        .btn-whatsapp { background: #25D366; color: white; }
+        .btn-sm { padding: 5px 8px; font-size: 9px; }
+        
+        .badge { padding: 3px 8px; border-radius: var(--radius-full); font-size: 9px; font-weight: 700; display: inline-block; }
+        .badge-success { background: #EDF7F1; color: #059669; }
+        .badge-warning { background: #FFF8EB; color: #D97706; }
+        .badge-danger { background: #FEF2F2; color: #DC2626; }
+        .badge-info { background: #EFF6FF; color: #2563EB; }
+        .badge-purple { background: #F3E8FF; color: #7C3AED; }
+        
+        .search-bar { position: relative; margin-bottom: 10px; }
+        .search-bar i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9CA3AF; font-size: 12px; pointer-events: none; }
+        .search-bar input { width: 100%; padding: 10px 12px 10px 36px; border: 1.5px solid var(--neutral-border); border-radius: 10px; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; background: white; transition: border-color 0.2s; }
+        .search-bar input:focus { border-color: var(--brand-orange); }
+        .search-bar .clear-search { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border-radius: 50%; background: #F3F4F6; border: none; cursor: pointer; font-size: 10px; color: #6B7280; display: none; align-items: center; justify-content: center; }
+        .search-bar .clear-search.show { display: flex; }
+        .search-count { font-size: 10px; color: #6B7280; margin-bottom: 8px; }
+        
+        .table-wrapper { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 500px; font-size: 12px; }
+        .data-table th { text-align: left; padding: 10px; background: var(--neutral-bg); font-weight: 700; font-size: 10px; text-transform: uppercase; color: var(--neutral-gray); border-bottom: 2px solid var(--neutral-border); }
+        .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--neutral-border); }
+        
+        .empty-state { text-align: center; padding: 30px; color: var(--neutral-gray); }
+        .empty-state i { font-size: 40px; margin-bottom: 8px; display: block; color: #D1D5DB; }
+        
+        .toast-container { position: fixed; top: 14px; right: 14px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; }
+        .toast { background: white; padding: 10px 14px; border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; border-left: 4px solid var(--brand-green); animation: slideIn 0.3s ease; max-width: 340px; }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.success { border-left-color: var(--success); }
+        
+        .shop-group-header { font-size: 10px; font-weight: 700; color: var(--brand-green); background: #EDF7F1; padding: 4px 8px; border-radius: 6px; margin-top: 6px; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+        
+        @media(max-width: 1024px) { 
+            .sidebar { transform: translateX(-100%); } 
+            .sidebar.open { transform: translateX(0); } 
+            .sidebar-toggle { display: flex; } 
+            .main-content { margin-left: 0; padding: 12px; } 
+            .stats-grid { grid-template-columns: repeat(2, 1fr); } 
+        }
+        @media(max-width: 640px) { 
+            .stats-grid { grid-template-columns: 1fr; } 
+        }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div></div>
+<div id="app"></div>
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    window.addEventListener('error', function(e) { console.error('[Dashboard]', e.message); });
+    window.addEventListener('unhandledrejection', function(e) { console.error('[Dashboard]', e.reason); e.preventDefault(); });
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1',
+        CLOUDINARY_CLOUD_NAME: 'b0zm0rac',
+        CLOUDINARY_ENABLED: true,
+        USER_LIMIT: 2000,
+        SHOP_LIMIT: 500,
+        ORDER_LIMIT: 100
+    };
+    
+    var sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    var SUPABASE_URL = CONFIG.SUPABASE_URL;
+    
+    var currentAdmin = null;
+    var allUsers = [], allShops = [], allProducts = [], allOrders = [];
+    var currentSection = 'dashboard';
+    var otpTimerInterval = null, currentOtpEmail = null;
+    var sessionRefreshTimer = null;
+    var autoRefreshTimer = null;
+    var searchUsers = '', searchOrders = '';
+    
+    function $(id) { return document.getElementById(id); }
+    function esc(s) { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function safeText(id, t) { var el = $(id); if(el) el.textContent = t; }
+    
+    function showApp() { 
+        var l = $('simpleLoader'); 
+        if(l) { l.classList.add('fade-out'); setTimeout(function() { if(l.parentNode) l.parentNode.removeChild(l); }, 200); } 
+    }
+    
+    function getImageUrl(url, width) {
+        if(!url || typeof url !== 'string') return '';
+        var fullUrl;
+        if(url.indexOf('http') === 0 || url.indexOf('data:') === 0) fullUrl = url;
+        else fullUrl = SUPABASE_URL + '/storage/v1/object/public/' + url;
+        if(fullUrl.indexOf('res.cloudinary.com') === 0) return fullUrl;
+        if(!CONFIG.CLOUDINARY_ENABLED) return fullUrl;
+        return 'https://res.cloudinary.com/' + CONFIG.CLOUDINARY_CLOUD_NAME + '/image/fetch/w_' + (width || 150) + ',q_auto,f_auto/' + fullUrl;
+    }
+    
+    async function safeFetch(fn, r) { 
+        r = r || 2; 
+        for(var i = 0; i < r; i++) { 
+            try { 
+                var res = await fn(); 
+                if(res && res.error) throw new Error(res.error.message); 
+                return res || {data: null}; 
+            } catch(e) { 
+                if(i === r-1) throw e; 
+                await new Promise(function(x) { setTimeout(x, 300*(i+1)); }); 
+            } 
+        } 
+    }
+    
+    function getShopName(shopId) { var s = allShops.find(function(x) { return x.id === shopId; }); return s ? (s.name || s.shop_name) : (shopId || ''); }
+    
+    function parseUTC(isoString) {
+        if (!isoString) return null;
+        var s = String(isoString).trim();
+        var match = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})/);
+        if (match) {
+            var iso = match[1] + '-' + match[2] + '-' + match[3] + 'T' + match[4] + ':' + match[5] + ':' + match[6] + 'Z';
+            var d = new Date(iso);
+            if (!isNaN(d.getTime())) return d;
+        }
+        s = s.replace(' ', 'T');
+        if (/[+\-]\d{2}$/.test(s)) s += ':00';
+        if (!/[Zz]$/.test(s) && !/[+\-]\d{2}:?\d{2}$/.test(s)) s += 'Z';
+        var d2 = new Date(s);
+        if (isNaN(d2.getTime())) return null;
+        return d2;
+    }
+    
+    function formatOrderDate(isoString) {
+        var d = parseUTC(isoString);
+        if (!d) return { date: '', time: '', full: '' };
+        var dateStr = d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' });
+        var timeStr = d.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+        return { date: dateStr, time: timeStr, full: dateStr + ' · ' + timeStr };
+    }
+    
+    function fmtWeightDisplay(w, u) {
+        if(!w) return '';
+        var nw = parseFloat(w);
+        if(isNaN(nw)) return String(w);
+        var unitLower = u ? u.toLowerCase() : '';
+        if(unitLower === 'gram' || unitLower === 'g' || unitLower === 'gm') return nw >= 1000 ? (nw/1000).toFixed(1).replace(/\.0$/,'') + ' kg' : nw + ' g';
+        if(unitLower === 'kg') return nw + ' kg';
+        if(unitLower === 'liter' || unitLower === 'l') return nw + ' L';
+        if(unitLower === 'ml') return nw + ' ml';
+        if(unitLower === 'piece' || unitLower === 'pcs') return nw + ' pcs';
+        return nw + ' ' + (u || '');
+    }
+    
+    function getProductWeight(productId) {
+        if(!productId) return null;
+        var prod = allProducts.find(function(p) { return p.id === productId; });
+        if(prod) return { weight: prod.weight, unit: prod.weight_unit || prod.unit };
+        return null;
+    }
+    
+    function groupItemsByShop(items) {
+        var groups = {}, order = [];
+        for(var i = 0; i < items.length; i++) {
+            var item = items[i];
+            var shopKey = item.shop_id || 'unknown';
+            if(!groups[shopKey]) {
+                groups[shopKey] = { shop_id: shopKey, shop_name: item.shop_name || getShopName(shopKey) || 'Shop', items: [] };
+                order.push(shopKey);
+            }
+            groups[shopKey].items.push(item);
+        }
+        return order.map(function(k) { return groups[k]; });
+    }
+    
+    function toast(msg, type) { 
+        type = type || 'success'; 
+        var c = $('toastContainer'); if(!c) return; 
+        var el = document.createElement('div'); 
+        el.className = 'toast ' + type; 
+        el.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i> ' + msg; 
+        c.appendChild(el); 
+        setTimeout(function() { el.style.opacity = '0'; setTimeout(function() { el.remove(); }, 250); }, 3000); 
+    }
+    
+    window.fastNavigate = function(url) { window.location.href = url; };
+    window.switchToPanel = function() { window.location.href = 'admin-panel.html'; };
+    
+    function renderSearchBar(id, placeholder, value, filterFn) {
+        return '<div class="search-bar">' +
+            '<i class="fas fa-search"></i>' +
+            '<input type="text" id="' + id + '" placeholder="' + placeholder + '" value="' + esc(value) + '" oninput="' + filterFn + '(this.value)">' +
+            '<button class="clear-search' + (value ? ' show' : '') + '" onclick="' + filterFn + '(\'\');document.getElementById(\'' + id + '\').value=\'\';">✕</button>' +
+            '</div>';
+    }
+    
+    window.filterUsers = function(q) { searchUsers = (q || '').toLowerCase().trim(); renderUsers($('contentArea')); };
+    window.filterOrders = function(q) { searchOrders = (q || '').toLowerCase().trim(); renderOrders($('contentArea')); };
+    
+    function startSessionRefresh() {
+        if(sessionRefreshTimer) clearInterval(sessionRefreshTimer);
+        sessionRefreshTimer = setInterval(async function() {
+            try {
+                var res = await sb.auth.getSession();
+                if(!res || !res.data || !res.data.session) {
+                    toast('Session expired', 'error');
+                    setTimeout(function() { window.location.href = 'index.html'; }, 1500);
+                }
+            } catch(e) {}
+        }, 5 * 60 * 1000);
+    }
+    
+    function startAutoRefresh() {
+        if(autoRefreshTimer) clearInterval(autoRefreshTimer);
+        autoRefreshTimer = setInterval(async function() {
+            if(!currentAdmin) return;
+            var activeElement = document.activeElement;
+            var isTyping = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'SELECT');
+            if (isTyping) return;
+            await loadData();
+            refreshCurrentContent();
+        }, 300000);
+    }
+    
+    async function loadData() {
+        var results = await Promise.allSettled([
+            safeFetch(function() { return sb.from('users').select('id, name, email, phone, role, is_blocked, created_at').order('created_at', { ascending: false }).limit(CONFIG.USER_LIMIT); }),
+            safeFetch(function() { return sb.from('shops').select('id, name, shop_name, status').limit(CONFIG.SHOP_LIMIT); }),
+            safeFetch(function() { return sb.from('orders').select('*').order('created_at', {ascending: false}).limit(CONFIG.ORDER_LIMIT); }),
+            safeFetch(function() { return sb.from('products').select('id, name, weight, weight_unit, unit').limit(500); })
+        ]);
+        allUsers = results[0].status === 'fulfilled' ? (results[0].value.data || []) : [];
+        allShops = results[1].status === 'fulfilled' ? (results[1].value.data || []) : [];
+        allOrders = results[2].status === 'fulfilled' ? (results[2].value.data || []) : [];
+        allProducts = results[3].status === 'fulfilled' ? (results[3].value.data || []) : [];
+    }
+    
+    function refreshCurrentContent() {
+        var content = $('contentArea');
+        if (!content) return;
+        if(currentSection === 'dashboard') renderDashboard(content);
+        else if(currentSection === 'orders') renderOrders(content);
+        else if(currentSection === 'users') renderUsers(content);
+    }
+    
+    window.manualRefresh = async function() {
+        var btn = document.getElementById('manualRefreshBtn');
+        if (btn) btn.classList.add('spinning');
+        try {
+            await loadData();
+            refreshCurrentContent();
+            toast('✅ Updated!', 'success');
+        } catch(e) { toast('❌ Refresh failed', 'error'); }
+        if (btn) setTimeout(function() { btn.classList.remove('spinning'); }, 500);
+    };
+    
+    function showLogin() {
+        $('app').innerHTML = '<div class="login-container"><div class="login-card">' +
+            '<div class="login-logo"><span class="login-zy">Zy</span><span class="login-mart">Mart</span></div>' +
+            '<div class="login-subtitle">🔐 Admin Dashboard</div>' +
+            '<div class="login-error" id="loginError"></div>' +
+            '<div id="loginStepEmail">' +
+            '<input type="email" id="adminEmail" class="login-input" placeholder="Admin Email">' +
+            '<button class="login-btn" onclick="sendAdminOTP()"><i class="fas fa-paper-plane"></i> Send OTP</button></div>' +
+            '<div id="loginStepOTP" style="display:none;">' +
+            '<p style="font-size:13px;margin-bottom:8px;color:var(--neutral-gray);">OTP sent to: <strong id="otpEmailDisplay"></strong></p>' +
+            '<input type="text" id="adminOtp" class="login-input" placeholder="Enter 6-digit OTP" maxlength="6">' +
+            '<button class="login-btn" onclick="verifyAdminOTP()"><i class="fas fa-check-circle"></i> Verify & Login</button>' +
+            '<button class="login-btn" id="resendAdminBtn" onclick="resendAdminOTP()" style="background:transparent;border:1.5px solid var(--neutral-border);color:var(--neutral-dark);">📩 Resend OTP</button>' +
+            '<button class="login-back" onclick="backToAdminEmail()">← Back</button></div>' +
+            '<button class="login-back" style="margin-top:16px;" onclick="fastNavigate(\'index.html\')">← Go to Home</button>' +
+            '</div></div>';
+    }
+    
+    window.sendAdminOTP = async function() {
+        var email = $('adminEmail').value.trim();
+        var errEl = $('loginError');
+        if(!email) { errEl.style.display = 'block'; errEl.textContent = '⚠️ Enter email'; return; }
+        errEl.style.display = 'none';
+        var btn = document.querySelector('#loginStepEmail .login-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        try {
+            var res = await sb.auth.signInWithOtp({email: email, options: {shouldCreateUser: false}});
+            if(res && res.error) { errEl.style.display = 'block'; errEl.textContent = '❌ ' + res.error.message; btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; return; }
+            currentOtpEmail = email;
+            safeText('otpEmailDisplay', email);
+            $('loginStepEmail').style.display = 'none';
+            $('loginStepOTP').style.display = 'block';
+            startOtpTimer();
+            toast('📩 OTP sent!');
+        } catch(e) { errEl.style.display = 'block'; errEl.textContent = '❌ Failed'; btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; }
+    };
+    
+    window.verifyAdminOTP = async function() {
+        var otp = $('adminOtp').value.trim();
+        var errEl = $('loginError');
+        if(!otp || otp.length < 4) { errEl.style.display = 'block'; errEl.textContent = '⚠️ Enter OTP'; return; }
+        errEl.style.display = 'none';
+        var btn = document.querySelector('#loginStepOTP .login-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+        try {
+            var res = await sb.auth.verifyOtp({email: currentOtpEmail, token: otp, type: 'email'});
+            if(res && res.error) { errEl.style.display = 'block'; errEl.textContent = '❌ Invalid OTP'; btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify'; return; }
+            
+            if (currentOtpEmail === 'sk12shaikh@gmail.com') {
+                currentAdmin = res.data.user;
+                toast('✅ Login!');
+                await loadData();
+                renderApp();
+                return;
+            }
+            
+            var prof = await safeFetch(function() { return sb.from('users').select('role').eq('email', currentOtpEmail).maybeSingle(); });
+            var role = prof.data ? prof.data.role : null;
+            if(role != 1 && role !== '1' && role !== 'admin' && role !== 'Admin') { 
+                await sb.auth.signOut(); 
+                errEl.style.display = 'block'; 
+                errEl.textContent = '🚫 Access denied'; 
+                btn.disabled = false; 
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify'; 
+                return; 
+            }
+            currentAdmin = res.data.user;
+            toast('✅ Login!');
+            await loadData();
+            renderApp();
+        } catch(e) { errEl.style.display = 'block'; errEl.textContent = '❌ Error'; btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify'; }
+    };
+    
+    window.resendAdminOTP = async function() { if(!currentOtpEmail) return; try { await sb.auth.signInWithOtp({email: currentOtpEmail, options: {shouldCreateUser: false}}); startOtpTimer(); toast('📩 New OTP sent!'); } catch(e) { toast('❌ Failed', 'error'); } };
+    
+    function startOtpTimer() { var s = 60, b = $('resendAdminBtn'); if(!b) return; if(otpTimerInterval) clearInterval(otpTimerInterval); b.disabled = true; b.textContent = '⏳ Resend (' + s + 's)'; otpTimerInterval = setInterval(function() { s--; b.textContent = '⏳ Resend (' + s + 's)'; if(s <= 0) { clearInterval(otpTimerInterval); b.disabled = false; b.textContent = '📩 Resend OTP'; } }, 1000); }
+    window.backToAdminEmail = function() { if(otpTimerInterval) clearInterval(otpTimerInterval); $('loginStepOTP').style.display = 'none'; $('loginStepEmail').style.display = 'block'; };
+    
+    function renderApp() {
+        var pendingOrders = allOrders.filter(function(o) { return (o.status || o.order_status) === 'pending'; }).length;
+        
+        $('app').innerHTML = 
+            '<button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>' +
+            '<div class="sidebar" id="sidebar">' +
+            '<div class="sidebar-header"><div class="sidebar-logo"><span class="sidebar-zy">Zy</span><span class="sidebar-mart">Mart</span></div><div class="sidebar-version">📊 Dashboard v1.0</div></div>' +
+            '<button class="switch-panel-btn" onclick="switchToPanel()"><i class="fas fa-tools"></i> Open Admin Panel</button>' +
+            '<div class="sidebar-menu">' +
+            '<button class="menu-item active" onclick="loadSection(\'dashboard\')"><i class="fas fa-chart-pie"></i> Dashboard</button>' +
+            '<div class="menu-divider"></div>' +
+            '<button class="menu-item" onclick="loadSection(\'orders\')"><i class="fas fa-receipt"></i> Orders <span class="menu-badge">' + pendingOrders + '</span></button>' +
+            '<button class="menu-item" onclick="loadSection(\'users\')"><i class="fas fa-users"></i> Users (' + allUsers.length + ')</button>' +
+            '<div class="menu-divider"></div>' +
+            '<button class="menu-item" onclick="fastNavigate(\'index.html\')"><i class="fas fa-external-link-alt"></i> View Site</button>' +
+            '<button class="menu-item" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>' +
+            '</div></div>' +
+            '<div class="main-content" id="mainContent">' +
+            '<div class="admin-header"><h1 class="page-title" id="pageTitle">📊 Dashboard</h1>' +
+            '<div class="admin-info"><button class="refresh-btn" id="manualRefreshBtn" onclick="manualRefresh()"><i class="fas fa-sync-alt"></i></button><div class="admin-avatar">' + (currentAdmin.email || 'A').charAt(0).toUpperCase() + '</div><span>' + esc(currentAdmin.email) + '</span></div></div>' +
+            '<div id="contentArea"></div></div>';
+        
+        loadSection('dashboard');
+        startSessionRefresh();
+        startAutoRefresh();
+    }
+    
+    function toggleSidebar() { $('sidebar').classList.toggle('open'); }
+    
+    function loadSection(section) {
+        currentSection = section;
+        var items = document.querySelectorAll('.menu-item');
+        for(var i = 0; i < items.length; i++) items[i].classList.remove('active');
+        var titles = {dashboard: '📊 Dashboard', orders: '📋 Orders', users: '👥 Users'};
+        safeText('pageTitle', titles[section] || section);
+        $('sidebar').classList.remove('open');
+        refreshCurrentContent();
+    }
+    
+    function renderDashboard(c) {
+        var pending = allShops.filter(function(s) { return s.status === 'pending'; }).length;
+        var approved = allShops.filter(function(s) { return s.status === 'approved'; }).length;
+        var revenue = 0;
+        for(var i = 0; i < allOrders.length; i++) { if((allOrders[i].status || allOrders[i].order_status) !== 'cancelled') revenue += parseFloat(allOrders[i].total_amount) || 0; }
+        
+        getTodayVisits().then(function(visits) {
+            var visitEl = document.getElementById('todayVisits');
+            if (visitEl && visits !== null) visitEl.textContent = visits;
+        });
+        
+        c.innerHTML = '<div class="stats-grid">' +
+            '<div class="stat-card" onclick="loadSection(\'users\')"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-info"><h3>' + allUsers.length + '</h3><p>Users</p></div></div>' +
+            '<div class="stat-card" onclick="switchToPanel()"><div class="stat-icon green"><i class="fas fa-store"></i></div><div class="stat-info"><h3>' + approved + '</h3><p>Shops (' + pending + ' pending)</p></div></div>' +
+            '<div class="stat-card" onclick="switchToPanel()"><div class="stat-icon orange"><i class="fas fa-box"></i></div><div class="stat-info"><h3>→</h3><p>Manage Products</p></div></div>' +
+            '<div class="stat-card"><div class="stat-icon purple"><i class="fas fa-rupee-sign"></i></div><div class="stat-info"><h3>₹' + revenue.toLocaleString('en-IN') + '</h3><p>Revenue</p></div></div>' +
+            '</div>' +
+            '<div class="content-card"><div class="card-header"><h2>📊 Today\'s Visits</h2></div><div style="padding:20px;text-align:center;"><h3 style="font-size:36px;font-weight:800;" id="todayVisits">...</h3><p style="color:#6B7280;">App Visits Today</p></div></div>' +
+            '<div class="content-card"><div class="card-header"><h2>⚡ Quick Actions</h2></div><div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">' +
+            '<button class="btn btn-primary" style="padding:14px;font-size:13px;" onclick="loadSection(\'orders\')">📋 View Orders</button>' +
+            '<button class="btn btn-warning" style="padding:14px;font-size:13px;" onclick="switchToPanel()">🔧 Admin Panel</button>' +
+            '<button class="btn btn-outline" style="padding:14px;font-size:13px;" onclick="loadSection(\'users\')">👥 Users</button>' +
+            '</div></div>';
+    }
+    
+    async function getTodayVisits() {
+        try {
+            var today = new Date().toISOString().split('T')[0];
+            var r = await sb.from('app_visits').select('visit_count').eq('visit_date', today).single();
+            return r.data ? r.data.visit_count : 0;
+        } catch(e) { return 0; }
+    }
+    
+    function renderOrders(c) {
+        var filtered = allOrders;
+        if (searchOrders) {
+            filtered = allOrders.filter(function(o) {
+                var oid = ('#' + (o.id || '').substring(0, 8)).toLowerCase();
+                var fullId = (o.id || '').toLowerCase();
+                var name = (o.customer_name || '').toLowerCase();
+                var phone = (o.customer_phone || '').toLowerCase();
+                var status = (o.status || o.order_status || '').toLowerCase();
+                return fullId.indexOf(searchOrders) !== -1 || oid.indexOf(searchOrders) !== -1 || name.indexOf(searchOrders) !== -1 || phone.indexOf(searchOrders) !== -1 || status.indexOf(searchOrders) !== -1;
+            });
+        }
+        
+        var html = '';
+        for(var i = 0; i < filtered.length; i++) {
+            var o = filtered[i];
+            var items = [];
+            try { items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []); } catch(e) { items = []; }
+            var oid = '#' + (o.id || '').substring(0, 8).toUpperCase();
+            var dt = formatOrderDate(o.created_at);
+            var statusValue = o.status || o.order_status || 'pending';
+            var statusBadge = statusValue === 'pending' ? 'badge-warning' : statusValue === 'confirmed' ? 'badge-success' : statusValue === 'out_for_delivery' ? 'badge-info' : statusValue === 'delivered' ? 'badge-purple' : 'badge-danger';
+            var shopIds = o.shop_ids || [];
+            var isMultiShop = (Array.isArray(shopIds) && shopIds.length > 1);
+            
+            html += '<div style="background:white;border:1px solid var(--neutral-border);border-radius:12px;padding:12px;margin-bottom:8px;">';
+            html += '<div style="display:flex;justify-content:space-between;"><strong>' + oid + '</strong><span class="badge ' + statusBadge + '">' + statusValue.toUpperCase() + '</span></div>';
+            html += '<div style="font-size:11px;color:#6B7280;margin-top:2px;">📅 ' + esc(dt.full) + '</div>';
+            html += '<div style="font-size:12px;margin-top:4px;">👤 ' + esc(o.customer_name || 'N/A') + ' · 📱 +91 ' + esc(o.customer_phone || '') + '</div>';
+            html += '<div style="font-size:11px;color:#6B7280;">📍 ' + esc([o.customer_address, o.customer_city, o.customer_pincode].filter(Boolean).join(', ')) + '</div>';
+            if(isMultiShop) html += '<div style="font-size:10px;color:#0B5A31;margin-top:4px;font-weight:600;">🏪 ' + shopIds.length + ' shops involved</div>';
+            
+            if(items.length) {
+                html += '<div style="background:#F9FAFB;border-radius:8px;padding:8px;margin-top:6px;">';
+                if(isMultiShop) {
+                    var groups = groupItemsByShop(items);
+                    for(var g = 0; g < groups.length; g++) {
+                        var grp = groups[g];
+                        html += '<div class="shop-group-header">🏪 ' + esc(grp.shop_name) + ' (' + grp.items.length + ')</div>';
+                        for(var j = 0; j < grp.items.length; j++) html += renderOrderItemRow(grp.items[j]);
+                    }
+                } else {
+                    for(var j = 0; j < items.length; j++) html += renderOrderItemRow(items[j]);
+                }
+                html += '</div>';
+            }
+            html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:6px;">';
+            html += '<strong>₹' + (parseFloat(o.total_amount) || 0).toLocaleString('en-IN') + '</strong>';
+            html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+            if(o.customer_phone) html += '<button class="btn btn-whatsapp btn-sm" onclick="sendWhatsAppOrder(\'' + o.id + '\')"><i class="fab fa-whatsapp"></i></button>';
+            html += '<button class="btn btn-outline btn-sm" onclick="copyOrderDetails(\'' + o.id + '\')">📋</button>';
+            if(statusValue === 'pending') {
+                html += '<button class="btn btn-success btn-sm" onclick="updateOrderStatus(\'' + o.id + '\',\'confirmed\')">✅ Confirm</button>';
+            } else if(statusValue === 'confirmed') {
+                html += '<button class="btn btn-info btn-sm" style="background:#3B82F6;color:white;" onclick="updateOrderStatus(\'' + o.id + '\',\'out_for_delivery\')">🚚 Out</button>';
+                html += '<button class="btn btn-success btn-sm" onclick="updateOrderStatus(\'' + o.id + '\',\'delivered\')">📦 Delivered</button>';
+            } else if(statusValue === 'out_for_delivery') {
+                html += '<button class="btn btn-success btn-sm" onclick="updateOrderStatus(\'' + o.id + '\',\'delivered\')">📦 Delivered</button>';
+            } else if(statusValue === 'delivered') {
+                html += '<span class="badge badge-purple" style="padding:6px 10px;">✅ Delivered</span>';
+            }
+            html += '<button class="btn btn-danger btn-sm" onclick="deleteOrder(\'' + o.id + '\')">🗑️</button>';
+            html += '</div></div></div>';
+        }
+        
+        c.innerHTML = '<div class="content-card"><div class="card-header"><h2>📋 Orders (' + filtered.length + (searchOrders ? ' of ' + allOrders.length : '') + ')</h2></div>' +
+        '<div style="padding:0 12px;">' + renderSearchBar('searchOrdersInput', 'Search by order ID, name, phone, status...', searchOrders, 'filterOrders') + '</div>' +
+        '<div style="padding:12px;">' + (html || '<div class="empty-state"><i class="fas fa-receipt"></i><p>No orders found</p></div>') + '</div></div>';
+    }
+    
+    function renderOrderItemRow(item) {
+        var itemName = item.product_name || item.name || 'Item';
+        var itemWeight = null, itemUnit = null;
+        if(item.variant_weight) { itemWeight = item.variant_weight; itemUnit = item.variant_unit; }
+        else if(item.product_id) { var prodInfo = getProductWeight(item.product_id); if(prodInfo && prodInfo.weight) { itemWeight = prodInfo.weight; itemUnit = prodInfo.unit; } }
+        var itemDisplay = itemName;
+        if(itemWeight) { var weightStr = fmtWeightDisplay(itemWeight, itemUnit); if(weightStr) itemDisplay += ' (' + weightStr + ')'; }
+        return '<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;">' +
+               '<span>📦 ' + esc(itemDisplay) + ' × ' + (item.quantity || 1) + '</span>' +
+               '<span>₹' + ((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN') + '</span></div>';
+    }
+    
+    window.updateOrderStatus = async function(id, newStatus) {
+        var labels = { confirmed: 'Confirm', out_for_delivery: 'Mark Out for Delivery', delivered: 'Mark as Delivered' };
+        if(!confirm(labels[newStatus] + ' — are you sure?')) return;
+        
+        try {
+            var updateData = { status: newStatus };
+            if (newStatus === 'confirmed') updateData.confirmed_at = new Date().toISOString();
+            else if (newStatus === 'out_for_delivery') updateData.out_for_delivery_at = new Date().toISOString();
+            else if (newStatus === 'delivered') updateData.delivered_at = new Date().toISOString();
+            
+            var r = await sb.from('orders').update(updateData).eq('id', id).select();
+            if (r.error) {
+                var r2 = await sb.from('orders').update({status: newStatus}).eq('id', id).select();
+                if (r2.error) throw new Error(r2.error.message);
+            }
+            
+            toast('✅ Status: ' + newStatus);
+            await loadData();
+            renderOrders($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    window.sendWhatsAppOrder = function(orderId) {
+        var order = allOrders.find(function(o) { return o.id === orderId; });
+        if(!order) return;
+        var phone = order.customer_phone || '';
+        if(!phone) { toast('No phone', 'error'); return; }
+        var items = [];
+        try { items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []); } catch(e) { items = []; }
+        var oid = '#' + (order.id || '').substring(0, 8).toUpperCase();
+        var dt = formatOrderDate(order.created_at);
+        var text = '🏪 *ZyMart+ - Order Confirmation*\n\n✅ *Your order has been confirmed!*\n\n🛒 Order ID: ' + oid + '\n📅 Date: ' + dt.full + '\n\n👤 ' + (order.customer_name || 'N/A') + '\n📍 ' + [order.customer_address, order.customer_city, order.customer_pincode].filter(Boolean).join(', ') + '\n\n📦 Items:\n';
+        for(var i = 0; i < items.length; i++) {
+            var it = items[i];
+            text += (i+1) + '. ' + (it.product_name || it.name) + ' × ' + (it.quantity || 1) + ' = ₹' + ((it.price || 0) * (it.quantity || 1)).toLocaleString('en-IN') + '\n';
+        }
+        text += '\n💰 Total: ₹' + (parseFloat(order.total_amount) || 0).toLocaleString('en-IN') + '\n\nThank you for shopping with ZyMart+!';
+        window.open('https://wa.me/91' + phone.replace(/[^0-9]/g, '') + '?text=' + encodeURIComponent(text), '_blank');
+    };
+    
+    window.copyOrderDetails = function(orderId) {
+        var order = allOrders.find(function(o) { return o.id === orderId; });
+        if(!order) return;
+        var items = [];
+        try { items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []); } catch(e) { items = []; }
+        var oid = '#' + (order.id || '').substring(0, 8).toUpperCase();
+        var dt = formatOrderDate(order.created_at);
+        var text = '🧾 *ORDER ' + oid + '*\n📅 ' + dt.full + '\n\n👤 ' + (order.customer_name || 'N/A') + '\n📱 +91 ' + (order.customer_phone || '') + '\n📍 ' + [order.customer_address, order.customer_city, order.customer_pincode].filter(Boolean).join(', ') + '\n\n📦 Items:\n';
+        for(var i = 0; i < items.length; i++) {
+            var it = items[i];
+            text += (i+1) + '. ' + (it.product_name || it.name) + ' × ' + (it.quantity || 1) + ' = ₹' + ((it.price || 0) * (it.quantity || 1)).toLocaleString('en-IN') + '\n';
+        }
+        text += '\n💰 Total: ₹' + (parseFloat(order.total_amount) || 0).toLocaleString('en-IN');
+        navigator.clipboard.writeText(text).then(function() { toast('📋 Copied!'); }).catch(function() { toast('Copy failed', 'error'); });
+    };
+    
+    window.deleteOrder = async function(id) { if(!confirm('Delete order?')) return; await sb.from('orders').delete().eq('id', id); toast('Deleted'); await loadData(); renderOrders($('contentArea')); };
+    
+    function renderUsers(c) {
+        var filtered = allUsers;
+        if (searchUsers) {
+            filtered = allUsers.filter(function(u) {
+                var name = (u.name || '').toLowerCase();
+                var phone = (u.phone || '').toLowerCase();
+                var email = (u.email || '').toLowerCase();
+                return name.indexOf(searchUsers) !== -1 || phone.indexOf(searchUsers) !== -1 || email.indexOf(searchUsers) !== -1;
+            });
+        }
+        
+        var customers = filtered.filter(function(u) { return u.role !== '1' && u.role !== 'admin' && u.role !== 'Admin' && u.role !== '2' && u.role !== 'shop_owner' && u.role !== '3'; });
+        var admins = filtered.filter(function(u) { return u.role === '1' || u.role === 'admin' || u.role === 'Admin'; });
+        var shopOwners = filtered.filter(function(u) { return u.role === '2' || u.role === 'shop_owner' || u.role === '3'; });
+        
+        function userRow(u) {
+            return '<tr><td>' + esc(u.name || 'N/A') + '</td><td>' + esc(u.phone || u.email || '-') + '</td><td>' +
+            (u.is_blocked ? '<button class="btn btn-success btn-sm" onclick="toggleBlockUser(\'' + u.id + '\',false)">Unblock</button>' : '<button class="btn btn-warning btn-sm" onclick="toggleBlockUser(\'' + u.id + '\',true)">Block</button>') +
+            '</td></tr>';
+        }
+        
+        var html = '<div style="padding:0 12px;">' + renderSearchBar('searchUsersInput', 'Search by name, phone, email...', searchUsers, 'filterUsers') + '</div>';
+        html += '<div class="search-count" style="padding:0 12px;">Showing ' + filtered.length + ' of ' + allUsers.length + ' users</div>';
+        html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;padding:12px;">';
+        html += '<div class="content-card"><div class="card-header"><h2>👥 Customers (' + customers.length + ')</h2></div><div style="padding:12px;"><div class="table-wrapper"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Actions</th></tr></thead><tbody>' +
+        (customers.length ? customers.map(userRow).join('') : '<tr><td colspan="3" style="text-align:center;">No users</td></tr>') + '</tbody></table></div></div></div>';
+        html += '<div class="content-card"><div class="card-header"><h2>🔧 Admin (' + admins.length + ')</h2></div><div style="padding:12px;"><div class="table-wrapper"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Actions</th></tr></thead><tbody>' +
+        (admins.length ? admins.map(userRow).join('') : '<tr><td colspan="3" style="text-align:center;">No admins</td></tr>') + '</tbody></table></div></div></div>';
+        html += '<div class="content-card"><div class="card-header"><h2>🏪 Shop Owners (' + shopOwners.length + ')</h2></div><div style="padding:12px;"><div class="table-wrapper"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Actions</th></tr></thead><tbody>' +
+        (shopOwners.length ? shopOwners.map(userRow).join('') : '<tr><td colspan="3" style="text-align:center;">No shop owners</td></tr>') + '</tbody></table></div></div></div>';
+        html += '</div>';
+        c.innerHTML = html;
+    }
+    
+    window.toggleBlockUser = async function(id, block) { 
+        try {
+            var r = await sb.from('users').update({is_blocked: block}).eq('id', id).select();
+            if (r.error) throw new Error(r.error.message);
+            toast('Done!'); 
+            await loadData(); 
+            renderUsers($('contentArea')); 
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    window.handleLogout = async function() { 
+        if(sessionRefreshTimer) clearInterval(sessionRefreshTimer);
+        if(autoRefreshTimer) clearInterval(autoRefreshTimer);
+        try { await sb.auth.signOut(); } catch(e) {}
+        ['zymart_session','zymart_user_role','zymart_user_phone','zymart_token'].forEach(function(k) { localStorage.removeItem(k); });
+        try { var keys = Object.keys(localStorage); for (var i = 0; i < keys.length; i++) if (keys[i].indexOf('sb-') === 0) localStorage.removeItem(keys[i]); } catch(e) {}
+        try { sessionStorage.clear(); } catch(e) {}
+        window.location.replace('index.html'); 
+    };
+    
+    async function checkSession() {
+        try {
+            var res = await sb.auth.getSession();
+            if(res && res.data && res.data.session) {
+                if (res.data.session.user.email === 'sk12shaikh@gmail.com') {
+                    currentAdmin = res.data.session.user;
+                    await loadData();
+                    renderApp();
+                    showApp();
+                    return;
+                }
+                var prof = await safeFetch(function() { return sb.from('users').select('role').eq('email', res.data.session.user.email).maybeSingle(); });
+                var role = prof.data ? prof.data.role : null;
+                if(role === 1 || role === '1' || role === 'admin' || role === 'Admin') {
+                    currentAdmin = res.data.session.user;
+                    await loadData();
+                    renderApp();
+                    showApp();
+                    return;
+                }
+                window.location.href = 'index.html';
+                return;
+            }
+            try {
+                var localSession = JSON.parse(localStorage.getItem('zymart_session') || 'null');
+                var userRole = localStorage.getItem('zymart_user_role') || '';
+                if(localSession && localSession.userId && (userRole === 'admin' || userRole === '1' || userRole === 'Admin')) {
+                    currentAdmin = { id: localSession.userId, email: localSession.email || 'admin@zymart.com', phone: localSession.phone || '' };
+                    await loadData();
+                    renderApp();
+                    showApp();
+                    return;
+                }
+            } catch(e) {}
+            showLogin();
+            showApp();
+        } catch(e) { showLogin(); showApp(); }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() { checkSession(); });
+    
+    window.toggleSidebar = toggleSidebar;
+    window.loadSection = loadSection;
+    window.updateOrderStatus = updateOrderStatus;
+    window.sendWhatsAppOrder = sendWhatsAppOrder;
+    window.copyOrderDetails = copyOrderDetails;
+    window.deleteOrder = deleteOrder;
+    window.toggleBlockUser = toggleBlockUser;
+    window.handleLogout = handleLogout;
+    window.fastNavigate = fastNavigate;
+    window.switchToPanel = switchToPanel;
+    window.sendAdminOTP = sendAdminOTP;
+    window.verifyAdminOTP = verifyAdminOTP;
+    window.resendAdminOTP = resendAdminOTP;
+    window.backToAdminEmail = backToAdminEmail;
+    window.manualRefresh = manualRefresh;
+    window.filterUsers = filterUsers;
+    window.filterOrders = filterOrders;
+    
+})();
+</script>
+</body>
+</html>

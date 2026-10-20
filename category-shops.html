@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Category Shops - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root{
+            --brand-green:#0B5A31;--brand-green-dark:#083D21;--brand-orange:#F59E0B;
+            --brand-orange-dark:#E8890A;--neutral-white:#FFFFFF;--neutral-bg:#F8FAF9;
+            --neutral-border:#E5E7EB;--neutral-gray:#6B7280;--neutral-dark:#1A1A1A;
+            --danger:#EF4444;--success:#10B981;
+            --shadow-xs:0 1px 2px rgba(0,0,0,0.04);--shadow-sm:0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md:0 4px 16px rgba(0,0,0,0.08);--shadow-lg:0 8px 30px rgba(0,0,0,0.10);
+            --radius-sm:10px;--radius-md:14px;--radius-lg:18px;--radius-xl:22px;--radius-full:9999px;
+            --status-bar-height:env(safe-area-inset-top, 0px);
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--neutral-bg);color:var(--neutral-dark);padding-bottom:calc(85px + env(safe-area-inset-bottom, 0px));-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;min-height:100vh;}
+        @keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(11,90,49,0.4)}50%{box-shadow:0 0 0 8px rgba(11,90,49,0)}}
+        
+        /* FIX 4: Safe-area top */
+        .top-bar{background:linear-gradient(135deg,var(--brand-green),var(--brand-green-dark));position:fixed;top:0;left:0;width:100%;z-index:1000;padding:10px 14px;padding-top:calc(10px + var(--status-bar-height));display:flex;align-items:center;gap:10px;box-shadow:0 2px 20px rgba(11,90,49,0.3);}
+        .back-btn{width:40px;height:40px;min-width:40px;background:rgba(255,255,255,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:white;font-size:15px;text-decoration:none;transition:all 0.15s ease;}
+        .back-btn:active{background:rgba(255,255,255,0.25);transform:scale(0.93);}
+        .top-title{font-family:'Poppins',sans-serif;flex:1;font-size:17px;font-weight:700;color:white;display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .brand-zy{color:#A3E635;}.brand-mart{color:#FDE047;}
+        .top-count{font-size:11px;color:rgba(255,255,255,0.8);background:rgba(255,255,255,0.15);padding:4px 10px;border-radius:var(--radius-full);white-space:nowrap;}
+        
+        /* FIX 4: Safe-area top content */
+        .split-layout{display:flex;padding-top:calc(60px + var(--status-bar-height));min-height:calc(100vh - 60px);}
+        
+        .sidebar{
+            width:95px;min-width:95px;background:white;
+            border-right:1px solid var(--neutral-border);
+            overflow-y:auto;overflow-x:hidden;
+            position:fixed;top:calc(60px + var(--status-bar-height));
+            bottom:calc(75px + env(safe-area-inset-bottom, 0px));
+            left:0;
+            z-index:50;
+            -webkit-overflow-scrolling:touch;
+            scrollbar-width:none;
+            padding-bottom:24px;
+            transition:transform 0.2s ease;
+        }
+        .sidebar::-webkit-scrollbar{display:none}
+        .sidebar-item{
+            padding:10px 4px 8px;text-align:center;cursor:pointer;
+            font-size:10px;font-weight:600;color:var(--neutral-gray);
+            border-bottom:1px solid #F3F4F6;
+            border-left:3px solid transparent;
+            transition:all 0.15s ease;
+            -webkit-tap-highlight-color:transparent;
+        }
+        .sidebar-item:active{background:#F9FAFB}
+        .sidebar-item.active{
+            background:#EDF7F1;color:var(--brand-green);
+            border-left-color:var(--brand-green);font-weight:700;
+        }
+        .sidebar-cat-img{
+            width:52px;height:52px;border-radius:50%;
+            margin:0 auto 5px;overflow:hidden;
+            background:linear-gradient(135deg,#EDF7F1,#D1FAE5);
+            display:flex;align-items:center;justify-content:center;
+            border:2px solid #E5E7EB;transition:all 0.15s ease;
+        }
+        .sidebar-item.active .sidebar-cat-img{
+            border-color:var(--brand-green);
+            background:linear-gradient(135deg,#D1FAE5,#A7F3D0);
+        }
+        .sidebar-cat-img img{width:100%;height:100%;object-fit:cover}
+        .sidebar-cat-img i{font-size:20px;color:var(--brand-green)}
+        .sidebar-cat-name{
+            line-height:1.15;
+            display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+            overflow:hidden;word-break:break-word;
+        }
+        
+        .main-area{
+            flex:1;margin-left:95px;
+            min-width:0;overflow-x:hidden;
+        }
+        
+        .category-hero{background:linear-gradient(135deg,#EDF7F1,#D1FAE5);margin:12px 14px;padding:14px 16px;border-radius:var(--radius-xl);display:flex;align-items:center;gap:12px;animation:slideUp 0.3s ease;border:1px solid #A7F3D0}
+        .category-icon{width:48px;height:48px;min-width:48px;background:white;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:var(--shadow-sm)}
+        .category-info h2{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;color:var(--brand-green-dark);}
+        .category-info p{font-size:11px;color:var(--neutral-gray);margin-top:2px}
+        
+        /* FIX 10: Fallback notice */
+        .fallback-notice{margin:0 14px 10px;padding:10px 14px;background:#FFF8EB;border:1px solid #FDE68A;border-radius:var(--radius-md);font-size:11px;color:#92400E;display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+        .fallback-notice i{color:#F59E0B;font-size:14px;flex-shrink:0;margin-top:1px;}
+        
+        .location-bar{display:flex;align-items:center;gap:8px;margin:0 14px 8px;padding:10px 14px;background:white;border-radius:var(--radius-md);font-size:12px;color:var(--brand-green);cursor:pointer;border:1px solid var(--neutral-border);box-shadow:var(--shadow-xs);animation:slideUp 0.3s ease}
+        .location-bar:active{background:#EDF7F1}
+        .location-dot{width:10px;height:10px;background:var(--success);border-radius:50%;animation:pulse 2s infinite}
+        .nearby-badge{background:var(--brand-green);color:white;font-size:10px;padding:3px 10px;border-radius:9999px;font-weight:600;margin-left:auto}
+        
+        .sort-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;font-size:11px;color:var(--neutral-gray);flex-wrap:wrap;gap:6px}
+        .sort-option{cursor:pointer;padding:4px 12px;border-radius:var(--radius-full);font-weight:500;transition:all 0.15s ease;white-space:nowrap}
+        .sort-option.active{background:var(--brand-green);color:white;font-weight:600}
+        
+        .shops-list{padding:0 14px 20px}
+        .shop-card{background:var(--neutral-white);margin-bottom:10px;border-radius:var(--radius-lg);padding:14px;display:flex;gap:12px;align-items:center;border:1px solid var(--neutral-border);box-shadow:var(--shadow-xs);cursor:pointer;animation:slideUp 0.35s ease forwards;transition:all 0.15s ease;position:relative;overflow:hidden}
+        .shop-card:active{transform:scale(0.98)}
+        .shop-card.nearby{border:2px solid var(--brand-green);background:linear-gradient(135deg,#F9FDF9,#FFFFFF)}
+        .shop-card.nearby::before{content:'📍 Nearby';position:absolute;top:8px;right:8px;background:var(--brand-green);color:white;font-size:8px;padding:3px 8px;border-radius:9999px;font-weight:600;z-index:1}
+        
+        .shop-img{width:58px;height:58px;min-width:58px;border-radius:var(--radius-md);background:linear-gradient(135deg,#EDF7F1,#D1FAE5);display:flex;align-items:center;justify-content:center;overflow:hidden;border:2px solid #C8E6C9}
+        .shop-img img{width:100%;height:100%;object-fit:cover}
+        .shop-img i{font-size:24px;color:var(--brand-green)}
+        
+        .shop-info{flex:1;min-width:0}
+        .shop-name{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+        .shop-rating{display:inline-flex;align-items:center;gap:3px;background:#FFF8EB;color:#D97706;padding:2px 8px;border-radius:var(--radius-full);font-size:10px;font-weight:700}
+        .shop-rating i{font-size:8px}
+        .shop-rating.new-shop{background:#F3F4F6;color:#9CA3AF;font-size:9px}
+        .shop-meta{display:flex;gap:8px;font-size:10px;color:var(--neutral-gray);flex-wrap:wrap;margin-top:3px}
+        .shop-meta span{display:flex;align-items:center;gap:3px}
+        .shop-distance{color:var(--brand-green);font-weight:700;background:#EDF7F1;padding:2px 8px;border-radius:var(--radius-full);font-size:9px}
+        .shop-arrow{color:#D1D5DB;font-size:14px;transition:transform 0.15s ease;flex-shrink:0}
+        .shop-card:active .shop-arrow{transform:translateX(4px)}
+        
+        .empty-state{text-align:center;padding:60px 20px;animation:fadeIn 0.4s ease}
+        .empty-icon{width:80px;height:80px;background:#F3F5F4;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+        .empty-icon i{font-size:36px;color:#D1D5DB}
+        .empty-state h3{font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px}
+        .empty-state p{font-size:12px;color:var(--neutral-gray);margin-bottom:16px;line-height:1.5}
+        .btn-primary{background:var(--brand-green);color:white;border:none;padding:11px 22px;border-radius:var(--radius-full);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px;text-decoration:none;transition:all 0.15s ease;margin:4px}
+        .btn-primary:active{background:var(--brand-green-dark);transform:scale(0.96)}
+        
+        /* FIX 4: Safe-area bottom nav */
+        .bottom-nav{background:white;position:fixed;bottom:0;left:0;width:100%;display:flex;justify-content:space-around;padding:5px 10px calc(10px + env(safe-area-inset-bottom, 0px));box-shadow:0 -4px 20px rgba(0,0,0,0.05);z-index:1000;border-top:1px solid var(--neutral-border)}
+        .nav-item{display:flex;flex-direction:column;align-items:center;font-size:9px;font-weight:500;color:var(--neutral-gray);cursor:pointer;padding:3px 10px;border-radius:var(--radius-full);border:none;background:transparent;font-family:'Inter',sans-serif;text-decoration:none;transition:all 0.15s ease}
+        .nav-item:active{background:#EDF7F1}.nav-item.active{color:var(--brand-green);font-weight:700}.nav-item i{font-size:18px;margin-bottom:1px}
+        
+        .loading-state{text-align:center;padding:40px 20px}
+        .loading-spinner{width:34px;height:34px;border:3px solid #E5E7EB;border-top-color:var(--brand-orange);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px}
+        .loading-text{font-size:12px;color:var(--neutral-gray)}
+        
+        /* FIX 4: Safe-area toast */
+        .toast{position:fixed;bottom:calc(95px + env(safe-area-inset-bottom, 0px));left:50%;transform:translateX(-50%);background:var(--neutral-dark);color:white;padding:10px 20px;border-radius:var(--radius-full);font-size:12px;z-index:10050;opacity:0;visibility:hidden;white-space:nowrap;box-shadow:var(--shadow-md);transition:all 0.3s ease;max-width:90%;overflow:hidden;text-overflow:ellipsis}
+        .toast.show{opacity:1;visibility:visible}
+        .toast.error{background:var(--danger)}.toast.success{background:var(--success)}
+        
+        @media(max-width:380px){
+            .sidebar{width:80px;min-width:80px}
+            .main-area{margin-left:80px}
+            .sidebar-cat-img{width:44px;height:44px}
+            .shop-img{width:50px;height:50px;min-width:50px}
+            .shop-name{font-size:13px}
+            .shop-card{padding:11px;gap:9px}
+            .category-hero{padding:12px 14px}
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="netBanner" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);background:#DC2626;color:white;text-align:center;padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;z-index:99999;box-shadow:0 4px 12px rgba(220,38,38,0.4);white-space:nowrap;pointer-events:none;">📴 No Internet</div>
+
+<div id="mainApp">
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
+        <span class="top-title"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span></span>
+        <span class="top-count" id="shopCount">0 shops</span>
+    </div>
+    
+    <div class="split-layout">
+        <aside class="sidebar" id="sidebar">
+            <div style="padding:20px 4px;text-align:center;">
+                <div class="loading-spinner" style="width:24px;height:24px;border-width:2.5px;"></div>
+            </div>
+        </aside>
+        
+        <main class="main-area" id="mainContent">
+            <div class="loading-state"><div class="loading-spinner"></div><p class="loading-text">Finding shops near you...</p></div>
+        </main>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <a class="nav-item" href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+    <a class="nav-item" href="products.html"><i class="fas fa-box"></i><span>Browse</span></a>
+    <a class="nav-item" href="cart.html"><i class="fas fa-shopping-cart"></i><span>Cart</span></a>
+    <a class="nav-item" href="orders.html"><i class="fas fa-receipt"></i><span>Orders</span></a>
+    <a class="nav-item active"><i class="fas fa-store"></i><span>Shops</span></a>
+</nav>
+
+<div class="toast" id="toastMsg"><span id="toastText"></span></div>
+
+<script>
+(function(){'use strict';
+window.addEventListener('error',function(e){console.error('[Category]',e.message);try{showToast('Something went wrong','error');}catch(_){}});
+
+// FIX 5: Offline banner
+window.addEventListener('offline',function(){var b=document.getElementById('netBanner');if(b)b.style.display='block';});
+window.addEventListener('online',function(){var b=document.getElementById('netBanner');if(b)b.style.display='none';});
+
+// FIX 6: Image fallback
+var IMG_FALLBACK = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="#F3F4F6" width="100" height="100"/><circle cx="50" cy="42" r="13" fill="#D1D5DB"/><rect x="34" y="60" width="32" height="7" rx="3.5" fill="#D1D5DB"/></svg>');
+window.addEventListener('error', function(e) {
+    var el = e.target;
+    if (el && el.tagName === 'IMG' && !el.dataset.fb) {
+        el.dataset.fb = '1';
+        el.onerror = null;
+        el.src = IMG_FALLBACK;
+    }
+}, true);
+
+var CONFIG = {
+    SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+    SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1',
+    CLOUDINARY_CLOUD_NAME: 'b0zm0rac',
+    CLOUDINARY_ENABLED: true
+};
+
+var sb=supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+var SUPABASE_URL=CONFIG.SUPABASE_URL;
+
+// FIX 1: Only needed columns (egress)
+var SHOP_COLS = 'id, name, image_url, category, city, rating, latitude, longitude, delivery_radius_km, is_open';
+var CAT_COLS = 'id, name, image_url, display_order';
+
+var categoryId=null, categoryName='', nearbyShopIds=[], shopDistances={}, userLat=null, userLng=null;
+var allShops=[], currentSort='nearby';
+var allCategories=[];
+var currentLoadingCategory=null;
+var usedFallback=false; // FIX 10
+
+try{var p=new URLSearchParams(window.location.search);categoryId=p.get('id');categoryName=p.get('name')?decodeURIComponent(p.get('name')):'';}catch(e){}
+
+function $(id){return document.getElementById(id);}
+function esc(s){if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function attrEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// FIX 7: Back button fallback
+window.goBack = function() {
+    try {
+        if (document.referrer && document.referrer.indexOf(location.host) !== -1) history.back();
+        else window.location.href = 'all-shops.html';
+    } catch(e) { window.location.href = 'all-shops.html'; }
+};
+
+function getFullUrl(u, width){
+    if(!u||typeof u!=='string')return '';
+    var fullUrl;
+    if(u.indexOf('http')===0||u.indexOf('data:')===0){
+        fullUrl=u;
+    }else{
+        fullUrl=SUPABASE_URL+'/storage/v1/object/public/'+u;
+    }
+    if(fullUrl.indexOf('res.cloudinary.com')===0)return fullUrl;
+    if(!CONFIG.CLOUDINARY_ENABLED)return fullUrl;
+    var w=width||150;
+    return 'https://res.cloudinary.com/'+CONFIG.CLOUDINARY_CLOUD_NAME+'/image/fetch/w_'+w+',q_auto,f_auto/'+fullUrl;
+}
+
+var CACHE_TTL = 5 * 60 * 1000;
+function getCache(key){
+    try{var raw=sessionStorage.getItem('zymart_cc_'+key);if(!raw)return null;var parsed=JSON.parse(raw);if(Date.now()-parsed.t>CACHE_TTL){sessionStorage.removeItem('zymart_cc_'+key);return null;}return parsed.d;}catch(e){return null;}
+}
+function setCache(key,data){
+    try{sessionStorage.setItem('zymart_cc_'+key,JSON.stringify({t:Date.now(),d:data}));}catch(e){}
+}
+
+function showToast(m,type){var t=$('toastMsg'),s=$('toastText');if(!t||!s)return;s.textContent=m;t.className='toast';if(type==='error')t.classList.add('error');else if(type==='success')t.classList.add('success');t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show','error','success');},2500);}
+window.fastNavigate=function(url){window.location.href=url;};
+
+function calculateDistance(lat1,lng1,lat2,lng2){var R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180,a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+
+// FIX 3: Rating display — no fake 4.0
+function getRatingHtml(s) {
+    var r = parseFloat(s.rating) || 0;
+    if (r <= 0) return '<span class="shop-rating new-shop">🆕 New</span>';
+    return '<span class="shop-rating"><i class="fas fa-star"></i> ' + r.toFixed(1) + '</span>';
+}
+
+function loadLocationAndSort(shops){
+    var lat=parseFloat(localStorage.getItem('user_lat')||'0')||null,lng=parseFloat(localStorage.getItem('user_lng')||'0')||null,ts=parseInt(localStorage.getItem('location_timestamp')||'0');
+    if(!lat||!lng||(Date.now()-ts)>86400000)return shops;
+    userLat=lat;userLng=lng;nearbyShopIds=[];shopDistances={};
+    for(var i=0;i<shops.length;i++){
+        var shop=shops[i];
+        if(!shop.latitude||!shop.longitude)continue;
+        var dist=calculateDistance(userLat,userLng,shop.latitude,shop.longitude);
+        shopDistances[shop.id]=Math.round(dist*10)/10;
+        if(dist<=(shop.delivery_radius_km||10))nearbyShopIds.push(shop.id);
+    }
+    return shops;
+}
+
+function getSortedShops(){
+    if(currentSort==='rating')return allShops.slice().sort(function(a,b){return(b.rating||0)-(a.rating||0);});
+    return allShops.slice().sort(function(a,b){
+        var aN=nearbyShopIds.indexOf(a.id)!==-1,bN=nearbyShopIds.indexOf(b.id)!==-1;
+        if(aN&&!bN)return-1;if(!aN&&bN)return 1;
+        var aD = shopDistances[a.id] !== undefined ? shopDistances[a.id] : 999;
+        var bD = shopDistances[b.id] !== undefined ? shopDistances[b.id] : 999;
+        return aD-bD;
+    });
+}
+
+window.setSort=function(sort,btn){currentSort=sort;document.querySelectorAll('.sort-option').forEach(function(x){x.classList.remove('active');});btn.classList.add('active');renderShops();};
+
+function renderShops(){
+    var c=$('mainContent');if(!c)return;
+    var decodedName=categoryName || 'Category';
+    var locShort=localStorage.getItem('location_short')||'';
+    
+    var h='';
+    h+='<div class="category-hero"><div class="category-icon">🏪</div><div class="category-info"><h2>'+esc(decodedName)+'</h2><p>Browse shops in this category</p></div></div>';
+    
+    // FIX 10: Fallback notice
+    if (usedFallback) {
+        h += '<div class="fallback-notice"><i class="fas fa-info-circle"></i><div>Is category mein abhi koi shop nahi hai — <strong>saare shops dikha rahe hain</strong>.</div></div>';
+    }
+    
+    if(locShort&&userLat&&userLng){
+        h+='<div class="location-bar" onclick="window.location.href=\'set-location.html\'"><div class="location-dot"></div><span>📍 '+esc(locShort)+'</span>'+'<span class="nearby-badge">'+nearbyShopIds.length+' nearby</span></div>';
+    }
+    
+    h+='<div class="sort-bar"><span>'+allShops.length+' shop'+(allShops.length!==1?'s':'')+'</span><div><span class="sort-option'+(currentSort==='nearby'?' active':'')+'" onclick="setSort(\'nearby\',this)">📍 Nearby</span> <span class="sort-option'+(currentSort==='rating'?' active':'')+'" onclick="setSort(\'rating\',this)">⭐ Rating</span></div></div>';
+    
+    var sorted=getSortedShops();
+    h+='<div class="shops-list">';
+    for(var i=0;i<sorted.length;i++){
+        var s=sorted[i];
+        var imgUrl=getFullUrl(s.image_url, 150);
+        var isNearby=nearbyShopIds.indexOf(s.id)!==-1;
+        var dist = shopDistances[s.id] !== undefined ? shopDistances[s.id] : null;
+        h+='<div class="shop-card'+(isNearby?' nearby':'')+'" onclick="fastNavigate(\'shop-details.html?id='+attrEsc(s.id)+'\')" style="animation-delay:'+(i*0.04)+'s">';
+        h+='<div class="shop-img">'+(imgUrl?'<img src="'+attrEsc(imgUrl)+'" loading="lazy" decoding="async" alt="'+attrEsc(s.name)+'">':'<i class="fas fa-store"></i>')+'</div>';
+        h+='<div class="shop-info"><div class="shop-name">'+esc(s.name||s.shop_name||'Shop')+' '+getRatingHtml(s)+'</div>';
+        h+='<div class="shop-meta"><span><i class="fas fa-map-pin"></i> '+esc(s.city||'Location')+'</span>';
+        if(dist!==null)h+='<span class="shop-distance">📍 '+dist+' km</span>';
+        if(s.is_open)h+='<span style="color:#10B981;">🟢 Open</span>';
+        h+='</div></div><i class="fas fa-chevron-right shop-arrow"></i></div>';
+    }
+    h+='</div>';
+    
+    var sc = $('shopCount');
+    if (sc) sc.textContent = allShops.length+' shop'+(allShops.length!==1?'s':'');
+    
+    if(!sorted.length){
+        h='<div class="empty-state"><div class="empty-icon"><i class="fas fa-store-slash"></i></div><h3>No Shops Found</h3><p>No shops available in "'+esc(decodedName)+'" yet.<br>Check back soon!</p><button class="btn-primary" onclick="window.location.href=\'index.html\'"><i class="fas fa-home"></i> Go Home</button></div>';
+    }
+    c.innerHTML=h;
+}
+
+// ═══ FIX 2 + FIX 8 + FIX 9: Load shops with proper filters, limits, guards ═══
+async function loadShopsForCategory(catId, catName) {
+    if (!catId) return;
+    currentLoadingCategory = catId;
+    usedFallback = false;
+    
+    var c = $('mainContent');
+    if (!c) return;
+    c.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p class="loading-text">Loading shops...</p></div>';
+    
+    try {
+        var cacheKey = 'shops_v4_' + catId; // v4 = new cache schema
+        var cached = getCache(cacheKey);
+        var allShopsData = null;
+        
+        if (cached && Array.isArray(cached.shops)) {
+            allShopsData = cached.shops;
+            usedFallback = cached.fallback === true;
+        } else {
+            // FIX 1: Only specific columns — not select('*')
+            var shops = [];
+            try {
+                var r = await sb.from('shops')
+                    .select(SHOP_COLS)
+                    .eq('status','approved')
+                    .neq('is_open', false)
+                    .limit(200);
+                shops = (r && r.data) ? r.data : [];
+            } catch(e1) {
+                console.error('[Category] Shops fetch failed:', e1);
+                shops = [];
+            }
+            
+            // FIX 2: is_open NULL handling — include NULL (new shops)
+            shops = shops.filter(function(s){ return s.is_open !== false; });
+            
+            if (shops.length === 0) {
+                if (currentLoadingCategory !== catId) return;
+                allShops = [];
+                renderShops();
+                return;
+            }
+            
+            var shopIds = shops.map(function(s){ return s.id; });
+            
+            // FIX 8: Guard — shopIds empty
+            if (shopIds.length === 0) {
+                allShopsData = [];
+                if (currentLoadingCategory !== catId) return;
+                allShops = loadLocationAndSort(allShopsData);
+                renderShops();
+                return;
+            }
+            
+            // Subcategories
+            var categoryIds = [catId];
+            try {
+                var subRes = await sb.from('categories').select('id').eq('parent_id', catId);
+                if (subRes && subRes.data) {
+                    subRes.data.forEach(function(sc) {
+                        if (sc.id && categoryIds.indexOf(sc.id) === -1) categoryIds.push(sc.id);
+                    });
+                }
+            } catch(e2) {
+                console.warn('[Category] Subcategory lookup failed:', e2);
+            }
+            
+            // Products query — try multiple fields
+            var matchingShopIds = [];
+            var productCategoryFields = ['category_id', 'subcategory_id', 'sub_category_id'];
+            
+            for (var f = 0; f < productCategoryFields.length; f++) {
+                var field = productCategoryFields[f];
+                try {
+                    // FIX 9: Only shop_id column, limit
+                    var pr = await sb.from('products')
+                        .select('shop_id')
+                        .in(field, categoryIds)
+                        .in('shop_id', shopIds)
+                        .limit(100);
+                    
+                    if (pr && pr.data && pr.data.length > 0) {
+                        var seen = {};
+                        pr.data.forEach(function(p) {
+                            if (p.shop_id && !seen[p.shop_id]) {
+                                seen[p.shop_id] = true;
+                                matchingShopIds.push(p.shop_id);
+                            }
+                        });
+                        break; // success — stop trying other fields
+                    }
+                } catch(e3) {
+                    console.log('[Category] Field "' + field + '" not usable:', e3.message || e3);
+                }
+            }
+            
+            if (matchingShopIds.length > 0) {
+                allShopsData = shops.filter(function(s){ return matchingShopIds.indexOf(s.id) !== -1; });
+                usedFallback = false;
+                setCache(cacheKey, { shops: allShopsData, fallback: false });
+            } else {
+                // FIX 10: Fallback but mark as used
+                console.log('[Category] No matching products — showing ALL shops');
+                allShopsData = shops.slice();
+                usedFallback = true;
+                // Don't cache fallback result (fresh try next time)
+            }
+        }
+        
+        if (currentLoadingCategory !== catId) return;
+        
+        allShops = loadLocationAndSort(allShopsData);
+        renderShops();
+    } catch(e) {
+        console.error('[Category] FATAL load error:', e);
+        if (currentLoadingCategory !== catId) return;
+        try {
+            var r2 = await sb.from('shops')
+                .select(SHOP_COLS)
+                .eq('status','approved')
+                .neq('is_open', false)
+                .limit(200);
+            allShops = (r2 && r2.data) ? r2.data : [];
+            allShops = loadLocationAndSort(allShops);
+            usedFallback = true;
+            renderShops();
+        } catch(e4) {
+            c.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="fas fa-exclamation-circle"></i></div><h3>Failed to Load</h3><p>Please check your connection</p><button class="btn-primary" onclick="window.switchCategory(\''+attrEsc(catId)+'\',\''+encodeURIComponent(catName)+'\')"><i class="fas fa-redo"></i> Retry</button></div>';
+        }
+    }
+}
+
+async function loadSidebar() {
+    var sidebar = $('sidebar');
+    if (!sidebar) return;
+    
+    try {
+        var cats = getCache('categories_list_v4');
+        
+        if (!cats) {
+            // Only specific columns
+            var r = await sb.from('categories')
+                .select(CAT_COLS)
+                .eq('is_active', true)
+                .eq('is_on_hold', false)
+                .is('parent_id', null)
+                .order('display_order', { ascending: true, nullsFirst: false })
+                .limit(40);
+            cats = (r && r.data) ? r.data : [];
+            setCache('categories_list_v4', cats);
+        }
+        
+        allCategories = cats;
+        
+        if (cats.length === 0) {
+            sidebar.innerHTML = '<div style="padding:20px 8px;text-align:center;font-size:10px;color:#9CA3AF;">No categories</div>';
+            $('mainContent').innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="fas fa-store-slash"></i></div><h3>No Categories</h3><p>Categories coming soon!</p></div>';
+            return;
+        }
+        
+        // If categoryId from URL doesn't match any top-level, use first
+        if (!categoryId || !cats.find(function(c){return c.id===categoryId;})) {
+            categoryId = cats[0].id;
+            categoryName = cats[0].name;
+        }
+        
+        var html = '';
+        for (var i=0; i<cats.length; i++) {
+            var cat = cats[i];
+            var isActive = (cat.id === categoryId);
+            var img = cat.image_url ? getFullUrl(cat.image_url, 100) : '';
+            
+            html += '<div class="sidebar-item'+(isActive?' active':'')+'" data-cat-id="'+attrEsc(cat.id)+'" onclick="window.switchCategory(\''+attrEsc(cat.id)+'\',\''+encodeURIComponent(cat.name).replace(/'/g,"\\'")+'\')">';
+            html += '<div class="sidebar-cat-img">';
+            html += img ? '<img src="'+attrEsc(img)+'" loading="lazy" decoding="async" alt="'+attrEsc(cat.name)+'">' : '<i class="fas fa-shopping-basket"></i>';
+            html += '</div>';
+            html += '<div class="sidebar-cat-name">'+esc(cat.name)+'</div>';
+            html += '</div>';
+        }
+        sidebar.innerHTML = html;
+        
+        // Auto-scroll active item
+        setTimeout(function(){
+            var activeItem = sidebar.querySelector('.sidebar-item.active');
+            if (activeItem) {
+                var top = activeItem.offsetTop - 40;
+                if (top > 0) sidebar.scrollTop = top;
+            }
+        }, 100);
+        
+        await loadShopsForCategory(categoryId, categoryName);
+        
+    } catch(e) {
+        console.error('[Category] Sidebar error:', e);
+        sidebar.innerHTML = '<div style="padding:20px 8px;text-align:center;font-size:10px;color:#EF4444;">Error</div>';
+    }
+}
+
+window.switchCategory = function(catId, catNameEncoded) {
+    if (!catId) return;
+    var catName = decodeURIComponent(catNameEncoded);
+    
+    document.querySelectorAll('.sidebar-item').forEach(function(el){
+        if (el.getAttribute('data-cat-id') === catId) el.classList.add('active');
+        else el.classList.remove('active');
+    });
+    
+    try {
+        var newUrl = window.location.pathname + '?id=' + catId + '&name=' + catNameEncoded;
+        history.replaceState({catId: catId}, '', newUrl);
+    } catch(e) {}
+    
+    document.title = catName + ' Shops - ZyMart+';
+    
+    categoryId = catId;
+    categoryName = catName;
+    currentSort = 'nearby';
+    usedFallback = false;
+    
+    loadShopsForCategory(catId, catName);
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (!navigator.onLine) { var nb = $('netBanner'); if (nb) nb.style.display = 'block'; }
+    loadSidebar();
+});
+})();
+</script>
+</body>
+</html>

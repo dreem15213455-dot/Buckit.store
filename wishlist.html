@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>My Wishlist - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root { 
+            --brand-green: #0B5A31; --brand-green-dark: #083D21; --brand-orange: #F59E0B; 
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB; 
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444; --success: #10B981; 
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); 
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --radius-sm: 10px; --radius-md: 14px; 
+            --radius-lg: 18px; --radius-full: 9999px; --status-bar-height: env(safe-area-inset-top, 0px);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); padding-bottom: 90px; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(80px); } }
+        @keyframes heartBeat { 0%{transform:scale(1)} 25%{transform:scale(1.2)} 50%{transform:scale(1)} 75%{transform:scale(1.2)} 100%{transform:scale(1)} }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes cartBounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .cart-badge.bounce { animation: cartBounce 0.3s ease; }
+        
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 100; padding: 10px 14px; padding-top: calc(10px + var(--status-bar-height)); display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; text-decoration: none; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { font-family: 'Poppins', sans-serif; flex: 1; font-size: 16px; font-weight: 700; color: white; }
+        .brand-zy { color: #A3E635; } .brand-mart { color: #FDE047; }
+        .top-count { font-size: 11px; color: white; background: rgba(255,255,255,0.12); padding: 5px 12px; border-radius: var(--radius-full); }
+        .cart-icon-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; position: relative; text-decoration: none; }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--brand-orange); color: white; border-radius: 50%; width: 17px; height: 17px; font-size: 8px; display: none; align-items: center; justify-content: center; border: 2px solid var(--brand-green); font-weight: 700; }
+        .cart-badge.show { display: flex; }
+        
+        .main-content { padding-top: 62px; max-width: 600px; margin: 0 auto; }
+        .holiday-strip { display: none; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; background: #FEE2E2; color: #DC2626; font-size: 11px; font-weight: 600; margin: 10px 14px; border-radius: var(--radius-md); border: 1px solid #FECACA; }
+        .holiday-strip.show { display: flex; }
+        
+        .wishlist-items { padding: 12px 14px; }
+        .wishlist-item { background: white; border-radius: var(--radius-lg); padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; align-items: center; border: 1px solid var(--neutral-border); box-shadow: var(--shadow-xs); animation: slideUp 0.3s ease forwards; position: relative; transition: all 0.15s ease; }
+        .wishlist-item:active { transform: scale(0.98); }
+        .wishlist-item.removing { animation: fadeOut 0.25s ease forwards; }
+        .wishlist-item.unavailable { opacity: 0.6; }
+        
+        .item-image { width: 72px; height: 72px; min-width: 72px; border-radius: var(--radius-sm); background: var(--neutral-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; flex-shrink: 0; position: relative; }
+        .item-image img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+        .item-image .oos-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; }
+        .item-image .oos-overlay span { background: rgba(0,0,0,0.7); color: white; padding: 2px 6px; border-radius: 9999px; font-size: 8px; font-weight: 700; }
+        
+        .item-details { flex: 1; min-width: 0; cursor: pointer; }
+        .item-name { font-size: 13px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .item-variant { font-size: 10px; font-weight: 600; display: inline-block; padding: 1px 6px; border-radius: 9999px; margin-top: 3px; }
+        .item-variant.weight { color: var(--brand-green); background: #EDF7F1; }
+        .item-variant.clothing { color: #7C3AED; background: #F3E8FF; }
+        
+        .item-rating { display: flex; align-items: center; gap: 2px; font-size: 10px; font-weight: 600; color: #6B7280; margin-top: 2px; }
+        .item-rating .star-icon { color: #F59E0B; font-size: 10px; }
+        .item-rating .avg-val { color: #1A1A1A; font-weight: 700; }
+        .item-rating .count-val { color: #9CA3AF; font-weight: 500; font-size: 9px; }
+        
+        .item-price-row { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+        .item-price { font-size: 16px; font-weight: 700; color: var(--brand-green-dark); }
+        .item-price-cut { font-size: 11px; color: var(--neutral-gray); text-decoration: line-through; }
+        .item-discount-badge { font-size: 9px; font-weight: 700; color: white; background: var(--brand-orange); padding: 2px 7px; border-radius: var(--radius-full); }
+        .item-stock-badge { font-size: 10px; font-weight: 600; margin-top: 2px; }
+        .item-stock-badge.low { color: #F59E0B; }
+        .item-stock-badge.oos { color: #EF4444; }
+        
+        .item-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+        .move-cart-btn { background: var(--brand-green); color: white; border: none; padding: 10px 16px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap; display: flex; align-items: center; gap: 4px; transition: all 0.15s ease; }
+        .move-cart-btn:active { background: var(--brand-green-dark); transform: scale(0.95); }
+        .move-cart-btn.in-cart { background: #EDF7F1; color: var(--brand-green); border: 1px solid var(--brand-green); }
+        .move-cart-btn.disabled { background: #D1D5DB; color: #9CA3AF; cursor: not-allowed; }
+        
+        .remove-btn { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: #FEF2F2; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: #EF4444; font-size: 9px; z-index: 1; }
+        .remove-btn:active { background: #FEE2E2; transform: scale(0.9); }
+        
+        .empty-state { text-align: center; padding: 70px 30px; }
+        .empty-icon { width: 80px; height: 80px; background: #F3F5F4; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+        .empty-icon i { font-size: 34px; color: #D1D5DB; }
+        .empty-state h3 { font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+        .empty-state p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 16px; }
+        .browse-btn { background: var(--brand-green); color: white; border: none; padding: 12px 26px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 7px; text-decoration: none; }
+        .browse-btn:active { background: var(--brand-green-dark); transform: scale(0.96); }
+        
+        .clear-all-btn { display: flex; gap: 8px; justify-content: center; padding: 10px; flex-wrap: wrap; }
+        .clear-all-btn button { background: transparent; color: var(--danger); border: 1px solid #FECACA; padding: 8px 20px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .clear-all-btn button:active { background: #FEF2F2; }
+        .clear-all-btn .move-all-btn { color: var(--brand-green); border-color: var(--brand-green); }
+        .clear-all-btn .move-all-btn:active { background: #EDF7F1; }
+        
+        /* Skeleton for wishlist loading */
+        .sk-wishlist-item { background: white; border-radius: var(--radius-lg); padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; border: 1px solid var(--neutral-border); }
+        .sk-img { width: 72px; height: 72px; min-width: 72px; border-radius: var(--radius-sm); background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        .sk-content { flex: 1; display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+        .sk-line { height: 12px; border-radius: 4px; background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        .sk-line.short { width: 60%; }
+        .sk-line.tiny { width: 40%; height: 10px; }
+        
+        .bottom-nav { background: white; position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; align-items: center; padding: 5px 12px 10px; box-shadow: 0 -4px 16px rgba(0,0,0,0.03); z-index: 100; border-top: 1px solid var(--neutral-border); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 9px; font-weight: 500; color: var(--neutral-gray); cursor: pointer; padding: 3px 10px; border-radius: var(--radius-full); border: none; background: transparent; font-family: 'Inter', sans-serif; text-decoration: none; position: relative; }
+        .nav-item:active { background: #EDF7F1; }
+        .nav-item.active { color: var(--brand-green); font-weight: 600; }
+        .nav-item i { font-size: 18px; margin-bottom: 1px; }
+        .nav-cart-count { position: absolute; top: -2px; right: 2px; background: var(--brand-orange); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 8px; display: none; align-items: center; justify-content: center; border: 2px solid white; font-weight: 700; }
+        .nav-cart-count.show { display: flex; }
+        
+        .toast { position: fixed; bottom: 95px; left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 200; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-md); transition: all 0.3s ease; max-width: 90%; overflow: hidden; text-overflow: ellipsis; }
+        .toast.show { opacity: 1; visibility: visible; }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <span class="top-title"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span> Wishlist</span>
+    <span class="top-count" id="wishlistCount">0 items</span>
+    <a href="cart.html" class="cart-icon-btn">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+    </a>
+</div>
+
+<div class="holiday-strip" id="holidayStrip">
+    <i class="fas fa-calendar-times"></i> 
+    <span id="holidayStripText">🏖️ आज डिलीवरी बंद है</span>
+</div>
+
+<div class="main-content" id="mainContent">
+    <div style="text-align:center;padding:60px;">
+        <div style="width:34px;height:34px;border:2.5px solid #E5E7EB;border-top-color:#F59E0B;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px;"></div>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <a class="nav-item" href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+    <a class="nav-item" href="cart.html">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Cart</span>
+        <span class="nav-cart-count" id="navCartCount">0</span>
+    </a>
+    <a class="nav-item" href="orders.html"><i class="fas fa-receipt"></i><span>Orders</span></a>
+    <a class="nav-item" href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a>
+    <a class="nav-item active" href="wishlist.html"><i class="fas fa-heart"></i><span>Wishlist</span></a>
+</nav>
+
+<div class="toast" id="toastMsg"><span id="toastText"></span></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1',
+        CLOUDINARY_CLOUD_NAME: 'b0zm0rac',
+        CLOUDINARY_ENABLED: true
+    };
+    
+    var sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    var SUPABASE_URL = CONFIG.SUPABASE_URL;
+    
+    var wishlistIds = [];  // Raw IDs from localStorage
+    var wishlistProducts = [];  // Fetched products from DB
+    var productRatingsCache = {};
+    var isHolidayToday = false;
+    var holidayReason = '';
+    var isLoading = false;
+    
+    // Product columns needed
+    var PRODUCT_COLS = 'id, name, price, offer_price, image_url, images, variants, colors, variant_type, size_type, weight, unit, weight_unit, stock, shop_id, brand_name, is_offer';
+    
+    function getEl(id) { return document.getElementById(id); }
+    function safeJSON(s, f) { try { return s ? JSON.parse(s) : f; } catch(e) { return f; } }
+    function esc(s) { if(!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    
+    function getFullUrl(u, width) {
+        if (!u || typeof u !== 'string') return '';
+        var fullUrl;
+        if (u.indexOf('http') === 0 || u.indexOf('data:') === 0) fullUrl = u;
+        else fullUrl = CONFIG.SUPABASE_URL + '/storage/v1/object/public/' + u;
+        if (fullUrl.indexOf('res.cloudinary.com') === 0) return fullUrl;
+        if (!CONFIG.CLOUDINARY_ENABLED) return fullUrl;
+        return 'https://res.cloudinary.com/' + CONFIG.CLOUDINARY_CLOUD_NAME + '/image/fetch/w_' + (width || 150) + ',q_auto,f_auto/' + fullUrl;
+    }
+    
+    function showToast(m, type) { 
+        var t = getEl('toastMsg'), s = getEl('toastText'); 
+        if (!t || !s) return; 
+        s.textContent = m; t.className = 'toast';
+        if (type === 'error') t.classList.add('error');
+        else if (type === 'success') t.classList.add('success');
+        t.classList.add('show'); 
+        clearTimeout(t._timer); 
+        t._timer = setTimeout(function() { t.classList.remove('show','error','success'); }, 2500); 
+    }
+    
+    // ═══ Product formatting helpers (from sub-category logic) ═══
+    function fmtWeight(w, u) {
+        if (!w || w === 0) return '';
+        var nw = parseFloat(w);
+        if(isNaN(nw)) return String(w);
+        var unitLower = u ? u.toLowerCase() : '';
+        if (unitLower === 'gram' || unitLower === 'g') return nw >= 1000 ? (nw/1000).toFixed(1).replace(/\.0$/,'') + ' kg' : nw + ' g';
+        if (unitLower === 'kg') return nw + ' kg';
+        if (unitLower === 'liter' || unitLower === 'l') return nw + ' L';
+        if (unitLower === 'ml') return nw + ' ml';
+        return nw + ' ' + (u || '');
+    }
+    
+    var COLOR_HEX_MAP = { 'red': '#EF4444', 'blue': '#3B82F6', 'green': '#10B981', 'yellow': '#FBBF24', 'black': '#1F2937', 'white': '#F9FAFB', 'orange': '#F97316', 'purple': '#8B5CF6', 'pink': '#EC4899', 'brown': '#92400E', 'grey': '#9CA3AF', 'gray': '#9CA3AF', 'navy': '#1E3A8A', 'maroon': '#7F1D1D', 'cream': '#FEF3C7', 'beige': '#F5F5DC', 'gold': '#D4AF37', 'silver': '#C0C0C0', 'olive': '#808000', 'teal': '#14B8A6', 'cyan': '#06B6D4', 'magenta': '#D946EF', 'violet': '#7C3AED', 'indigo': '#4338CA' };
+    function getColorHex(n) { if (!n) return '#E5E7EB'; var k = n.toLowerCase().trim(); if (COLOR_HEX_MAP[k]) return COLOR_HEX_MAP[k]; for (var x in COLOR_HEX_MAP) if (k.indexOf(x) !== -1) return COLOR_HEX_MAP[x]; return '#E5E7EB'; }
+    function getSizeTypeLabel(st) { var m = { 'adult': '👔', 'kids': '👶', 'footwear': '👟', 'free': '📏' }; return m[st] || ''; }
+    function parseColors(p) { try { return typeof p.colors === 'string' ? JSON.parse(p.colors) : (p.colors || []); } catch(e) { return []; } }
+    
+    function getClothingPriceRange(colors) {
+        if (!colors || !colors.length) return null;
+        var prices = [];
+        colors.forEach(function(c) { (c.sizes || []).forEach(function(s) { var pr = s.offer_price || s.price; if (pr > 0) prices.push(parseFloat(pr)); }); });
+        if (!prices.length) return null;
+        return { min: Math.min.apply(null, prices), max: Math.max.apply(null, prices) };
+    }
+    function getClothingOriginalRange(colors) {
+        if (!colors || !colors.length) return null;
+        var prices = [];
+        colors.forEach(function(c) { (c.sizes || []).forEach(function(s) { if (s.price > 0) prices.push(parseFloat(s.price)); }); });
+        if (!prices.length) return null;
+        return { min: Math.min.apply(null, prices), max: Math.max.apply(null, prices) };
+    }
+    function getClothingTotalStock(colors) { var t = 0; (colors || []).forEach(function(c) { (c.sizes || []).forEach(function(s) { t += (s.stock || 0); }); }); return t; }
+    function getClothingDiscount(colors) { var mx = 0; (colors || []).forEach(function(c) { (c.sizes || []).forEach(function(s) { if (s.offer_price && s.price && s.offer_price < s.price) { var d = Math.round((1 - s.offer_price / s.price) * 100); if (d > mx) mx = d; } }); }); return mx; }
+    function getSizeRangeText(colors) {
+        var allSizes = {}, ordered = [];
+        var order = ['XS','S','M','L','XL','XXL','3XL','1-2Y','2-3Y','3-4Y','4-5Y','5-6Y','6-7Y','7-8Y','8-9Y','10-11Y','12-13Y','5','6','7','8','9','10','11','12','Free Size'];
+        (colors || []).forEach(function(c) { (c.sizes || []).forEach(function(s) { if (s.size && !allSizes[s.size]) { allSizes[s.size] = true; ordered.push(s.size); } }); });
+        ordered.sort(function(a, b) { var ia = order.indexOf(a), ib = order.indexOf(b); if (ia === -1) ia = 999; if (ib === -1) ib = 999; return ia - ib; });
+        if (!ordered.length) return '';
+        if (ordered.length === 1) return ordered[0];
+        return ordered[0] + ' - ' + ordered[ordered.length - 1];
+    }
+    
+    // ═══ Compute display data for a product ═══
+    function computeProductData(p) {
+        var isClothing = (p.variant_type === 'color_size');
+        var colors = isClothing ? parseColors(p) : [];
+        var variants = (p.variants && Array.isArray(p.variants)) ? p.variants : [];
+        var bestV = variants.length > 0 ? (variants.find(function(v) { return (v.stock||0) > 0; }) || variants[0]) : null;
+        
+        var price = 0, original = 0, discount = 0, totalStock = 0, variantLabel = '', variantClass = '';
+        
+        if (isClothing) {
+            var range = getClothingPriceRange(colors);
+            var origRange = getClothingOriginalRange(colors);
+            price = range ? range.min : 0;
+            original = origRange ? origRange.min : price;
+            discount = getClothingDiscount(colors);
+            totalStock = getClothingTotalStock(colors);
+            var sizeRange = getSizeRangeText(colors);
+            if (sizeRange) { variantLabel = '📏 ' + sizeRange; variantClass = 'clothing'; }
+        } else {
+            price = bestV ? (parseFloat(bestV.offer_price) || parseFloat(bestV.price) || 0) : (parseFloat(p.offer_price) || parseFloat(p.price) || 0);
+            original = bestV ? parseFloat(bestV.price) || 0 : parseFloat(p.price) || 0;
+            discount = price && original && price < original ? Math.round((1 - price/original) * 100) : 0;
+            totalStock = bestV ? (bestV.stock || 0) : (p.stock || 0);
+            var wt = bestV ? fmtWeight(bestV.weight, bestV.weight_unit || bestV.unit) : fmtWeight(p.weight, p.weight_unit || p.unit);
+            if (wt) { variantLabel = '⚖️ ' + wt; variantClass = 'weight'; }
+        }
+        
+        var img = getFullUrl((p.images && p.images[0]) || p.image_url || (isClothing && colors[0] && colors[0].image_url) || '', 150);
+        
+        return {
+            isClothing: isClothing,
+            price: price,
+            original: original,
+            discount: discount,
+            totalStock: totalStock,
+            isOut: totalStock <= 0,
+            isLowStock: totalStock > 0 && totalStock <= 5,
+            variantLabel: variantLabel,
+            variantClass: variantClass,
+            img: img,
+            cartWeight: bestV ? (bestV.weight || p.weight || '') : (p.weight || ''),
+            cartUnit: bestV ? (bestV.weight_unit || bestV.unit || p.weight_unit || p.unit || '') : (p.weight_unit || p.unit || '')
+        };
+    }
+    
+    // ═══ Fetch ratings ═══
+    async function fetchRatingsForIds(ids) {
+        if (!ids || !ids.length) return;
+        var missing = ids.filter(function(id) { return productRatingsCache[id] === undefined; });
+        if (!missing.length) return;
+        try {
+            var r = await sb.from('product_reviews').select('product_id, rating').in('product_id', missing).eq('admin_hidden', false);
+            for (var i = 0; i < missing.length; i++) { if (productRatingsCache[missing[i]] === undefined) productRatingsCache[missing[i]] = { avg: 0, count: 0 }; }
+            if (r && r.data && r.data.length > 0) {
+                var temp = {};
+                r.data.forEach(function(rv) { if (!temp[rv.product_id]) temp[rv.product_id] = { sum: 0, count: 0 }; temp[rv.product_id].sum += parseInt(rv.rating) || 0; temp[rv.product_id].count++; });
+                Object.keys(temp).forEach(function(pid) { productRatingsCache[pid] = { avg: temp[pid].sum / temp[pid].count, count: temp[pid].count }; });
+            }
+        } catch(e) {
+            for (var i = 0; i < missing.length; i++) { if (productRatingsCache[missing[i]] === undefined) productRatingsCache[missing[i]] = { avg: 0, count: 0 }; }
+        }
+    }
+    
+    function getRatingHtml(productId) {
+        var r = productRatingsCache[productId];
+        if (!r || r.count === 0) return '';
+        return '<div class="item-rating"><span class="star-icon">★</span><span class="avg-val">' + r.avg.toFixed(1) + '</span><span class="count-val">(' + r.count + ')</span></div>';
+    }
+    
+    var CartManager = {
+        getCart: function() { return safeJSON(localStorage.getItem('zymart_cart'), []); },
+        saveCart: function(cart) { try { localStorage.setItem('zymart_cart', JSON.stringify(cart)); } catch(e) {} this.updateBadges(); },
+        getTotalItems: function() { return this.getCart().reduce(function(sum, item) { return sum + (item.quantity || 1); }, 0); },
+        updateBadges: function() {
+            var totalItems = this.getTotalItems();
+            var topBadge = getEl('cartBadge');
+            if (topBadge) { topBadge.textContent = totalItems; topBadge.classList.toggle('show', totalItems > 0); }
+            var navBadge = getEl('navCartCount');
+            if (navBadge) { navBadge.textContent = totalItems > 99 ? '99+' : totalItems; navBadge.classList.toggle('show', totalItems > 0); }
+        }
+    };
+    
+    async function checkHoliday() {
+        try {
+            var r = await sb.from('delivery_settings').select('is_holiday, holiday_reason, holiday_date, is_open').eq('is_active', true).single();
+            if(r.data) {
+                if(r.data.is_holiday) { var today = new Date().toISOString().split('T')[0]; if(r.data.holiday_date === today) { isHolidayToday = true; holidayReason = r.data.holiday_reason || 'आज डिलीवरी बंद है'; } }
+                if(r.data.is_open === false) { isHolidayToday = true; if(!holidayReason) holidayReason = 'दुकान अभी बंद है'; }
+                if(isHolidayToday) { var strip = getEl('holidayStrip'); if(strip) { strip.classList.add('show'); getEl('holidayStripText').textContent = '🏖️ ' + holidayReason; } }
+            }
+        } catch(e) { console.error('Holiday check error:', e); }
+    }
+    
+    // ═══ FIXED: Load wishlist with proper ID handling ═══
+    function loadWishlistIds() {
+        var raw = safeJSON(localStorage.getItem('zymart_wishlist'), []);
+        wishlistIds = raw.map(function(item) {
+            if (typeof item === 'string') return item;
+            if (item && item.id) return item.id;
+            return null;
+        }).filter(Boolean);
+        
+        // Dedupe
+        wishlistIds = wishlistIds.filter(function(v, i, a) { return a.indexOf(v) === i; });
+        
+        return wishlistIds;
+    }
+    
+    function saveWishlistIds() {
+        try { localStorage.setItem('zymart_wishlist', JSON.stringify(wishlistIds)); } catch(e) {}
+    }
+    
+    function updateCount() {
+        var el = getEl('wishlistCount');
+        if (el) {
+            var count = wishlistProducts.filter(function(p) { return p._available; }).length;
+            el.textContent = wishlistIds.length + ' item' + (wishlistIds.length !== 1 ? 's' : '');
+        }
+    }
+    
+    function getCartQty(itemId) {
+        var cart = CartManager.getCart();
+        var item = cart.find(function(c) { return c.id === itemId; });
+        return item ? (item.quantity || 1) : 0;
+    }
+    
+    // ═══ NEW: Fetch products from DB by IDs ═══
+    async function fetchWishlistProducts() {
+        if (!wishlistIds.length) { wishlistProducts = []; return; }
+        
+        try {
+            var r = await sb.from('products').select(PRODUCT_COLS).in('id', wishlistIds);
+            var fetchedMap = {};
+            (r.data || []).forEach(function(p) { fetchedMap[p.id] = p; });
+            
+            // Maintain order as per wishlistIds, mark unavailable
+            wishlistProducts = wishlistIds.map(function(id) {
+                var p = fetchedMap[id];
+                if (!p) {
+                    return { id: id, _available: false, name: 'Product unavailable' };
+                }
+                if (p.is_active === false || p.is_on_hold === true) {
+                    p._available = false;
+                    return p;
+                }
+                p._available = true;
+                return p;
+            });
+            
+            // Fetch ratings for available products
+            var availableIds = wishlistProducts.filter(function(p) { return p._available; }).map(function(p) { return p.id; });
+            if (availableIds.length > 0) await fetchRatingsForIds(availableIds);
+            
+        } catch(e) {
+            console.error('Fetch wishlist error:', e);
+            wishlistProducts = wishlistIds.map(function(id) { return { id: id, _available: false, name: 'Could not load' }; });
+        }
+    }
+    
+    // ═══ Render skeleton while loading ═══
+    function renderSkeleton() {
+        var c = getEl('mainContent');
+        var h = '<div class="wishlist-items">';
+        for (var i = 0; i < 3; i++) {
+            h += '<div class="sk-wishlist-item"><div class="sk-img"></div><div class="sk-content"><div class="sk-line"></div><div class="sk-line short"></div><div class="sk-line tiny"></div></div></div>';
+        }
+        h += '</div>';
+        c.innerHTML = h;
+    }
+    
+    // ═══ Render wishlist ═══
+    async function renderWishlist() {
+        if (isLoading) return;
+        isLoading = true;
+        
+        loadWishlistIds();
+        
+        if (!wishlistIds.length) {
+            var c = getEl('mainContent');
+            c.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="far fa-heart"></i></div><h3>Your Wishlist is Empty</h3><p>Tap the heart icon on any product to save it here</p><a href="products.html" class="browse-btn"><i class="fas fa-shopping-bag"></i> Browse Products</a><br><br><a href="index.html" style="color:var(--brand-green);font-size:13px;font-weight:600;text-decoration:none;"><i class="fas fa-home"></i> Go to Home</a></div>';
+            updateCount();
+            isLoading = false;
+            return;
+        }
+        
+        // Show skeleton
+        renderSkeleton();
+        
+        // Fetch fresh data
+        await fetchWishlistProducts();
+        
+        // Render
+        var container = getEl('mainContent');
+        var h = '<div class="wishlist-items">';
+        var availableCount = 0;
+        var unavailableCount = 0;
+        
+        for (var i = 0; i < wishlistProducts.length; i++) {
+            var p = wishlistProducts[i];
+            var id = p.id;
+            
+            if (!p._available) {
+                unavailableCount++;
+                h += '<div class="wishlist-item unavailable" id="wishlistItem' + i + '">';
+                h += '<button class="remove-btn" onclick="event.stopPropagation();removeItem(\'' + id + '\')" title="Remove"><i class="fas fa-times"></i></button>';
+                h += '<div class="item-image" style="opacity:0.5;"><i class="fas fa-box-open" style="font-size:24px;color:#D1D5DB;"></i></div>';
+                h += '<div class="item-details"><div class="item-name" style="color:#9CA3AF;">Product unavailable</div>';
+                h += '<div class="item-stock-badge oos">❌ No longer available</div></div>';
+                h += '<div class="item-actions"><button class="move-cart-btn disabled" disabled>Unavailable</button></div>';
+                h += '</div>';
+                continue;
+            }
+            
+            availableCount++;
+            var data = computeProductData(p);
+            var cartQty = getCartQty(p.id);
+            var ratingHtml = getRatingHtml(p.id);
+            
+            var priceDisplay = '₹' + Number(data.price).toLocaleString('en-IN');
+            if (data.isClothing) {
+                var range = getClothingPriceRange(parseColors(p));
+                if (range && range.min !== range.max) priceDisplay = '₹' + Number(range.min).toLocaleString('en-IN') + '-₹' + Number(range.max).toLocaleString('en-IN');
+            }
+            
+            h += '<div class="wishlist-item" id="wishlistItem' + i + '">';
+            h += '<button class="remove-btn" onclick="event.stopPropagation();removeItem(\'' + p.id + '\')" title="Remove"><i class="fas fa-times"></i></button>';
+            h += '<div class="item-image" onclick="window.location.href=\'product-detail.html?id=' + p.id + '\'">';
+            if (data.img) h += '<img src="' + data.img + '" loading="lazy" decoding="async" alt="" onerror="this.parentElement.innerHTML=\'<i class=&quot;fas fa-box-open&quot; style=&quot;font-size:24px;color:#D1D5DB;&quot;></i>\'">';
+            else h += '<i class="fas fa-box-open" style="font-size:24px;color:#D1D5DB;"></i>';
+            if (data.isOut) h += '<div class="oos-overlay"><span>Out</span></div>';
+            h += '</div>';
+            
+            h += '<div class="item-details" onclick="window.location.href=\'product-detail.html?id=' + p.id + '\'">';
+            h += '<div class="item-name">' + esc(p.name) + '</div>';
+            if (data.variantLabel) h += '<span class="item-variant ' + data.variantClass + '">' + data.variantLabel + '</span>';
+            h += ratingHtml;
+            h += '<div class="item-price-row"><span class="item-price">' + priceDisplay + '</span>';
+            if (data.discount > 0 && !data.isClothing) {
+                h += '<span class="item-price-cut">₹' + Number(data.original).toLocaleString('en-IN') + '</span>';
+                h += '<span class="item-discount-badge">' + data.discount + '% OFF</span>';
+            }
+            h += '</div>';
+            
+            if (data.isOut) h += '<div class="item-stock-badge oos">❌ Out of Stock</div>';
+            else if (data.isLowStock) h += '<div class="item-stock-badge low">⚠️ Only ' + data.totalStock + ' left!</div>';
+            
+            h += '</div>';
+            
+            h += '<div class="item-actions">';
+            if (isHolidayToday) {
+                h += '<button class="move-cart-btn disabled" disabled>🔒 Closed</button>';
+            } else if (data.isOut) {
+                h += '<button class="move-cart-btn disabled" disabled>Out of Stock</button>';
+            } else if (data.isClothing) {
+                h += '<button class="move-cart-btn" onclick="event.stopPropagation();window.location.href=\'product-detail.html?id=' + p.id + '\'">Select ›</button>';
+            } else if (cartQty > 0) {
+                h += '<button class="move-cart-btn in-cart" onclick="event.stopPropagation();moveToCart(\'' + p.id + '\')">✓ In Cart (' + cartQty + ')</button>';
+            } else {
+                h += '<button class="move-cart-btn" onclick="event.stopPropagation();moveToCart(\'' + p.id + '\')"><i class="fas fa-shopping-cart"></i> Add</button>';
+            }
+            h += '</div>';
+            h += '</div>';
+        }
+        
+        h += '</div>';
+        
+        // Action buttons
+        if (availableCount > 0) {
+            h += '<div class="clear-all-btn">';
+            if (availableCount > 1 && !isHolidayToday) {
+                h += '<button class="move-all-btn" onclick="moveAllToCart()"><i class="fas fa-shopping-cart"></i> Move All to Cart</button>';
+            }
+            h += '<button onclick="clearAll()"><i class="fas fa-trash-alt"></i> Clear All</button>';
+            h += '</div>';
+        }
+        
+        container.innerHTML = h;
+        updateCount();
+        isLoading = false;
+    }
+    
+    // ═══ UPDATED: moveToCart by product ID ═══
+    window.moveToCart = function(id) {
+        if (isHolidayToday) { showToast('🏖️ ' + holidayReason, 'error'); return; }
+        
+        var p = wishlistProducts.find(function(x) { return x.id === id; });
+        if (!p || !p._available) { showToast('Product unavailable', 'error'); return; }
+        
+        var data = computeProductData(p);
+        if (data.isOut) { showToast('⚠️ Out of stock', 'error'); return; }
+        
+        var cart = CartManager.getCart();
+        var found = cart.find(function(c) { return c.id === p.id; });
+        
+        var displayName = p.name;
+        var cartKey = p.id + '_' + data.cartWeight + '_' + data.cartUnit;
+        
+        if (found) {
+            found.quantity = (found.quantity || 1) + 1;
+            showToast('🛒 Quantity increased!', 'success');
+        } else {
+            cart.push({
+                id: p.id,
+                variantKey: cartKey,
+                cartKey: cartKey,
+                name: displayName,
+                price: data.price,
+                image: data.img,
+                quantity: 1,
+                variantWeight: data.cartWeight || null,
+                variantUnit: data.cartUnit || null,
+                shop_id: p.shop_id || null,
+                shop_name: null,
+                stock: data.totalStock
+            });
+            showToast('🛒 Added to cart!', 'success');
+        }
+        
+        CartManager.saveCart(cart);
+        renderWishlist();
+    };
+    
+    // ═══ NEW: Move all to cart ═══
+    window.moveAllToCart = function() {
+        if (isHolidayToday) { showToast('🏖️ ' + holidayReason, 'error'); return; }
+        
+        var cart = CartManager.getCart();
+        var addedCount = 0;
+        var skippedCount = 0;
+        
+        for (var i = 0; i < wishlistProducts.length; i++) {
+            var p = wishlistProducts[i];
+            if (!p._available) continue;
+            var data = computeProductData(p);
+            if (data.isOut) { skippedCount++; continue; }
+            if (data.isClothing) { skippedCount++; continue; } // clothing needs options
+            
+            var found = cart.find(function(c) { return c.id === p.id; });
+            var cartKey = p.id + '_' + data.cartWeight + '_' + data.cartUnit;
+            
+            if (found) {
+                found.quantity = (found.quantity || 1) + 1;
+            } else {
+                cart.push({
+                    id: p.id,
+                    variantKey: cartKey,
+                    cartKey: cartKey,
+                    name: p.name,
+                    price: data.price,
+                    image: data.img,
+                    quantity: 1,
+                    variantWeight: data.cartWeight || null,
+                    variantUnit: data.cartUnit || null,
+                    shop_id: p.shop_id || null,
+                    shop_name: null,
+                    stock: data.totalStock
+                });
+            }
+            addedCount++;
+        }
+        
+        if (addedCount > 0) {
+            CartManager.saveCart(cart);
+            var msg = '🛒 ' + addedCount + ' item' + (addedCount > 1 ? 's' : '') + ' added!';
+            if (skippedCount > 0) msg += ' (' + skippedCount + ' skipped - out of stock)';
+            showToast(msg, 'success');
+            renderWishlist();
+        } else {
+            showToast('⚠️ No items could be added', 'error');
+        }
+    };
+    
+    // ═══ UPDATED: removeItem by ID ═══
+    window.removeItem = function(id) {
+        var idx = wishlistIds.indexOf(id);
+        if (idx === -1) return;
+        
+        var p = wishlistProducts.find(function(x) { return x.id === id; });
+        var itemName = p ? p.name : 'Item';
+        
+        // Find DOM element
+        var el = document.querySelector('[data-wishlist-id="' + id + '"]');
+        if (!el) {
+            // Fallback: find by id
+            var allItems = document.querySelectorAll('.wishlist-item');
+            for (var j = 0; j < allItems.length; j++) {
+                var btn = allItems[j].querySelector('.remove-btn');
+                if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf(id) !== -1) {
+                    el = allItems[j];
+                    break;
+                }
+            }
+        }
+        
+        if (el) {
+            el.classList.add('removing');
+            setTimeout(function() {
+                wishlistIds.splice(idx, 1);
+                saveWishlistIds();
+                renderWishlist();
+                showToast('💔 Removed from wishlist');
+            }, 250);
+        } else {
+            wishlistIds.splice(idx, 1);
+            saveWishlistIds();
+            renderWishlist();
+            showToast('💔 Removed from wishlist');
+        }
+    };
+    
+    window.clearAll = function() {
+        if (!wishlistIds.length) return;
+        if (!confirm('Remove all ' + wishlistIds.length + ' items from wishlist?')) return;
+        wishlistIds = [];
+        saveWishlistIds();
+        wishlistProducts = [];
+        renderWishlist();
+        showToast('🗑️ Wishlist cleared');
+    };
+    
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'zymart_wishlist' || e.key === 'zymart_cart') {
+            renderWishlist();
+            CartManager.updateBadges();
+        }
+    });
+    
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            CartManager.updateBadges();
+            // Refresh if coming back
+            renderWishlist();
+        }
+    });
+    
+    document.addEventListener('DOMContentLoaded', async function() {
+        await checkHoliday();
+        CartManager.updateBadges();
+        renderWishlist();
+    });
+    
+    window.CartManager = CartManager;
+})();
+</script>
+</body>
+</html>

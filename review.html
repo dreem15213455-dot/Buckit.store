@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Rate Order - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root { --brand-green: #0B5A31; --brand-green-dark: #083D21; --brand-orange: #F59E0B; --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB; --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444; --success: #10B981; --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-full: 9999px; --status-bar-height: env(safe-area-inset-top, 0px); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes starPop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
+        
+        .top-bar { background: var(--brand-green); position: fixed; top: 0; left: 0; width: 100%; z-index: 100; padding: 10px 14px; padding-top: calc(10px + var(--status-bar-height)); display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 16px rgba(11,90,49,0.3); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; text-decoration: none; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        .top-title { font-family: 'Poppins', sans-serif; flex: 1; font-size: 16px; font-weight: 700; color: white; }
+        .brand-zy { color: #A3E635; } .brand-mart { color: #FDE047; }
+
+        .main-content { padding-top: calc(62px + var(--status-bar-height)); max-width: 600px; margin: 0 auto; padding-left: 14px; padding-right: 14px; }
+
+        .order-header-card { background: white; border-radius: var(--radius-lg); padding: 14px; border: 1px solid var(--neutral-border); margin: 10px 0; box-shadow: var(--shadow-sm); }
+        .order-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .order-id-label { font-weight: 700; font-size: 14px; }
+        .order-date-label { font-size: 11px; color: var(--neutral-gray); margin-top: 2px; }
+        .verified-badge { background: #EDF7F1; color: #059669; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); display: inline-flex; align-items: center; gap: 4px; }
+
+        .items-preview { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; margin-top: 8px; }
+        .items-preview::-webkit-scrollbar { display: none; }
+        .item-chip { flex-shrink: 0; display: flex; align-items: center; gap: 6px; background: #F9FAFB; border: 1px solid var(--neutral-border); border-radius: var(--radius-sm); padding: 6px 8px; }
+        .item-chip-img { width: 32px; height: 32px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+        .item-chip-img img { width: 100%; height: 100%; object-fit: contain; padding: 2px; }
+        .item-chip-info { font-size: 10px; font-weight: 600; max-width: 90px; }
+        .item-chip-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-chip-qty { color: var(--neutral-gray); font-size: 9px; font-weight: 500; }
+
+        .rating-section { background: white; border-radius: var(--radius-lg); padding: 18px 16px; border: 1px solid var(--neutral-border); margin: 10px 0; box-shadow: var(--shadow-sm); animation: slideUp 0.3s ease; }
+        .rating-section-title { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 4px; text-align: center; }
+        .rating-section-sub { font-size: 11px; color: var(--neutral-gray); text-align: center; margin-bottom: 14px; }
+
+        .stars-row { display: flex; justify-content: center; gap: 8px; margin: 12px 0; }
+        .star-btn { background: none; border: none; font-size: 40px; cursor: pointer; padding: 2px; line-height: 1; transition: transform 0.15s; color: #E5E7EB; }
+        .star-btn.filled { color: #F59E0B; text-shadow: 0 2px 8px rgba(245,158,11,0.3); }
+        .star-btn.popped { animation: starPop 0.3s ease; }
+        .star-btn:active { transform: scale(0.9); }
+        @media(max-width: 380px) { .star-btn { font-size: 34px; gap: 6px; } }
+
+        .rating-label { text-align: center; font-size: 13px; font-weight: 700; min-height: 20px; transition: color 0.2s; }
+        .rating-label.r1 { color: #DC2626; }
+        .rating-label.r2 { color: #EA580C; }
+        .rating-label.r3 { color: #D97706; }
+        .rating-label.r4 { color: #059669; }
+        .rating-label.r5 { color: #10B981; }
+
+        .textarea-wrapper { position: relative; margin-top: 8px; }
+        .review-textarea { width: 100%; min-height: 100px; padding: 12px 14px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-md); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; resize: vertical; background: white; line-height: 1.5; transition: border-color 0.2s; }
+        .review-textarea:focus { border-color: var(--brand-orange); }
+        .char-count { font-size: 10px; color: var(--neutral-gray); text-align: right; margin-top: 4px; }
+
+        .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+        .photo-slot { aspect-ratio: 1; border: 2px dashed var(--neutral-border); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; background: #F9FAFB; transition: all 0.2s; position: relative; overflow: visible; }
+        .photo-slot.filled { border-style: solid; border-color: var(--success); background: white; }
+        .photo-slot .slot-inner { width: 100%; height: 100%; border-radius: calc(var(--radius-md) - 2px); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-slot .add-icon { font-size: 24px; color: var(--brand-green); }
+        .photo-slot .remove-btn { position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; border-radius: 50%; background: #EF4444; color: white; border: 2px solid white; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .photo-slot input { display: none; }
+        .photo-hint { font-size: 10px; color: var(--neutral-gray); text-align: center; margin-top: 8px; }
+
+        .required-mark { color: #EF4444; }
+
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -4px 20px rgba(0,0,0,0.06); z-index: 100; border-top: 1px solid var(--neutral-border); }
+        .submit-btn { width: 100%; padding: 15px; background: var(--brand-orange); color: #1a1a1a; border: none; border-radius: var(--radius-full); font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s; box-shadow: 0 4px 14px rgba(245,158,11,0.25); }
+        .submit-btn:active { transform: scale(0.97); background: #E8890A; }
+        .submit-btn:disabled { background: #D1D5DB; color: #9CA3AF; cursor: not-allowed; box-shadow: none; }
+
+        .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8,61,33,0.85); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .success-overlay.show { display: flex; }
+        .success-card { background: white; border-radius: 24px; padding: 30px 24px; text-align: center; width: 100%; max-width: 350px; animation: slideUp 0.4s ease; }
+        .success-icon { font-size: 60px; margin-bottom: 14px; animation: starPop 0.6s ease; }
+        .success-card h3 { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .success-card p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 18px; line-height: 1.6; }
+        .success-card button { width: 100%; padding: 13px; border-radius: var(--radius-full); font-size: 14px; font-weight: 700; cursor: pointer; border: none; font-family: 'Inter', sans-serif; margin-bottom: 8px; }
+        .success-card button.primary { background: var(--brand-green); color: white; }
+        .success-card button.ghost { background: transparent; color: var(--brand-green); border: 1.5px solid var(--brand-green); }
+
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state i { font-size: 56px; color: #D1D5DB; margin-bottom: 14px; display: block; }
+        .empty-state h3 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .empty-state p { font-size: 12px; color: var(--neutral-gray); margin-bottom: 16px; }
+        .empty-state button { background: var(--brand-green); color: white; border: none; padding: 12px 24px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+
+        .already-rated-card { background: white; border-radius: var(--radius-lg); padding: 22px 16px; border: 1px solid var(--neutral-border); margin: 10px 0; text-align: center; box-shadow: var(--shadow-sm); }
+        .already-rated-card .check-icon { font-size: 48px; color: var(--success); margin-bottom: 12px; }
+        .already-rated-card h3 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .already-rated-card p { font-size: 12px; color: var(--neutral-gray); line-height: 1.6; margin-bottom: 16px; }
+        .already-rated-card .prev-rating { display: flex; justify-content: center; gap: 4px; font-size: 24px; color: #F59E0B; margin-bottom: 12px; }
+
+        .toast { position: fixed; bottom: calc(100px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 1200; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-md); transition: all 0.3s ease; max-width: 90%; overflow: hidden; text-overflow: ellipsis; }
+        .toast.show { opacity: 1; visibility: visible; }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+
+        .loading-center { text-align: center; padding: 50px 20px; }
+        .loading-center .spinner { width: 34px; height: 34px; border: 2.5px solid #E5E7EB; border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+
+        .uploading-overlay { display: none; padding: 12px; text-align: center; background: #FEF3C7; border-radius: var(--radius-sm); margin-top: 10px; font-size: 11px; font-weight: 600; color: #92400E; }
+        .uploading-overlay.show { display: block; }
+    </style>
+</head>
+<body>
+
+<div id="netBanner" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);background:#DC2626;color:white;text-align:center;padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;z-index:99999;box-shadow:0 4px 12px rgba(220,38,38,0.4);white-space:nowrap;pointer-events:none;">📴 No Internet</div>
+
+<div class="top-bar">
+    <a href="orders.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <span class="top-title"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span> · Rate Order</span>
+</div>
+
+<div class="main-content" id="mainContent">
+    <div class="loading-center">
+        <div class="spinner"></div>
+        <p style="color:#6B7280;font-size:12px;">Loading order details...</p>
+    </div>
+</div>
+
+<div class="bottom-bar" id="bottomBar" style="display:none;">
+    <button class="submit-btn" id="submitBtn" onclick="submitReview()">
+        <i class="fas fa-paper-plane"></i> Submit Review
+    </button>
+</div>
+
+<div class="success-overlay" id="successOverlay">
+    <div class="success-card">
+        <div class="success-icon">🎉</div>
+        <h3>Thank You!</h3>
+        <p>Your review has been submitted successfully.<br>It helps us serve you better!</p>
+        <button class="primary" onclick="window.location.href='orders.html'">📋 View Orders</button>
+        <button class="ghost" onclick="window.location.href='index.html'">🏠 Go Home</button>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg"><span id="toastText"></span></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1',
+        CLOUDINARY_CLOUD_NAME: 'b0zm0rac',
+        CLOUDINARY_ENABLED: true,
+        IMG_MAX_KB: 100,
+        IMG_MAX_DIM: 1200,
+        MAX_PHOTOS: 3,
+        MAX_REVIEW_LENGTH: 500
+    };
+    
+    var sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    var SUPABASE_URL = CONFIG.SUPABASE_URL;
+    var SHOP_NAME_CACHE = 'zymart_shop_name_cache_v1';
+    var SHOP_CACHE_TTL = 3600000;
+    
+    var currentUser = null;
+    var currentOrder = null;
+    var orderItems = [];
+    var shopId = null;
+    var shopName = 'Shop';
+    
+    var productRating = 0;
+    var shopRating = 0;
+    var reviewText = '';
+    var reviewPhotos = [];
+    var isSubmitting = false;
+    var orderId = null;
+    
+    var RATING_LABELS = { 1: 'Very Bad 😞', 2: 'Not Good 😕', 3: 'Okay 😐', 4: 'Good 😊', 5: 'Excellent! 🤩' };
+    
+    function getEl(id) { return document.getElementById(id); }
+    function esc(s) { if(!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function safeJSON(s, f) { try { return s ? JSON.parse(s) : f; } catch(e) { return f; } }
+    
+    // ═══ IMAGE FALLBACK ═══
+    var IMG_FALLBACK = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="#F3F4F6" width="100" height="100"/><circle cx="50" cy="42" r="13" fill="#D1D5DB"/><rect x="34" y="60" width="32" height="7" rx="3.5" fill="#D1D5DB"/></svg>');
+    window.addEventListener('error', function(e) {
+        var el = e.target;
+        if (el && el.tagName === 'IMG' && !el.dataset.fb) {
+            el.dataset.fb = '1';
+            el.onerror = null;
+            el.src = IMG_FALLBACK;
+        }
+    }, true);
+    
+    // ═══ OFFLINE BANNER ═══
+    window.addEventListener('offline', function() { var b = getEl('netBanner'); if (b) b.style.display = 'block'; });
+    window.addEventListener('online', function() { var b = getEl('netBanner'); if (b) b.style.display = 'none'; });
+    
+    // ═══ SAFE UTC PARSER ═══
+    function parseUTC(isoString) {
+        if (!isoString) return null;
+        var s = String(isoString).trim();
+        var match = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})/);
+        if (match) {
+            var iso = match[1] + '-' + match[2] + '-' + match[3] + 'T' + match[4] + ':' + match[5] + ':' + match[6] + 'Z';
+            var d = new Date(iso);
+            if (!isNaN(d.getTime())) return d;
+        }
+        s = s.replace(' ', 'T');
+        if (/[+\-]\d{2}$/.test(s)) s += ':00';
+        if (!/[Zz]$/.test(s) && !/[+\-]\d{2}:?\d{2}$/.test(s)) s += 'Z';
+        var d2 = new Date(s);
+        if (isNaN(d2.getTime())) return null;
+        return d2;
+    }
+    
+    function formatDate(iso) {
+        var d = parseUTC(iso);
+        if (!d) return '';
+        return d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    
+    function showToast(m, type) { 
+        var t = getEl('toastMsg'), s = getEl('toastText'); 
+        if (!t || !s) return; 
+        s.textContent = m; 
+        t.className = 'toast';
+        if (type === 'error') t.classList.add('error');
+        else if (type === 'success') t.classList.add('success');
+        t.classList.add('show'); 
+        clearTimeout(t._timer); 
+        t._timer = setTimeout(function() { t.classList.remove('show','error','success'); }, 2500); 
+    }
+    
+    function getFullUrl(u, width) {
+        if (!u) return '';
+        var fullUrl;
+        if (u.indexOf('http') === 0 || u.indexOf('data:') === 0) fullUrl = u;
+        else fullUrl = SUPABASE_URL + '/storage/v1/object/public/' + u;
+        if (fullUrl.indexOf('res.cloudinary.com') === 0) return fullUrl;
+        if (!CONFIG.CLOUDINARY_ENABLED) return fullUrl;
+        return 'https://res.cloudinary.com/' + CONFIG.CLOUDINARY_CLOUD_NAME + '/image/fetch/w_' + (width || 100) + ',q_auto,f_auto/' + fullUrl;
+    }
+    
+    async function checkUser() {
+        try {
+            var r = await sb.auth.getSession();
+            if (r && r.data && r.data.session && r.data.session.user) { currentUser = r.data.session.user; return true; }
+        } catch(e) {}
+        try {
+            var session = JSON.parse(localStorage.getItem('zymart_session') || 'null');
+            if (session && session.userId) { currentUser = { id: session.userId, phone: session.phone }; return true; }
+        } catch(e) {}
+        currentUser = null;
+        return false;
+    }
+    
+    function goToLogin() {
+        try { sessionStorage.setItem('zymart_redirect_after_login', 'review.html?order_id=' + (orderId || '')); } catch(e) {}
+        window.location.href = 'login.html';
+    }
+    
+    // ═══ EGRESS: shop name cache ═══
+    function getCachedShopName(id) {
+        try {
+            var cache = safeJSON(localStorage.getItem(SHOP_NAME_CACHE), null);
+            if (cache && cache.t && (Date.now() - cache.t < SHOP_CACHE_TTL) && cache.v && cache.v[id]) {
+                return cache.v[id];
+            }
+        } catch(e) {}
+        return null;
+    }
+    
+    function setCachedShopName(id, name) {
+        try {
+            var cache = safeJSON(localStorage.getItem(SHOP_NAME_CACHE), { t: 0, v: {} });
+            cache.v = cache.v || {};
+            cache.v[id] = name;
+            cache.t = Date.now();
+            localStorage.setItem(SHOP_NAME_CACHE, JSON.stringify(cache));
+        } catch(e) {}
+    }
+    
+    async function checkIfRated(oid) {
+        var ratedMap = safeJSON(localStorage.getItem('zymart_rated_orders'), {});
+        if (ratedMap[oid]) {
+            var localRating = safeJSON(localStorage.getItem('zymart_ratings_' + oid), null);
+            return { rated: true, rating: localRating };
+        }
+        try {
+            var r = await sb.from('product_reviews')
+                .select('rating, review_text, review_images, created_at')
+                .eq('order_id', oid)
+                .eq('user_id', currentUser.id)
+                .limit(1);
+            if (r && r.data && r.data.length > 0) {
+                var row = r.data[0];
+                ratedMap[oid] = true;
+                try { localStorage.setItem('zymart_rated_orders', JSON.stringify(ratedMap)); } catch(e) {}
+                return {
+                    rated: true,
+                    rating: { productRating: row.rating, reviewText: row.review_text || '', reviewImages: safeJSON(row.review_images, []), createdAt: row.created_at }
+                };
+            }
+        } catch(e) {
+            console.warn('[Review] DB check skipped:', e.message);
+        }
+        return { rated: false };
+    }
+    
+    // ═══ FIX 3: loadOrder with maybeSingle + safe shop_ids parse ═══
+    async function loadOrder() {
+        try {
+            var r = await sb.from('orders')
+                .select('id, user_id, shop_id, shop_ids, status, created_at, delivered_at, items, total_amount, customer_name, customer_phone')
+                .eq('id', orderId)
+                .maybeSingle();
+            
+            if (!r || !r.data) { showError('Order not found'); return null; }
+            if (r.data.user_id !== currentUser.id) { showError('This order does not belong to you'); return null; }
+            if (r.data.status !== 'delivered') { showError('You can only rate delivered orders'); return null; }
+            
+            currentOrder = r.data;
+            // ═══ FIX 5: safeJSON for items and shop_ids ═══
+            var rawItems = r.data.items;
+            orderItems = typeof rawItems === 'string' ? safeJSON(rawItems, []) : (Array.isArray(rawItems) ? rawItems : []);
+            
+            var shopIdsArr = r.data.shop_ids;
+            if (typeof shopIdsArr === 'string') shopIdsArr = safeJSON(shopIdsArr, []);
+            if (!Array.isArray(shopIdsArr)) shopIdsArr = [];
+            
+            if (r.data.shop_id) shopId = r.data.shop_id;
+            else if (shopIdsArr.length > 0) shopId = shopIdsArr[0];
+            
+            if (shopId) {
+                var cached = getCachedShopName(shopId);
+                if (cached) { shopName = cached; }
+                else {
+                    try {
+                        var sr = await sb.from('shops').select('name').eq('id', shopId).limit(1).maybeSingle();
+                        if (sr && sr.data && sr.data.name) {
+                            shopName = sr.data.name;
+                            setCachedShopName(shopId, shopName);
+                        }
+                    } catch(e) {}
+                }
+            }
+            return r.data;
+        } catch(e) {
+            console.error('[Review] Load order error:', e);
+            showError('Failed to load order');
+            return null;
+        }
+    }
+    
+    function showError(msg) {
+        getEl('mainContent').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Oops!</h3><p>' + esc(msg) + '</p><button onclick="window.location.href=\'orders.html\'">← Back to Orders</button></div>';
+        getEl('bottomBar').style.display = 'none';
+    }
+    
+    function renderForm() {
+        var date = formatDate(currentOrder.created_at);
+        var shortId = '#' + currentOrder.id.substring(0, 8).toUpperCase();
+        var h = '';
+        
+        h += '<div class="order-header-card">';
+        h += '<div class="order-header-row">';
+        h += '<div><div class="order-id-label">' + shortId + '</div><div class="order-date-label">📅 ' + date + ' · ' + orderItems.length + ' item(s)</div></div>';
+        h += '<div class="verified-badge"><i class="fas fa-check-circle"></i> Verified</div>';
+        h += '</div>';
+        
+        h += '<div class="items-preview">';
+        for (var i = 0; i < orderItems.length; i++) {
+            var it = orderItems[i];
+            var img = getFullUrl(it.image || '', 80);
+            h += '<div class="item-chip">';
+            h += '<div class="item-chip-img">' + (img ? '<img src="' + esc(img) + '" loading="lazy">' : '<i class="fas fa-box" style="color:#D1D5DB;"></i>') + '</div>';
+            h += '<div class="item-chip-info"><div class="item-chip-name">' + esc(it.product_name || it.name || 'Item') + '</div><div class="item-chip-qty">× ' + (it.quantity || 1) + '</div></div>';
+            h += '</div>';
+        }
+        h += '</div></div>';
+        
+        // PRODUCT RATING
+        h += '<div class="rating-section"><div class="rating-section-title">⭐ Rate Products <span class="required-mark">*</span></div><div class="rating-section-sub">How was the product quality?</div><div class="stars-row" id="productStars">';
+        for (var s = 1; s <= 5; s++) h += '<button class="star-btn" data-rating="' + s + '" onclick="setProductRating(' + s + ')">★</button>';
+        h += '</div><div class="rating-label" id="productRatingLabel">Tap a star to rate</div></div>';
+        
+        // SHOP RATING
+        h += '<div class="rating-section"><div class="rating-section-title">🏪 Rate Shop <span class="required-mark">*</span></div><div class="rating-section-sub">' + esc(shopName) + ' · Delivery & Service</div><div class="stars-row" id="shopStars">';
+        for (var ss = 1; ss <= 5; ss++) h += '<button class="star-btn" data-rating="' + ss + '" onclick="setShopRating(' + ss + ')">★</button>';
+        h += '</div><div class="rating-label" id="shopRatingLabel">Tap a star to rate</div></div>';
+        
+        // TEXT
+        h += '<div class="rating-section"><div class="rating-section-title">📝 Write a Review</div><div class="rating-section-sub">Optional — apna experience share karein</div>';
+        h += '<div class="textarea-wrapper"><textarea class="review-textarea" id="reviewTextarea" placeholder="Kaisa laga aapko product? Delivery time, packaging, quality — kuch bhi likhein..." maxlength="' + CONFIG.MAX_REVIEW_LENGTH + '" oninput="updateCharCount()"></textarea><div class="char-count"><span id="charCount">0</span>/' + CONFIG.MAX_REVIEW_LENGTH + '</div></div></div>';
+        
+        // PHOTOS — FIX: wrapper with overflow:visible + remove-btn outside inner
+        h += '<div class="rating-section"><div class="rating-section-title">📸 Add Photos</div><div class="rating-section-sub">Optional · ' + CONFIG.MAX_PHOTOS + ' photos tak · 100KB each</div><div class="photo-grid" id="photoGrid">';
+        for (var p = 0; p < CONFIG.MAX_PHOTOS; p++) {
+            h += '<div class="photo-slot" id="photoSlot_' + p + '" onclick="pickPhoto(' + p + ')">';
+            h += '<div class="slot-inner"><i class="fas fa-plus add-icon"></i></div>';
+            h += '<input type="file" id="photoInput_' + p + '" accept="image/*" onchange="handlePhoto(this, ' + p + ')">';
+            h += '</div>';
+        }
+        h += '</div><div class="photo-hint">Auto-compress hoke upload honge</div><div class="uploading-overlay" id="uploadingOverlay">⏳ Photo upload ho raha hai...</div></div>';
+        
+        getEl('mainContent').innerHTML = h;
+        getEl('bottomBar').style.display = 'block';
+    }
+    
+    function renderAlreadyRated(ratingData) {
+        var shortId = '#' + currentOrder.id.substring(0, 8).toUpperCase();
+        var rating = (ratingData && ratingData.productRating) || 0;
+        var stars = '';
+        for (var i = 1; i <= 5; i++) stars += i <= rating ? '★' : '☆';
+        
+        var h = '<div class="order-header-card"><div class="order-header-row"><div><div class="order-id-label">' + shortId + '</div><div class="order-date-label">' + orderItems.length + ' item(s)</div></div><div class="verified-badge"><i class="fas fa-check-circle"></i> Verified</div></div></div>';
+        h += '<div class="already-rated-card"><div class="check-icon"><i class="fas fa-check-circle"></i></div><h3>Already Rated</h3><p>Aap is order ko already rate kar chuke hain.<br>Thank you for your feedback!</p>';
+        if (rating > 0) h += '<div class="prev-rating">' + stars + '</div>';
+        if (ratingData && ratingData.reviewText) h += '<div style="text-align:left;background:#F9FAFB;padding:10px;border-radius:8px;margin-top:8px;font-size:12px;line-height:1.5;color:#374151;">' + esc(ratingData.reviewText) + '</div>';
+        h += '<button onclick="window.location.href=\'orders.html\'" style="margin-top:14px;background:var(--brand-green);color:white;border:none;padding:12px 24px;border-radius:var(--radius-full);font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">📋 Back to Orders</button></div>';
+        
+        getEl('mainContent').innerHTML = h;
+        getEl('bottomBar').style.display = 'none';
+    }
+    
+    window.setProductRating = function(rating) {
+        productRating = rating;
+        updateStars('productStars', rating);
+        var label = getEl('productRatingLabel');
+        if (label) { label.textContent = RATING_LABELS[rating] || ''; label.className = 'rating-label r' + rating; }
+        var star = document.querySelector('#productStars .star-btn[data-rating="' + rating + '"]');
+        if (star) { star.classList.add('popped'); setTimeout(function() { star.classList.remove('popped'); }, 300); }
+    };
+    
+    window.setShopRating = function(rating) {
+        shopRating = rating;
+        updateStars('shopStars', rating);
+        var label = getEl('shopRatingLabel');
+        if (label) { label.textContent = RATING_LABELS[rating] || ''; label.className = 'rating-label r' + rating; }
+        var star = document.querySelector('#shopStars .star-btn[data-rating="' + rating + '"]');
+        if (star) { star.classList.add('popped'); setTimeout(function() { star.classList.remove('popped'); }, 300); }
+    };
+    
+    function updateStars(containerId, count) {
+        var container = getEl(containerId);
+        if (!container) return;
+        var stars = container.querySelectorAll('.star-btn');
+        for (var i = 0; i < stars.length; i++) {
+            var r = parseInt(stars[i].getAttribute('data-rating'));
+            if (r <= count) stars[i].classList.add('filled');
+            else stars[i].classList.remove('filled');
+        }
+    }
+    
+    window.updateCharCount = function() {
+        var ta = getEl('reviewTextarea'), cc = getEl('charCount');
+        if (ta && cc) cc.textContent = ta.value.length;
+    };
+    
+    window.pickPhoto = function(index) {
+        var inp = getEl('photoInput_' + index);
+        if (inp) inp.click();
+    };
+    
+    window.handlePhoto = async function(input, index) {
+        var file = input.files[0];
+        if (!file) return;
+        if (!file.type.match(/image\//)) { showToast('❌ Only images allowed', 'error'); return; }
+        
+        var compressed = await compressImage(file);
+        var sizeKB = Math.round(compressed.size / 1024);
+        if (sizeKB > 200) { showToast('⚠️ Image too large. Try smaller', 'error'); input.value = ''; return; }
+        
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var slot = getEl('photoSlot_' + index);
+            if (!slot) return;
+            slot.classList.add('filled');
+            slot.innerHTML = 
+                '<div class="slot-inner"><img src="' + e.target.result + '"></div>' +
+                '<button class="remove-btn" onclick="event.stopPropagation();removePhoto(' + index + ')"><i class="fas fa-times"></i></button>' +
+                '<input type="file" id="photoInput_' + index + '" accept="image/*" onchange="handlePhoto(this, ' + index + ')" style="display:none;">';
+            reviewPhotos[index] = { file: compressed, url: e.target.result, sizeKB: sizeKB };
+        };
+        reader.readAsDataURL(compressed);
+    };
+    
+    window.removePhoto = function(index) {
+        var slot = getEl('photoSlot_' + index);
+        if (!slot) return;
+        slot.classList.remove('filled');
+        slot.innerHTML = '<div class="slot-inner"><i class="fas fa-plus add-icon"></i></div><input type="file" id="photoInput_' + index + '" accept="image/*" onchange="handlePhoto(this, ' + index + ')">';
+        reviewPhotos[index] = null;
+    };
+    
+    function compressImage(file) {
+        return new Promise(function(resolve) {
+            if (!file || !file.type.match(/image\//)) { resolve(file); return; }
+            var maxBytes = CONFIG.IMG_MAX_KB * 1024;
+            if (file.size <= maxBytes) { resolve(file); return; }
+            
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var maxDim = CONFIG.IMG_MAX_DIM;
+                    var w = img.width, h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        var ratio = Math.min(maxDim/w, maxDim/h);
+                        w = Math.round(w * ratio); h = Math.round(h * ratio);
+                    }
+                    var canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    var ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, w, h);
+                    var qualities = [0.9, 0.8, 0.7, 0.6, 0.5];
+                    var idx = 0;
+                    function tryNext() {
+                        if (idx >= qualities.length) { canvas.toBlob(function(blob) { resolve(new File([blob || new Blob()], 'img.jpg', { type: 'image/jpeg' })); }, 'image/jpeg', 0.4); return; }
+                        var q = qualities[idx++];
+                        canvas.toBlob(function(blob) {
+                            if (!blob) { resolve(file); return; }
+                            if (blob.size <= maxBytes) { resolve(new File([blob], 'img.jpg', { type: 'image/jpeg' })); return; }
+                            tryNext();
+                        }, 'image/jpeg', q);
+                    }
+                    tryNext();
+                };
+                img.onerror = function() { resolve(file); };
+                img.src = e.target.result;
+            };
+            reader.onerror = function() { resolve(file); };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    async function uploadReviewPhoto(file, oid, idx) {
+        var path = 'reviews/' + oid + '_' + idx + '_' + Date.now() + '.jpg';
+        var r = await sb.storage.from('product-images').upload(path, file, { contentType: 'image/jpeg', upsert: true });
+        if (r.error) throw new Error(r.error.message);
+        return SUPABASE_URL + '/storage/v1/object/public/product-images/' + path;
+    }
+    
+    // ═══ FIX 9: try/finally to always re-enable button ═══
+    window.submitReview = async function() {
+        if (isSubmitting) return;
+        if (productRating < 1) { showToast('⚠️ Please rate the products', 'error'); return; }
+        if (shopRating < 1) { showToast('⚠️ Please rate the shop', 'error'); return; }
+        
+        var ta = getEl('reviewTextarea');
+        reviewText = ta ? ta.value.trim() : '';
+        
+        isSubmitting = true;
+        var btn = getEl('submitBtn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...'; }
+        
+        try {
+            var uploadedUrls = [];
+            var photoFailCount = 0;
+            var uploadingOverlay = getEl('uploadingOverlay');
+            if (uploadingOverlay) uploadingOverlay.classList.add('show');
+            
+            for (var p = 0; p < reviewPhotos.length; p++) {
+                if (reviewPhotos[p] && reviewPhotos[p].file) {
+                    try {
+                        var url = await uploadReviewPhoto(reviewPhotos[p].file, currentOrder.id, p);
+                        uploadedUrls.push(url);
+                    } catch(e) { photoFailCount++; console.warn('[Review] Photo upload failed:', e); }
+                }
+            }
+            
+            if (uploadingOverlay) uploadingOverlay.classList.remove('show');
+            if (photoFailCount > 0) showToast('⚠️ ' + photoFailCount + ' photo(s) failed to upload', 'error');
+            
+            // Save to localStorage FIRST (safety net)
+            var localReview = {
+                orderId: currentOrder.id,
+                userId: currentUser.id,
+                productRating: productRating,
+                shopRating: shopRating,
+                reviewText: reviewText,
+                reviewImages: uploadedUrls,
+                createdAt: new Date().toISOString(),
+                itemCount: orderItems.length
+            };
+            
+            try {
+                var localAll = safeJSON(localStorage.getItem('zymart_all_reviews'), []);
+                localAll.push(localReview);
+                localStorage.setItem('zymart_all_reviews', JSON.stringify(localAll));
+                var ratedMap = safeJSON(localStorage.getItem('zymart_rated_orders'), {});
+                ratedMap[currentOrder.id] = true;
+                localStorage.setItem('zymart_rated_orders', JSON.stringify(ratedMap));
+                localStorage.setItem('zymart_ratings_' + currentOrder.id, JSON.stringify(localReview));
+            } catch(e) { console.warn('[Review] localStorage save failed:', e); }
+            
+            // Try DB insert (graceful fail if tables/columns don't exist)
+            var dbSuccess = false;
+            try {
+                var productInserts = [];
+                var now = new Date().toISOString();
+                for (var i = 0; i < orderItems.length; i++) {
+                    var prodId = orderItems[i].product_id || orderItems[i].id;
+                    if (!prodId) continue;
+                    productInserts.push({
+                        product_id: prodId,
+                        order_id: currentOrder.id,
+                        user_id: currentUser.id,
+                        shop_id: shopId,
+                        rating: productRating,
+                        review_text: reviewText || null,
+                        review_images: uploadedUrls.length > 0 ? uploadedUrls : null,
+                        is_verified: true,
+                        created_at: now
+                    });
+                }
+                
+                if (productInserts.length > 0) {
+                    var pr = await sb.from('product_reviews').insert(productInserts);
+                    if (pr.error) throw new Error('product_reviews: ' + pr.error.message);
+                }
+                
+                if (shopId) {
+                    var sr = await sb.from('shop_reviews').insert([{
+                        shop_id: shopId,
+                        order_id: currentOrder.id,
+                        user_id: currentUser.id,
+                        rating: shopRating,
+                        product_rating: productRating,
+                        review_text: reviewText || null,
+                        review_images: uploadedUrls.length > 0 ? uploadedUrls : null,
+                        created_at: now
+                    }]);
+                    if (sr.error) throw new Error('shop_reviews: ' + sr.error.message);
+                }
+                dbSuccess = true;
+            } catch(e) {
+                console.warn('[Review] DB save failed (tables may not exist):', e.message);
+            }
+            
+            getEl('successOverlay').classList.add('show');
+            showToast(dbSuccess ? '✅ Review submitted!' : '✅ Review saved locally', 'success');
+        } catch(e) {
+            console.error('[Review] Submit error:', e);
+            showToast('❌ ' + (e.message || 'Submission failed'), 'error');
+        } finally {
+            // ═══ FIX: Always re-enable button ═══
+            isSubmitting = false;
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review'; }
+        }
+    };
+    
+    async function init() {
+        if (!navigator.onLine) { var nb = getEl('netBanner'); if (nb) nb.style.display = 'block'; }
+        
+        try { orderId = new URLSearchParams(window.location.search).get('order_id'); } catch(e) { orderId = null; }
+        
+        if (!orderId) { showError('No order ID provided'); return; }
+        
+        var loggedIn = await checkUser();
+        if (!loggedIn) { showToast('🔐 Please login to rate', 'error'); setTimeout(goToLogin, 800); return; }
+        
+        var order = await loadOrder();
+        if (!order) return;
+        
+        if (orderItems.length === 0) { showError('No items in this order'); return; }
+        
+        var ratedCheck = await checkIfRated(orderId);
+        if (ratedCheck.rated) { renderAlreadyRated(ratedCheck.rating); return; }
+        
+        renderForm();
+    }
+    
+    document.addEventListener('DOMContentLoaded', init);
+    
+    window.submitReview = submitReview;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>My Orders - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root { 
+            --brand-green: #0B5A31; 
+            --brand-green-dark: #083D21; 
+            --brand-orange: #F59E0B; 
+            --neutral-white: #FFFFFF; 
+            --neutral-bg: #F9FAFB; 
+            --neutral-border: #E5E7EB; 
+            --neutral-gray: #6B7280; 
+            --neutral-dark: #1A1A1A; 
+            --danger: #EF4444; 
+            --success: #10B981; 
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); 
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); 
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08); 
+            --radius-sm: 10px; 
+            --radius-md: 14px; 
+            --radius-lg: 18px; 
+            --radius-full: 9999px; 
+            --status-bar-height: env(safe-area-inset-top, 0px);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background: var(--neutral-bg); 
+            color: var(--neutral-dark); 
+            padding-bottom: calc(85px + env(safe-area-inset-bottom, 0px)); 
+            -webkit-tap-highlight-color: transparent; 
+            -webkit-font-smoothing: antialiased; 
+            min-height: 100vh; 
+        }
+        
+        @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.5); } 50% { box-shadow: 0 0 0 6px rgba(245,158,11,0); } }
+        @keyframes cartBounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        
+        .cart-badge.bounce { animation: cartBounce 0.3s ease; }
+        
+        .top-bar { 
+            background: var(--brand-green); 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            z-index: 100; 
+            padding: 10px 14px; 
+            padding-top: calc(10px + var(--status-bar-height));
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            box-shadow: 0 2px 16px rgba(11,90,49,0.3); 
+        }
+        
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; text-decoration: none; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        
+        .top-title { font-family: 'Poppins', sans-serif; flex: 1; font-size: 16px; font-weight: 700; color: white; }
+        .brand-zy { color: #A3E635; } 
+        .brand-mart { color: #FDE047; }
+        
+        .cart-icon-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; position: relative; text-decoration: none; }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--brand-orange); color: white; border-radius: 50%; width: 17px; height: 17px; font-size: 8px; display: none; align-items: center; justify-content: center; border: 2px solid var(--brand-green); font-weight: 700; }
+        .cart-badge.show { display: flex; }
+        
+        .refresh-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.10); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; }
+        .refresh-btn:active { background: rgba(255,255,255,0.22); }
+        .refresh-btn.spinning i { animation: spin 0.7s linear infinite; }
+        
+        .main-content { padding-top: calc(62px + var(--status-bar-height)); max-width: 600px; margin: 0 auto; }
+        
+        .tabs { display: flex; gap: 6px; padding: 10px 14px; background: white; position: sticky; top: calc(60px + var(--status-bar-height)); z-index: 50; border-bottom: 1px solid var(--neutral-border); overflow-x: auto; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        
+        .tab-btn { padding: 8px 14px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--neutral-border); background: white; color: var(--neutral-gray); white-space: nowrap; font-family: 'Inter', sans-serif; transition: all 0.15s ease; }
+        .tab-btn.active { background: var(--brand-green); color: white; border-color: var(--brand-green); }
+        .tab-btn .count { background: rgba(0,0,0,0.1); padding: 1px 6px; border-radius: 9999px; font-size: 9px; margin-left: 4px; }
+        .tab-btn.active .count { background: rgba(255,255,255,0.2); }
+        
+        .orders-list { padding: 10px 14px; }
+        
+        .order-card { 
+            background: white; 
+            border-radius: var(--radius-lg); 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            border: 1px solid var(--neutral-border); 
+            box-shadow: var(--shadow-xs); 
+            animation: slideUp 0.3s ease; 
+        }
+        
+        .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .order-id { font-weight: 700; font-size: 14px; }
+        .order-date { font-size: 11px; color: var(--neutral-gray); }
+        
+        .order-status { padding: 4px 10px; border-radius: var(--radius-full); font-size: 10px; font-weight: 700; white-space: nowrap; }
+        .status-pending { background: #FFF8EB; color: #D97706; }
+        .status-confirmed { background: #EFF6FF; color: #2563EB; }
+        .status-out_for_delivery { background: #FEF3C7; color: #D97706; }
+        .status-delivered { background: #EDF7F1; color: #059669; }
+        .status-cancelled { background: #FEF2F2; color: #DC2626; }
+        
+        .order-address { font-size: 10px; color: var(--neutral-gray); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .order-address i { color: var(--brand-green); font-size: 9px; }
+        .gps-badge { display: inline-block; background: #EDF7F1; color: #0B5A31; font-size: 8px; padding: 2px 6px; border-radius: 9999px; font-weight: 600; margin-left: 4px; }
+        
+        .timeline-wrap { 
+            margin: 10px 0; 
+            padding: 10px 8px 6px; 
+            background: #F9FAFB; 
+            border-radius: var(--radius-md);
+            border: 1px solid #F3F4F6;
+        }
+        .timeline {
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+        }
+        .tl-step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .tl-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #9CA3AF;
+            font-weight: 700;
+            z-index: 2;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        .tl-step.done .tl-dot { background: #10B981; color: white; }
+        .tl-step.active .tl-dot { background: #F59E0B; color: white; animation: pulse-dot 1.5s infinite; }
+        .tl-line {
+            flex: 1;
+            height: 3px;
+            background: #E5E7EB;
+            margin-top: 11px;
+            margin-left: -50%;
+            margin-right: -50%;
+            position: relative;
+            z-index: 1;
+            transition: background 0.3s;
+        }
+        .tl-line.done { background: #10B981; }
+        .tl-label {
+            font-size: 9px;
+            margin-top: 5px;
+            color: #9CA3AF;
+            text-align: center;
+            font-weight: 600;
+            line-height: 1.2;
+            padding: 0 2px;
+        }
+        .tl-step.done .tl-label { color: #059669; }
+        .tl-step.active .tl-label { color: #D97706; }
+        .tl-time {
+            font-size: 8px;
+            color: #9CA3AF;
+            text-align: center;
+            margin-top: 1px;
+            font-weight: 500;
+        }
+        
+        .eta-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            color: #92400E;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            margin-bottom: 6px;
+        }
+        
+        .cancelled-notice {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            color: #DC2626;
+            font-weight: 600;
+            text-align: center;
+            margin: 8px 0;
+        }
+        
+        .order-items { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+        .order-item-tag { background: #F3F5F4; padding: 4px 9px; border-radius: var(--radius-full); font-size: 10px; color: var(--neutral-dark); display: flex; align-items: center; gap: 4px; }
+        .order-item-variant { font-weight: 600; font-size: 9px; }
+        .order-item-variant.clothing { color: #7C3AED; }
+        .order-item-variant.weight { color: var(--brand-green); }
+        
+        .order-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--neutral-border); padding-top: 10px; flex-wrap: wrap; gap: 8px; }
+        .order-total { font-size: 17px; font-weight: 700; }
+        .order-payment { font-size: 10px; color: var(--neutral-gray); }
+        
+        .order-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+        .reorder-btn { background: #EDF7F1; color: var(--brand-green); border: 1px solid var(--brand-green); padding: 7px 12px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s ease; display: flex; align-items: center; gap: 4px; }
+        .reorder-btn:active { background: var(--brand-green); color: white; transform: scale(0.95); }
+        
+        .rate-btn { background: linear-gradient(135deg, #F59E0B, #EF4444); color: white; border: none; padding: 7px 14px; border-radius: var(--radius-full); font-size: 10px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s ease; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(245,158,11,0.3); }
+        .rate-btn:active { transform: scale(0.95); }
+        
+        .rated-badge { background: #ECFDF5; color: #059669; border: 1px solid #10B981; padding: 7px 12px; border-radius: var(--radius-full); font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        
+        .cancel-btn { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; padding: 7px 12px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s ease; display: flex; align-items: center; gap: 4px; }
+        .cancel-btn:active { background: #FEE2E2; transform: scale(0.95); }
+        .cancel-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state i { font-size: 56px; color: #D1D5DB; margin-bottom: 14px; display: block; }
+        .empty-state h3 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .empty-state p { font-size: 12px; color: var(--neutral-gray); margin-bottom: 14px; }
+        
+        .btn-primary { background: var(--brand-green); color: white; border: none; padding: 12px 24px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; display: inline-block; margin: 4px; text-decoration: none; }
+        .btn-primary:active { background: var(--brand-green-dark); transform: scale(0.96); }
+        .btn-orange { background: var(--brand-orange); color: #1a1a1a; border: none; padding: 12px 24px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .btn-outline { background: white; color: var(--brand-green); border: 2px solid var(--brand-green); padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        
+        .login-prompt { text-align: center; padding: 60px 20px; }
+        .login-prompt i { font-size: 56px; color: #D1D5DB; margin-bottom: 14px; display: block; }
+        .login-prompt h3 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .login-prompt p { color: var(--neutral-gray); font-size: 13px; margin-bottom: 16px; }
+        
+        .bottom-nav { background: white; position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; align-items: center; padding: 5px 14px calc(10px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -4px 16px rgba(0,0,0,0.03); z-index: 100; border-top: 1px solid var(--neutral-border); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 9px; font-weight: 500; color: var(--neutral-gray); cursor: pointer; padding: 3px 10px; border-radius: var(--radius-full); border: none; background: transparent; font-family: 'Inter', sans-serif; text-decoration: none; position: relative; }
+        .nav-item:active { background: #EDF7F1; }
+        .nav-item.active { color: var(--brand-green); font-weight: 600; }
+        .nav-item i { font-size: 18px; margin-bottom: 1px; }
+        
+        .nav-cart-count { position: absolute; top: -2px; right: 2px; background: var(--brand-orange); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 8px; display: none; align-items: center; justify-content: center; border: 2px solid white; font-weight: 700; }
+        .nav-cart-count.show { display: flex; }
+        
+        .toast { position: fixed; bottom: calc(95px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 200; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-md); transition: all 0.3s ease; max-width: 90%; overflow: hidden; text-overflow: ellipsis; }
+        .toast.show { opacity: 1; visibility: visible; }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+        
+        .cancel-dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .cancel-dialog-overlay.show { display: flex; }
+        .cancel-dialog-box { background: white; border-radius: 22px; padding: 24px 22px; text-align: center; width: 100%; max-width: 340px; animation: slideUp 0.3s ease; }
+        .cancel-dialog-icon { width: 60px; height: 60px; background: #FEF2F2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 28px; color: #DC2626; }
+        .cancel-dialog-title { font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+        .cancel-dialog-msg { font-size: 12px; color: #6B7280; margin-bottom: 18px; line-height: 1.6; }
+        .cancel-dialog-btn { width: 100%; padding: 12px; border-radius: var(--radius-full); font-size: 13px; font-weight: 700; cursor: pointer; border: none; margin-bottom: 8px; font-family: 'Inter', sans-serif; }
+        .cancel-dialog-btn.danger { background: #DC2626; color: white; }
+        .cancel-dialog-btn.danger:disabled { opacity: 0.6; cursor: not-allowed; }
+        .cancel-dialog-btn.ghost { background: #F3F4F6; color: #6B7280; }
+    </style>
+</head>
+<body>
+
+<div id="netBanner" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);background:#DC2626;color:white;text-align:center;padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;z-index:99999;box-shadow:0 4px 12px rgba(220,38,38,0.4);white-space:nowrap;pointer-events:none;">📴 No Internet — Cached data</div>
+
+<div class="top-bar">
+    <button onclick="goBack()" class="back-btn"><i class="fas fa-arrow-left"></i></button>
+    <span class="top-title"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span> Orders</span>
+    <a href="cart.html" class="cart-icon-btn">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+    </a>
+    <button class="refresh-btn" id="refreshBtn" onclick="loadOrders()"><i class="fas fa-sync-alt"></i></button>
+</div>
+
+<div class="tabs" id="tabsBar">
+    <button class="tab-btn active" onclick="filterOrders('all',this)">All</button>
+    <button class="tab-btn" onclick="filterOrders('confirmed',this)">✅ Active</button>
+    <button class="tab-btn" onclick="filterOrders('out_for_delivery',this)">🚚 On the Way</button>
+    <button class="tab-btn" onclick="filterOrders('delivered',this)">📦 Delivered</button>
+    <button class="tab-btn" onclick="filterOrders('cancelled',this)">❌ Cancelled</button>
+</div>
+
+<div class="main-content" id="mainContent">
+    <div style="text-align:center;padding:50px;">
+        <div style="width:32px;height:32px;border:2.5px solid #E5E7EB;border-top-color:#F59E0B;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto;"></div>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <a class="nav-item" href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+    <a class="nav-item" href="cart.html">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Cart</span>
+        <span class="nav-cart-count" id="navCartCount">0</span>
+    </a>
+    <a class="nav-item active" href="orders.html"><i class="fas fa-receipt"></i><span>Orders</span></a>
+    <a class="nav-item" href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a>
+    <a class="nav-item" href="more.html"><i class="fas fa-ellipsis-h"></i><span>More</span></a>
+</nav>
+
+<div class="cancel-dialog-overlay" id="cancelDialog">
+    <div class="cancel-dialog-box">
+        <div class="cancel-dialog-icon"><i class="fas fa-times-circle"></i></div>
+        <h3 class="cancel-dialog-title">Cancel Order?</h3>
+        <p class="cancel-dialog-msg" id="cancelDialogMsg">Are you sure you want to cancel this order?<br>This action cannot be undone.</p>
+        <button class="cancel-dialog-btn danger" id="cancelConfirmBtn" onclick="confirmCancelOrder()">Yes, Cancel Order</button>
+        <button class="cancel-dialog-btn ghost" onclick="closeCancelDialog()">No, Keep It</button>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg"><span id="toastText"></span></div>
+
+<script>
+(function() {
+    'use strict';
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'
+    };
+    
+    var sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    var currentUser = null, allOrders = [], currentFilter = 'all';
+    var deliverySettings = null;
+    var ratedOrders = {};
+    var pendingCancelId = null;
+    var isCancelling = false;
+    
+    var ORDER_COLS = 'id, created_at, status, confirmed_at, out_for_delivery_at, delivered_at, customer_address, location_verified, items, total_amount, payment_method';
+    
+    function getEl(id) { return document.getElementById(id); }
+    function esc(s) { if(!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function safeJSON(s, f) { try { return s ? JSON.parse(s) : f; } catch(e) { return f; } }
+    
+    // ═══ Back navigation with fallback ═══
+    window.goBack = function() {
+        try {
+            if (document.referrer && document.referrer.indexOf(location.host) !== -1) history.back();
+            else window.location.href = 'index.html';
+        } catch(e) { window.location.href = 'index.html'; }
+    };
+    
+    function showToast(m, type) { 
+        var t = getEl('toastMsg'), s = getEl('toastText'); 
+        if (!t || !s) return; 
+        s.textContent = m; 
+        t.className = 'toast';
+        if (type === 'error') t.classList.add('error');
+        else if (type === 'success') t.classList.add('success');
+        t.classList.add('show'); 
+        clearTimeout(t._timer); 
+        t._timer = setTimeout(function() { t.classList.remove('show','error','success'); }, 2500); 
+    }
+    
+    var CartManager = {
+        getCart: function() { return safeJSON(localStorage.getItem('zymart_cart'), []); },
+        saveCart: function(cart) { try { localStorage.setItem('zymart_cart', JSON.stringify(cart)); } catch(e) {} this.updateBadges(); },
+        getTotalItems: function() { var cart = this.getCart(); return cart.reduce(function(sum, item) { return sum + (item.quantity || 1); }, 0); },
+        updateBadges: function() {
+            var totalItems = this.getTotalItems();
+            var topBadge = getEl('cartBadge');
+            if (topBadge) { topBadge.textContent = totalItems; if (totalItems > 0) topBadge.classList.add('show'); else topBadge.classList.remove('show'); }
+            var navBadge = getEl('navCartCount');
+            if (navBadge) { navBadge.textContent = totalItems; if (totalItems > 0) navBadge.classList.add('show'); else navBadge.classList.remove('show'); }
+        }
+    };
+    
+    function parseUTC(isoString) {
+        if (!isoString) return null;
+        var s = String(isoString).trim();
+        var match = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})/);
+        if (match) {
+            var iso = match[1] + '-' + match[2] + '-' + match[3] + 'T' + match[4] + ':' + match[5] + ':' + match[6] + 'Z';
+            var d = new Date(iso);
+            if (!isNaN(d.getTime())) return d;
+        }
+        s = s.replace(' ', 'T');
+        if (/[+\-]\d{2}$/.test(s)) s += ':00';
+        if (!/[Zz]$/.test(s) && !/[+\-]\d{2}:?\d{2}$/.test(s)) s += 'Z';
+        var d2 = new Date(s);
+        if (isNaN(d2.getTime())) return null;
+        return d2;
+    }
+    
+    function formatOrderDate(isoString) {
+        var d = parseUTC(isoString);
+        if (!d) return { date: '', time: '' };
+        return {
+            date: d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' }),
+            time: d.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true })
+        };
+    }
+    
+    function formatTimeShort(isoString) {
+        var d = parseUTC(isoString);
+        if (!d) return '';
+        return d.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+    
+    function fmtWeight(w, u) {
+        if (!w) return '';
+        var nw = parseFloat(w);
+        if (isNaN(nw)) return String(w);
+        var unitLower = u ? u.toLowerCase() : '';
+        if (unitLower === 'gram' || unitLower === 'g') return nw >= 1000 ? (nw/1000).toFixed(1).replace(/\.0$/,'') + ' kg' : nw + ' g';
+        if (unitLower === 'kg') return nw + ' kg';
+        if (unitLower === 'liter' || unitLower === 'l') return nw + ' L';
+        if (unitLower === 'ml') return nw + ' ml';
+        return nw + ' ' + (u || '');
+    }
+    
+    async function loadDeliverySettings() {
+        try {
+            var r = await sb.from('delivery_settings').select('delivery_time_minutes').order('updated_at', { ascending: false }).limit(1).maybeSingle();
+            if (r && r.data) deliverySettings = r.data;
+        } catch(e) {}
+    }
+    
+    async function checkUser() { 
+        try { 
+            var r = await sb.auth.getSession(); 
+            if (r && r.data && r.data.session) { currentUser = r.data.session.user; return true; }
+        } catch(e) {}
+        try {
+            var session = JSON.parse(localStorage.getItem('zymart_session') || 'null');
+            if (session && session.userId) { currentUser = { id: session.userId, phone: session.phone }; return true; }
+        } catch(e) {}
+        currentUser = null; 
+        return false;
+    }
+    
+    function goToLogin() { 
+        try { sessionStorage.setItem('zymart_redirect_after_login', 'orders.html'); } catch(e) {}
+        window.location.href = 'login.html'; 
+    }
+    
+    async function loadRatedOrders() {
+        ratedOrders = {};
+        try { ratedOrders = JSON.parse(localStorage.getItem('zymart_rated_orders') || '{}'); } catch(e) {}
+        
+        var deliveredIds = allOrders.filter(function(o) { return o.status === 'delivered'; }).map(function(o) { return o.id; });
+        if (deliveredIds.length > 0 && currentUser && currentUser.id) {
+            try {
+                var r = await sb.from('product_reviews').select('order_id').eq('user_id', currentUser.id).in('order_id', deliveredIds).eq('admin_hidden', false);
+                if (r && r.data && r.data.length > 0) {
+                    for (var i = 0; i < r.data.length; i++) {
+                        if (r.data[i].order_id) ratedOrders[r.data[i].order_id] = true;
+                    }
+                    try { localStorage.setItem('zymart_rated_orders', JSON.stringify(ratedOrders)); } catch(e) {}
+                }
+            } catch(e) {
+                // reviews table not created yet — use localStorage fallback
+            }
+        }
+    }
+    
+    // ═══ FIXED: loadOrders with silent mode + scroll preservation ═══
+    async function loadOrders(silent) {
+        var btn = getEl('refreshBtn');
+        if (btn && !silent) {
+            if (btn.classList.contains('spinning')) return;
+            btn.classList.add('spinning');
+        }
+        
+        if (!currentUser) { 
+            var li = await checkUser(); 
+            if (!li) { 
+                if (!silent) {
+                    getEl('mainContent').innerHTML = '<div class="login-prompt"><i class="fas fa-user-lock"></i><h3>Login Required</h3><p>Please login to view your orders</p><button class="btn-orange" onclick="goToLogin()"><i class="fas fa-sign-in-alt"></i> Login / Register</button></div>'; 
+                    getEl('tabsBar').style.display = 'none';
+                    if (btn) btn.classList.remove('spinning');
+                }
+                return; 
+            } 
+        }
+        
+        try {
+            var r = await sb.from('orders').select(ORDER_COLS).eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(50);
+            
+            // ═══ FIX: Don't wipe cache on silent-refresh failure ═══
+            if (r && r.data) {
+                var oldStr = JSON.stringify(allOrders);
+                allOrders = r.data;
+                var newStr = JSON.stringify(allOrders);
+                
+                await loadRatedOrders();
+                updateTabCounts();
+                getEl('tabsBar').style.display = 'flex';
+                
+                // Silent + no changes → skip re-render (preserves scroll)
+                if (silent && oldStr === newStr) {
+                    if (btn) btn.classList.remove('spinning');
+                    return;
+                }
+                
+                var scrollY = window.scrollY;
+                renderOrders();
+                if (silent) window.scrollTo(0, scrollY);
+            } else if (!silent) {
+                // Show error only for non-silent first-load
+                allOrders = [];
+                renderOrders();
+            }
+        } catch(e) { 
+            console.error('[Orders]', e);
+            if (!silent) {
+                getEl('mainContent').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Failed to Load Orders</h3><p>Please check your connection</p><button class="btn-primary" onclick="loadOrders()">🔄 Retry</button></div>'; 
+            }
+        }
+        
+        if (btn) btn.classList.remove('spinning');
+    }
+    
+    function updateTabCounts() {
+        // pending merged into "Active" tab
+        var counts = { all: allOrders.length, confirmed: 0, out_for_delivery: 0, delivered: 0, cancelled: 0 };
+        for (var i = 0; i < allOrders.length; i++) {
+            var s = allOrders[i].status;
+            if (s === 'pending' || s === 'confirmed') counts.confirmed++;
+            else if (counts[s] !== undefined) counts[s]++;
+        }
+        var tabs = document.querySelectorAll('.tab-btn');
+        var keys = ['all', 'confirmed', 'out_for_delivery', 'delivered', 'cancelled'];
+        for (var j = 0; j < tabs.length; j++) {
+            var key = keys[j];
+            var count = counts[key] || 0;
+            var existingCount = tabs[j].querySelector('.count');
+            if (existingCount) existingCount.remove();
+            if (count > 0) {
+                var countSpan = document.createElement('span');
+                countSpan.className = 'count';
+                countSpan.textContent = count;
+                tabs[j].appendChild(countSpan);
+            }
+        }
+    }
+    
+    window.filterOrders = function(f, btn) { 
+        currentFilter = f; 
+        document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); }); 
+        if (btn) btn.classList.add('active'); 
+        renderOrders(); 
+    };
+    
+    function getStatusBadge(s) { 
+        var m = { 
+            pending: 'status-pending', 
+            confirmed: 'status-confirmed', 
+            out_for_delivery: 'status-out_for_delivery', 
+            delivered: 'status-delivered', 
+            cancelled: 'status-cancelled' 
+        }; 
+        return m[s] || 'status-pending'; 
+    }
+    
+    function getStatusIcon(s) {
+        var m = { pending: '⏳', confirmed: '✅', out_for_delivery: '🚚', delivered: '📦', cancelled: '❌' };
+        return m[s] || '⏳';
+    }
+    
+    function getStatusText(s) { 
+        var m = { pending: 'Pending', confirmed: 'Confirmed', out_for_delivery: 'On the Way', delivered: 'Delivered', cancelled: 'Cancelled' }; 
+        return m[s] || s; 
+    }
+    
+    // ═══ FIXED: Timeline logic (proper active step per status) ═══
+    function renderTimeline(o) {
+        var status = o.status;
+        
+        if (status === 'cancelled') {
+            return '<div class="cancelled-notice">❌ This order has been cancelled</div>';
+        }
+        
+        // Correct step states:
+        //   pending          → step 1 active (being confirmed), 2 & 3 pending
+        //   confirmed        → step 1 done, 2 pending (waiting), 3 pending
+        //   out_for_delivery → step 1 done, 2 active (in motion), 3 pending
+        //   delivered        → all done
+        var s1 = 'pending', s2 = 'pending', s3 = 'pending';
+        if (status === 'pending') {
+            s1 = 'active';
+        } else if (status === 'confirmed') {
+            s1 = 'done';
+        } else if (status === 'out_for_delivery') {
+            s1 = 'done'; s2 = 'active';
+        } else if (status === 'delivered') {
+            s1 = 'done'; s2 = 'done'; s3 = 'done';
+        }
+        
+        var confirmedTime = o.confirmed_at ? formatTimeShort(o.confirmed_at) : (o.created_at ? formatTimeShort(o.created_at) : '');
+        var outTime = o.out_for_delivery_at ? formatTimeShort(o.out_for_delivery_at) : '';
+        var deliveredTime = o.delivered_at ? formatTimeShort(o.delivered_at) : '';
+        
+        var line1 = (s2 === 'done' || (s1 === 'done' && s2 !== 'pending')) ? 'done' : (s1 === 'done' ? '' : '');
+        if (s2 === 'active' || s2 === 'done') line1 = 'done';
+        
+        var line2 = (s3 === 'done' || s3 === 'active') ? (s3 === 'done' ? 'done' : '') : '';
+        if (s3 === 'done') line2 = 'done';
+        
+        var html = '<div class="timeline-wrap">';
+        html += '<div class="timeline">';
+        
+        html += '<div class="tl-step ' + s1 + '">';
+        html += '<div class="tl-dot">' + (s1 === 'done' ? '✓' : '1') + '</div>';
+        html += '<div class="tl-label">Confirmed</div>';
+        if (confirmedTime && s1 !== 'pending') html += '<div class="tl-time">' + confirmedTime + '</div>';
+        html += '</div>';
+        
+        html += '<div class="tl-line ' + (s1 === 'done' ? 'done' : '') + '"></div>';
+        
+        html += '<div class="tl-step ' + s2 + '">';
+        html += '<div class="tl-dot">' + (s2 === 'done' ? '✓' : '2') + '</div>';
+        html += '<div class="tl-label">On the Way</div>';
+        if (outTime) html += '<div class="tl-time">' + outTime + '</div>';
+        html += '</div>';
+        
+        html += '<div class="tl-line ' + (s2 === 'done' ? 'done' : '') + '"></div>';
+        
+        html += '<div class="tl-step ' + s3 + '">';
+        html += '<div class="tl-dot">' + (s3 === 'done' ? '✓' : '3') + '</div>';
+        html += '<div class="tl-label">Delivered</div>';
+        if (deliveredTime) html += '<div class="tl-time">' + deliveredTime + '</div>';
+        html += '</div>';
+        
+        html += '</div></div>';
+        return html;
+    }
+    
+    function renderOrderActions(o) {
+        var status = o.status;
+        var oid = o.id;
+        var isRated = ratedOrders[oid] === true;
+        var actions = '';
+        
+        if (status === 'delivered') {
+            if (isRated) {
+                actions += '<div class="rated-badge"><i class="fas fa-check-circle"></i> Rated</div>';
+            } else {
+                actions += '<button class="rate-btn" onclick="event.stopPropagation();goToReview(\'' + oid + '\')"><i class="fas fa-star"></i> Rate Order</button>';
+            }
+            actions += '<button class="reorder-btn" onclick="event.stopPropagation();reorder(\'' + oid + '\')"><i class="fas fa-redo"></i> Reorder</button>';
+        }
+        else if (status === 'confirmed' || status === 'pending') {
+            actions += '<button class="cancel-btn" onclick="event.stopPropagation();requestCancelOrder(\'' + oid + '\')"><i class="fas fa-times"></i> Cancel</button>';
+            actions += '<button class="reorder-btn" onclick="event.stopPropagation();reorder(\'' + oid + '\')"><i class="fas fa-redo"></i> Reorder</button>';
+        }
+        else if (status === 'out_for_delivery') {
+            actions += '<button class="reorder-btn" onclick="event.stopPropagation();reorder(\'' + oid + '\')"><i class="fas fa-redo"></i> Reorder</button>';
+        }
+        else if (status === 'cancelled') {
+            actions += '<button class="reorder-btn" onclick="event.stopPropagation();reorder(\'' + oid + '\')"><i class="fas fa-redo"></i> Reorder</button>';
+        }
+        
+        return actions;
+    }
+    
+    function renderOrders() {
+        var c = getEl('mainContent');
+        var filtered = allOrders;
+        if (currentFilter !== 'all') {
+            if (currentFilter === 'confirmed') {
+                // "Active" tab includes pending + confirmed
+                filtered = allOrders.filter(function(o) { return o.status === 'pending' || o.status === 'confirmed'; });
+            } else {
+                filtered = allOrders.filter(function(o) { return o.status === currentFilter; });
+            }
+        }
+        
+        if (!filtered.length) {
+            c.innerHTML = '<div class="empty-state">' +
+                '<i class="fas fa-receipt"></i>' +
+                '<h3>' + getStatusIcon(currentFilter) + ' No ' + (currentFilter === 'all' ? '' : getStatusText(currentFilter) + ' ') + 'Orders</h3>' +
+                '<p>' + (currentFilter === 'all' ? 'Place your first order now!' : 'No orders in this category') + '</p>' +
+                '<a href="products.html" class="btn-primary"><i class="fas fa-shopping-bag"></i> Browse Products</a><br>' +
+                '<button class="btn-outline" onclick="window.location.href=\'index.html\'"><i class="fas fa-home"></i> Go Home</button>' +
+                '</div>';
+            return;
+        }
+        
+        var h = '<div class="orders-list">';
+        
+        for (var i = 0; i < filtered.length; i++) {
+            var o = filtered[i];
+            var oid = '#' + (o.id || '').substring(0, 8).toUpperCase();
+            var dt = formatOrderDate(o.created_at);
+            var items = Array.isArray(o.items) ? o.items : safeJSON(typeof o.items === 'string' ? o.items : JSON.stringify(o.items || []), []);
+            
+            h += '<div class="order-card" onclick="window.location.href=\'order-details.html?id=' + o.id + '\'">';
+            
+            h += '<div class="order-header">';
+            h += '<div><div class="order-id">' + oid + '</div><div class="order-date">📅 ' + dt.date + ' · ' + dt.time + '</div></div>';
+            h += '<span class="order-status ' + getStatusBadge(o.status) + '">' + getStatusIcon(o.status) + ' ' + getStatusText(o.status) + '</span>';
+            h += '</div>';
+            
+            if (o.customer_address) {
+                h += '<div class="order-address"><i class="fas fa-map-marker-alt"></i> ' + esc((o.customer_address || '').substring(0, 45)) + (o.customer_address && o.customer_address.length > 45 ? '...' : '');
+                if (o.location_verified) h += '<span class="gps-badge">📍 GPS Verified</span>';
+                h += '</div>';
+            }
+            
+            if ((o.status === 'confirmed' || o.status === 'out_for_delivery') && deliverySettings) {
+                var eta = deliverySettings.delivery_time_minutes || 10;
+                h += '<div class="eta-badge">⏱️ Arriving in ~' + eta + ' mins</div>';
+            }
+            
+            h += renderTimeline(o);
+            
+            h += '<div class="order-items">';
+            var maxShow = 3;
+            for (var j = 0; j < Math.min(items.length, maxShow); j++) {
+                var it = items[j];
+                var itName = it.product_name || it.name || 'Item';
+                var variantLabel = '';
+                var variantClass = '';
+                
+                if (it.variant_color && it.variant_size) {
+                    variantLabel = ' · 🎨 ' + it.variant_color + ' · 📏 ' + it.variant_size;
+                    variantClass = ' clothing';
+                } else if (it.variant_weight) {
+                    variantLabel = ' · ' + fmtWeight(it.variant_weight, it.variant_unit);
+                    variantClass = ' weight';
+                }
+                
+                var qty = it.quantity || 1;
+                h += '<span class="order-item-tag">' + esc(itName) + ' ×' + qty + '<span class="order-item-variant' + variantClass + '">' + variantLabel + '</span></span>';
+            }
+            if (items.length > maxShow) h += '<span class="order-item-tag">+' + (items.length - maxShow) + ' more</span>';
+            h += '</div>';
+            
+            h += '<div class="order-footer">';
+            h += '<div><div class="order-total">₹' + (parseFloat(o.total_amount) || 0).toLocaleString('en-IN') + '</div>';
+            h += '<div class="order-payment">💵 ' + (o.payment_method === 'cod' ? 'Cash on Delivery' : (o.payment_method || 'COD')) + '</div></div>';
+            h += '<div class="order-actions">' + renderOrderActions(o) + '</div>';
+            h += '</div>';
+            
+            h += '</div>';
+        }
+        
+        h += '</div>';
+        c.innerHTML = h;
+    }
+    
+    window.goToReview = function(orderId) {
+        window.location.href = 'review.html?order_id=' + orderId;
+    };
+    
+    window.requestCancelOrder = function(orderId) {
+        if (isCancelling) return;
+        pendingCancelId = orderId;
+        var dialog = getEl('cancelDialog');
+        var msg = getEl('cancelDialogMsg');
+        if (msg) msg.innerHTML = 'Order <strong>#' + orderId.substring(0, 8).toUpperCase() + '</strong> cancel karna chahte hain?<br><br>Yeh action undo nahi ho sakta.';
+        if (dialog) dialog.classList.add('show');
+    };
+    
+    window.closeCancelDialog = function() {
+        if (isCancelling) return;
+        pendingCancelId = null;
+        var dialog = getEl('cancelDialog');
+        if (dialog) dialog.classList.remove('show');
+    };
+    
+    // ═══ FIX: Double-tap guard ═══
+    window.confirmCancelOrder = async function() {
+        if (!pendingCancelId) return;
+        if (isCancelling) return;
+        isCancelling = true;
+        
+        var orderId = pendingCancelId;
+        var btn = getEl('cancelConfirmBtn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Cancelling...'; }
+        
+        try {
+            var r = await sb.from('orders').update({ 
+                status: 'cancelled',
+                cancelled_at: new Date().toISOString(),
+                cancelled_by: 'customer'
+            }).eq('id', orderId);
+            
+            if (r.error) {
+                var r2 = await sb.from('orders').update({ status: 'cancelled' }).eq('id', orderId);
+                if (r2.error) throw new Error(r2.error.message);
+            }
+            
+            showToast('✅ Order cancelled', 'success');
+            pendingCancelId = null;
+            var dlg = getEl('cancelDialog');
+            if (dlg) dlg.classList.remove('show');
+            isCancelling = false;
+            await loadOrders(true);
+        } catch(e) {
+            console.error('[Cancel]', e);
+            showToast('❌ ' + (e.message || 'Cancel failed'), 'error');
+            isCancelling = false;
+        }
+        
+        if (btn) { btn.disabled = false; btn.innerHTML = 'Yes, Cancel Order'; }
+    };
+    
+    window.reorder = function(oid) {
+        var order = allOrders.find(function(o) { return o.id === oid; });
+        if (!order) { showToast('Order not found', 'error'); return; }
+        
+        var items = Array.isArray(order.items) ? order.items : safeJSON(typeof order.items === 'string' ? order.items : JSON.stringify(order.items || []), []);
+        if (!items.length) { showToast('No items in this order', 'error'); return; }
+        
+        var cart = CartManager.getCart();
+        var addedCount = 0;
+        
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            var pid = item.product_id || item.id;
+            if (!pid) continue;
+            
+            var cartKey;
+            if (item.variant_color && item.variant_size) {
+                cartKey = pid + '_' + item.variant_color + '_' + item.variant_size;
+            } else {
+                cartKey = item.variant_key || (pid + '_' + (item.variant_weight || '') + '_' + (item.variant_unit || ''));
+            }
+            
+            var found = cart.find(function(c) { return c.cartKey === cartKey || c.variantKey === cartKey; });
+            
+            if (found) {
+                found.quantity += (item.quantity || 1);
+            } else {
+                cart.push({
+                    id: pid,
+                    cartKey: cartKey,
+                    variantKey: cartKey,
+                    name: item.product_name || item.name || 'Product',
+                    price: item.price || 0,
+                    originalPrice: item.original_price || null,
+                    image: item.image || '',
+                    quantity: item.quantity || 1,
+                    variantWeight: item.variant_weight || null,
+                    variantUnit: item.variant_unit || null,
+                    variantColor: item.variant_color || null,
+                    variantSize: item.variant_size || null,
+                    shop_id: item.shop_id || '',
+                    shop_name: item.shop_name || '',
+                    stock: 999
+                });
+            }
+            addedCount++;
+        }
+        
+        CartManager.saveCart(cart);
+        showToast('🛒 ' + addedCount + ' item(s) added to cart!', 'success');
+        setTimeout(function() { window.location.href = 'cart.html'; }, 800);
+    };
+    
+    // ═══ OFFLINE BANNER ═══
+    window.addEventListener('offline', function() { var b = getEl('netBanner'); if (b) b.style.display = 'block'; });
+    window.addEventListener('online', function() { var b = getEl('netBanner'); if (b) b.style.display = 'none'; });
+    
+    window.addEventListener('storage', function(e) {
+        if(e.key === 'zymart_cart') CartManager.updateBadges();
+    });
+    
+    document.addEventListener('visibilitychange', function() {
+        if(document.visibilityState === 'visible') CartManager.updateBadges();
+    });
+    
+    document.addEventListener('DOMContentLoaded', async function() { 
+        if (!navigator.onLine) { var nb = getEl('netBanner'); if (nb) nb.style.display = 'block'; }
+        CartManager.updateBadges();
+        
+        var li = await checkUser(); 
+        if (li) {
+            await loadDeliverySettings();
+            loadOrders();
+            
+            // Silent auto-refresh every 45s (was 30s), preserves scroll
+            setInterval(function() {
+                var hasActive = allOrders.some(function(o) { return o.status === 'pending' || o.status === 'confirmed' || o.status === 'out_for_delivery'; });
+                if (hasActive && document.visibilityState === 'visible' && navigator.onLine) {
+                    loadOrders(true);
+                }
+            }, 45000);
+        } else { 
+            getEl('mainContent').innerHTML = '<div class="login-prompt"><i class="fas fa-user-lock"></i><h3>Login Required</h3><p>Please login to view your orders</p><button class="btn-orange" onclick="goToLogin()"><i class="fas fa-sign-in-alt"></i> Login / Register</button></div>'; 
+            getEl('tabsBar').style.display = 'none';
+        } 
+    });
+    
+    window.loadOrders = loadOrders;
+    window.filterOrders = filterOrders;
+    window.reorder = reorder;
+    window.goToReview = goToReview;
+    window.requestCancelOrder = requestCancelOrder;
+    window.closeCancelDialog = closeCancelDialog;
+    window.confirmCancelOrder = confirmCancelOrder;
+    window.goBack = goBack;
+    window.CartManager = CartManager;
+    
+})();
+</script>
+</body>
+</html>

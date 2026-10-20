@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Invite & Earn - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root{
+            --brand-green:#0B5A31;--brand-orange:#F59E0B;--neutral-white:#FFFFFF;
+            --neutral-bg:#F9FAFB;--neutral-border:#E5E7EB;--neutral-gray:#6B7280;
+            --neutral-dark:#1A1A1A;--shadow-xs:0 1px 2px rgba(0,0,0,0.04);
+            --shadow-sm:0 1px 4px rgba(0,0,0,0.06);--shadow-md:0 4px 16px rgba(0,0,0,0.08);
+            --radius-sm:10px;--radius-md:14px;--radius-lg:18px;--radius-xl:22px;--radius-full:9999px;
+            --status-bar-height:env(safe-area-inset-top, 0px);
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--neutral-bg);color:var(--neutral-dark);min-height:100vh;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;padding-bottom:calc(30px + env(safe-area-inset-bottom, 0px))}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+        
+        .top-bar{background:var(--brand-green);position:fixed;top:0;left:0;width:100%;z-index:100;padding:10px 14px;padding-top:calc(10px + var(--status-bar-height));display:flex;align-items:center;gap:10px;box-shadow:0 2px 16px rgba(11,90,49,0.3)}
+        .back-btn{width:40px;height:40px;min-width:40px;background:rgba(255,255,255,0.10);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:white;font-size:15px;text-decoration:none}
+        .back-btn:active{background:rgba(255,255,255,0.22);transform:scale(0.93)}
+        .top-title{font-family:'Poppins',sans-serif;flex:1;font-size:16px;font-weight:700;color:white}
+        .brand-zy{color:#A3E635}.brand-mart{color:#FDE047}
+        .main-content{padding-top:calc(62px + var(--status-bar-height));max-width:600px;margin:0 auto}
+        
+        /* COMING SOON BANNER */
+        .coming-soon-banner{
+            background:linear-gradient(135deg,#FFF8EB,#FEF3C7);
+            border:2px solid #FDE68A;
+            border-radius:var(--radius-xl);
+            margin:12px 14px;
+            padding:18px 16px;
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+            animation:fadeInUp 0.4s ease
+        }
+        .coming-soon-icon{
+            width:42px;height:42px;min-width:42px;
+            background:#F59E0B;color:white;
+            border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            font-size:18px;flex-shrink:0
+        }
+        .coming-soon-text h3{
+            font-family:'Poppins',sans-serif;
+            font-size:14px;font-weight:700;
+            color:#92400E;margin-bottom:4px
+        }
+        .coming-soon-text p{
+            font-size:12px;color:#A16207;line-height:1.5
+        }
+        
+        .hero-card{background:#FFF8EB;margin:12px 14px;border-radius:var(--radius-xl);padding:24px 20px;text-align:center;border:2px solid #FDE68A;animation:fadeInUp 0.4s ease;opacity:0.75}
+        .hero-icon{font-size:52px;margin-bottom:10px;animation:bounce 2s infinite}
+        .hero-title{font-family:'Poppins',sans-serif;font-size:21px;font-weight:700;color:#92400E}
+        .hero-subtitle{font-size:13px;color:#A16207;margin-bottom:16px}
+        .reward-badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+        .reward-badge{background:white;padding:10px 16px;border-radius:var(--radius-full);font-weight:600;font-size:13px;box-shadow:var(--shadow-xs);border:1.5px solid #FDE68A;display:flex;align-items:center;gap:6px}
+        .reward-badge i{color:var(--brand-orange)}.reward-badge .amount{color:#92400E;font-size:16px;font-weight:700}
+        
+        .referral-section{background:var(--neutral-white);margin:0 14px 12px;border-radius:var(--radius-lg);padding:18px;border:1px solid var(--neutral-border);box-shadow:var(--shadow-xs);text-align:center;opacity:0.6;pointer-events:none}
+        .section-title{font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;text-align:left}
+        .section-title i{color:var(--brand-green)}
+        .referral-code-box{background:#F3F5F4;border:2px dashed var(--neutral-border);border-radius:var(--radius-md);padding:14px;margin:10px 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+        .referral-code{font-size:18px;font-weight:700;color:var(--neutral-gray);letter-spacing:2px;font-family:monospace}
+        .copy-btn{background:#D1D5DB;color:white;border:none;padding:8px 14px;border-radius:var(--radius-full);font-size:11px;font-weight:600;cursor:not-allowed;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px}
+        .share-buttons{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+        .share-btn{padding:10px 16px;border-radius:var(--radius-full);font-weight:600;font-size:12px;cursor:not-allowed;border:none;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px;opacity:0.5}
+        .share-btn.whatsapp{background:#25D366;color:white}
+        .share-btn.copy-link{background:#F3F5F4;color:var(--neutral-dark);border:1.5px solid var(--neutral-border)}
+        
+        .how-section{background:var(--neutral-white);margin:0 14px 12px;border-radius:var(--radius-lg);padding:18px;border:1px solid var(--neutral-border);box-shadow:var(--shadow-xs)}
+        .step{display:flex;gap:12px;align-items:flex-start;padding:12px;background:#F3F5F4;border-radius:var(--radius-sm);margin-bottom:8px}
+        .step:last-child{margin-bottom:0}
+        .step-number{width:32px;height:32px;min-width:32px;background:var(--brand-green);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+        .step-text h4{font-size:13px;font-weight:600;margin-bottom:2px}.step-text p{font-size:11px;color:var(--neutral-gray)}
+        
+        .login-prompt{text-align:center;padding:40px 20px}
+        .login-prompt i{font-size:48px;color:#D1D5DB;margin-bottom:10px;display:block}
+        .login-prompt h3{font-family:'Poppins',sans-serif;font-size:17px;font-weight:700}.login-prompt p{color:var(--neutral-gray);font-size:13px;margin-bottom:14px}
+        .btn-orange{background:var(--brand-orange);color:white;border:none;padding:12px 28px;border-radius:var(--radius-full);font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 14px rgba(245,158,11,0.25);display:inline-flex;align-items:center;gap:6px}
+        
+        .terms-section{background:var(--neutral-white);margin:0 14px 20px;border-radius:var(--radius-lg);padding:18px;border:1px solid var(--neutral-border);box-shadow:var(--shadow-xs)}
+        .terms-section h3{font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+        .terms-section h3 i{color:#6B7280}
+        .terms-section ul{padding-left:18px}
+        .terms-section li{font-size:12px;color:var(--neutral-gray);margin-bottom:4px;line-height:1.5}
+        
+        .toast{position:fixed;bottom:calc(30px + env(safe-area-inset-bottom, 0px));left:50%;transform:translateX(-50%);background:var(--neutral-dark);color:white;padding:10px 20px;border-radius:var(--radius-full);font-size:12px;z-index:200;opacity:0;visibility:hidden;white-space:nowrap;box-shadow:var(--shadow-md);transition:all 0.3s ease;max-width:90%;overflow:hidden;text-overflow:ellipsis}
+        .toast.show{opacity:1;visibility:visible}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="netBanner" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);background:#DC2626;color:white;text-align:center;padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;z-index:99999;box-shadow:0 4px 12px rgba(220,38,38,0.4);white-space:nowrap;pointer-events:none;">📴 No Internet</div>
+
+<div class="top-bar">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <span class="top-title"><span class="brand-zy">Zy</span><span class="brand-mart">Mart</span> Invite</span>
+</div>
+
+<div class="main-content" id="mainContent"></div>
+<div class="toast" id="toastMsg"></div>
+
+<script>
+(function(){
+    'use strict';
+    
+    window.addEventListener('error', function(e) { console.error('[Invite]', e.message); });
+    window.addEventListener('offline', function() { var b = document.getElementById('netBanner'); if (b) b.style.display = 'block'; });
+    window.addEventListener('online', function() { var b = document.getElementById('netBanner'); if (b) b.style.display = 'none'; });
+    
+    function getEl(id) { return document.getElementById(id); }
+    function esc(s) { if(!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    
+    var sb = supabase.createClient('https://zwajyovemwdqtkecipeb.supabase.co', 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1');
+    var currentUser = null, isLoggedIn = false;
+    
+    function showToast(m, e) {
+        var t = getEl('toastMsg');
+        if (!t) return;
+        t.textContent = m;
+        t.style.background = e ? '#EF4444' : '#1A1A1A';
+        t.classList.add('show');
+        clearTimeout(t._t);
+        t._t = setTimeout(function() { t.classList.remove('show'); }, 2500);
+    }
+    
+    function goToLogin() { window.location.href = 'login.html'; }
+    
+    function renderPage() {
+        var mc = getEl('mainContent');
+        if (!mc) return;
+        
+        // Coming soon banner — honest disclosure
+        var html = '';
+        html += '<div class="coming-soon-banner">';
+        html += '<div class="coming-soon-icon"><i class="fas fa-tools"></i></div>';
+        html += '<div class="coming-soon-text">';
+        html += '<h3>🚧 Coming Soon!</h3>';
+        html += '<p>Referral program abhi setup ho raha hai. Jald hi aap invite karke <b>₹50</b> kama payenge!</p>';
+        html += '</div>';
+        html += '</div>';
+        
+        if (!isLoggedIn) {
+            html += '<div class="login-prompt"><i class="fas fa-gift"></i><h3>Login to be Notified</h3><p>Referral program launch hone par aapko sabse pehle batayenge!</p><button class="btn-orange" onclick="goToLogin()"><i class="fas fa-sign-in-alt"></i> Login / Register</button></div>';
+            html += renderHowItWorks();
+            mc.innerHTML = html;
+            return;
+        }
+        
+        // Logged in — show preview (disabled)
+        html += '<div class="hero-card">';
+        html += '<div class="hero-icon">🎁</div>';
+        html += '<div class="hero-title">Invite Friends & Earn!</div>';
+        html += '<div class="hero-subtitle">Get ₹50 for every friend\'s first order</div>';
+        html += '<div class="reward-badges">';
+        html += '<div class="reward-badge"><i class="fas fa-gift"></i> You get <span class="amount">₹50</span></div>';
+        html += '<div class="reward-badge"><i class="fas fa-tag"></i> Friend gets <span class="amount">₹25</span></div>';
+        html += '</div>';
+        html += '</div>';
+        
+        // Disabled referral code box
+        html += '<div class="referral-section">';
+        html += '<div class="section-title"><i class="fas fa-hashtag"></i> Your Referral Code</div>';
+        html += '<div class="referral-code-box">';
+        html += '<span class="referral-code">COMING-SOON</span>';
+        html += '<button class="copy-btn"><i class="fas fa-lock"></i> Locked</button>';
+        html += '</div>';
+        html += '<p style="font-size:11px;color:#6B7280;margin-top:8px;line-height:1.5;"><i class="fas fa-info-circle" style="color:#F59E0B;"></i> Referral code generate hoga launch par</p>';
+        html += '</div>';
+        
+        html += renderHowItWorks();
+        
+        // Honest terms
+        html += '<div class="terms-section">';
+        html += '<h3><i class="fas fa-file-contract"></i> Important Note</h3>';
+        html += '<ul>';
+        html += '<li>Referral program <b>abhi live nahi</b> hai — setup chal raha hai.</li>';
+        html += '<li>Launch hone par aapko notification milegi.</li>';
+        html += '<li>Tab tak koi code share mat karein — sabhi codes invalid hain.</li>';
+        html += '</ul>';
+        html += '</div>';
+        
+        mc.innerHTML = html;
+    }
+    
+    function renderHowItWorks() {
+        var h = '<div class="how-section">';
+        h += '<div class="section-title"><i class="fas fa-question-circle"></i> How It Will Work</div>';
+        h += '<div class="step"><div class="step-number">1</div><div class="step-text"><h4>Share Your Code</h4><p>Launch hone ke baad code share kar payenge</p></div></div>';
+        h += '<div class="step"><div class="step-number">2</div><div class="step-text"><h4>Friend Joins</h4><p>Wo signup ke time aapka code enter karega</p></div></div>';
+        h += '<div class="step"><div class="step-number">3</div><div class="step-text"><h4>First Order</h4><p>Unka pehla order deliver hone par aapko ₹50 milega</p></div></div>';
+        h += '</div>';
+        return h;
+    }
+    
+    async function checkAuth() {
+        try {
+            var r = await sb.auth.getSession();
+            if (r && r.data && r.data.session) {
+                currentUser = r.data.session.user;
+                isLoggedIn = true;
+                return;
+            }
+        } catch(e) {}
+        try {
+            var session = JSON.parse(localStorage.getItem('zymart_session') || 'null');
+            if (session && session.userId) {
+                currentUser = { id: session.userId, phone: session.phone };
+                isLoggedIn = true;
+                return;
+            }
+        } catch(e) {}
+        isLoggedIn = false;
+    }
+    
+    async function init() {
+        if (!navigator.onLine) { var nb = getEl('netBanner'); if (nb) nb.style.display = 'block'; }
+        renderPage();  // Quick render
+        await checkAuth();
+        renderPage();  // Re-render if logged in
+    }
+    
+    document.addEventListener('DOMContentLoaded', init);
+    
+    window.goToLogin = goToLogin;
+})();
+</script>
+</body>
+</html>

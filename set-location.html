@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Set Location - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --green: #0B5A31; 
+            --orange: #F59E0B; 
+            --danger: #EF4444; 
+            --success: #10B981; 
+            --status-bar-height: env(safe-area-inset-top, 0px);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background: #0B5A31; 
+            min-height: 100vh; 
+            color: white; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; 
+        }
+        
+        .container { display: flex; flex-direction: column; min-height: 100vh; }
+        
+        .top-bar { 
+            padding: 12px 16px; 
+            padding-top: calc(12px + var(--status-bar-height));
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            flex-shrink: 0; 
+        }
+        
+        .back-btn { 
+            width: 36px; height: 36px; 
+            background: rgba(255,255,255,0.12); 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; border: none; color: white; font-size: 14px; 
+            text-decoration: none;
+        }
+        
+        .back-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.93); }
+        
+        .top-title { flex: 1; font-size: 14px; font-weight: 600; opacity: 0.9; }
+        
+        .cart-icon-btn {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: none; color: white; font-size: 14px;
+            position: relative; text-decoration: none;
+        }
+        
+        .cart-badge {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--orange); color: white; border-radius: 50%;
+            width: 17px; height: 17px; font-size: 8px;
+            display: none; align-items: center; justify-content: center;
+            border: 2px solid var(--green); font-weight: 700;
+        }
+        
+        .cart-badge.show { display: flex; }
+        
+        .top-section { padding: 20px 24px 16px; text-align: center; flex-shrink: 0; }
+        .logo { font-family: 'Poppins', sans-serif; font-size: 36px; font-weight: 700; }
+        .logo-zy { color: #A3E635; } .logo-mart { color: #FDE047; }
+        .title { font-size: 20px; font-weight: 700; margin-top: 12px; }
+        .subtitle { font-size: 12px; opacity: 0.85; margin-top: 4px; line-height: 1.5; }
+        
+        .map-section { 
+            flex-shrink: 0; 
+            display: flex; align-items: center; justify-content: center; 
+            padding: 10px 0 16px; 
+        }
+        
+        .map-container { position: relative; width: 110px; height: 110px; }
+        
+        .pin { 
+            position: absolute; top: 50%; left: 50%;
+            width: 36px; height: 36px;
+            background: #F59E0B;
+            border-radius: 50% 50% 50% 0;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            animation: bounce 2s infinite;
+            z-index: 3;
+        }
+        
+        .pin::after { 
+            content: '';
+            position: absolute; top: 50%; left: 50%;
+            width: 12px; height: 12px;
+            background: white; border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+        
+        .pulse { 
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid rgba(245,158,11,0.3);
+            animation: pulseAnim 2s ease-out infinite;
+        }
+        
+        .pulse:nth-child(2) { width: 55px; height: 55px; }
+        .pulse:nth-child(3) { width: 90px; height: 90px; animation-delay: 0.6s; }
+        
+        @keyframes bounce { 
+            0%,100% { transform: translate(-50%,-50%) rotate(-45deg) translateY(0); }
+            50% { transform: translate(-50%,-50%) rotate(-45deg) translateY(-8px); }
+        }
+        
+        @keyframes pulseAnim { 
+            0% { transform: translate(-50%,-50%) scale(0.4); opacity: 1; }
+            100% { transform: translate(-50%,-50%) scale(1.3); opacity: 0; }
+        }
+        
+        /* FIX 3: Safe-area bottom */
+        .bottom-card { 
+            background: white; 
+            border-radius: 24px 24px 0 0; 
+            padding: 20px 20px calc(30px + env(safe-area-inset-bottom, 0px)); 
+            color: #1A1A1A; 
+            flex-shrink: 0; 
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.1); 
+        }
+        
+        .option-card { 
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px; border-radius: 14px;
+            cursor: pointer; margin-bottom: 10px;
+            border: 1.5px solid #E5E7EB;
+            background: #F9FAFB;
+            transition: all 0.15s ease;
+        }
+        
+        .option-card:active { background: #EDF7F1; border-color: #0B5A31; transform: scale(0.98); }
+        .option-card.gps { background: #EDF7F1; border-color: #0B5A31; }
+        
+        .option-icon { 
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        
+        .option-icon.green { background: #EDF7F1; color: #0B5A31; }
+        .option-icon.amber { background: #FFF8EB; color: #F59E0B; }
+        
+        .option-info { flex: 1; }
+        .option-title { font-size: 13px; font-weight: 600; }
+        .option-desc { font-size: 10px; color: #6B7280; margin-top: 1px; }
+        .option-arrow { color: #9CA3AF; font-size: 12px; }
+        
+        .status-box { 
+            display: none; align-items: center; gap: 10px;
+            padding: 12px 14px; background: #F9FAFB;
+            border-radius: 12px; margin-bottom: 12px;
+        }
+        
+        .status-box.show { display: flex; }
+        .status-box.success { background: #D1FAE5; border: 1.5px solid #10B981; }
+        .status-box.error { background: #FEF2F2; border: 1.5px solid #EF4444; }
+        .status-box.warning { background: #FFF8EB; border: 1.5px solid #F59E0B; }
+        
+        .status-icon { 
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        
+        .status-icon.detecting { background: #FFF8EB; color: #F59E0B; }
+        .status-icon.success { background: #D1FAE5; color: #10B981; }
+        .status-icon.error { background: #FEF2F2; color: #EF4444; }
+        .status-title { font-size: 12px; font-weight: 600; }
+        .status-detail { font-size: 10px; color: #6B7280; }
+        
+        .btn { 
+            width: 100%; padding: 14px;
+            border-radius: 14px; font-size: 14px; font-weight: 600;
+            border: none; cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 8px;
+            display: none; align-items: center; justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:active { transform: scale(0.97); }
+        .btn-settings { background: #F59E0B; color: #1A1A1A; }
+        .btn-retry { background: #0B5A31; color: white; }
+        
+        .pincode-section { display: none; margin-top: 4px; }
+        .pincode-section.show { display: block; }
+        
+        .pincode-input-group { display: flex; gap: 8px; margin-bottom: 8px; }
+        
+        .pincode-input { 
+            flex: 1; padding: 12px 14px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 14px; font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+        
+        .pincode-input:focus { border-color: #0B5A31; }
+        
+        .pincode-submit { 
+            background: #0B5A31; color: white; border: none;
+            padding: 12px 18px; border-radius: 12px;
+            font-weight: 600; cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px; white-space: nowrap;
+        }
+        
+        .skip-section { 
+            text-align: center; margin-top: 14px; padding-top: 10px;
+            border-top: 1px solid #F3F5F4;
+        }
+        
+        .skip-btn { 
+            background: transparent; color: #0B5A31;
+            border: 1.5px solid #0B5A31;
+            padding: 12px 24px; border-radius: 25px;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            width: 100%;
+        }
+        
+        .skip-btn:active { background: #EDF7F1; }
+        .skip-hint { font-size: 10px; color: #9CA3AF; margin-top: 6px; line-height: 1.4; }
+        .service-info { font-size: 10px; color: #9CA3AF; text-align: center; margin-top: 8px; }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .loader { 
+            display: inline-block; width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: white; border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+    </style>
+</head>
+<body>
+
+<div id="netBanner" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);background:#DC2626;color:white;text-align:center;padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;z-index:99999;box-shadow:0 4px 12px rgba(220,38,38,0.4);white-space:nowrap;pointer-events:none;">📴 No Internet</div>
+
+<div class="container">
+    <div class="top-bar">
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <span class="top-title">Set Location</span>
+        <a href="cart.html" class="cart-icon-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+    </div>
+    
+    <div class="top-section">
+        <div class="logo"><span class="logo-zy">Zy</span><span class="logo-mart">Mart</span></div>
+        <div class="title">📍 Set Your Location</div>
+        <div class="subtitle">We serve in Sillod (10km radius).<br>Set your location to find nearby shops.</div>
+    </div>
+    
+    <div class="map-section">
+        <div class="map-container">
+            <div class="pulse"></div>
+            <div class="pulse"></div>
+            <div class="pin"></div>
+        </div>
+    </div>
+    
+    <div class="bottom-card">
+        <div class="status-box" id="statusBox">
+            <div class="status-icon" id="statusIcon">📍</div>
+            <div>
+                <div class="status-title" id="statusTitle"></div>
+                <div class="status-detail" id="statusDetail"></div>
+            </div>
+        </div>
+        
+        <div class="option-card gps" id="gpsOption" onclick="startGPSDetection()">
+            <div class="option-icon green"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="option-info">
+                <div class="option-title">📍 Use Current Location</div>
+                <div class="option-desc">Auto-detect via GPS (Recommended)</div>
+            </div>
+            <div class="option-arrow"><i class="fas fa-chevron-right"></i></div>
+        </div>
+        
+        <div class="option-card" id="pincodeOption" onclick="showPincodeInput()">
+            <div class="option-icon amber"><i class="fas fa-hashtag"></i></div>
+            <div class="option-info">
+                <div class="option-title">📝 Enter Pincode</div>
+                <div class="option-desc">Manually enter your area pincode</div>
+            </div>
+            <div class="option-arrow"><i class="fas fa-chevron-right"></i></div>
+        </div>
+        
+        <div class="pincode-section" id="pincodeSection">
+            <div class="pincode-input-group">
+                <input type="text" class="pincode-input" id="pincodeInput" placeholder="Enter 6-digit pincode" maxlength="6" inputmode="numeric">
+                <button class="pincode-submit" onclick="submitPincode()">Find →</button>
+            </div>
+        </div>
+        
+        <button class="btn btn-settings" id="settingsBtn" onclick="openSettings()">⚙️ Open GPS Settings</button>
+        <button class="btn btn-retry" id="retryBtn" onclick="startGPSDetection()">🔄 Try Again</button>
+        
+        <div class="skip-section">
+            <button class="skip-btn" onclick="skipLocation()">Continue with Sillod Location →</button>
+            <p class="skip-hint">Products will be shown from Sillod shops.<br>You can change location anytime.</p>
+        </div>
+        
+        <p class="service-info">📍 Serving: Sillod (10km radius)</p>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    
+    var detected = false;
+    var gpsInProgress = false;
+    var gpsTimeout = null;
+    
+    var TALUKAS = [
+        { name: 'Sillod', lat: 20.3030, lng: 75.6529, pincodes: ['431112', '431113', '431114'] }
+    ];
+    var SERVICE_RADIUS_KM = 10;
+    
+    function $(id) { return document.getElementById(id); }
+    function esc(s) { if(!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    
+    // FIX 5: Offline banner
+    window.addEventListener('offline', function() { var b = $('netBanner'); if (b) b.style.display = 'block'; });
+    window.addEventListener('online', function() { var b = $('netBanner'); if (b) b.style.display = 'none'; });
+    
+    function updateCartBadge() {
+        try {
+            var cart = JSON.parse(localStorage.getItem('zymart_cart') || '[]');
+            var totalItems = cart.reduce(function(sum, item) { return sum + (item.quantity || 1); }, 0);
+            var badge = $('cartBadge');
+            if (badge) {
+                badge.textContent = totalItems;
+                if (totalItems > 0) badge.classList.add('show');
+                else badge.classList.remove('show');
+            }
+        } catch(e) {}
+    }
+    
+    function calculateDistance(lat1, lng1, lat2, lng2) {
+        var R = 6371;
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLng = (lng2 - lng1) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+                Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * 
+                Math.sin(dLng/2) * Math.sin(dLng/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+    
+    function isInServiceArea(lat, lng) {
+        for (var i = 0; i < TALUKAS.length; i++) {
+            if (calculateDistance(lat, lng, TALUKAS[i].lat, TALUKAS[i].lng) <= SERVICE_RADIUS_KM) {
+                return { inArea: true, taluka: TALUKAS[i].name, center: TALUKAS[i] };
+            }
+        }
+        return { inArea: false, taluka: null };
+    }
+    
+    // FIX 5: Pincode → coordinates converter
+    async function pincodeToCoords(pincode) {
+        try {
+            var c = new AbortController();
+            var t = setTimeout(function() { c.abort(); }, 6000);
+            var r = await fetch('https://nominatim.openstreetmap.org/search?postalcode=' + encodeURIComponent(pincode) + '&country=India&format=json&limit=1', {
+                headers: { 'User-Agent': 'ZyMartApp/2.0' },
+                signal: c.signal
+            });
+            clearTimeout(t);
+            var d = await r.json();
+            if (d && d.length > 0) {
+                return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) };
+            }
+        } catch(e) {
+            console.warn('[Pincode] Geocode failed:', e.message);
+        }
+        return null;
+    }
+    
+    function updateStatus(type, title, detail) {
+        var box = $('statusBox'), icon = $('statusIcon');
+        box.className = 'status-box show';
+        icon.className = 'status-icon';
+        if (type === 'detecting') { icon.classList.add('detecting'); icon.innerHTML = '<i class="fas fa-satellite"></i>'; }
+        else if (type === 'success') { box.classList.add('success'); icon.classList.add('success'); icon.innerHTML = '<i class="fas fa-check"></i>'; }
+        else if (type === 'error') { box.classList.add('error'); icon.classList.add('error'); icon.innerHTML = '<i class="fas fa-times"></i>'; }
+        else if (type === 'warning') { box.classList.add('warning'); icon.classList.add('detecting'); icon.innerHTML = '<i class="fas fa-exclamation"></i>'; }
+        $('statusTitle').textContent = title;
+        $('statusDetail').textContent = detail || '';
+    }
+    
+    function hideOptionCards() { 
+        var cards = document.querySelectorAll('.option-card'); 
+        for (var i = 0; i < cards.length; i++) cards[i].style.display = 'none'; 
+    }
+    
+    function hideActionBtns() { 
+        $('settingsBtn').style.display = 'none'; 
+        $('retryBtn').style.display = 'none'; 
+    }
+    
+    function showOptionsAgain() {
+        var cards = document.querySelectorAll('.option-card'); 
+        for (var i = 0; i < cards.length; i++) cards[i].style.display = 'flex'; 
+    }
+    
+    // FIX: Add timeout feedback
+    window.startGPSDetection = function() {
+        if (detected || gpsInProgress) return;
+        
+        gpsInProgress = true;
+        updateStatus('detecting', 'Detecting your location...', 'Please wait while we find you');
+        hideOptionCards();
+        hideActionBtns();
+        
+        // Timeout feedback after 10s
+        if (gpsTimeout) clearTimeout(gpsTimeout);
+        gpsTimeout = setTimeout(function() {
+            if (gpsInProgress) {
+                updateStatus('warning', 'Taking longer than usual...', 'GPS signal weak. Please wait or try pincode');
+            }
+        }, 10000);
+        
+        if (window.Android && typeof window.Android.requestLocation === 'function') { 
+            window.Android.requestLocation(); 
+            return; 
+        }
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(p) { 
+                    gpsInProgress = false;
+                    if (gpsTimeout) clearTimeout(gpsTimeout);
+                    handleSuccess(p.coords.latitude, p.coords.longitude); 
+                },
+                function(e) {
+                    gpsInProgress = false;
+                    if (gpsTimeout) clearTimeout(gpsTimeout);
+                    showOptionsAgain();
+                    if (e.code === 1) { 
+                        updateStatus('error', 'Location permission denied', 'Allow location access or use pincode'); 
+                        $('retryBtn').style.display = 'flex'; 
+                        $('settingsBtn').style.display = 'flex';
+                    } else if (e.code === 2) { 
+                        updateStatus('error', 'GPS is turned off', 'Enable GPS in phone settings'); 
+                        $('settingsBtn').style.display = 'flex'; 
+                        $('retryBtn').style.display = 'flex'; 
+                    } else { 
+                        updateStatus('error', 'Could not detect location', 'Try again or use pincode'); 
+                        $('retryBtn').style.display = 'flex'; 
+                    }
+                },
+                { timeout: 15000, maximumAge: 0, enableHighAccuracy: true }
+            );
+        } else { 
+            gpsInProgress = false;
+            if (gpsTimeout) clearTimeout(gpsTimeout);
+            showOptionsAgain();
+            updateStatus('error', 'GPS not supported', 'Use pincode option instead'); 
+        }
+    };
+    
+    window.setLocationFromAndroid = function(lat, lng) { 
+        gpsInProgress = false;
+        if (gpsTimeout) clearTimeout(gpsTimeout);
+        handleSuccess(parseFloat(lat), parseFloat(lng)); 
+    };
+    
+    window.onLocationError = function(msg) {
+        gpsInProgress = false;
+        if (gpsTimeout) clearTimeout(gpsTimeout);
+        showOptionsAgain();
+        if (msg === 'GPS_DISABLED' || msg === 'LOCATION_OFF') { 
+            updateStatus('error', 'GPS is turned off', 'Enable GPS in phone settings'); 
+            $('settingsBtn').style.display = 'flex'; 
+            $('retryBtn').style.display = 'flex'; 
+        } else { 
+            updateStatus('error', 'Could not detect location', 'Try pincode option'); 
+            $('retryBtn').style.display = 'flex'; 
+        }
+    };
+    
+    function handleSuccess(lat, lng) {
+        detected = true;
+        var check = isInServiceArea(lat, lng);
+        
+        try {
+            localStorage.setItem('user_lat', String(lat));
+            localStorage.setItem('user_lng', String(lng));
+            localStorage.setItem('location_timestamp', String(Date.now()));
+        } catch(e) {}
+        
+        if (check.inArea) {
+            updateStatus('success', '✅ You are in ' + check.taluka + '!', 'Saving your location...');
+            try { localStorage.setItem('location_short', check.taluka); } catch(e) {}
+            
+            try {
+                var controller = new AbortController();
+                var timeout = setTimeout(function() { controller.abort(); }, 5000);
+                fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1', {
+                    headers: { 'User-Agent': 'ZyMartApp/2.0' },
+                    signal: controller.signal
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    clearTimeout(timeout);
+                    var a = d.address || {};
+                    var city = a.city || a.town || a.village || '';
+                    var pincode = a.postcode || '';
+                    if (pincode) try { localStorage.setItem('user_pincode', pincode); } catch(e) {}
+                    if (city) try { 
+                        localStorage.setItem('user_city', city); 
+                        localStorage.setItem('location_short', city); 
+                    } catch(e) {}
+                })
+                .catch(function() { clearTimeout(timeout); })
+                .finally(function() {
+                    setTimeout(function() { goHome(); }, 800);
+                });
+            } catch(e) {
+                setTimeout(function() { goHome(); }, 800);
+            }
+        } else {
+            var nearest = null, minDist = Infinity;
+            for (var i = 0; i < TALUKAS.length; i++) {
+                var d = calculateDistance(lat, lng, TALUKAS[i].lat, TALUKAS[i].lng);
+                if (d < minDist) { minDist = d; nearest = TALUKAS[i]; }
+            }
+            updateStatus('warning', '⚠️ Outside Service Area', 
+                'We serve only in Sillod (10km). Nearest: ' + nearest.name + ' (' + minDist.toFixed(1) + ' km)');
+            $('retryBtn').style.display = 'flex';
+            $('pincodeOption').style.display = 'flex';
+        }
+    }
+    
+    window.openSettings = function() { 
+        if (window.Android && typeof window.Android.openLocationSettings === 'function') { 
+            window.Android.openLocationSettings(); 
+        } else { 
+            updateStatus('error', 'Please enable GPS', 'Go to Settings → Location → Turn ON');
+        } 
+    };
+    
+    window.showPincodeInput = function() { 
+        var s = $('pincodeSection'); 
+        if (s.classList.contains('show')) s.classList.remove('show'); 
+        else { 
+            s.classList.add('show'); 
+            setTimeout(function() { var inp = $('pincodeInput'); if (inp) inp.focus(); }, 200); 
+        } 
+    };
+    
+    // FIX 1 + FIX 5: Pincode now sets lat/lng AND validates service area
+    window.submitPincode = async function() { 
+        var pc = ($('pincodeInput').value || '').trim(); 
+        
+        if (!pc || pc.length !== 6 || !/^\d{6}$/.test(pc)) { 
+            updateStatus('error', 'Invalid Pincode', 'Please enter a valid 6-digit pincode');
+            return; 
+        } 
+        
+        updateStatus('detecting', 'Looking up pincode...', 'Please wait');
+        
+        // STEP 1: Check if pincode is in known Sillod pincodes
+        var matchedTaluka = null;
+        for (var i = 0; i < TALUKAS.length; i++) {
+            if (TALUKAS[i].pincodes.indexOf(pc) !== -1) {
+                matchedTaluka = TALUKAS[i];
+                break;
+            }
+        }
+        
+        // STEP 2: If not in known list, geocode via Nominatim
+        if (!matchedTaluka) {
+            var coords = await pincodeToCoords(pc);
+            if (coords) {
+                var areaCheck = isInServiceArea(coords.lat, coords.lng);
+                if (areaCheck.inArea) {
+                    matchedTaluka = areaCheck.center;
+                    // Save coords directly
+                    try {
+                        localStorage.setItem('user_lat', String(coords.lat));
+                        localStorage.setItem('user_lng', String(coords.lng));
+                        localStorage.setItem('user_pincode', pc);
+                        localStorage.setItem('location_short', matchedTaluka.name);
+                        localStorage.setItem('location_timestamp', String(Date.now()));
+                    } catch(e) {}
+                    detected = true;
+                    updateStatus('success', '✅ Pincode verified!', matchedTaluka.name + ' — ' + pc);
+                    hideOptionCards();
+                    hideActionBtns();
+                    $('pincodeSection').classList.remove('show');
+                    setTimeout(function() { goHome(); }, 900);
+                    return;
+                }
+            }
+            // Not in service area
+            updateStatus('warning', '⚠️ Outside Service Area', 
+                'Pincode ' + pc + ' is not in Sillod (10km). Please use GPS for accurate check.');
+            return;
+        }
+        
+        // STEP 3: Matched taluka from known pincodes - save lat/lng
+        try {
+            localStorage.setItem('user_lat', String(matchedTaluka.lat));
+            localStorage.setItem('user_lng', String(matchedTaluka.lng));
+            localStorage.setItem('user_pincode', pc); 
+            localStorage.setItem('location_short', matchedTaluka.name);
+            localStorage.setItem('location_timestamp', String(Date.now()));
+        } catch(e) {}
+        
+        detected = true;
+        updateStatus('success', '✅ Pincode saved!', matchedTaluka.name + ' — ' + pc);
+        hideOptionCards();
+        hideActionBtns();
+        $('pincodeSection').classList.remove('show');
+        setTimeout(function() { goHome(); }, 1000);
+    };
+    
+    // FIX 2: Honest skip — actual Sillod center, proper message
+    window.skipLocation = function() {
+        try {
+            localStorage.setItem('user_lat', '20.3030');
+            localStorage.setItem('user_lng', '75.6529');
+            localStorage.setItem('location_timestamp', String(Date.now()));
+            localStorage.setItem('location_short', 'Sillod');
+        } catch(e) {}
+        goHome();
+    };
+    
+    function goHome() { 
+        window.location.href = 'index.html'; 
+    }
+    
+    // FIX 4: Only auto-GPS if no recent location
+    function autoStartGPS() {
+        // Check if we already have a fresh location
+        try {
+            var lat = localStorage.getItem('user_lat');
+            var lng = localStorage.getItem('user_lng');
+            var ts = parseInt(localStorage.getItem('location_timestamp') || '0');
+            
+            if (lat && lng && ts && (Date.now() - ts) < 86400000) {
+                // Location already set and fresh — show it but don't auto-detect
+                var locShort = localStorage.getItem('location_short') || 'Sillod';
+                updateStatus('success', '✅ Location already set: ' + locShort, 
+                    'Tap "Use Current Location" to update');
+                return;
+            }
+        } catch(e) {}
+        
+        // No fresh location — auto-start GPS
+        if (window.Android && typeof window.Android.requestLocation === 'function') {
+            window.Android.requestLocation();
+        } else {
+            startGPSDetection();
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!navigator.onLine) { var nb = $('netBanner'); if (nb) nb.style.display = 'block'; }
+        updateCartBadge();
+        setTimeout(function() { autoStartGPS(); }, 500);
+    });
+    
+    window.addEventListener('storage', function(e) {
+        if(e.key === 'zymart_cart') updateCartBadge();
+    });
+    
+    window.startGPSDetection = startGPSDetection;
+    window.setLocationFromAndroid = setLocationFromAndroid;
+    window.onLocationError = onLocationError;
+    window.openSettings = openSettings;
+    window.showPincodeInput = showPincodeInput;
+    window.submitPincode = submitPincode;
+    window.skipLocation = skipLocation;
+    
+})();
+</script>
+</body>
+</html>
