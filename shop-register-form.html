@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Registration Form - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-green-dark: #083D21; --brand-orange: #F59E0B;
+            --brand-gold: #D4A017; --brand-gold-light: #FDE047;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444;
+            --success: #22C55E; --warning: #F59E0B;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-xl: 22px;
+            --radius-2xl: 28px; --radius-full: 9999px;
+            --status-bar-height: env(safe-area-inset-top, 0px);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* FONT MISMATCH FIX */
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); -webkit-tap-highlight-color: transparent; min-height: 100vh; padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); overflow-x: hidden; width: 100%; -webkit-font-smoothing: antialiased; }
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; transition: opacity 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; }
+        .loader-zy { color: #A3E635; } .loader-mart { color: #FDE047; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(11,90,49,0.4); } 50% { box-shadow: 0 0 0 10px rgba(11,90,49,0); } }
+        @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes chevronPulse { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
+        
+        .top-bar { background: linear-gradient(135deg, #0A3D26 0%, #0F5132 50%, #0A3D26 100%); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; padding-top: calc(10px + var(--status-bar-height)); display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(11,90,49,0.35); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; text-decoration: none; transition: all 0.2s; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        
+        .brand-logo { display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; padding-bottom: 2px; }
+        .logo-main { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 800; line-height: 1; letter-spacing: -0.5px; }
+        .logo-z { color: #FFFFFF; } .logo-y { color: #FDE047; } .logo-mart { color: #FFFFFF; }
+        .logo-india { font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 800; color: #FDE047; letter-spacing: 1.5px; margin-top: 2px; padding-left: 18px; display: flex; align-items: center; gap: 3px; }
+        .logo-india::before { content: ''; display: inline-block; width: 14px; height: 5px; flex-shrink: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M1 1 Q 8 5 15 1' fill='none' stroke='%23A3E635' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center; background-size: 100% 100%; }
+        
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 13px; color: white; }
+        .cart-icon-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; position: relative; text-decoration: none; }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--brand-orange); color: white; border-radius: 50%; width: 17px; height: 17px; font-size: 8px; display: none; align-items: center; justify-content: center; border: 2px solid var(--brand-green); font-weight: 700; }
+        .cart-badge.show { display: flex; }
+        
+        .main-content { padding-top: calc(60px + var(--status-bar-height)); padding-bottom: 40px; max-width: 600px; margin: 0 auto; }
+        
+        .selected-plan-summary { 
+            background: linear-gradient(135deg, #EDF7F1, #DCFCE7); margin: 12px 14px 14px; border-radius: var(--radius-xl); padding: 16px; border: 2px solid #86EFAC; 
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; animation: fadeInUp 0.3s ease; position: relative; overflow: visible; 
+        }
+        .selected-plan-summary::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #22C55E, transparent); border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
+        
+        .sps-left { flex: 1; min-width: 0; }
+        .sps-badge { display: inline-block; font-size: 8.5px; font-weight: 800; color: #059669; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+        .sps-detail { font-size: 10px; color: #374151; font-weight: 500; line-height: 1.4; margin-top: 4px; }
+        .sps-right { text-align: right; flex-shrink: 0; }
+        .sps-price { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 800; color: var(--brand-green); line-height: 1; }
+        .sps-gst { font-size: 9px; color: #D97706; font-weight: 600; margin-top: 2px; }
+        .sps-plans-count { font-size: 8.5px; color: #059669; font-weight: 700; margin-top: 4px; background: #DCFCE7; padding: 2px 7px; border-radius: 9999px; display: inline-block; }
+        
+        .sps-dropdown-wrap { position: relative; margin-bottom: 4px; }
+        .sps-name-btn { 
+            background: transparent; border: none; padding: 4px 8px 4px 0; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 800; color: var(--brand-green-dark); 
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px; line-height: 1.2; transition: all 0.2s; border-radius: 8px;
+        }
+        .sps-name-btn:active { background: rgba(11,90,49,0.08); }
+        .sps-change-pill { display: inline-flex; align-items: center; gap: 3px; background: #DCFCE7; color: #059669; font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 9999px; letter-spacing: 0.3px; border: 1px solid #86EFAC; }
+        .sps-change-pill i { font-size: 8px; }
+        .sps-chevron { font-size: 11px; color: var(--brand-green); transition: transform 0.25s; animation: chevronPulse 2s ease-in-out infinite; }
+        .sps-chevron.open { transform: rotate(180deg); animation: none; }
+        
+        .sps-dropdown-menu { position: absolute; top: calc(100% + 10px); left: 0; min-width: 285px; max-width: calc(100vw - 40px); background: white; border: 1.5px solid var(--neutral-border); border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.18); padding: 8px; z-index: 500; display: none; }
+        .sps-dropdown-menu.show { display: block; animation: fadeInUp 0.2s ease; }
+        
+        .sps-dropdown-header { display: flex; align-items: center; gap: 6px; padding: 8px 10px 10px; border-bottom: 1px dashed #E5E7EB; margin-bottom: 6px; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700; color: var(--brand-green); letter-spacing: 0.3px; }
+        .sps-dropdown-header i { font-size: 10px; }
+        
+        .sps-dropdown-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s; gap: 10px; border: 1px solid transparent; margin-bottom: 4px; }
+        .sps-dropdown-item:last-child { margin-bottom: 0; }
+        .sps-dropdown-item:hover, .sps-dropdown-item:active { background: #F0FDF4; }
+        .sps-dropdown-item.active { background: #DCFCE7; border: 1.5px solid #86EFAC; }
+        .sps-dropdown-item.active .sps-di-name::after { content: ' ✓'; color: #059669; font-weight: 900; }
+        .sps-di-left { flex: 1; min-width: 0; }
+        .sps-di-name { font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700; color: var(--neutral-dark); margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+        .sps-di-meta { font-size: 10px; color: var(--neutral-gray); font-weight: 500; }
+        .sps-di-price { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 800; color: var(--brand-green); white-space: nowrap; }
+        
+        .sps-di-badge { font-size: 7.5px; font-weight: 900; padding: 1px 5px; border-radius: 9999px; letter-spacing: 0.3px; }
+        .sps-di-badge.popular { background: #FEF3C7; color: #92400E; }
+        .sps-di-badge.value { background: #DBEAFE; color: #1E40AF; }
+        
+        .form-card { background: white; margin: 0 14px 20px; border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); overflow: hidden; animation: fadeInUp 0.3s ease; }
+        .form-header { padding: 16px 20px; border-bottom: 1px solid var(--neutral-border); background: #EDF7F1; display: flex; align-items: center; gap: 8px; }
+        .form-header i { color: var(--brand-green); font-size: 18px; }
+        .form-header h2 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: var(--brand-green-dark); }
+        .form-body { padding: 18px 20px; }
+        .form-group { margin-bottom: 14px; }
+        .form-label { font-weight: 600; font-size: 12px; margin-bottom: 4px; display: block; color: var(--neutral-dark); }
+        .form-label i { color: var(--brand-green); width: 16px; margin-right: 3px; }
+        .form-label .required { color: var(--danger); }
+        .form-label .optional { color: var(--neutral-gray); font-weight: 400; font-size: 10px; }
+        .form-control { width: 100%; padding: 12px 14px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; background: white; transition: all 0.15s ease; }
+        .form-control:focus { border-color: var(--brand-orange); box-shadow: 0 0 0 3px rgba(245,158,11,0.08); }
+        .form-control.error { border-color: var(--danger); background: #FEF2F2; }
+        .form-control.locked { background: #D1FAE5; border: 1.5px solid #22C55E; }
+        select.form-control { -webkit-appearance: none; padding-right: 32px; }
+        textarea.form-control { resize: vertical; min-height: 60px; }
+        .image-upload-area { border: 2px dashed var(--brand-green); border-radius: var(--radius-sm); padding: 16px; text-align: center; cursor: pointer; background: #EDF7F1; transition: all 0.15s ease; }
+        .image-upload-area:active { background: #C8E6C9; }
+        .image-upload-area i { font-size: 24px; color: var(--brand-green); margin-bottom: 4px; }
+        .image-upload-area p { font-size: 11px; color: var(--brand-green); font-weight: 500; }
+        .image-preview { max-width: 100%; max-height: 120px; margin-top: 8px; border-radius: var(--radius-sm); display: none; }
+        .location-btn { width: 100%; padding: 14px; background: #EDF7F1; border: 2px solid var(--brand-green); border-radius: var(--radius-sm); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--brand-green); transition: all 0.2s ease; font-family: 'Inter', sans-serif; animation: pulse 2s infinite; box-shadow: 0 4px 15px rgba(11,90,49,0.2); }
+        .location-btn:active { background: #C8E6C9; transform: scale(0.97); }
+        .location-btn:disabled { opacity: 0.7; cursor: not-allowed; animation: none; box-shadow: none; }
+        .location-btn.success { background: #22C55E; color: white; border-color: #22C55E; animation: none; box-shadow: none; }
+        .location-status { font-size: 11px; padding: 10px 12px; border-radius: var(--radius-sm); background: #F3F5F4; margin-top: 10px; display: flex; align-items: center; gap: 6px; }
+        .location-status.success { color: #059669; background: #EDF7F1; border: 1px solid #A7F3D0; }
+        .gps-coords-display { font-size: 10px; color: var(--brand-green); font-weight: 600; margin-top: 6px; font-family: monospace; display: none; }
+        .gps-coords-display.show { display: block; }
+        .gps-address-display { font-size: 10px; color: var(--neutral-gray); margin-top: 4px; display: none; line-height: 1.3; }
+        .gps-address-display.show { display: block; }
+        
+        .otp-section { background: #FFF8EB; border: 2px solid #FDE68A; border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px; display: none; }
+        .otp-section.show { display: block; }
+        .otp-section.verified { background: #D1FAE5; border: 2px solid #22C55E; }
+        .otp-input-full { width: 100%; padding: 14px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-sm); font-size: 22px; text-align: center; letter-spacing: 8px; font-family: 'Inter', sans-serif; font-weight: 700; background: white; outline: none; transition: all 0.15s ease; }
+        .otp-input-full:focus { border-color: var(--brand-orange); box-shadow: 0 0 0 3px rgba(245,158,11,0.08); }
+        .otp-input-full::placeholder { font-size: 13px; letter-spacing: normal; font-weight: 500; color: #9CA3AF; }
+        
+        .btn { width: 100%; padding: 14px; border-radius: var(--radius-full); font-weight: 600; font-size: 14px; cursor: pointer; border: none; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s ease; margin-bottom: 8px; }
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-green { background: var(--brand-green); color: white; }
+        .btn-orange { background: linear-gradient(135deg, #F59E0B, #EA580C); color: white; box-shadow: 0 6px 20px rgba(245,158,11,0.35); font-weight: 700; }
+        .btn-outline { background: white; color: var(--brand-green); border: 1.5px solid var(--brand-green); }
+        .btn-gray { background: #F3F5F4; color: #374151; border: 1px solid var(--neutral-border); }
+        .btn-sm { font-size: 11px; padding: 9px 12px; margin: 0; }
+        .text-muted { color: var(--neutral-gray); font-size: 10px; text-align: center; margin-top: 8px; line-height: 1.5; }
+        .error-msg { background: #FEF2F2; color: #DC2626; padding: 8px 12px; border-radius: 8px; font-size: 11px; margin-bottom: 10px; display: none; }
+        .error-msg.show { display: block; }
+        .success-msg { background: #D1FAE5; color: #059669; padding: 8px 12px; border-radius: 8px; font-size: 11px; margin-bottom: 10px; display: none; }
+        .success-msg.show { display: block; }
+        .verified-badge { display: none; background: #22C55E; color: white; padding: 8px 12px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; white-space: nowrap; align-items: center; }
+        .verified-badge.show { display: inline-flex; }
+        .verified-badge a { color: white; text-decoration: underline; margin-left: 6px; font-size: 10px; font-weight: 500; cursor: pointer; }
+        
+        .toast-notification { position: fixed; bottom: calc(30px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--neutral-dark); color: white; padding: 10px 20px; border-radius: var(--radius-full); font-size: 12px; z-index: 10050; opacity: 0; visibility: hidden; white-space: nowrap; box-shadow: var(--shadow-lg); transition: all 0.3s ease; max-width: 90%; overflow: hidden; text-overflow: ellipsis; }
+        .toast-notification.show { opacity: 1; visibility: visible; }
+        .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8,61,33,0.7); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 9990; padding: 20px; }
+        .alert-modal.show { display: flex; }
+        .alert-content { background: white; border-radius: var(--radius-xl); padding: 24px; max-width: 380px; width: 100%; text-align: center; animation: fadeInUp 0.3s ease; max-height: 85vh; overflow-y: auto; }
+        .alert-content i.alert-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+        .alert-content h3 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .alert-content p { font-size: 13px; color: var(--neutral-gray); margin-bottom: 14px; line-height: 1.5; white-space: pre-line; text-align: left; }
+        .alert-btn { background: var(--brand-green); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; width: 100%; font-size: 13px; font-family: 'Inter', sans-serif; margin-top: 6px; }
+        .alert-btn.gray { background: #F3F5F4; color: #374151; }
+        .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .terms-compact { background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px; }
+        .terms-compact-row { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+        .terms-compact-row input[type="checkbox"] { width: 20px; height: 20px; min-width: 20px; margin-top: 2px; cursor: pointer; accent-color: var(--brand-green); }
+        .terms-compact-text { font-size: 12px; color: #78350F; line-height: 1.55; flex: 1; }
+        .terms-compact-text strong { color: #92400E; }
+        .terms-link { color: var(--brand-green); font-weight: 700; text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font-family: inherit; font-size: 12px; }
+        .terms-accepted-badge { display: none; align-items: center; gap: 6px; background: #D1FAE5; border: 1px solid #A7F3D0; color: #059669; font-size: 11px; font-weight: 600; padding: 8px 12px; border-radius: var(--radius-sm); margin-top: 8px; }
+        .terms-accepted-badge.show { display: flex; }
+        .terms-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 10000; display: none; align-items: flex-end; justify-content: center; }
+        .terms-modal.show { display: flex; }
+        .terms-sheet { background: white; width: 100%; max-width: 600px; max-height: 92vh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; animation: slideUpSheet 0.3s ease; }
+        .terms-sheet-header { padding: 16px 20px; border-bottom: 1px solid var(--neutral-border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .terms-sheet-header h3 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: var(--brand-green-dark); flex: 1; }
+        .terms-sheet-close { width: 32px; height: 32px; background: #F3F5F4; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #6B7280; }
+        .terms-sheet-body { padding: 18px 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+        .terms-sheet-footer { padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--neutral-border); background: #F9FAFB; flex-shrink: 0; }
+        .terms-sheet-footer .btn { margin-bottom: 0; }
+        .terms-content { font-size: 13px; color: #374151; line-height: 1.7; }
+        .terms-content .terms-intro { background: #EFF6FF; border-left: 3px solid #2563EB; padding: 12px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 12px; color: #1E40AF; }
+        .terms-content h4 { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; color: var(--brand-green-dark); margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; gap: 6px; }
+        .terms-content h4:first-of-type { margin-top: 0; }
+        .terms-content h4 .num { background: var(--brand-green); color: white; width: 22px; height: 22px; min-width: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+        .terms-content p { margin-bottom: 10px; }
+        .terms-content ol { padding-left: 22px; margin-bottom: 10px; }
+        .terms-content li { margin-bottom: 6px; }
+        .terms-content .highlight-danger { background: #FEF2F2; border: 1px solid #FECACA; border-left: 4px solid #DC2626; padding: 12px 14px; border-radius: 6px; color: #991B1B; font-weight: 600; font-size: 12px; margin: 12px 0; }
+        .terms-content .consent-block { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 14px; margin-top: 16px; font-size: 12px; color: #78350F; }
+        .terms-content .fee-table { background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 12px 14px; margin: 12px 0; }
+        .terms-content .fee-table-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; border-bottom: 1px dashed #E5E7EB; }
+        .terms-content .fee-table-row:last-child { border-bottom: none; font-weight: 700; font-size: 13px; color: var(--brand-green-dark); padding-top: 10px; border-top: 1px solid #E5E7EB; }
+        
+        @media (max-width: 380px) { 
+            .form-body { padding: 14px; } 
+            .logo-main { font-size: 18px; }
+            .page-title { font-size: 12px; }
+            .sps-dropdown-menu { min-width: 240px; }
+            .sps-name-btn { font-size: 13px; }
+            .sps-price { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="netBanner" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);background:#DC2626;color:white;text-align:center;padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;z-index:99999;box-shadow:0 4px 12px rgba(220,38,38,0.4);white-space:nowrap;pointer-events:none;">📴 No Internet Connection</div>
+
+<div id="simpleLoader">
+    <div class="simple-spinner"></div>
+    <div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div>
+</div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <a href="shop-register.html" class="back-btn" aria-label="Back"><i class="fas fa-arrow-left"></i></a>
+        <div class="brand-logo" onclick="window.location.href='index.html'">
+            <div class="logo-main"><span class="logo-z">Z</span><span class="logo-y">y</span><span class="logo-mart">Mart</span></div>
+            <div class="logo-india">INDIA</div>
+        </div>
+        <div class="page-title">Registration Form</div>
+        <a href="cart.html" class="cart-icon-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+    </div>
+    
+    <div class="main-content">
+        
+        <!-- ✅ UPDATED: Selected Plan Summary with Clickable Dropdown -->
+        <div class="selected-plan-summary" id="selectedPlanSummary">
+            <div class="sps-left">
+                <div class="sps-badge" id="spsBadge">✓ SELECTED PLAN</div>
+                <div class="sps-dropdown-wrap" id="spsDropdownWrap">
+                    <button type="button" class="sps-name-btn" id="spsNameBtn" onclick="togglePlanDropdown(event)">
+                        <span id="spsName">Monthly Plan</span>
+                        <span class="sps-change-pill"><i class="fas fa-sync-alt"></i> Change</span>
+                        <i class="fas fa-chevron-down sps-chevron" id="spsNameIcon"></i>
+                    </button>
+                    <div class="sps-dropdown-menu" id="spsDropdownMenu">
+                        <div class="sps-dropdown-header">
+                            <i class="fas fa-gem"></i> Choose Your Plan
+                        </div>
+                        <div class="sps-dropdown-item" data-plan="1m" onclick="selectPlanFromDropdown('1m')">
+                            <div class="sps-di-left">
+                                <div class="sps-di-name">Monthly</div>
+                                <div class="sps-di-meta">10 products · 1 month</div>
+                            </div>
+                            <div class="sps-di-price" id="spsDiPrice1m">₹499</div>
+                        </div>
+                        <div class="sps-dropdown-item" data-plan="6m" onclick="selectPlanFromDropdown('6m')">
+                            <div class="sps-di-left">
+                                <div class="sps-di-name">Half-Yearly <span class="sps-di-badge popular">POPULAR</span></div>
+                                <div class="sps-di-meta">100 products · 6 months</div>
+                            </div>
+                            <div class="sps-di-price" id="spsDiPrice6m">₹1999</div>
+                        </div>
+                        <div class="sps-dropdown-item" data-plan="12m" onclick="selectPlanFromDropdown('12m')">
+                            <div class="sps-di-left">
+                                <div class="sps-di-name">Yearly <span class="sps-di-badge value">BEST VALUE</span></div>
+                                <div class="sps-di-meta">1000 products · 12 months</div>
+                            </div>
+                            <div class="sps-di-price" id="spsDiPrice12m">₹3499</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sps-detail" id="spsDetail">10 products · 3 photos each · 1 month</div>
+            </div>
+            <div class="sps-right">
+                <div class="sps-price" id="spsPrice">₹499</div>
+                <div class="sps-gst">+18% GST</div>
+                <div class="sps-plans-count">3 plans</div>
+            </div>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-header"><i class="fas fa-clipboard-list"></i><h2>Business Registration</h2></div>
+            <div class="form-body">
+                <div class="error-msg" id="formError"></div>
+                <div class="success-msg" id="formSuccess"></div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-camera"></i> Business Photo <span class="required">*</span></label>
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Tap to upload business photo</p>
+                        <input type="file" id="shopImageInput" accept="image/*" style="display:none">
+                        <img id="imagePreview" class="image-preview">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-user"></i> Owner Full Name <span class="required">*</span></label>
+                    <input type="text" id="ownerName" class="form-control" placeholder="Enter your full name" autocomplete="name" oninput="saveFormData()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
+                    <input type="email" id="ownerEmail" class="form-control" placeholder="your@email.com" autocomplete="email" oninput="saveFormData()">
+                </div>
+                
+                <div class="form-group" style="background:#EDF7F1;padding:12px;border-radius:var(--radius-sm);border:2px dashed var(--brand-green);">
+                    <label class="form-label"><i class="fas fa-mobile-alt"></i> Mobile (Login & OTP) <span class="required">*</span></label>
+                    <input type="tel" id="ownerPhone" class="form-control" placeholder="10-digit mobile" maxlength="10" style="margin-bottom:8px;" oninput="saveFormData()">
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <button class="btn btn-outline" id="sendOtpBtn" onclick="sendVerificationOTP()" style="flex:1;margin:0;padding:10px;font-size:12px;">Send OTP</button>
+                        <span class="verified-badge" id="otpVerifiedBadge"><i class="fas fa-check-circle"></i> Verified <a href="javascript:void(0)" onclick="changePhoneNumber()">Change</a></span>
+                    </div>
+                    <div class="otp-section" id="otpSection">
+                        <p style="font-size:11px;margin-bottom:8px;text-align:center;">OTP sent to <strong id="otpPhoneDisplay"></strong></p>
+                        <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric" autocomplete="one-time-code" class="otp-input-full">
+                        <button class="btn btn-green" id="verifyOtpBtn" onclick="verifyOTP()" style="width:100%;padding:12px;font-size:13px;margin-top:10px;margin-bottom:8px;"><i class="fas fa-check-circle"></i> Verify OTP</button>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-gray btn-sm" id="resendOtpBtn" onclick="sendVerificationOTP()" style="flex:1;display:none;">Resend OTP</button>
+                            <button class="btn btn-gray btn-sm" id="changeNumberBtn" onclick="changePhoneNumber()" style="flex:1;display:none;"><i class="fas fa-edit"></i> Change Number</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fab fa-whatsapp"></i> WhatsApp Number <span class="required">*</span></label>
+                    <input type="tel" id="ownerWhatsapp" class="form-control" placeholder="10-digit WhatsApp" maxlength="10" oninput="saveFormData()">
+                </div>
+                
+                <hr style="margin:18px 0;border:none;border-top:1px dashed var(--neutral-border);">
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-store"></i> Business Name <span class="required">*</span></label>
+                    <input type="text" id="shopName" class="form-control" placeholder="Your business name" oninput="saveFormData()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-tags"></i> Category <span class="required">*</span></label>
+                    <select id="shopCategory" class="form-control" onchange="onCategoryChange()">
+                        <option value="">Select Category</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="radiusFieldGroup" style="display:none;">
+                    <label class="form-label">
+                        <i class="fas fa-route"></i> Delivery Radius (km) <span class="required">*</span>
+                    </label>
+                    <input type="number" id="shopRadius" class="form-control" placeholder="Auto-suggested based on category" min="3" max="30" step="1" inputmode="numeric" oninput="saveFormData()">
+                    <div class="location-status" id="radiusStatus" style="margin-top:8px;">
+                        <i class="fas fa-info-circle"></i> Select category first
+                    </div>
+                </div>
+                
+                <div class="form-group" style="background:#EDF7F1;padding:14px;border-radius:var(--radius-sm);border:2px dashed var(--brand-green);">
+                    <label class="form-label" style="font-size:14px;"><i class="fas fa-map-marker-alt" style="color:var(--brand-green);"></i> Business Location <span class="required">*</span></label>
+                    <button type="button" class="location-btn" id="locationBtn" onclick="captureShopLocation()"><i class="fas fa-location-dot"></i> Capture GPS Location</button>
+                    <div id="locationStatus" class="location-status"><i class="fas fa-info-circle"></i> GPS is mandatory for registration</div>
+                    <div id="locationCoords" class="gps-coords-display"></div>
+                    <div id="locationAddress" class="gps-address-display"></div>
+                    <input type="hidden" id="shopLatitude">
+                    <input type="hidden" id="shopLongitude">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-address-card"></i> Full Address <span class="required">*</span></label>
+                    <textarea id="shopAddress" class="form-control" rows="2" placeholder="Building, Street, Area" oninput="saveFormData()"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-map"></i> District <span class="required">*</span></label>
+                    <select id="shopDistrict" class="form-control" onchange="onDistrictChange()">
+                        <option value="">Select District</option>
+                        <option value="Aurangabad">Chhatrapati Sambhajinagar (Aurangabad)</option>
+                        <option value="Jalna">Jalna</option>
+                        <option value="Jalgaon">Jalgaon</option>
+                        <option value="Buldhana">Buldhana</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-map-pin"></i> Taluka / City <span class="required">*</span></label>
+                    <select id="shopTaluka" class="form-control" onchange="saveFormData()">
+                        <option value="">Select Taluka</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-map-pin"></i> Pincode <span class="required">*</span></label>
+                    <input type="text" id="shopPincode" class="form-control" placeholder="6-digit" maxlength="6" inputmode="numeric" oninput="saveFormData()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-align-left"></i> Description <span class="optional">(Optional)</span></label>
+                    <textarea id="shopDesc" class="form-control" rows="2" placeholder="Brief description about your business"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-qrcode"></i> Payment QR Code <span class="optional">(Optional)</span></label>
+                    <div class="image-upload-area" id="qrUploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Upload UPI QR Code</p>
+                        <input type="file" id="qrImageInput" accept="image/*" style="display:none">
+                        <img id="qrPreview" class="image-preview">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-id-card"></i> ID Proof Number <span class="optional">(Optional)</span></label>
+                    <input type="text" id="idNumber" class="form-control" placeholder="Aadhaar / PAN" maxlength="20" oninput="saveFormData()">
+                    <div class="image-upload-area" id="idUploadArea" style="margin-top:8px;">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Upload ID Document</p>
+                        <input type="file" id="idImageInput" accept="image/*" style="display:none">
+                        <img id="idPreview" class="image-preview">
+                    </div>
+                </div>
+                
+                <div class="terms-compact" id="termsCompact">
+                    <label class="terms-compact-row" for="termsCheckbox">
+                        <input type="checkbox" id="termsCheckbox" onchange="toggleTerms()">
+                        <span class="terms-compact-text">
+                            <strong>I accept the Terms & Conditions</strong> of ZyMart+. 
+                            Registration fee is <strong>non-refundable</strong>. 
+                            <button type="button" class="terms-link" onclick="event.preventDefault();openTermsModal()">Read full terms →</button>
+                        </span>
+                    </label>
+                    <div class="terms-accepted-badge" id="termsAcceptedBadge"><i class="fas fa-check-circle"></i> Terms accepted</div>
+                </div>
+                
+                <button class="btn btn-orange" id="payBtn" onclick="startRazorpayPayment()" disabled style="opacity:0.6;">
+                    <i class="fas fa-lock"></i> Pay ₹499 & Register (Monthly)
+                </button>
+                <p class="text-muted">
+                    <i class="fas fa-shield-alt"></i> Secured by Razorpay<br>
+                    +18% GST will be added at payment<br>
+                    Please verify OTP and accept Terms to enable payment
+                </p>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div id="toastMsg" class="toast-notification"><span id="toastText"></span></div>
+
+<div id="customAlert" class="alert-modal">
+    <div class="alert-content">
+        <i id="alertIcon" class="fas fa-info-circle alert-icon" style="color:var(--warning);"></i>
+        <h3 id="alertTitle">Notice</h3>
+        <p id="alertMessage"></p>
+        <div id="alertExtraButtons"></div>
+        <button class="alert-btn" onclick="closeAlert()">OK</button>
+    </div>
+</div>
+
+<div id="termsModal" class="terms-modal">
+    <div class="terms-sheet">
+        <div class="terms-sheet-header">
+            <h3><i class="fas fa-file-contract" style="color:var(--brand-green);"></i> Terms & Conditions</h3>
+            <button class="terms-sheet-close" onclick="closeTermsModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="terms-sheet-body">
+            <div class="terms-content" id="termsContentBody"></div>
+        </div>
+        <div class="terms-sheet-footer">
+            <button class="btn btn-green" onclick="acceptTermsFromModal()">
+                <i class="fas fa-check-circle"></i> I Accept These Terms
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    
+    window.addEventListener('offline', function() { var b = document.getElementById('netBanner'); if (b) b.style.display = 'block'; });
+    window.addEventListener('online', function() { var b = document.getElementById('netBanner'); if (b) b.style.display = 'none'; });
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1',
+        RAZORPAY_KEY_ID: 'rzp_live_SZqH2di86Njggl',
+        GST_PERCENT: 18,
+        TERMS_VERSION: 'v1.0',
+        SUPPORT_EMAIL: 'support@zymart.in',
+        SUPPORT_PHONE: '+91 8600252238',
+        JURISDICTION: 'Aurangabad, Maharashtra, India'
+    };
+    
+    var sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    var SUPABASE_URL = CONFIG.SUPABASE_URL;
+    
+    var PLANS = {
+        '1m':  { key: 'plan_1m_fee',  months: 1,  label: 'Monthly',     sub: '1 month validity',  max_products: 10,   max_photos: 3, badge: 'LIMITED' },
+        '6m':  { key: 'plan_6m_fee',  months: 6,  label: 'Half-Yearly', sub: '6 months validity', max_products: 100,  max_photos: 3, badge: 'POPULAR' },
+        '12m': { key: 'plan_12m_fee', months: 12, label: 'Yearly',      sub: '12 months validity', max_products: 1000, max_photos: 3, badge: 'BEST VALUE' }
+    };
+    var planFees = { '1m': 499, '6m': 1999, '12m': 3499 };
+    
+    var DISTRICT_TALUKAS = {
+        "Aurangabad": ["Aurangabad", "Sillod", "Gangapur", "Vaijapur", "Kannad", "Phulambri", "Paithan", "Khuldabad", "Soegaon"],
+        "Jalna": ["Jalna", "Ambad", "Bhokardan", "Badnapur", "Ghansawangi", "Jafrabad", "Partur", "Mantha"],
+        "Jalgaon": ["Jalgaon", "Bhusawal", "Chalisgaon", "Amalner", "Chopda", "Pachora", "Jamner", "Raver", "Muktainagar", "Bhadgaon", "Bodwad", "Dharangaon", "Erandol", "Parola", "Yawal"],
+        "Buldhana": ["Buldhana", "Chikhli", "Khamgaon", "Malkapur", "Shegaon", "Mehkar", "Sindkhed Raja", "Lonar", "Deulgaon Raja", "Jalgaon Jamod", "Motala", "Nandura", "Sangrampur"]
+    };
+    
+    window.onDistrictChange = function() {
+        var dist = document.getElementById('shopDistrict').value;
+        var talukaSelect = document.getElementById('shopTaluka');
+        
+        talukaSelect.innerHTML = '<option value="">Select Taluka</option>';
+        if(dist && DISTRICT_TALUKAS[dist]) {
+            var talukas = DISTRICT_TALUKAS[dist];
+            for(var i=0; i<talukas.length; i++) {
+                var option = document.createElement('option');
+                option.value = talukas[i];
+                option.textContent = talukas[i];
+                talukaSelect.appendChild(option);
+            }
+        }
+        saveFormData();
+    };
+
+    var CATEGORY_RADIUS_CONFIG = {
+        'sabji': { min: 3, max: 5, default: 5, label: 'Sabji Bhaji' }, 'vegetable': { min: 3, max: 5, default: 5, label: 'Vegetables' },
+        'bhaji': { min: 3, max: 5, default: 5, label: 'Bhaji' }, 'भाजी': { min: 3, max: 5, default: 5, label: 'भाजी' },
+        'भाजीपाला': { min: 3, max: 5, default: 5, label: 'भाजीपाला' }, 'सब्जी': { min: 3, max: 5, default: 5, label: 'सब्जी' },
+        'fruit': { min: 3, max: 5, default: 5, label: 'Fruits' }, 'phal': { min: 3, max: 5, default: 5, label: 'Fruits' },
+        'फळ': { min: 3, max: 5, default: 5, label: 'फळे' }, 'फल': { min: 3, max: 5, default: 5, label: 'फल' },
+        'dairy': { min: 3, max: 5, default: 5, label: 'Dairy' }, 'doodh': { min: 3, max: 5, default: 5, label: 'Dairy' },
+        'milk': { min: 3, max: 5, default: 5, label: 'Dairy' }, 'दूध': { min: 3, max: 5, default: 5, label: 'दूध' },
+        'bakery': { min: 3, max: 15, default: 10, label: 'Bakery' }, 'kirana': { min: 3, max: 15, default: 10, label: 'Kirana' },
+        'grocery': { min: 3, max: 15, default: 10, label: 'Grocery' }, 'किराणा': { min: 3, max: 15, default: 10, label: 'किराणा' },
+        'snack': { min: 3, max: 15, default: 10, label: 'Snacks' }, 'beverage': { min: 3, max: 15, default: 10, label: 'Beverages' },
+        'personal': { min: 3, max: 15, default: 10, label: 'Personal Care' }, 'home care': { min: 3, max: 15, default: 10, label: 'Home Care' },
+        'hair': { min: 3, max: 15, default: 10, label: 'Hair' }, 'makeup': { min: 3, max: 15, default: 10, label: 'Makeup' },
+        'beauty': { min: 3, max: 15, default: 10, label: 'Beauty' }, 'nail': { min: 3, max: 15, default: 10, label: 'Nail' },
+        'bindi': { min: 3, max: 15, default: 10, label: 'Bindi' }, 'fashion': { min: 10, max: 30, default: 30, label: 'Fashion' },
+        'cloth': { min: 10, max: 30, default: 30, label: 'Clothing' }, 'kapde': { min: 10, max: 30, default: 30, label: 'Clothing' },
+        'कपडे': { min: 10, max: 30, default: 30, label: 'कपडे' }, 'वस्त्र': { min: 10, max: 30, default: 30, label: 'वस्त्र' },
+        'footwear': { min: 10, max: 30, default: 30, label: 'Footwear' }, 'shoe': { min: 10, max: 30, default: 30, label: 'Footwear' },
+        'chappal': { min: 10, max: 30, default: 30, label: 'Footwear' }, 'जूते': { min: 10, max: 30, default: 30, label: 'Footwear' },
+        'जोडे': { min: 10, max: 30, default: 30, label: 'जोडे' }, 'jewellery': { min: 10, max: 30, default: 30, label: 'Jewellery' },
+        'दागिने': { min: 10, max: 30, default: 30, label: 'दागिने' }, 'bag': { min: 10, max: 30, default: 30, label: 'Bags' },
+        'watch': { min: 10, max: 30, default: 30, label: 'Watches' }, 'electronic': { min: 10, max: 30, default: 30, label: 'Electronics' },
+        'mobile': { min: 10, max: 30, default: 30, label: 'Mobile' }
+    };
+    
+    var DEFAULT_RADIUS_CONFIG = { min: 3, max: 30, default: 15, label: 'General' };
+    
+    function getRadiusConfigForCategory(categoryName) {
+        if (!categoryName) return DEFAULT_RADIUS_CONFIG;
+        var lower = String(categoryName).toLowerCase();
+        for (var key in CATEGORY_RADIUS_CONFIG) {
+            if (!CATEGORY_RADIUS_CONFIG.hasOwnProperty(key)) continue;
+            if (lower.indexOf(key) !== -1) { return CATEGORY_RADIUS_CONFIG[key]; }
+        }
+        return DEFAULT_RADIUS_CONFIG;
+    }
+    
+    var urlParams = new URLSearchParams(window.location.search);
+    var selectedPlan = urlParams.get('plan') || '1m';
+    if (!PLANS[selectedPlan]) selectedPlan = '1m';
+    
+    var categories = [];
+    var selectedImageFile = null, selectedQrFile = null, selectedIdFile = null;
+    var isProcessing = false;
+    var isCapturingLocation = false;
+    var paymentDone = false;
+    var otpVerified = false, currentOtpPhone = null;
+    var otpSendCount = 0, otpSendWindow = 0, otpAttemptCount = 0, otpLockedUntil = 0, otpTimer = null, otpSeconds = 0;
+    var termsAccepted = false;
+    var authUserId = null;
+    var _waitingForGps = false;
+    
+    var IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var IS_ANDROID = /Android/i.test(navigator.userAgent);
+    var IS_WEBVIEW = (function() {
+        var ua = navigator.userAgent || '';
+        if (window.Android && typeof window.Android.requestLocation === 'function') return true;
+        if (IS_ANDROID && /wv\b/i.test(ua)) return true;
+        if (IS_ANDROID && /Version\/[\d.]+/i.test(ua) && !/Chrome\/\d+/i.test(ua)) return true;
+        if (IS_IOS && !/Safari\//.test(ua) && !/CriOS\//.test(ua)) return true;
+        return false;
+    })();
+    
+    function $(id) { return document.getElementById(id); }
+    function esc(s) { if(!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function formatRupees(n) { return '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
+    
+    function calcPlanTotals(planId) {
+        var base = planFees[planId] || 0;
+        var gst = Math.round((base * CONFIG.GST_PERCENT / 100) * 100) / 100;
+        var total = Math.round((base + gst) * 100) / 100;
+        return { base: base, gst: gst, total: total };
+    }
+    
+    function showApp() { 
+        var l = $('simpleLoader'), a = $('mainApp'); 
+        if(a) a.style.display = ''; 
+        if(l) { l.classList.add('fade-out'); setTimeout(function() { if(l && l.parentNode) l.parentNode.removeChild(l); }, 300); } 
+    }
+    
+    function showToast(m, e) { 
+        var t = $('toastMsg'), s = $('toastText'); 
+        if(!t || !s) return; 
+        s.textContent = m; 
+        t.style.background = e ? '#EF4444' : '#1A1A1A'; 
+        t.classList.add('show'); 
+        clearTimeout(t._t); 
+        t._t = setTimeout(function() { t.classList.remove('show'); }, 3000); 
+    }
+    
+    function showAlert(msg, title, icon, extraButtons) {
+        title = title || 'Notice'; icon = icon || 'warning';
+        var me = $('alertMessage'), te = $('alertTitle'), ie = $('alertIcon'), mo = $('customAlert');
+        if(me) me.textContent = msg; if(te) te.textContent = title;
+        if(ie) { 
+            ie.style.color = icon === 'success' ? '#22C55E' : icon === 'error' ? '#EF4444' : '#F59E0B'; 
+            ie.className = 'fas ' + (icon === 'success' ? 'fa-check-circle' : icon === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle') + ' alert-icon'; 
+        }
+        var ex = $('alertExtraButtons');
+        if(ex) { 
+            ex.innerHTML = ''; 
+            if(extraButtons) { 
+                for(var i = 0; i < extraButtons.length; i++) { 
+                    var b = extraButtons[i], btn = document.createElement('button'); 
+                    btn.className = 'alert-btn ' + (b.cls || ''); 
+                    btn.textContent = b.text; 
+                    btn.onclick = b.onClick; 
+                    ex.appendChild(btn); 
+                } 
+            } 
+        }
+        if(mo) mo.classList.add('show');
+    }
+    
+    window.closeAlert = function() { var m = $('customAlert'); if(m) m.classList.remove('show'); var ex = $('alertExtraButtons'); if(ex) ex.innerHTML = ''; };
+    
+    function showFormError(m) { var e = $('formError'); if(e) { e.innerHTML = m; e.classList.add('show'); } var s = $('formSuccess'); if(s) s.classList.remove('show'); }
+    function showFormSuccess(m) { var e = $('formSuccess'); if(e) { e.innerHTML = m; e.classList.add('show'); } var er = $('formError'); if(er) er.classList.remove('show'); }
+    
+    function saveFormData() { 
+        var d = {}, f = ['ownerName','ownerEmail','ownerPhone','ownerWhatsapp','shopName','shopCategory','shopRadius','shopAddress','shopDistrict','shopTaluka','shopPincode','shopDesc','idNumber']; 
+        for(var i = 0; i < f.length; i++) { var e = $(f[i]); if(e) d[f[i]] = e.value; } 
+        try { localStorage.setItem('zm_shop_draft', JSON.stringify(d)); } catch(e) {} 
+    }
+    
+    function loadFormData() { 
+        try { 
+            var r = localStorage.getItem('zm_shop_draft'); 
+            if(!r) return; 
+            var d = JSON.parse(r); 
+            for(var k in d) { 
+                if(!d.hasOwnProperty(k)) continue; 
+                var e = $(k); 
+                if(e && d[k]) e.value = d[k]; 
+            } 
+            if(d.shopDistrict) {
+                onDistrictChange();
+                if(d.shopTaluka) {
+                    var talukaSelect = $('shopTaluka');
+                    if(talukaSelect) talukaSelect.value = d.shopTaluka;
+                }
+            }
+        } catch(e) {} 
+    }
+    function clearFormData() { try { localStorage.removeItem('zm_shop_draft'); } catch(e) {} }
+    
+    window.onCategoryChange = function() {
+        saveFormData();
+        var cat = $('shopCategory')?.value || '';
+        var radiusGroup = $('radiusFieldGroup');
+        var radiusInput = $('shopRadius');
+        var radiusStatus = $('radiusStatus');
+        
+        if (!cat) { if (radiusGroup) radiusGroup.style.display = 'none'; return; }
+        
+        var cfg = getRadiusConfigForCategory(cat);
+        if (radiusGroup) radiusGroup.style.display = 'block';
+        if (radiusInput) {
+            radiusInput.min = cfg.min;
+            radiusInput.max = cfg.max;
+            if (!radiusInput.value) radiusInput.value = cfg.default;
+        }
+        if (radiusStatus) {
+            radiusStatus.innerHTML = '<i class="fas fa-check-circle" style="color:#22C55E;"></i> <strong>' + esc(cfg.label) + '</strong> — Radius: <strong>' + cfg.min + '–' + cfg.max + ' km</strong> (suggested: ' + cfg.default + ' km)';
+            radiusStatus.className = 'location-status success';
+        }
+    };
+    
+    async function fetchPlanFees() {
+        try {
+            var r = await sb.from('app_settings').select('key, value').in('key', ['plan_1m_fee', 'plan_6m_fee', 'plan_12m_fee']);
+            if (r && r.data && r.data.length > 0) {
+                r.data.forEach(function(row) {
+                    var numVal = parseInt(row.value, 10);
+                    if (isNaN(numVal) || numVal <= 0) return;
+                    if (row.key === 'plan_1m_fee') planFees['1m'] = numVal;
+                    else if (row.key === 'plan_6m_fee') planFees['6m'] = numVal;
+                    else if (row.key === 'plan_12m_fee') planFees['12m'] = numVal;
+                });
+            }
+        } catch(e) { console.error('[PlanFees] Fetch failed:', e); }
+    }
+    
+    async function loadCategories() { 
+        try { var r = await sb.from('categories').select('id, name').eq('is_active', true).order('name'); categories = (r && r.data) ? r.data : []; } catch(e) { categories = []; } 
+    }
+    
+    async function compressImage(file) {
+        if (!file || !file.type || !file.type.match(/image\//)) return file;
+        var TARGET_MIN = 80 * 1024;
+        var TARGET_MAX = 90 * 1024;
+        if (file.size >= TARGET_MIN && file.size <= TARGET_MAX) return file;
+        if (file.size < TARGET_MIN) return file;
+        
+        return new Promise(function(resolve) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var maxDim = 1600;
+                    var w = img.width, h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        var ratio = Math.min(maxDim / w, maxDim / h);
+                        w = Math.round(w * ratio); h = Math.round(h * ratio);
+                    }
+                    var canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    var ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, w, h);
+                    
+                    var qualities = [0.92, 0.90, 0.88, 0.85, 0.82, 0.80, 0.78, 0.75, 0.72, 0.70, 0.68, 0.65, 0.62, 0.60, 0.58, 0.55, 0.52, 0.50];
+                    var idx = 0; var bestBlob = null;
+                    
+                    function tryQuality() {
+                        if (idx >= qualities.length) {
+                            if (w > 400 && h > 400) {
+                                var newW = Math.round(w * 0.8), newH = Math.round(h * 0.8);
+                                var nc = document.createElement('canvas'); nc.width = newW; nc.height = newH;
+                                var nctx = nc.getContext('2d');
+                                nctx.imageSmoothingEnabled = true; nctx.imageSmoothingQuality = 'high';
+                                nctx.drawImage(canvas, 0, 0, newW, newH);
+                                canvas = nc; w = newW; h = newH; idx = 0; tryQuality(); return;
+                            }
+                            resolve(bestBlob ? new File([bestBlob], 'img.jpg', { type: 'image/jpeg' }) : file); return;
+                        }
+                        var q = qualities[idx++];
+                        canvas.toBlob(function(blob) {
+                            if (!blob) { tryQuality(); return; }
+                            if (blob.size >= TARGET_MIN && blob.size <= TARGET_MAX) { resolve(new File([blob], 'img.jpg', { type: 'image/jpeg' })); return; }
+                            if (blob.size < TARGET_MIN) { resolve(new File([blob], 'img.jpg', { type: 'image/jpeg' })); return; }
+                            bestBlob = blob; tryQuality();
+                        }, 'image/jpeg', q);
+                    }
+                    tryQuality();
+                };
+                img.onerror = function() { resolve(file); };
+                img.src = e.target.result;
+            };
+            reader.onerror = function() { resolve(file); };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    async function uploadImage(file, folder) {
+        if(!file) return null;
+        var comp = await compressImage(file);
+        var fn = Date.now() + '_' + Math.random().toString(36).substr(2, 6) + '.jpg';
+        var ur = await sb.storage.from('shop-images').upload(folder + '/' + fn, comp, { cacheControl: '3600', upsert: true });
+        if(ur.error) throw new Error('Image upload failed');
+        return sb.storage.from('shop-images').getPublicUrl(folder + '/' + fn).data.publicUrl;
+    }
+    
+    function updatePlanSummary() {
+        var t = calcPlanTotals(selectedPlan);
+        var pl = PLANS[selectedPlan];
+        
+        var nameEl = $('spsName'), detailEl = $('spsDetail'), priceEl = $('spsPrice'), badgeEl = $('spsBadge');
+        
+        if (nameEl) nameEl.textContent = pl.label + ' Plan';
+        if (detailEl) detailEl.textContent = pl.max_products + ' products · ' + pl.max_photos + ' photos each · ' + pl.sub;
+        if (priceEl) priceEl.textContent = formatRupees(t.base);
+        if (badgeEl) badgeEl.textContent = '✓ ' + pl.badge + ' PLAN';
+        
+        updateDropdownPrices();
+        updatePayButton();
+    }
+    
+    function updateDropdownPrices() {
+        var t1 = calcPlanTotals('1m'), t6 = calcPlanTotals('6m'), t12 = calcPlanTotals('12m');
+        var p1 = $('spsDiPrice1m'); if (p1) p1.textContent = formatRupees(t1.base);
+        var p6 = $('spsDiPrice6m'); if (p6) p6.textContent = formatRupees(t6.base);
+        var p12 = $('spsDiPrice12m'); if (p12) p12.textContent = formatRupees(t12.base);
+    }
+    
+    function updatePayButton() {
+        var btn = $('payBtn'); 
+        if(!btn) return;
+        var t = calcPlanTotals(selectedPlan);
+        btn.innerHTML = '<i class="fas fa-lock"></i> Pay ' + formatRupees(t.base) + ' & Register (' + PLANS[selectedPlan].label + ')';
+        if(otpVerified && termsAccepted && authUserId) { btn.disabled = false; btn.style.opacity = '1'; } 
+        else { btn.disabled = true; btn.style.opacity = '0.6'; }
+    }
+    
+    window.togglePlanDropdown = function(e) {
+        if (e) e.stopPropagation();
+        var menu = $('spsDropdownMenu'), icon = $('spsNameIcon');
+        if (!menu) return;
+        var isOpen = menu.classList.contains('show');
+        if (isOpen) { menu.classList.remove('show'); if (icon) icon.classList.remove('open'); } 
+        else {
+            menu.classList.add('show'); if (icon) icon.classList.add('open');
+            document.querySelectorAll('.sps-dropdown-item').forEach(function(el) { el.classList.toggle('active', el.getAttribute('data-plan') === selectedPlan); });
+        }
+    };
+    
+    window.selectPlanFromDropdown = function(planId) {
+        if (!PLANS[planId]) return;
+        var menu = $('spsDropdownMenu'), icon = $('spsNameIcon');
+        
+        if (planId === selectedPlan) { if (menu) menu.classList.remove('show'); if (icon) icon.classList.remove('open'); return; }
+        
+        selectedPlan = planId;
+        updatePlanSummary();
+        
+        var tb = $('termsContentBody'); if (tb) tb.innerHTML = renderTermsContent();
+        document.querySelectorAll('.sps-dropdown-item').forEach(function(el) { el.classList.toggle('active', el.getAttribute('data-plan') === planId); });
+        
+        if (menu) menu.classList.remove('show'); if (icon) icon.classList.remove('open');
+        showToast('✅ Plan: ' + PLANS[planId].label + ' · ' + formatRupees(calcPlanTotals(planId).base));
+    };
+    
+    document.addEventListener('click', function(e) {
+        var menu = $('spsDropdownMenu'); if (!menu) return;
+        if (menu.classList.contains('show') && !e.target.closest('.sps-dropdown-wrap')) {
+            menu.classList.remove('show'); var icon = $('spsNameIcon'); if (icon) icon.classList.remove('open');
+        }
+    });
+    
+    window.captureShopLocation = function() {
+        if(isCapturingLocation) { showToast('⚠️ GPS already searching...', true); return; }
+        if(window.Android && typeof window.Android.requestLocation === 'function') { 
+            isCapturingLocation = true; updateLocationButton('loading'); window.Android.requestLocation(); 
+            window._gpsShopTimeout = setTimeout(function() { if(isCapturingLocation) tryBrowserGPS(); }, 12000); return; 
+        }
+        tryBrowserGPS();
+    };
+    
+    function tryBrowserGPS() {
+        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout);
+        if(!navigator.geolocation) { isCapturingLocation = false; updateLocationButton('retry'); showAlert('GPS not supported.', 'Not Supported', 'error'); return; }
+        updateLocationButton('loading');
+        
+        var fallbackTimer = setTimeout(function() {
+            if (isCapturingLocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(p) { isCapturingLocation = false; setLocationData(p.coords.latitude, p.coords.longitude, null, p.coords.accuracy); },
+                    function(err) { isCapturingLocation = false; updateLocationButton('retry'); handleGpsError(err); },
+                    { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 }
+                );
+            }
+        }, 35000);
+        
+        var attempts = 0, best = null;
+        function go() {
+            attempts++;
+            navigator.geolocation.getCurrentPosition(
+                function(p) { 
+                    clearTimeout(fallbackTimer);
+                    if(!best || p.coords.accuracy < best.coords.accuracy) best = p; 
+                    if(best.coords.accuracy <= 50 || attempts >= 2) { 
+                        isCapturingLocation = false; _waitingForGps = false; setLocationData(best.coords.latitude, best.coords.longitude, null, best.coords.accuracy); 
+                    } else go(); 
+                },
+                function(err) { 
+                    clearTimeout(fallbackTimer);
+                    if(!best) { isCapturingLocation = false; updateLocationButton('retry'); handleGpsError(err); } 
+                    else { isCapturingLocation = false; _waitingForGps = false; setLocationData(best.coords.latitude, best.coords.longitude, null, best.coords.accuracy); } 
+                },
+                { enableHighAccuracy: !IS_IOS, timeout: IS_IOS ? 30000 : 20000, maximumAge: IS_IOS ? 300000 : 0 }
+            );
+        }
+        go();
+    }
+    
+    function handleGpsError(err) {
+        var code = err && err.code;
+        var retryBtn = [{ text: 'Retry GPS', cls: 'gray', onClick: function() { closeAlert(); setTimeout(function() { captureShopLocation(); }, 300); }}];
+        if(code === 1) { showAlert(IS_IOS ? 'Location permission denied.\n\nSettings → Privacy → Location Services → Safari → While Using' : 'Location permission denied.', 'Permission Denied', 'error', retryBtn); }
+        else if(code === 2) { 
+            if(window.Android && typeof window.Android.openLocationSettings === 'function') { try { window.Android.openLocationSettings(); } catch(e) {} }
+            _waitingForGps = true; showAlert('GPS is off. Please enable Location.', 'GPS Off', 'error', retryBtn);
+        }
+        else { showAlert('Unable to get location.', 'GPS Failed', 'error', retryBtn); }
+    }
+    
+    window.setLocationFromAndroid = function(lat, lng, address) { 
+        if(!lat || !lng || lat === 0 || lng === 0) return; 
+        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout); 
+        setLocationData(parseFloat(lat), parseFloat(lng), address); 
+    };
+    window.onLocationError = function() { 
+        isCapturingLocation = false; 
+        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout); 
+        updateLocationButton('retry'); handleGpsError({ code: 3 }); 
+    };
+    
+    function setLocationData(lat, lng, address, accuracy) {
+        isCapturingLocation = false; _waitingForGps = false;
+        if(window._gpsShopTimeout) clearTimeout(window._gpsShopTimeout);
+        $('shopLatitude').value = lat; $('shopLongitude').value = lng;
+        var ce = $('locationCoords');
+        if(ce) { var at = accuracy ? ' (±' + Math.round(accuracy) + 'm)' : ''; ce.textContent = '📍 ' + Number(lat).toFixed(6) + ', ' + Number(lng).toFixed(6) + at; ce.style.display = 'block'; }
+        updateLocationButton('success');
+        var sd = $('locationStatus'); if(sd) { sd.innerHTML = '<i class="fas fa-check-circle"></i> Location captured successfully'; sd.className = 'location-status success'; }
+        if(address) { 
+            var ae = $('locationAddress'); if(ae) { ae.innerHTML = '<i class="fas fa-map-pin"></i> ' + (address || '').substring(0, 180); ae.style.display = 'block'; } 
+            autoFillCityFromAddress(address); 
+        } else { fetchAddressFromCoords(lat, lng); }
+        saveFormData(); showToast('📍 Location captured');
+    }
+    
+    async function fetchAddressFromCoords(lat, lng) {
+        try {
+            var c = new AbortController(), t = setTimeout(function() { c.abort(); }, 7000);
+            var r = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1', { headers: { 'User-Agent': 'ZyMartApp/1.0' }, signal: c.signal });
+            clearTimeout(t); 
+            var d = await r.json(); var addrObj = d.address || {}; var parts = [];
+            if(addrObj.house_number) parts.push(addrObj.house_number);
+            if(addrObj.road || addrObj.street) parts.push(addrObj.road || addrObj.street);
+            if(addrObj.neighbourhood || addrObj.suburb) parts.push(addrObj.neighbourhood || addrObj.suburb);
+            if(addrObj.city || addrObj.town || addrObj.village) parts.push(addrObj.city || addrObj.town || addrObj.village);
+            if(addrObj.state) parts.push(addrObj.state); if(addrObj.postcode) parts.push(addrObj.postcode);
+            var det = parts.length > 0 ? parts.join(', ') : (d.display_name || '');
+            var ae = $('locationAddress'); if(ae && det) { ae.innerHTML = '<i class="fas fa-map-pin"></i> ' + det.substring(0, 180); ae.style.display = 'block'; }
+            autoFillCityFromAddress(det, addrObj);
+        } catch(e) {}
+    }
+    
+    function autoFillCityFromAddress(disp, addrObj) {
+        var ad = $('shopAddress'); var area = addrObj ? (addrObj.neighbourhood || addrObj.suburb || '') : '';
+        if(ad && area && !ad.value) { ad.value = area; saveFormData(); }
+        
+        var pi = $('shopPincode'); 
+        if(pi && addrObj && addrObj.postcode && !pi.value) { 
+            var pc = String(addrObj.postcode).replace(/\D/g, '').substring(0, 6); if(pc.length === 6) { pi.value = pc; saveFormData(); } 
+        }
+        
+        if (addrObj) {
+            var osmCity = (addrObj.city || addrObj.town || addrObj.state_district || "").toLowerCase();
+            var distSelect = $('shopDistrict');
+            if (distSelect && !distSelect.value) {
+                if (osmCity.includes('aurangabad') || osmCity.includes('sambhajinagar')) { distSelect.value = 'Aurangabad'; onDistrictChange(); } 
+                else if (osmCity.includes('jalna')) { distSelect.value = 'Jalna'; onDistrictChange(); } 
+                else if (osmCity.includes('jalgaon')) { distSelect.value = 'Jalgaon'; onDistrictChange(); } 
+                else if (osmCity.includes('buldhana')) { distSelect.value = 'Buldhana'; onDistrictChange(); }
+            }
+        }
+    }
+    
+    function updateLocationButton(st) {
+        var b = $('locationBtn'); if(!b) return;
+        if(st === 'loading') { b.innerHTML = '<span class="loading-spinner"></span> Detecting GPS...'; b.className = 'location-btn'; b.disabled = true; }
+        else if(st === 'success') { b.innerHTML = '<i class="fas fa-check-circle"></i> Location Captured'; b.className = 'location-btn success'; b.disabled = false; }
+        else if(st === 'retry') { b.innerHTML = '<i class="fas fa-redo"></i> Retry GPS'; b.className = 'location-btn'; b.disabled = false; }
+        else { b.innerHTML = '<i class="fas fa-location-dot"></i> Capture GPS Location'; b.className = 'location-btn'; b.disabled = false; }
+    }
+    
+    function scrollToField(id) { 
+        var e = $(id); if(!e) return; 
+        setTimeout(function() { 
+            try { e.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(ex) { e.scrollIntoView(); } 
+            setTimeout(function() { try { e.focus({ preventScroll: true }); } catch(ex2) { try { e.focus(); } catch(ex3) {} } 
+                var old = e.style.outline; e.style.outline = '3px solid #F59E0B'; setTimeout(function() { e.style.outline = old || ''; }, 1500); 
+            }, 400); 
+        }, 100); 
+    }
+    
+    async function validateFullForm() {
+        var on = $('ownerName')?.value.trim(), oe = $('ownerEmail')?.value.trim(), op = $('ownerPhone')?.value.trim(),
+            ow = $('ownerWhatsapp')?.value.trim(), sn = $('shopName')?.value.trim(), cat = $('shopCategory')?.value || '',
+            ad = $('shopAddress')?.value.trim(), dist = $('shopDistrict')?.value || '', taluka = $('shopTaluka')?.value || '',
+            pi = $('shopPincode')?.value.trim(), lat = $('shopLatitude')?.value || '', lng = $('shopLongitude')?.value || '', idn = $('idNumber')?.value.trim();
+            
+        if(!on || on.length < 2) { showFormError('Please enter your full name.'); scrollToField('ownerName'); return false; }
+        if(!oe || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(oe)) { showFormError('Please enter a valid email address.'); scrollToField('ownerEmail'); return false; }
+        if(!op || !/^[6-9]\d{9}$/.test(op)) { showFormError('Please enter a valid 10-digit mobile number.'); scrollToField('ownerPhone'); return false; }
+        if(!ow || !/^[6-9]\d{9}$/.test(ow)) { showFormError('Please enter a valid 10-digit WhatsApp number.'); scrollToField('ownerWhatsapp'); return false; }
+        if(!sn || sn.length < 3) { showFormError('Business name must be at least 3 characters.'); scrollToField('shopName'); return false; }
+        if(!cat) { showFormError('Please select a category.'); scrollToField('shopCategory'); return false; }
+        
+        var radiusVal = parseInt($('shopRadius')?.value || '0', 10), rCfg = getRadiusConfigForCategory(cat);
+        if (!radiusVal || radiusVal < 1) { showFormError('Please enter delivery radius in km.'); scrollToField('shopRadius'); return false; }
+        if (radiusVal < rCfg.min || radiusVal > rCfg.max) { showFormError(rCfg.label + ' category ke liye radius ' + rCfg.min + ' se ' + rCfg.max + ' km ke beech hona chahiye.'); scrollToField('shopRadius'); return false; }
+        
+        if(!ad || ad.length < 10) { showFormError('Please enter your full business address.'); scrollToField('shopAddress'); return false; }
+        if(!dist) { showFormError('Please select your District.'); scrollToField('shopDistrict'); return false; }
+        if(!taluka) { showFormError('Please select your Taluka.'); scrollToField('shopTaluka'); return false; }
+        if(!pi || !/^\d{6}$/.test(pi)) { showFormError('Please enter a valid 6-digit pincode.'); scrollToField('shopPincode'); return false; }
+        if(!lat || !lng) { showFormError('Please capture GPS location first.'); scrollToField('locationBtn'); return false; }
+        if(idn && idn.length < 8) { showFormError('ID number must be at least 8 characters.'); scrollToField('idNumber'); return false; }
+        if(!otpVerified) { showFormError('Please verify your mobile number via OTP.'); scrollToField('ownerPhone'); return false; }
+        if(!termsAccepted) { showFormError('Please accept the Terms & Conditions to proceed.'); scrollToField('termsCompact'); return false; }
+        if(!authUserId) { showFormError('Session expired. Please re-verify your mobile number.'); scrollToField('sendOtpBtn'); return false; }
+        var dup = await checkDuplicates(oe, op, idn); 
+        if(dup) { showFormError(dup); return false; }
+        return true;
+    }
+    
+    async function checkDuplicates(em, ph, idn) {
+        if(em) { 
+            var eu = await sb.from('users').select('id').ilike('email', em).maybeSingle(); 
+            if(eu && eu.data) return 'This email address is already registered.'; 
+            var es = await sb.from('shops').select('id').ilike('owner_email', em).maybeSingle(); 
+            if(es && es.data) return 'This email is already linked to another business.'; 
+        }
+        if(ph) { 
+            var ps = await sb.from('shops').select('id').eq('owner_phone', ph).maybeSingle(); 
+            if(ps && ps.data) return 'This mobile number is already registered with a business.'; 
+        }
+        if(idn && idn.length >= 8) { 
+            var ids = await sb.from('shops').select('id').eq('id_number', idn).maybeSingle(); 
+            if(ids && ids.data) return 'This ID number is already in use.'; 
+        }
+        return null;
+    }
+    
+    window.sendVerificationOTP = async function() {
+        showFormError(''); showFormSuccess('');
+        var phone = $('ownerPhone')?.value.trim();
+        if(!phone || !/^[6-9]\d{9}$/.test(phone)) { showFormError('Please enter a valid 10-digit mobile number.'); scrollToField('ownerPhone'); return; }
+        if(otpLockedUntil > 0) { var rem = Math.ceil((otpLockedUntil - Date.now()) / 60000); if(rem > 0) { showFormError('Too many requests. Try again in ' + rem + ' min.'); return; } else { otpLockedUntil = 0; otpAttemptCount = 0; } }
+        var now = Date.now(); if(now - otpSendWindow > 300000) { otpSendCount = 0; otpSendWindow = now; }
+        if(otpSendCount >= 3) { showFormError('Too many OTP requests. Wait 5 minutes.'); return; }
+        if(otpVerified && currentOtpPhone === phone) { showFormSuccess('Mobile already verified.'); return; }
+        if(currentOtpPhone && currentOtpPhone !== phone) { otpVerified = false; authUserId = null; $('otpVerifiedBadge').classList.remove('show'); updatePayButton(); }
+        var btn = $('sendOtpBtn'); if(btn) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Sending...'; }
+        try {
+            var res = await fetch(SUPABASE_URL + '/functions/v1/send-otp', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': CONFIG.SUPABASE_KEY, 'Authorization': 'Bearer ' + CONFIG.SUPABASE_KEY }, body: JSON.stringify({ phone: phone }) });
+            var data = await res.json();
+            if(data.Status === 'Success' || data.status === 'success' || data.success === true) {
+                otpSendCount++; currentOtpPhone = phone;
+                var os = $('otpSection'); os.classList.add('show'); os.classList.remove('verified'); os.style.display = 'block';
+                $('otpPhoneDisplay').textContent = '+91 ' + phone; $('otpInput').value = '';
+                showFormSuccess('OTP sent to +91 ' + phone);
+                if(btn) btn.style.display = 'none';
+                startOtpTimer();
+                var cbn = $('changeNumberBtn'); if(cbn) cbn.style.display = '';
+            } else { showFormError('Failed to send OTP.'); if(btn) { btn.disabled = false; btn.innerHTML = 'Send OTP'; } }
+        } catch(e) { showFormError('Network error.'); if(btn) { btn.disabled = false; btn.innerHTML = 'Send OTP'; } }
+    };
+    
+    function startOtpTimer() {
+        otpSeconds = 30; var rb = $('resendOtpBtn'); 
+        if(rb) { rb.disabled = true; rb.style.display = 'block'; rb.textContent = 'Resend OTP (30s)'; }
+        if(otpTimer) clearInterval(otpTimer);
+        otpTimer = setInterval(function() { 
+            otpSeconds--; 
+            if(otpSeconds <= 0) { clearInterval(otpTimer); if(rb) { rb.disabled = false; rb.textContent = 'Resend OTP'; } } 
+            else { if(rb) rb.textContent = 'Resend OTP (' + otpSeconds + 's)'; } 
+        }, 1000);
+    }
+    
+    window.verifyOTP = async function() {
+        showFormError(''); showFormSuccess('');
+        if(otpLockedUntil > 0) { var rem = Math.ceil((otpLockedUntil - Date.now()) / 60000); if(rem > 0) { showFormError('Too many attempts. Wait ' + rem + ' min.'); return; } else { otpLockedUntil = 0; otpAttemptCount = 0; } }
+        var otp = $('otpInput')?.value.trim();
+        if(!otp || otp.length < 4) { showFormError('Please enter the complete OTP.'); return; }
+        var btn = $('verifyOtpBtn'); if(btn) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Verifying...'; }
+        try {
+            var res = await fetch(SUPABASE_URL + '/functions/v1/verify-otp', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': CONFIG.SUPABASE_KEY, 'Authorization': 'Bearer ' + CONFIG.SUPABASE_KEY }, body: JSON.stringify({ phone: currentOtpPhone, otp: otp }) });
+            var data = await res.json();
+            if(data.Status === 'Success' || data.status === 'success' || data.success === true) {
+                if(data.email && data.password) {
+                    btn.innerHTML = '<span class="loading-spinner"></span> Creating Session...';
+                    var sr = await sb.auth.signInWithPassword({ email: data.email, password: data.password });
+                    if(sr.error) { showFormError('Session Error: ' + sr.error.message); btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify OTP'; return; }
+                    if(sr.data && sr.data.session) { authUserId = sr.data.session.user.id; }
+                    else { showFormError('Failed to create session.'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify OTP'; return; }
+                } else { showFormError('Auth credentials missing.'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify OTP'; return; }
+                otpAttemptCount = 0; otpLockedUntil = 0; otpVerified = true;
+                $('otpSection').classList.add('verified'); $('otpVerifiedBadge').classList.add('show');
+                var pi = $('ownerPhone'); if(pi) { pi.readOnly = true; pi.classList.add('locked'); }
+                $('otpSection').style.display = 'none'; $('resendOtpBtn').style.display = 'none';
+                if(otpTimer) clearInterval(otpTimer);
+                showFormSuccess('Mobile verified! Accept terms to continue.'); updatePayButton();
+            } else {
+                otpAttemptCount++; $('otpInput').value = '';
+                if(otpAttemptCount >= 3) { 
+                    otpLockedUntil = Date.now() + 600000; showFormError('3 incorrect attempts. Locked 10 minutes.'); 
+                    $('otpSection').style.display = 'none'; $('resendOtpBtn').style.display = 'none'; if(otpTimer) clearInterval(otpTimer); 
+                } else { var l = 3 - otpAttemptCount; showFormError('Incorrect OTP. ' + l + ' attempts left.'); }
+            }
+        } catch(e) { showFormError('Verification failed.'); }
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify OTP'; }
+    };
+    
+    window.changePhoneNumber = function() {
+        if(!confirm('Change mobile number?\n\nVerification will be reset.')) return;
+        otpVerified = false; currentOtpPhone = null; otpAttemptCount = 0; authUserId = null;
+        // ✅ OTP LIMIT RESET FIX: Taaki naye number pe OTP bhejne ke liye limit reset ho jaye
+        otpSendCount = 0; otpSendWindow = 0; otpLockedUntil = 0;
+        
+        var os = $('otpSection'); if(os) { os.classList.remove('show', 'verified'); os.style.display = 'none'; }
+        var oi = $('otpInput'); if(oi) oi.value = '';
+        var od = $('otpPhoneDisplay'); if(od) od.textContent = '';
+        var vb = $('otpVerifiedBadge'); if(vb) vb.classList.remove('show');
+        var sbtn = $('sendOtpBtn'); if(sbtn) { sbtn.style.display = ''; sbtn.disabled = false; sbtn.innerHTML = 'Send OTP'; }
+        var pi = $('ownerPhone'); if(pi) { pi.readOnly = false; pi.classList.remove('locked'); setTimeout(function() { try { pi.focus(); pi.select(); } catch(e) {} }, 100); }
+        if(otpTimer) clearInterval(otpTimer);
+        var rbn = $('resendOtpBtn'); if(rbn) rbn.style.display = 'none';
+        var cbn = $('changeNumberBtn'); if(cbn) cbn.style.display = 'none';
+        showFormSuccess('Enter new mobile number and tap Send OTP.'); updatePayButton();
+    };
+    
+    window.openTermsModal = function() { var m = $('termsModal'); if(m) m.classList.add('show'); document.body.style.overflow = 'hidden'; };
+    window.closeTermsModal = function() { var m = $('termsModal'); if(m) m.classList.remove('show'); document.body.style.overflow = ''; };
+    window.acceptTermsFromModal = function() { var cb = $('termsCheckbox'); if(cb) { cb.checked = true; toggleTerms(); } closeTermsModal(); showToast('Terms accepted'); };
+    window.toggleTerms = function() {
+        var cb = $('termsCheckbox'); if(!cb) return;
+        termsAccepted = cb.checked;
+        var b = $('termsAcceptedBadge'); if(b) { if(termsAccepted) b.classList.add('show'); else b.classList.remove('show'); }
+        updatePayButton();
+    };
+    
+    window.startRazorpayPayment = async function() {
+        if(!termsAccepted) { showAlert('Please accept the Terms & Conditions.', 'Terms Required', 'warning'); scrollToField('termsCompact'); return; }
+        if(!authUserId) { showAlert('Session expired. Please re-verify mobile.', 'Session Expired', 'error'); scrollToField('ownerPhone'); return; }
+        if(!await validateFullForm()) return;
+        if(paymentDone) { showToast('Payment already processed.', true); return; }
+        
+        if (IS_WEBVIEW && IS_ANDROID) {
+            if (window.Android && typeof window.Android.openRazorpayCheckout === 'function') {
+                try {
+                    var t0 = calcPlanTotals(selectedPlan); var pl0 = PLANS[selectedPlan].label;
+                    var on0 = $('ownerName')?.value.trim(), oe0 = $('ownerEmail')?.value.trim(), op0 = $('ownerPhone')?.value.trim();
+                    var nativeOpts = { key: CONFIG.RAZORPAY_KEY_ID, amount: Math.round(t0.total * 100), currency: 'INR', name: 'ZyMart+', description: pl0 + ' Plan — ₹' + t0.base + ' + GST = ₹' + t0.total, prefill: { name: on0, email: oe0, contact: op0 }, theme: { color: '#0B5A31' }, notes: { plan_type: selectedPlan, plan_months: String(PLANS[selectedPlan].months) } };
+                    window.Android.openRazorpayCheckout(JSON.stringify(nativeOpts));
+                    return;
+                } catch(e) { console.warn('Native Razorpay failed:', e); }
+            }
+            var proceed = confirm('⚠️ UPI may not work here.\n\nFor UPI payments, use Chrome browser.\n\nContinue with Card/NetBanking?');
+            if (!proceed) { try { window.open(window.location.href, '_system'); } catch(e) { window.open(window.location.href, '_blank'); } return; }
+        }
+        
+        var t = calcPlanTotals(selectedPlan); var pl = PLANS[selectedPlan].label;
+        var on = $('ownerName')?.value.trim(), oe = $('ownerEmail')?.value.trim(), op = $('ownerPhone')?.value.trim();
+        
+        var options = {
+            key: CONFIG.RAZORPAY_KEY_ID, amount: Math.round(t.total * 100), currency: 'INR', name: 'ZyMart+',
+            description: pl + ' Plan — ₹' + t.base + ' + 18% GST = ₹' + t.total,
+            prefill: { name: on, email: oe, contact: op }, theme: { color: '#0B5A31' },
+            method: { upi: true, card: true, netbanking: true, wallet: true },
+            retry: { enabled: false }, timeout: 300, remember_customer: true,
+            notes: { plan_type: selectedPlan, plan_months: String(PLANS[selectedPlan].months), gst_percent: String(CONFIG.GST_PERCENT), base_amount: String(t.base), gst_amount: String(t.gst), total_amount: String(t.total) },
+            handler: function(r) { paymentDone = true; showToast('Payment successful!'); registerShopAfterPayment(r, t); },
+            modal: { ondismiss: function() { showToast('Payment cancelled', true); }, escape: false, handleback: false }
+        };
+        try {
+            var rzp = new Razorpay(options);
+            rzp.on('payment.failed', function(r) { showAlert('Payment failed: ' + (r.error.description || 'Try again.') + '\n\nNo amount deducted.', 'Payment Failed', 'error'); });
+            rzp.open();
+        } catch(e) { showAlert('Failed to open payment gateway.', 'Error', 'error'); }
+    };
+    
+    async function registerShopAfterPayment(pr, totals) {
+        isProcessing = true;
+        var btn = $('payBtn'); if(btn) { btn.innerHTML = '<span class="loading-spinner"></span> Registering...'; btn.disabled = true; }
+        var on = $('ownerName')?.value.trim(), oe = $('ownerEmail')?.value.trim(), op = $('ownerPhone')?.value.trim(),
+            ow = $('ownerWhatsapp')?.value.trim(), sn = $('shopName')?.value.trim(), cat = $('shopCategory')?.value || '',
+            ad = $('shopAddress')?.value.trim(), dist = $('shopDistrict')?.value || '', taluka = $('shopTaluka')?.value || '',
+            pi = $('shopPincode')?.value.trim(), desc = $('shopDesc')?.value.trim(), lat = $('shopLatitude')?.value || '', lng = $('shopLongitude')?.value || '',
+            idn = $('idNumber')?.value.trim();
+        
+        var radiusVal = parseInt($('shopRadius')?.value || '0', 10); var rCfg = getRadiusConfigForCategory(cat);
+        
+        if(!authUserId) { isProcessing = false; if(btn) { btn.innerHTML = '<i class="fas fa-lock"></i> Pay & Register'; btn.disabled = false; } showAlert('Session expired during payment. Contact support.', 'Error', 'error'); return; }
+        try {
+            var siu = null, qru = null, idu = null;
+            if(selectedImageFile) siu = await uploadImage(selectedImageFile, 'shops');
+            if(selectedQrFile) qru = await uploadImage(selectedQrFile, 'qrcodes');
+            if(selectedIdFile) idu = await uploadImage(selectedIdFile, 'idproofs');
+            
+            var plan = PLANS[selectedPlan]; var months = plan.months;
+            var startedAt = new Date(); var expiresAt = new Date(startedAt); expiresAt.setMonth(expiresAt.getMonth() + months);
+            
+            var data = {
+                owner_id: authUserId, owner_email: oe, owner_name: on, owner_phone: op, owner_whatsapp: ow,
+                name: sn, category: cat, phone: op, whatsapp: ow, address: ad, city: taluka, district: dist, pincode: pi,
+                delivery_radius_km: radiusVal, description: desc || null, latitude: parseFloat(lat), longitude: parseFloat(lng),
+                image_url: siu, qr_code_url: qru, id_number: idn || null, id_image_url: idu || null,
+                status: 'pending', is_open: false, rating: 0, location_verified: true, plan_type: selectedPlan,
+                plan_started_at: startedAt.toISOString(), plan_expires_at: expiresAt.toISOString(),
+                plan_base_fee: totals.base, plan_gst_amount: totals.gst, plan_total_paid: totals.total, is_permanent: false, plan_status: 'active',
+                max_products: plan.max_products, max_photos_per_product: plan.max_photos,
+                base_amount: totals.base, gst_percent: CONFIG.GST_PERCENT, gst_amount: totals.gst,
+                payment_amount: totals.total, payment_status: 'paid', payment_id: pr.razorpay_payment_id, payment_order_id: pr.razorpay_order_id,
+                terms_accepted: true, terms_accepted_at: new Date().toISOString(), terms_version: CONFIG.TERMS_VERSION, created_at: new Date().toISOString()
+            };
+            
+            var ins = await sb.from('shops').insert([data]).select();
+            if(ins.error) throw new Error('DB Error: ' + ins.error.message);
+            if(!ins.data || ins.data.length === 0) throw new Error('RLS blocked insertion.');
+            
+            try { 
+                var uc = await sb.from('users').select('id').ilike('email', oe).maybeSingle(); 
+                if(uc && uc.data) await sb.from('users').update({ role: 'shop_owner' }).eq('id', uc.data.id); 
+            } catch(e) { console.warn('Role update failed:', e); }
+            
+            clearFormData();
+            
+            var expStr = expiresAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            showAlert(
+                'Business registered successfully!\n\n📋 Plan: ' + plan.label + ' (' + months + ' month' + (months > 1 ? 's' : '') + ')\n' +
+                '📍 Location: ' + taluka + ', ' + dist + '\n📏 Radius: ' + radiusVal + ' km (' + rCfg.label + ')\n' +
+                '📦 Product limit: ' + plan.max_products + '\n📸 Photos per product: ' + plan.max_photos + '\n\n' +
+                '💰 Base: ' + formatRupees(totals.base) + '\n📊 GST (18%): ' + formatRupees(totals.gst) + '\n✅ Total Paid: ' + formatRupees(totals.total) + '\n\n' +
+                '📅 Started: ' + startedAt.toLocaleDateString('en-IN') + '\n⏰ Expires: ' + expStr + '\n\n' +
+                'Admin review takes up to 24 hours.\nLogin Email: ' + oe + '\n\nRegistration fee is non-refundable.', 'Registration Successful', 'success'
+            );
+            if(btn) btn.innerHTML = '<i class="fas fa-check-circle"></i> Completed';
+            setTimeout(function() { window.location.href = 'index.html?registered=1'; }, 8000);
+        } catch(e) {
+            console.error('[Register] FATAL:', e); isProcessing = false;
+            if(btn) { btn.innerHTML = '<i class="fas fa-lock"></i> Pay & Register'; btn.disabled = false; }
+            showAlert('Registration failed: ' + (e.message || 'Unknown error.') + '\n\n⚠️ Payment was successful.\nPayment ID: ' + pr.razorpay_payment_id + '\n\nContact support immediately.', 'System Error', 'error');
+        }
+    }
+    
+    function setupImageUpload(ai, ii, pi, fv) {
+        var a = $(ai), inp = $(ii), pre = $(pi); if(!a || !inp) return;
+        a.onclick = function() { inp.click(); };
+        inp.onchange = async function(e) {
+            var file = e.target.files[0]; if(!file) return;
+            if(file.size > 5 * 1024 * 1024) { showAlert('Max 5MB.', 'File Too Large', 'error'); return; }
+            showToast('⏳ Compressing...');
+            var comp = await compressImage(file); var kb = Math.round(comp.size / 1024);
+            if(fv === 'selectedImageFile') selectedImageFile = comp; else if(fv === 'selectedQrFile') selectedQrFile = comp; else if(fv === 'selectedIdFile') selectedIdFile = comp;
+            var r = new FileReader(); r.onload = function(ev) { if(pre) { pre.src = ev.target.result; pre.style.display = 'block'; } }; r.readAsDataURL(comp); showToast('✅ Ready (' + kb + ' KB)');
+        };
+    }
+    
+    function renderTermsContent() {
+        var today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }); var plan = PLANS[selectedPlan];
+        return '<div class="terms-intro"><strong>ZyMart+ Business Owner Agreement</strong><br>Effective Date: <strong>' + today + '</strong> · Version: ' + CONFIG.TERMS_VERSION + '<br><br>Legally binding under the Information Technology Act, 2000.</div>' +
+            '<h4><span class="num">1</span> Plan Details</h4><p>Selected: <strong>' + plan.label + ' Plan</strong></p>' +
+            '<div class="fee-table"><div class="fee-table-row"><span>Duration</span><span>' + plan.months + ' month' + (plan.months > 1 ? 's' : '') + '</span></div><div class="fee-table-row"><span>Max Products</span><span>' + plan.max_products + '</span></div><div class="fee-table-row"><span>Photos per Product</span><span>' + plan.max_photos + '</span></div><div class="fee-table-row"><span>Base Fee</span><span>₹' + planFees[selectedPlan] + '</span></div><div class="fee-table-row"><span>GST (18%)</span><span>Added at payment</span></div></div>' +
+            '<p>On exceeding limits, upgrade is required. Existing data remains intact.</p>' +
+            '<h4><span class="num">2</span> Non-Refundable Payment</h4><div class="highlight-danger"><strong>⚠️ STRICTLY NON-REFUNDABLE</strong><br><br>All fees are non-refundable including:<br><br>• Rejection by admin<br>• Voluntary cancellation<br>• Suspension<br>• Early closure<br>• Non-renewal<br>• Change of mind<br>• Any other reason<br><br><strong>No partial refunds. No exceptions.</strong></div>' +
+            '<h4><span class="num">3</span> Plan Validity</h4><ol><li>Plan starts on <strong>admin approval date</strong>.</li><li>Expires ' + plan.months + ' month' + (plan.months > 1 ? 's' : '') + ' later.</li><li>On expiry, dashboard deactivates & listing hidden.</li><li>Renew anytime via support.</li></ol>' +
+            '<h4><span class="num">4</span> Owner\'s Declarations</h4><p>You declare that all information is <strong>true & accurate</strong>, you are the <strong>legal owner</strong>, you have all licenses (GST, FSSAI, trade license), you will maintain quality, and you are at least 18 years old.</p><p>False info → <strong>immediate termination without refund</strong>.</p>' +
+            '<h4><span class="num">5</span> Platform Rights</h4><p>ZyMart+ reserves the right to <strong>approve, reject, suspend, or terminate</strong> any business, modify plans/fees with notice, remove violating listings, and change features at any time.</p>' +
+            '<h4><span class="num">6</span> Data Protection</h4><p>Data stored securely. GPS used for verification and delivery. No data sold to third parties. Razorpay handles payments — no card info stored.</p>' +
+            '<h4><span class="num">7</span> Governing Law</h4><p>Governed by laws of India. Disputes resolved in courts at <strong>' + CONFIG.JURISDICTION + '</strong>.</p>' +
+            '<h4><span class="num">8</span> Contact</h4><div class="fee-table"><div class="fee-table-row"><span>Email</span><span>' + CONFIG.SUPPORT_EMAIL + '</span></div><div class="fee-table-row"><span>WhatsApp</span><span>' + CONFIG.SUPPORT_PHONE + '</span></div><div class="fee-table-row"><span>Hours</span><span>10 AM – 7 PM (Mon–Sat)</span></div></div>' +
+            '<div class="consent-block"><strong>FINAL DECLARATION</strong><br><br>By clicking "I Accept":<br><br>✓ I have read all terms.<br>✓ I agree to be bound.<br>✓ Fee is <strong>non-refundable</strong>.<br>✓ I am authorized to register.<br>✓ All information is true.<br><br><em>Binding under the IT Act, 2000 (India).</em></div>';
+    }
+    
+    async function initPage() {
+        await fetchPlanFees(); await loadCategories();
+        var sel = $('shopCategory');
+        if (sel) {
+            var co = '<option value="">Select Category</option>';
+            for(var i = 0; i < categories.length; i++) co += '<option value="' + esc(categories[i].name) + '">' + esc(categories[i].name) + '</option>';
+            sel.innerHTML = co;
+        }
+        
+        var tb = $('termsContentBody'); if(tb) tb.innerHTML = renderTermsContent();
+        updatePlanSummary();
+        
+        setupImageUpload('imageUploadArea', 'shopImageInput', 'imagePreview', 'selectedImageFile');
+        setupImageUpload('qrUploadArea', 'qrImageInput', 'qrPreview', 'selectedQrFile');
+        setupImageUpload('idUploadArea', 'idImageInput', 'idPreview', 'selectedIdFile');
+        
+        loadFormData();
+        var savedCat = $('shopCategory')?.value;
+        if (savedCat) {
+            window.onCategoryChange();
+            var savedRadius = $('shopRadius')?.value;
+            if (savedRadius) $('shopRadius').value = savedRadius;
+        }
+        
+        try {
+            var cart = JSON.parse(localStorage.getItem('zymart_cart') || '[]');
+            var count = cart.reduce(function(s, i) { return s + (i.quantity || 1); }, 0);
+            var badge = $('cartBadge'); if (badge && count > 0) { badge.textContent = count; badge.classList.add('show'); }
+        } catch(e) {}
+        
+        showApp();
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() { 
+        if(!navigator.onLine) { var nb = document.getElementById('netBanner'); if(nb) nb.style.display = 'block'; }
+        initPage(); 
+    });
+    
+    window.captureShopLocation = captureShopLocation;
+    window.sendVerificationOTP = sendVerificationOTP;
+    window.verifyOTP = verifyOTP;
+    window.changePhoneNumber = changePhoneNumber;
+    window.closeAlert = closeAlert;
+    window.setLocationFromAndroid = setLocationFromAndroid;
+    window.onLocationError = onLocationError;
+    window.saveFormData = saveFormData;
+    window.toggleTerms = toggleTerms;
+    window.openTermsModal = openTermsModal;
+    window.closeTermsModal = closeTermsModal;
+    window.acceptTermsFromModal = acceptTermsFromModal;
+    window.startRazorpayPayment = startRazorpayPayment;
+    window.togglePlanDropdown = togglePlanDropdown;
+    window.selectPlanFromDropdown = selectPlanFromDropdown;
+    window.onCategoryChange = onCategoryChange;
+    window.onDistrictChange = onDistrictChange;
+    
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Admin Panel - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link rel="preconnect" href="https://res.cloudinary.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root { --brand-green: #0B5A31; --brand-green-dark: #083D21; --brand-orange: #F59E0B; --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB; --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444; --success: #22C55E; --warning: #F59E0B; --shadow-xs: 0 1px 2px rgba(0,0,0,0.04); --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); --shadow-md: 0 4px 16px rgba(0,0,0,0.08); --shadow-lg: 0 8px 30px rgba(0,0,0,0.12); --radius-sm: 10px; --radius-md: 14px; --radius-lg: 18px; --radius-xl: 22px; --radius-full: 9999px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); min-height: 100vh; overflow-x: hidden; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--neutral-white); z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; }
+        .loader-zy { color: #A3E635; } .loader-mart { color: #FDE047; }
+        
+        .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #EDF7F1, #F9FAFB, #FFFFFF); padding: 20px; }
+        .login-card { background: white; border-radius: var(--radius-xl); padding: 36px 28px; width: 100%; max-width: 400px; box-shadow: var(--shadow-lg); text-align: center; }
+        .login-logo { font-family: 'Poppins', sans-serif; font-size: 32px; font-weight: 700; }
+        .login-zy { color: #A3E635; } .login-mart { color: #FDE047; }
+        .login-subtitle { color: var(--neutral-gray); font-size: 13px; margin-bottom: 24px; }
+        .login-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-sm); font-size: 14px; margin-bottom: 12px; font-family: 'Inter', sans-serif; outline: none; background: var(--neutral-bg); }
+        .login-input:focus { border-color: var(--brand-orange); }
+        .login-error { background: #FEF2F2; color: #EF4444; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 14px; display: none; }
+        .login-btn { width: 100%; padding: 13px; background: var(--brand-green); color: white; border: none; border-radius: var(--radius-full); font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; margin-bottom: 8px; }
+        .login-btn:active { background: var(--brand-green-dark); transform: scale(0.98); }
+        .login-btn:disabled { opacity: 0.6; }
+        .login-back { background: none; border: none; color: var(--brand-green); cursor: pointer; margin-top: 10px; font-size: 13px; font-weight: 600; }
+        
+        .sidebar { position: fixed; left: 0; top: 0; width: 260px; height: 100vh; background: white; border-right: 1px solid var(--neutral-border); z-index: 100; overflow-y: auto; box-shadow: var(--shadow-sm); transition: transform 0.3s ease; }
+        .sidebar-header { padding: 18px 14px; border-bottom: 1px solid var(--neutral-border); background: linear-gradient(135deg, #EDF7F1, white); }
+        .sidebar-logo { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; }
+        .sidebar-zy { color: #A3E635; } .sidebar-mart { color: #FDE047; }
+        .sidebar-version { font-size: 10px; color: var(--neutral-gray); }
+        .sidebar-menu { padding: 8px 6px; }
+        .menu-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: var(--radius-md); cursor: pointer; color: var(--neutral-gray); font-weight: 500; font-size: 12px; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; font-family: 'Inter', sans-serif; }
+        .menu-item:hover { background: #EDF7F1; }
+        .menu-item.active { background: var(--brand-green); color: white; }
+        .menu-item i { width: 18px; text-align: center; font-size: 13px; }
+        .menu-divider { height: 1px; background: var(--neutral-border); margin: 6px 0; }
+        .menu-badge { margin-left: auto; background: var(--danger); color: white; padding: 2px 7px; border-radius: var(--radius-full); font-size: 9px; font-weight: 700; }
+        .switch-dashboard-btn { width: calc(100% - 12px); margin: 8px 6px; padding: 12px; background: linear-gradient(135deg, #3B82F6, #2563EB); color: white; border: none; border-radius: var(--radius-md); font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(59,130,246,0.25); }
+        .switch-dashboard-btn:active { transform: scale(0.97); }
+        .sidebar-toggle { position: fixed; top: 10px; left: 10px; z-index: 101; width: 36px; height: 36px; background: var(--brand-green); color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; border: none; font-size: 15px; box-shadow: var(--shadow-md); }
+        
+        .main-content { margin-left: 260px; padding: 16px 18px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .page-title { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; }
+        .admin-info { display: flex; align-items: center; gap: 8px; background: white; padding: 6px 12px; border-radius: var(--radius-full); border: 1px solid var(--neutral-border); font-size: 12px; }
+        .admin-avatar { width: 28px; height: 28px; background: linear-gradient(135deg, var(--brand-green), #22C55E); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
+        .refresh-btn { width: 32px; height: 32px; background: #EDF7F1; color: var(--brand-green); border: 1px solid #C8E6C9; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .refresh-btn:hover { background: var(--brand-green); color: white; }
+        .refresh-btn.spinning i { animation: spin 0.8s linear infinite; }
+        
+        .content-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--neutral-border); overflow: hidden; margin-bottom: 14px; box-shadow: var(--shadow-xs); }
+        .card-header { padding: 12px 14px; border-bottom: 1px solid var(--neutral-border); display: flex; justify-content: space-between; align-items: center; background: #FAFAFA; flex-wrap: wrap; gap: 8px; }
+        .card-header h2 { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; }
+        
+        .btn { padding: 7px 13px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 4px; font-family: 'Inter', sans-serif; white-space: nowrap; transition: all 0.2s; }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary { background: var(--brand-green); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--brand-orange); color: white; }
+        .btn-outline { background: white; color: var(--neutral-dark); border: 1px solid var(--neutral-border); }
+        .btn-sm { padding: 5px 8px; font-size: 9px; }
+        .btn-lg { padding: 10px 20px; font-size: 12px; }
+        
+        .badge { padding: 3px 8px; border-radius: var(--radius-full); font-size: 9px; font-weight: 700; display: inline-block; }
+        .badge-success { background: #EDF7F1; color: #059669; }
+        .badge-warning { background: #FFF8EB; color: #D97706; }
+        .badge-danger { background: #FEF2F2; color: #DC2626; }
+        .badge-info { background: #EFF6FF; color: #2563EB; }
+        .badge-purple { background: #F3E8FF; color: #7C3AED; }
+        
+        .form-group { margin-bottom: 14px; }
+        .form-label { font-size: 12px; font-weight: 600; margin-bottom: 5px; display: block; color: var(--neutral-dark); }
+        .form-control { width: 100%; padding: 10px 12px; border: 1.5px solid var(--neutral-border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; background: white; }
+        .form-control:focus { border-color: var(--brand-orange); }
+        .form-row { display: flex; gap: 10px; }
+        .form-half { flex: 1; }
+        textarea.form-control { resize: vertical; min-height: 60px; }
+        
+        .toggle-switch { position: relative; width: 50px; height: 26px; cursor: pointer; display: inline-block; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #D1D5DB; border-radius: 26px; transition: 0.3s; }
+        .toggle-slider:before { content: ''; position: absolute; height: 20px; width: 20px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+        .toggle-switch input:checked + .toggle-slider { background: var(--brand-green); }
+        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(24px); }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8,61,33,0.7); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.show { display: flex; }
+        .modal-container { background: white; border-radius: var(--radius-xl); width: 92%; max-width: 550px; max-height: 85vh; overflow-y: auto; padding: 18px; animation: slideUp 0.3s ease; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--neutral-border); }
+        .modal-header h3 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; }
+        .modal-close { width: 28px; height: 28px; background: var(--neutral-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; font-size: 12px; color: var(--neutral-gray); }
+        
+        .toast-container { position: fixed; top: 14px; right: 14px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; }
+        .toast { background: white; padding: 10px 14px; border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; border-left: 4px solid var(--brand-green); animation: slideIn 0.3s ease; max-width: 340px; }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.success { border-left-color: var(--success); }
+        
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; padding: 12px; }
+        .card-item { background: white; border: 1px solid var(--neutral-border); border-radius: var(--radius-lg); overflow: hidden; position: relative; cursor: pointer; transition: all 0.2s; }
+        .card-item:hover { box-shadow: var(--shadow-md); }
+        .card-item-img { width: 100%; height: 120px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .card-item-img img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+        .card-item-img i { font-size: 30px; color: var(--brand-green); }
+        .card-item-body { padding: 10px; }
+        .card-item-title { font-weight: 700; font-size: 12px; margin-bottom: 3px; }
+        .card-item-subtitle { font-size: 9px; color: var(--neutral-gray); margin-bottom: 6px; }
+        .hold-badge { position: absolute; top: 6px; right: 6px; background: #F59E0B; color: white; padding: 2px 6px; border-radius: var(--radius-full); font-size: 8px; font-weight: 700; }
+        .delete-req-badge { background: #FFF8EB; color: #D97706; padding: 3px 8px; border-radius: 6px; font-size: 9px; font-weight: 700; margin-bottom: 6px; display: inline-block; }
+        .featured-badge { background: #EFF6FF; color: #2563EB; padding: 3px 8px; border-radius: 6px; font-size: 9px; font-weight: 700; margin-bottom: 6px; display: inline-block; }
+        
+        .search-bar { position: relative; margin-bottom: 10px; }
+        .search-bar i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9CA3AF; font-size: 12px; pointer-events: none; }
+        .search-bar input { width: 100%; padding: 10px 12px 10px 36px; border: 1.5px solid var(--neutral-border); border-radius: 10px; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; background: white; transition: border-color 0.2s; }
+        .search-bar input:focus { border-color: var(--brand-orange); }
+        .search-count { font-size: 10px; color: #6B7280; margin-bottom: 8px; }
+        
+        .order-num-badge { position: absolute; top: 6px; left: 6px; background: var(--brand-green); color: white; padding: 3px 8px; border-radius: var(--radius-full); font-size: 9px; font-weight: 700; z-index: 2; }
+        
+        .order-num-inline {
+            display: flex; align-items: center; gap: 6px; margin: 8px 0 6px;
+            background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 8px; padding: 6px 10px;
+        }
+        .order-num-inline label {
+            font-size: 10px; font-weight: 700; color: #065F46; text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .order-num-inline input {
+            flex: 1; max-width: 70px; padding: 6px 8px; border: 1.5px solid #86EFAC; border-radius: 6px;
+            font-size: 14px; font-weight: 800; text-align: center; font-family: 'Inter', sans-serif;
+            color: #065F46; background: white; outline: none;
+        }
+        .order-num-inline input:focus { border-color: var(--brand-green); box-shadow: 0 0 0 3px rgba(11,90,49,0.1); }
+        .move-btn { width: 30px; height: 30px; border-radius: 50%; background: #EDF7F1; border: 1px solid #86EFAC; cursor: pointer; font-weight: 900; font-size: 14px; color: #065F46; display: flex; align-items: center; justify-content: center; }
+        .move-btn:active { transform: scale(0.9); background: #C8E6C9; }
+        
+        .image-upload-box { border: 2px dashed var(--brand-green); border-radius: var(--radius-md); padding: 12px; text-align: center; cursor: pointer; background: #EDF7F1; }
+        .image-upload-box.has-image { border-style: solid; border-color: #22C55E; }
+        .image-preview { max-width: 130px; max-height: 80px; border-radius: 10px; margin-top: 6px; display: none; }
+        .image-preview.show { display: block; }
+        
+        .data-table { width: 100%; border-collapse: collapse; min-width: 500px; font-size: 12px; }
+        .data-table th { text-align: left; padding: 10px; background: var(--neutral-bg); font-weight: 700; font-size: 10px; text-transform: uppercase; color: var(--neutral-gray); border-bottom: 2px solid var(--neutral-border); }
+        .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--neutral-border); }
+        
+        .empty-state { text-align: center; padding: 30px; color: var(--neutral-gray); }
+        .empty-state i { font-size: 40px; margin-bottom: 8px; display: block; color: #D1D5DB; }
+        
+        .cat-checkbox-list { max-height: 200px; overflow-y: auto; border: 1px solid var(--neutral-border); border-radius: 8px; padding: 8px; }
+        .cat-checkbox-label { display: flex; align-items: center; gap: 6px; padding: 4px 6px; font-size: 12px; cursor: pointer; border-radius: 4px; }
+        .cat-checkbox-label:hover { background: #F3F4F6; }
+        
+        .slider-preview { width: 100%; height: 60px; object-fit: cover; border-radius: 8px; }
+        
+        .prod-edit-img-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+        .prod-edit-img-item { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #F9FAFB; border: 2px solid #E5E7EB; }
+        .prod-edit-img-item img { width: 100%; height: 100%; object-fit: cover; }
+        .prod-edit-img-item .remove-btn { 
+            position: absolute; top: 4px; right: 4px; 
+            width: 34px; height: 34px; min-width: 34px;
+            background: #EF4444; color: white; 
+            border: 3px solid white; border-radius: 50%; 
+            font-size: 18px; font-weight: 900; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+            z-index: 5;
+            line-height: 1;
+        }
+        .prod-edit-img-empty { grid-column: 1 / -1; text-align: center; color: #9CA3AF; font-size: 11px; padding: 14px; }
+        
+        .plan-fee-card { background: linear-gradient(135deg, #F0FDF4, #DCFCE7); border: 2px solid #86EFAC; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+        .plan-fee-card-title { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; color: #065F46; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .plan-fee-input { width: 100%; padding: 12px 14px; border: 2px solid #86EFAC; border-radius: 10px; font-size: 18px; font-weight: 700; font-family: 'Poppins', sans-serif; color: #065F46; background: white; outline: none; text-align: center; }
+        .plan-fee-input:focus { border-color: var(--brand-green); }
+        .plan-fee-total { font-size: 11px; color: #047857; margin-top: 6px; text-align: center; font-weight: 600; }
+        
+        @media(max-width: 1024px) { 
+            .sidebar { transform: translateX(-100%); } 
+            .sidebar.open { transform: translateX(0); } 
+            .sidebar-toggle { display: flex; } 
+            .main-content { margin-left: 0; padding: 12px; } 
+        }
+        @media(max-width: 640px) { 
+            .card-grid { grid-template-columns: repeat(2, 1fr); } 
+            .prod-edit-img-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader"><div class="simple-spinner"></div><div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div></div>
+<div id="app"></div>
+<div class="toast-container" id="toastContainer"></div>
+<script>
+(function() {
+    'use strict';
+    
+    window.addEventListener('error', function(e) { console.error('[Panel]', e.message); });
+    window.addEventListener('unhandledrejection', function(e) { console.error('[Panel]', e.reason); e.preventDefault(); });
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1',
+        CLOUDINARY_CLOUD_NAME: 'b0zm0rac',
+        CLOUDINARY_ENABLED: true,
+        IMG_MIN_KB: 80,
+        IMG_MAX_KB: 90,
+        PRODUCT_BATCH_SIZE: 500,
+        PRODUCT_MAX_BATCHES: 20,
+        SHOP_LIMIT: 500
+    };
+    
+    var sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    var SUPABASE_URL = CONFIG.SUPABASE_URL;
+    
+    var currentAdmin = null;
+    var allShops = [], allProducts = [], allCategories = [], allNotifications = [], allSections = [], allSliders = [], allAppSettings = [];
+    var allComboOffers = [];
+    var allLocations = [];
+    var currentSection = 'shops';
+    var catImageFile = null, catEditId = null, catImageRemoved = false;
+    var otpTimerInterval = null, currentOtpEmail = null;
+    var deliverySettingsData = null;
+    var sessionRefreshTimer = null;
+    var autoRefreshTimer = null;
+    
+    var searchProducts = '', searchShops = '', searchCategories = '', searchSubCategories = '', searchOffers = '';
+    
+    var editProductExistingImages = [];
+    var editProductNewBlobs = [];
+    var editProductRemovedImages = [];
+    
+    var SEARCH_SYNONYMS = {
+        'oil': ['tel', 'thail'], 'tel': ['oil', 'thail'],
+        'shirt': ['tshirt', 'top', 'kameez'], 'tshirt': ['shirt', 'top'],
+        'sugar': ['cheeni', 'shakkar', 'chini'], 'cheeni': ['sugar', 'shakkar'],
+        'shakkar': ['sugar', 'cheeni'], 'chini': ['sugar', 'cheeni'],
+        'dal': ['daal', 'lentil'], 'daal': ['dal'],
+        'rice': ['chawal'], 'chawal': ['rice'],
+        'milk': ['doodh'], 'doodh': ['milk'],
+        'aata': ['atta', 'flour'], 'atta': ['aata', 'flour'], 'flour': ['aata', 'atta'],
+        'soap': ['sabun'], 'sabun': ['soap'],
+        'detergent': ['surf', 'surd'], 'surf': ['detergent', 'surd'],
+        'biscuit': ['biskut'], 'biskut': ['biscuit'],
+        'tea': ['chai', 'patti'], 'chai': ['tea', 'patti'],
+        'salt': ['namak'], 'namak': ['salt'],
+        'black': ['kala', 'kaala'], 'kala': ['black'],
+        'red': ['lal', 'laal'], 'lal': ['red'],
+        'white': ['safed'], 'safed': ['white'],
+        'blue': ['neela', 'neeli'], 'neela': ['blue'],
+        'green': ['hara', 'hari'], 'hara': ['green']
+    };
+    
+    function $(id) { return document.getElementById(id); }
+    function esc(s) { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function safeText(id, t) { var el = $(id); if(el) el.textContent = t; }
+    
+    function showApp() { 
+        var l = $('simpleLoader'); 
+        if(l) { l.classList.add('fade-out'); setTimeout(function() { if(l.parentNode) l.parentNode.removeChild(l); }, 200); } 
+    }
+    
+    function getImageUrl(url, width) {
+        if(!url || typeof url !== 'string') return '';
+        var fullUrl;
+        if(url.indexOf('http') === 0 || url.indexOf('data:') === 0) fullUrl = url;
+        else fullUrl = SUPABASE_URL + '/storage/v1/object/public/' + url;
+        if(fullUrl.indexOf('res.cloudinary.com') === 0) return fullUrl;
+        if(!CONFIG.CLOUDINARY_ENABLED) return fullUrl;
+        return 'https://res.cloudinary.com/' + CONFIG.CLOUDINARY_CLOUD_NAME + '/image/fetch/w_' + (width || 150) + ',q_auto,f_auto/' + fullUrl;
+    }
+    
+    async function safeFetch(fn, r) { 
+        r = r || 2; 
+        for(var i = 0; i < r; i++) { 
+            try { 
+                var res = await fn(); 
+                if(res && res.error) throw new Error(res.error.message); 
+                return res || {data: null}; 
+            } catch(e) { 
+                if(i === r-1) throw e; 
+                await new Promise(function(x) { setTimeout(x, 300*(i+1)); }); 
+            } 
+        } 
+    }
+    
+    function getCatName(catId) { var c = allCategories.find(function(x) { return x.id === catId; }); return c ? c.name : (catId || ''); }
+    function getShopName(shopId) { var s = allShops.find(function(x) { return x.id === shopId; }); return s ? (s.name || s.shop_name) : (shopId || ''); }
+    function getAppSetting(key, defaultValue) { var setting = allAppSettings.find(function(s) { return s.key === key; }); return setting ? setting.value : defaultValue; }
+    
+    // ✅ FIX: GLOBAL CACHE BUSTER
+    function bustGlobalCache() {
+        var ts = Date.now().toString();
+        try { 
+            localStorage.setItem('zymart_cat_version', ts);
+            localStorage.setItem('zymart_settings_version', ts);
+            localStorage.setItem('zymart_product_version', ts); 
+            localStorage.setItem('zymart_slider_version', ts);
+        } catch(e) {}
+    }
+    
+    function toast(msg, type) { 
+        type = type || 'success'; 
+        var c = $('toastContainer'); if(!c) return; 
+        var el = document.createElement('div'); 
+        el.className = 'toast ' + type; 
+        el.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i> ' + msg; 
+        c.appendChild(el); 
+        setTimeout(function() { el.style.opacity = '0'; setTimeout(function() { el.remove(); }, 250); }, 3000); 
+    }
+    
+    function expandSearchTerms(query) {
+        var terms = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        var expanded = {};
+        terms.forEach(function(t) {
+            expanded[t] = true;
+            if (SEARCH_SYNONYMS[t]) SEARCH_SYNONYMS[t].forEach(function(s) { expanded[s] = true; });
+            Object.keys(SEARCH_SYNONYMS).forEach(function(k) {
+                if (SEARCH_SYNONYMS[k].indexOf(t) !== -1) {
+                    expanded[k] = true;
+                    SEARCH_SYNONYMS[k].forEach(function(s) { expanded[s] = true; });
+                }
+            });
+        });
+        return Object.keys(expanded);
+    }
+    
+    function fuzzyFilterProducts(query) {
+        if (!query || !query.trim()) return allProducts;
+        var expanded = expandSearchTerms(query);
+        var originalTerms = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        
+        var scored = allProducts.map(function(p) {
+            var name = (p.name || '').toLowerCase();
+            var shop = (getShopName(p.shop_id) || '').toLowerCase();
+            var cat = (getCatName(p.category_id) || '').toLowerCase();
+            var combined = name + ' ' + shop + ' ' + cat;
+            
+            var score = 0;
+            originalTerms.forEach(function(t) {
+                if (name.indexOf(t) !== -1) { score += 40; }
+                else if (combined.indexOf(t) !== -1) { score += 15; }
+            });
+            expanded.forEach(function(t) {
+                if (originalTerms.indexOf(t) !== -1) return;
+                if (name.indexOf(t) === 0) score += 20;
+                else if (name.indexOf(t) !== -1) score += 10;
+                else if (combined.indexOf(t) !== -1) score += 4;
+            });
+            return { product: p, score: score };
+        });
+        
+        return scored.filter(function(s) { return s.score > 0; })
+                     .sort(function(a, b) { return b.score - a.score; })
+                     .map(function(s) { return s.product; });
+    }
+    
+    window.fastNavigate = function(url) { window.location.href = url; };
+    window.switchToDashboard = function() { window.location.href = 'admin-dashboard.html'; };
+    
+    function renderSearchBar(id, placeholder, value, filterFn) {
+        return '<div class="search-bar">' +
+            '<i class="fas fa-search"></i>' +
+            '<input type="text" id="' + id + '" placeholder="' + placeholder + '" value="' + esc(value) + '" oninput="' + filterFn + '(this.value)">' +
+            '</div>';
+    }
+    
+    window.filterShops = function(q) { searchShops = (q || '').toLowerCase().trim(); renderShops($('contentArea')); };
+    window.filterProducts = function(q) { searchProducts = (q || '').toLowerCase().trim(); renderProducts($('contentArea')); };
+    window.filterCategories = function(q) { searchCategories = (q || '').toLowerCase().trim(); renderCategories($('contentArea')); };
+    window.filterSubCategories = function(q) { searchSubCategories = (q || '').toLowerCase().trim(); renderSubCategories($('contentArea')); };
+    window.filterOffers = function(q) { searchOffers = (q || '').toLowerCase().trim(); renderOffers($('contentArea')); };
+    
+    function startSessionRefresh() {
+        if(sessionRefreshTimer) clearInterval(sessionRefreshTimer);
+        sessionRefreshTimer = setInterval(async function() {
+            try {
+                var res = await sb.auth.getSession();
+                if(!res || !res.data || !res.data.session) {
+                    toast('Session expired', 'error');
+                    setTimeout(function() { window.location.href = 'index.html'; }, 1500);
+                }
+            } catch(e) {}
+        }, 5 * 60 * 1000);
+    }
+    
+    function startAutoRefresh() {
+        if(autoRefreshTimer) clearInterval(autoRefreshTimer);
+        autoRefreshTimer = setInterval(async function() {
+            if(!currentAdmin) return;
+            var activeElement = document.activeElement;
+            var isTyping = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'SELECT');
+            var modalOpen = document.getElementById('modalContainer');
+            if (isTyping || modalOpen) return;
+            await loadData();
+            refreshCurrentContent();
+        }, 300000);
+    }
+    
+    async function fetchAllProductsBatched() {
+        var all = [];
+        var batchSize = CONFIG.PRODUCT_BATCH_SIZE;
+        var PRODUCT_SELECT = 'id, name, price, offer_price, image_url, images, stock, category_id, shop_id, is_featured, is_offer, offer_tag, delete_requested, is_on_hold, weight, weight_unit, unit, variants, colors, created_at';
+        
+        for (var b = 0; b < CONFIG.PRODUCT_MAX_BATCHES; b++) {
+            var from = b * batchSize;
+            var to = from + batchSize - 1;
+            try {
+                var r = await sb.from('products').select(PRODUCT_SELECT).order('created_at', { ascending: false }).range(from, to);
+                if (r.error) { console.warn('[Products batch ' + b + ']', r.error.message); break; }
+                var batch = r.data || [];
+                all = all.concat(batch);
+                if (batch.length < batchSize) break;
+            } catch(e) { break; }
+        }
+        return all;
+    }
+    
+    async function loadData() {
+        var results = await Promise.allSettled([
+            safeFetch(function() { return sb.from('shops').select('*').limit(CONFIG.SHOP_LIMIT); }),
+            fetchAllProductsBatched().then(function(arr) { return { data: arr }; }),
+            safeFetch(function() { return sb.from('categories').select('*').order('display_order'); }),
+            safeFetch(function() { return sb.from('notifications').select('*').order('created_at', {ascending: false}).limit(20); }),
+            safeFetch(function() { return sb.from('delivery_settings').select('*').order('updated_at', {ascending: false}).limit(1).maybeSingle(); }),
+            safeFetch(function() { return sb.from('sections').select('*').order('display_order'); }),
+            safeFetch(function() { return sb.from('sliders').select('*').order('display_order'); }),
+            safeFetch(function() { return sb.from('app_settings').select('*'); }),
+            safeFetch(function() { return sb.from('service_areas').select('*').order('district').order('taluka'); }) 
+        ]);
+        allShops = results[0].status === 'fulfilled' ? (results[0].value.data || []) : [];
+        allProducts = results[1].status === 'fulfilled' ? (results[1].value.data || []) : [];
+        allCategories = results[2].status === 'fulfilled' ? (results[2].value.data || []) : [];
+        allNotifications = results[3].status === 'fulfilled' ? (results[3].value.data || []) : [];
+        deliverySettingsData = results[4].status === 'fulfilled' ? results[4].value.data : null;
+        allSections = results[5].status === 'fulfilled' ? (results[5].value.data || []) : [];
+        allSliders = results[6].status === 'fulfilled' ? (results[6].value.data || []) : [];
+        allAppSettings = results[7].status === 'fulfilled' ? (results[7].value.data || []) : [];
+        allLocations = results[8].status === 'fulfilled' ? (results[8].value.data || []) : []; 
+    }
+    
+    function refreshCurrentContent() {
+        var content = $('contentArea');
+        if (!content) return;
+        if(currentSection === 'shops') renderShops(content);
+        else if(currentSection === 'sections') renderSections(content);
+        else if(currentSection === 'categories') renderCategories(content);
+        else if(currentSection === 'subcategories') renderSubCategories(content);
+        else if(currentSection === 'products') renderProducts(content);
+        else if(currentSection === 'offers') renderOffers(content);
+        else if(currentSection === 'comboOffers') renderComboOffers(content);
+        else if(currentSection === 'sliders') renderSliders(content);
+        else if(currentSection === 'notifications') renderNotifications(content);
+        else if(currentSection === 'deliverySettings') renderDeliverySettings(content);
+        else if(currentSection === 'locations') renderLocations(content); 
+    }
+    
+    window.manualRefresh = async function() {
+        var btn = document.getElementById('manualRefreshBtn');
+        if (btn) btn.classList.add('spinning');
+        try {
+            await loadData();
+            refreshCurrentContent();
+            toast('✅ Updated!');
+        } catch(e) { toast('❌ Refresh failed', 'error'); }
+        if (btn) setTimeout(function() { btn.classList.remove('spinning'); }, 500);
+    };
+    
+    async function compressImage(file) {
+        if (!file || !file.type.match(/image\//)) return file;
+        var TARGET_MIN = CONFIG.IMG_MIN_KB * 1024;
+        var TARGET_MAX = CONFIG.IMG_MAX_KB * 1024;
+        if (file.size >= TARGET_MIN && file.size <= TARGET_MAX) return file;
+        if (file.size < TARGET_MIN) return file;
+        
+        return new Promise(function(resolve) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var maxDim = 1600;
+                    var w = img.width, h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        var ratio = Math.min(maxDim/w, maxDim/h);
+                        w = Math.round(w * ratio); h = Math.round(h * ratio);
+                    }
+                    var canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    var ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, w, h);
+                    var qualities = [0.92, 0.90, 0.88, 0.85, 0.82, 0.80, 0.78, 0.75, 0.72, 0.70, 0.68, 0.65, 0.62, 0.60, 0.58, 0.55, 0.52, 0.50];
+                    var idx = 0; var bestBlob = null;
+                    function tryQuality() {
+                        if (idx >= qualities.length) {
+                            if (w > 400 && h > 400) {
+                                var newW = Math.round(w * 0.8); var newH = Math.round(h * 0.8);
+                                var nc = document.createElement('canvas'); nc.width = newW; nc.height = newH;
+                                var nctx = nc.getContext('2d'); nctx.imageSmoothingEnabled = true; nctx.imageSmoothingQuality = 'high';
+                                nctx.drawImage(canvas, 0, 0, newW, newH);
+                                canvas = nc; w = newW; h = newH; idx = 0; tryQuality(); return;
+                            }
+                            resolve(bestBlob ? new File([bestBlob], 'img.jpg', {type:'image/jpeg'}) : file);
+                            return;
+                        }
+                        var q = qualities[idx++];
+                        canvas.toBlob(function(blob) {
+                            if (!blob) { tryQuality(); return; }
+                            if (blob.size >= TARGET_MIN && blob.size <= TARGET_MAX) { resolve(new File([blob], 'img.jpg', {type:'image/jpeg'})); return; }
+                            if (blob.size < TARGET_MIN) { resolve(new File([blob], 'img.jpg', {type:'image/jpeg'})); return; }
+                            bestBlob = blob; tryQuality();
+                        }, 'image/jpeg', q);
+                    }
+                    tryQuality();
+                };
+                img.onerror = function() { resolve(file); };
+                img.src = e.target.result;
+            };
+            reader.onerror = function() { resolve(file); };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    async function uploadCompressedImage(file, bucket, folder) {
+        if(!file) return null;
+        var compressed = await compressImage(file);
+        var fn = folder + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6) + '.jpg';
+        var r = await sb.storage.from(bucket).upload(fn, compressed, {cacheControl:'3600', upsert:true, contentType:'image/jpeg'});
+        if(r.error) { toast('❌ Upload failed', 'error'); return null; }
+        return sb.storage.from(bucket).getPublicUrl(fn).data.publicUrl;
+    }
+    
+    function showLogin() {
+        $('app').innerHTML = '<div class="login-container"><div class="login-card">' +
+            '<div class="login-logo"><span class="login-zy">Zy</span><span class="login-mart">Mart</span></div>' +
+            '<div class="login-subtitle">🔧 Admin Panel</div>' +
+            '<div class="login-error" id="loginError"></div>' +
+            '<div id="loginStepEmail">' +
+            '<input type="email" id="adminEmail" class="login-input" placeholder="Admin Email">' +
+            '<button class="login-btn" onclick="sendAdminOTP()"><i class="fas fa-paper-plane"></i> Send OTP</button></div>' +
+            '<div id="loginStepOTP" style="display:none;">' +
+            '<p style="font-size:13px;margin-bottom:8px;color:var(--neutral-gray);">OTP sent to: <strong id="otpEmailDisplay"></strong></p>' +
+            '<input type="text" id="adminOtp" class="login-input" placeholder="Enter 6-digit OTP" maxlength="6">' +
+            '<button class="login-btn" onclick="verifyAdminOTP()"><i class="fas fa-check-circle"></i> Verify & Login</button>' +
+            '<button class="login-btn" id="resendAdminBtn" onclick="resendAdminOTP()" style="background:transparent;border:1.5px solid var(--neutral-border);color:var(--neutral-dark);">📩 Resend OTP</button>' +
+            '<button class="login-back" onclick="backToAdminEmail()">← Back</button></div>' +
+            '<button class="login-back" style="margin-top:16px;" onclick="fastNavigate(\'index.html\')">← Go to Home</button>' +
+            '</div></div>';
+    }
+    
+    window.sendAdminOTP = async function() {
+        var email = $('adminEmail').value.trim();
+        var errEl = $('loginError');
+        if(!email) { errEl.style.display = 'block'; errEl.textContent = '⚠️ Enter email'; return; }
+        errEl.style.display = 'none';
+        var btn = document.querySelector('#loginStepEmail .login-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        try {
+            var res = await sb.auth.signInWithOtp({email: email, options: {shouldCreateUser: false}});
+            if(res && res.error) { errEl.style.display = 'block'; errEl.textContent = '❌ ' + res.error.message; btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; return; }
+            currentOtpEmail = email;
+            safeText('otpEmailDisplay', email);
+            $('loginStepEmail').style.display = 'none';
+            $('loginStepOTP').style.display = 'block';
+            startOtpTimer();
+            toast('📩 OTP sent!');
+        } catch(e) { errEl.style.display = 'block'; errEl.textContent = '❌ Failed'; btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; }
+    };
+    
+    window.verifyAdminOTP = async function() {
+        var otp = $('adminOtp').value.trim();
+        var errEl = $('loginError');
+        if(!otp || otp.length < 4) { errEl.style.display = 'block'; errEl.textContent = '⚠️ Enter OTP'; return; }
+        errEl.style.display = 'none';
+        var btn = document.querySelector('#loginStepOTP .login-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+        try {
+            var res = await sb.auth.verifyOtp({email: currentOtpEmail, token: otp, type: 'email'});
+            if(res && res.error) { errEl.style.display = 'block'; errEl.textContent = '❌ Invalid OTP'; btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify'; return; }
+            if (currentOtpEmail === 'sk12shaikh@gmail.com') {
+                currentAdmin = res.data.user;
+                toast('✅ Login!');
+                await loadData();
+                renderApp();
+                return;
+            }
+            var prof = await safeFetch(function() { return sb.from('users').select('role').eq('email', currentOtpEmail).maybeSingle(); });
+            var role = prof.data ? prof.data.role : null;
+            if(role != 1 && role !== '1' && role !== 'admin' && role !== 'Admin') { 
+                await sb.auth.signOut(); 
+                errEl.style.display = 'block'; 
+                errEl.textContent = '🚫 Access denied'; 
+                btn.disabled = false; 
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify'; 
+                return; 
+            }
+            currentAdmin = res.data.user;
+            toast('✅ Login!');
+            await loadData();
+            renderApp();
+        } catch(e) { errEl.style.display = 'block'; errEl.textContent = '❌ Error'; btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify'; }
+    };
+    
+    window.resendAdminOTP = async function() { if(!currentOtpEmail) return; try { await sb.auth.signInWithOtp({email: currentOtpEmail, options: {shouldCreateUser: false}}); startOtpTimer(); toast('📩 New OTP sent!'); } catch(e) { toast('❌ Failed', 'error'); } };
+    function startOtpTimer() { var s = 60, b = $('resendAdminBtn'); if(!b) return; if(otpTimerInterval) clearInterval(otpTimerInterval); b.disabled = true; b.textContent = '⏳ Resend (' + s + 's)'; otpTimerInterval = setInterval(function() { s--; b.textContent = '⏳ Resend (' + s + 's)'; if(s <= 0) { clearInterval(otpTimerInterval); b.disabled = false; b.textContent = '📩 Resend OTP'; } }, 1000); }
+    window.backToAdminEmail = function() { if(otpTimerInterval) clearInterval(otpTimerInterval); $('loginStepOTP').style.display = 'none'; $('loginStepEmail').style.display = 'block'; };
+    
+    function renderApp() {
+        var ps = allShops.filter(function(s) { return s.status === 'pending'; }).length;
+        var pd = allProducts.filter(function(p) { return p.delete_requested === true; }).length;
+        
+        $('app').innerHTML = 
+            '<button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>' +
+            '<div class="sidebar" id="sidebar">' +
+            '<div class="sidebar-header"><div class="sidebar-logo"><span class="sidebar-zy">Zy</span><span class="sidebar-mart">Mart</span></div><div class="sidebar-version">🔧 Panel v1.5</div></div>' +
+            '<button class="switch-dashboard-btn" onclick="switchToDashboard()"><i class="fas fa-chart-pie"></i> Open Dashboard</button>' +
+            '<div class="sidebar-menu">' +
+            '<button class="menu-item active" onclick="loadSection(\'shops\')"><i class="fas fa-store"></i> Shops <span class="menu-badge">' + ps + '</span></button>' +
+            '<button class="menu-item" onclick="loadSection(\'sections\')"><i class="fas fa-layer-group"></i> Sections</button>' +
+            '<button class="menu-item" onclick="loadSection(\'categories\')"><i class="fas fa-tags"></i> Categories</button>' +
+            '<button class="menu-item" onclick="loadSection(\'subcategories\')"><i class="fas fa-folder-open"></i> Sub-Categories</button>' +
+            '<button class="menu-item" onclick="loadSection(\'products\')"><i class="fas fa-box"></i> Products <span class="menu-badge">' + pd + '</span></button>' +
+            '<button class="menu-item" onclick="loadSection(\'offers\')"><i class="fas fa-gift"></i> Offer Products</button>' +
+            '<button class="menu-item" onclick="loadSection(\'comboOffers\')"><i class="fas fa-box-open"></i> Combo Offers</button>' +
+            '<button class="menu-item" onclick="loadSection(\'sliders\')"><i class="fas fa-images"></i> Sliders</button>' +
+            '<button class="menu-item" onclick="loadSection(\'notifications\')"><i class="fas fa-bell"></i> Notifications</button>' +
+            '<button class="menu-item" onclick="loadSection(\'locations\')"><i class="fas fa-map-marked-alt"></i> Manage Locations</button>' +
+            '<button class="menu-item" onclick="loadSection(\'deliverySettings\')"><i class="fas fa-clock"></i> Settings</button>' +
+            '<div class="menu-divider"></div>' +
+            '<button class="menu-item" onclick="fastNavigate(\'index.html\')"><i class="fas fa-external-link-alt"></i> View Site</button>' +
+            '<button class="menu-item" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>' +
+            '</div></div>' +
+            '<div class="main-content" id="mainContent">' +
+            '<div class="admin-header"><h1 class="page-title" id="pageTitle">🏪 Shops</h1>' +
+            '<div class="admin-info"><button class="refresh-btn" id="manualRefreshBtn" onclick="manualRefresh()"><i class="fas fa-sync-alt"></i></button><div class="admin-avatar">' + (currentAdmin.email || 'A').charAt(0).toUpperCase() + '</div><span>' + esc(currentAdmin.email) + '</span></div></div>' +
+            '<div id="contentArea"></div></div>';
+        
+        loadSection('shops');
+        startSessionRefresh();
+        startAutoRefresh();
+    }
+    
+    function toggleSidebar() { $('sidebar').classList.toggle('open'); }
+    
+    function loadSection(section) {
+        currentSection = section;
+        var items = document.querySelectorAll('.menu-item');
+        for(var i = 0; i < items.length; i++) items[i].classList.remove('active');
+        var titles = {
+            shops: '🏪 Shops', sections: '📑 Sections', categories: '🏷️ Categories',
+            subcategories: '📂 Sub-Categories', products: '📦 Products',
+            offers: '🎁 Offer Products', comboOffers: '📦 Combo Offers',
+            sliders: '🖼️ Sliders', notifications: '🔔 Notifications', 
+            locations: '📍 Service Locations',
+            deliverySettings: '⚙️ Settings'
+        };
+        safeText('pageTitle', titles[section] || section);
+        $('sidebar').classList.remove('open');
+        refreshCurrentContent();
+    }
+    
+    function renderShops(c) {
+        var filtered = allShops;
+        if (searchShops) {
+            var expandedShops = expandSearchTerms(searchShops);
+            filtered = allShops.filter(function(s) {
+                var combined = ((s.name || s.shop_name || '') + ' ' + (s.owner_name || '') + ' ' + (s.owner_phone || s.phone || '') + ' ' + (s.city || '')).toLowerCase();
+                return expandedShops.some(function(t) { return combined.indexOf(t) !== -1; });
+            });
+        }
+        
+        var html = '';
+        for(var i = 0; i < filtered.length; i++) {
+            var s = filtered[i];
+            var statusBadge = s.status === 'approved' ? 'badge-success' : s.status === 'rejected' ? 'badge-danger' : 'badge-warning';
+            var img = getImageUrl(s.image_url || s.shop_image, 150);
+            var planBadge = '';
+            if (s.is_permanent) planBadge = '<span class="badge badge-purple">♾️ Permanent</span>';
+            else if (s.plan_type) planBadge = '<span class="badge badge-info">📋 ' + (s.plan_type === '1m' ? '1M' : s.plan_type === '6m' ? '6M' : '12M') + '</span>';
+            
+            html += '<div class="card-item" style="cursor:default;">';
+            html += '<div class="card-item-img">' + (img ? '<img src="' + img + '" loading="lazy" decoding="async">' : '<i class="fas fa-store"></i>') + '</div>';
+            html += '<div class="card-item-body">';
+            html += '<div class="card-item-title">' + esc(s.name || s.shop_name) + '</div>';
+            html += '<div class="card-item-subtitle">👤 ' + esc(s.owner_name || 'N/A') + '<br>📱 ' + esc(s.owner_phone || 'N/A') + '</div>';
+            html += '<div style="margin:6px 0;display:flex;gap:4px;flex-wrap:wrap;"><span class="badge ' + statusBadge + '">' + s.status + '</span> ' + planBadge + ' ' + (s.is_open ? '<span class="badge badge-success">Open</span>' : '<span class="badge badge-danger">Closed</span>') + '</div>';
+            html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+            html += '<button class="btn btn-warning btn-sm" onclick="showShopEditModal(\'' + s.id + '\')">✏️ Edit</button>';
+            html += '<button class="btn btn-outline btn-sm" onclick="showShopDetails(\'' + s.id + '\')">👁️</button>';
+            if(s.status === 'pending') {
+                html += '<button class="btn btn-success btn-sm" onclick="approveShop(\'' + s.id + '\')" style="background:#22C55E;">✅ Approve</button>';
+                html += '<button class="btn btn-danger btn-sm" onclick="rejectShop(\'' + s.id + '\')">❌ Reject</button>';
+            }
+            html += '<button class="btn btn-danger btn-sm" onclick="deleteShop(\'' + s.id + '\')">🗑️</button>';
+            html += '</div></div></div>';
+        }
+        
+        c.innerHTML = '<div class="content-card"><div class="card-header"><h2>🏪 Shops (' + filtered.length + (searchShops ? ' of ' + allShops.length : '') + ')</h2></div>' +
+            '<div style="padding:0 12px;">' + renderSearchBar('searchShopsInput', 'Search by shop name, owner, phone, city...', searchShops, 'filterShops') + '</div>' +
+            '<div class="card-grid">' + (html || '<div class="empty-state"><i class="fas fa-store"></i><p>No shops found</p></div>') + '</div></div>';
+    }
+    
+    window.showShopDetails = function(id) {
+        var s = allShops.find(function(x) { return x.id === id; });
+        if(!s) return;
+        var img = getImageUrl(s.image_url || s.shop_image, 200);
+        var qr = getImageUrl(s.qr_code_url, 200);
+        var idImg = getImageUrl(s.id_image_url, 200);
+        
+        var html = '<div class="modal-header"><h3>🏪 Shop Details</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+        html += '<div style="text-align:center;margin-bottom:14px;">';
+        html += img ? '<img src="' + img + '" style="width:100px;height:100px;object-fit:cover;border-radius:12px;" loading="lazy">' : '<i class="fas fa-store" style="font-size:48px;color:#0B5A31;"></i>';
+        html += '<h3 style="margin-top:8px;">' + esc(s.name || s.shop_name) + '</h3></div>';
+        html += '<div class="form-group"><label class="form-label">👤 Owner</label><div style="font-size:13px;">' + esc(s.owner_name || 'N/A') + '</div></div>';
+        html += '<div class="form-group"><label class="form-label">📱 Phone</label><div style="font-size:13px;">+91 ' + esc(s.owner_phone || s.phone || 'N/A') + '</div></div>';
+        html += '<div class="form-group"><label class="form-label">📧 Email</label><div style="font-size:13px;">' + esc(s.owner_email || 'N/A') + '</div></div>';
+        html += '<div class="form-group"><label class="form-label">📍 Address</label><div style="font-size:13px;">' + esc([s.address, s.city, s.pincode].filter(Boolean).join(', ')) + '</div></div>';
+        if(qr) html += '<div class="form-group"><label class="form-label">📱 QR Code</label><img src="' + qr + '" style="max-width:120px;border-radius:8px;" loading="lazy"></div>';
+        if(idImg) html += '<div class="form-group"><label class="form-label">🪪 ID Proof</label><img src="' + idImg + '" style="max-width:120px;border-radius:8px;" loading="lazy"></div>';
+        showModal(html);
+    };
+    
+    window.showShopEditModal = function(id) {
+        var s = allShops.find(function(x) { return x.id === id; });
+        if(!s) return;
+        var html = '<div class="modal-header"><h3>✏️ Edit Shop</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+        html += '<div class="form-group"><label class="form-label">Shop Name</label><input type="text" id="editShopName" class="form-control" value="' + esc(s.name || s.shop_name) + '"></div>';
+        html += '<div class="form-group"><label class="form-label">Owner Name</label><input type="text" id="editShopOwner" class="form-control" value="' + esc(s.owner_name || '') + '"></div>';
+        html += '<div class="form-row"><div class="form-half"><label class="form-label">Phone</label><input type="text" id="editShopPhone" class="form-control" value="' + esc(s.owner_phone || s.phone || '') + '"></div>';
+        html += '<div class="form-half"><label class="form-label">WhatsApp</label><input type="text" id="editShopWhatsapp" class="form-control" value="' + esc(s.owner_whatsapp || s.whatsapp || '') + '"></div></div>';
+        html += '<div class="form-group"><label class="form-label">Address</label><textarea id="editShopAddress" class="form-control" rows="2">' + esc(s.address || '') + '</textarea></div>';
+        html += '<div class="form-row"><div class="form-half"><label class="form-label">City</label><input type="text" id="editShopCity" class="form-control" value="' + esc(s.city || '') + '"></div>';
+        html += '<div class="form-half"><label class="form-label">Pincode</label><input type="text" id="editShopPincode" class="form-control" value="' + esc(s.pincode || '') + '"></div></div>';
+        
+        html += '<div class="form-group"><label class="form-label">📏 Delivery Radius (KM)</label><input type="number" id="editShopRadius" class="form-control" value="' + (s.delivery_radius_km || 5) + '"></div>';
+        
+        html += '<div class="form-group"><label class="form-label">Status</label><select id="editShopStatus" class="form-control">' +
+            '<option value="pending"' + (s.status === 'pending' ? ' selected' : '') + '>Pending</option>' +
+            '<option value="approved"' + (s.status === 'approved' ? ' selected' : '') + '>Approved</option>' +
+            '<option value="rejected"' + (s.status === 'rejected' ? ' selected' : '') + '>Rejected</option></select></div>';
+        html += '<div class="form-group"><label class="form-label">Shop Open</label><label class="toggle-switch"><input type="checkbox" id="editShopOpen" ' + (s.is_open ? 'checked' : '') + '><span class="toggle-slider"></span></label></div>';
+        html += '<button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveShopEdit(\'' + s.id + '\')">💾 Save Changes</button>';
+        showModal(html);
+    };
+    
+    window.saveShopEdit = async function(id) {
+        var btn = document.querySelector('.modal-container button[onclick^="saveShopEdit"]');
+        if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+        
+        var data = {
+            name: $('editShopName').value.trim(), shop_name: $('editShopName').value.trim(),
+            owner_name: $('editShopOwner').value.trim(),
+            owner_phone: $('editShopPhone').value.trim(), phone: $('editShopPhone').value.trim(),
+            owner_whatsapp: $('editShopWhatsapp').value.trim(), whatsapp: $('editShopWhatsapp').value.trim(),
+            address: $('editShopAddress').value.trim(), city: $('editShopCity').value.trim(), pincode: $('editShopPincode').value.trim(),
+            delivery_radius_km: parseInt($('editShopRadius').value) || 5,
+            status: $('editShopStatus').value, is_open: $('editShopOpen').checked
+        };
+        try {
+            var updateRes = await sb.from('shops').update(data).eq('id', id).select();
+            if (updateRes.error) throw new Error(updateRes.error.message);
+            if (!updateRes.data || updateRes.data.length === 0) throw new Error('Update failed — RLS');
+            
+            bustGlobalCache(); // ✅ Cache clear for shop data
+            
+            toast('✅ Shop updated!');
+            closeModal();
+            await loadData();
+            renderShops($('contentArea'));
+        } catch(e) { 
+            toast('❌ ' + e.message, 'error'); 
+            if(btn){btn.disabled=false;btn.innerHTML='💾 Save Changes';}
+        }
+    };
+    
+    window.approveShop = async function(id) {
+        var shop = allShops.find(function(s) { return s.id === id; });
+        if(!shop) { toast('❌ Shop not found', 'error'); return; }
+        try {
+            var userId = null;
+            if (shop.owner_email) {
+                var eu = await sb.from('users').select('id').eq('email', shop.owner_email).maybeSingle();
+                if (eu.data) userId = eu.data.id;
+            }
+            if (!userId && shop.owner_phone) {
+                var ep = await sb.from('users').select('id').eq('phone', shop.owner_phone).maybeSingle();
+                if (ep.data) userId = ep.data.id;
+            }
+            if (!userId && (shop.owner_email || shop.owner_phone)) {
+                try {
+                    var nu = await sb.from('users').insert([{email: shop.owner_email || (shop.owner_phone + '@zymart.user'), name: shop.owner_name || 'Shop Owner', phone: shop.owner_phone || null, role: 'shop_owner', is_active: true}]).select('id').single();
+                    if (nu.data) userId = nu.data.id;
+                } catch(e) { console.warn('[Approve] User create:', e.message); }
+            } else if (userId) {
+                try { await sb.from('users').update({role: 'shop_owner'}).eq('id', userId); } catch(e) {}
+            }
+            
+            var updateData = { status: 'approved', is_open: true };
+            if (userId) updateData.owner_id = userId;
+            
+            var r = await sb.from('shops').update(updateData).eq('id', id).select();
+            if (r.error) throw new Error('Update error: ' + r.error.message);
+            if (!r.data || r.data.length === 0) throw new Error('RLS blocked update. Check shops table policy.');
+            
+            bustGlobalCache(); // ✅ Cache clear
+            
+            toast('✅ Shop approved!');
+            await loadData();
+            renderShops($('contentArea'));
+        } catch(e) {
+            console.error('[Approve]', e);
+            toast('❌ ' + e.message, 'error');
+        }
+    };
+    
+    window.rejectShop = async function(id) {
+        if (!confirm('Reject this shop? Owner will not be able to sell.')) return;
+        try {
+            var r = await sb.from('shops').update({ status: 'rejected', is_open: false }).eq('id', id).select();
+            if (r.error) throw new Error(r.error.message);
+            if (!r.data || r.data.length === 0) throw new Error('RLS blocked — check policy');
+            
+            bustGlobalCache(); // ✅ Cache clear
+            
+            toast('✅ Shop rejected');
+            await loadData();
+            renderShops($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    window.deleteShop = async function(id) { 
+        if(!confirm('Delete shop permanently?')) return; 
+        try {
+            await sb.from('shops').delete().eq('id', id); 
+            bustGlobalCache(); 
+            toast('Deleted'); 
+            await loadData(); 
+            renderShops($('contentArea')); 
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    function renderSections(c) {
+        var html = '';
+        allSections.forEach(function(section) {
+            var categoryCount = allCategories.filter(function(cat) { return cat.section === section.name; }).length;
+            html += '<div class="card-item"><div class="card-item-img"><i class="fas ' + (section.icon || 'fa-layer-group') + '"></i></div><div class="card-item-body">';
+            html += '<div class="card-item-title">' + esc(section.name) + '</div>';
+            html += '<div class="card-item-subtitle">Categories: ' + categoryCount + ' | Order: ' + section.display_order + ' | ' + (section.is_active ? '🟢 Active' : '🔴 Inactive') + '</div>';
+            html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+            html += '<button class="btn btn-warning btn-sm" onclick="showSectionModal(\'' + section.id + '\')">✏️ Edit</button>';
+            html += '<button class="btn btn-outline btn-sm" onclick="toggleSectionActive(\'' + section.id + '\',' + section.is_active + ')">' + (section.is_active ? '🔴 Disable' : '🟢 Enable') + '</button>';
+            html += '<button class="btn btn-danger btn-sm" onclick="deleteSection(\'' + section.id + '\')">🗑️</button>';
+            html += '</div></div></div>';
+        });
+        c.innerHTML = '<div class="content-card"><div class="card-header"><h2>📑 Homepage Sections (' + allSections.length + ')</h2><button class="btn btn-primary btn-sm" onclick="showSectionModal(null)">+ Add Section</button></div>' +
+        '<div class="card-grid">' + (html || '<div class="empty-state"><i class="fas fa-layer-group"></i><p>No sections</p></div>') + '</div></div>';
+    }
+    
+    window.showSectionModal = function(id) {
+        var section = id ? allSections.find(function(s) { return s.id === id; }) : null;
+        var assignedCategories = [];
+        if(section) assignedCategories = allCategories.filter(function(cat) { return cat.section === section.name; }).map(function(cat) { return cat.id; });
+        var html = '<div class="modal-header"><h3>' + (section ? '✏️ Edit Section' : '➕ Add New Section') + '</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+        html += '<div class="form-group"><label class="form-label">📑 Section Name *</label><input type="text" id="sectionName" class="form-control" value="' + esc(section ? section.name : '') + '"></div>';
+        html += '<div class="form-group"><label class="form-label">🔢 Display Order</label><input type="number" id="sectionOrder" class="form-control" value="' + (section ? section.display_order : allSections.length + 1) + '"></div>';
+        html += '<div class="form-group"><label class="form-label">🎨 Icon</label><input type="text" id="sectionIcon" class="form-control" value="' + esc(section ? (section.icon || 'fa-layer-group') : 'fa-shopping-basket') + '"></div>';
+        html += '<div class="form-group"><label class="form-label">📂 Categories</label><div class="cat-checkbox-list">';
+        allCategories.filter(function(cat) { return !cat.parent_id; }).forEach(function(cat) {
+            var checked = assignedCategories.indexOf(cat.id) > -1 ? ' checked' : '';
+            html += '<label class="cat-checkbox-label"><input type="checkbox" class="sectionCategoryCheck" value="' + cat.id + '"' + checked + '> ' + esc(cat.name) + '</label>';
+        });
+        html += '</div></div>';
+        html += '<button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveSectionWithCategories(\'' + (section ? section.id : '') + '\')">💾 Save Section</button>';
+        showModal(html);
+    };
+    
+    window.saveSectionWithCategories = async function(id) {
+        var btn = document.querySelector('.modal-container button[onclick^="saveSectionWithCategories"]');
+        if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+        
+        var name = $('sectionName').value.trim();
+        var order = parseInt($('sectionOrder').value) || 0;
+        var icon = $('sectionIcon').value.trim() || 'fa-layer-group';
+        if(!name) { toast('⚠️ Enter name', 'error'); if(btn){btn.disabled=false;btn.innerHTML='💾 Save Section';} return; }
+        var selected = [];
+        document.querySelectorAll('.sectionCategoryCheck:checked').forEach(function(cb) { selected.push(cb.value); });
+        try {
+            if(id) {
+                var old = allSections.find(function(s) { return s.id === id; });
+                await sb.from('sections').update({name: name, display_order: order, icon: icon}).eq('id', id);
+                if(old) await sb.from('categories').update({section: null}).eq('section', old.name);
+                if(selected.length) await sb.from('categories').update({section: name, is_active: true}).in('id', selected);
+                toast('✅ Updated!');
+            } else {
+                await sb.from('sections').insert([{name: name, display_order: order, icon: icon, is_active: true}]);
+                if(selected.length) await sb.from('categories').update({section: name, is_active: true}).in('id', selected);
+                toast('✅ Added!');
+            }
+            bustGlobalCache();
+            closeModal(); await loadData(); renderSections($('contentArea'));
+        } catch(e) { 
+            toast('❌ ' + e.message, 'error'); 
+            if(btn){btn.disabled=false;btn.innerHTML='💾 Save Section';}
+        }
+    };
+    
+    window.toggleSectionActive = async function(id, st) { 
+        await sb.from('sections').update({is_active: !st}).eq('id', id); 
+        bustGlobalCache();
+        toast('Done!'); 
+        await loadData(); 
+        renderSections($('contentArea')); 
+    };
+    window.deleteSection = async function(id) { 
+        var s = allSections.find(function(x) { return x.id === id; }); 
+        if(!s) return; 
+        if(!confirm('Delete section "' + s.name + '"?')) return; 
+        try {
+            await sb.from('categories').update({section: null}).eq('section', s.name); 
+            await sb.from('sections').delete().eq('id', id); 
+            bustGlobalCache();
+            toast('Deleted'); 
+            await loadData(); 
+            renderSections($('contentArea')); 
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    function renderCategories(c) {
+        var mainCats = allCategories.filter(function(cat) { return !cat.parent_id; });
+        if (searchCategories) {
+            mainCats = mainCats.filter(function(cat) { return (cat.name || '').toLowerCase().indexOf(searchCategories) !== -1; });
+        }
+        mainCats.sort(function(a, b) { return (a.display_order || 999) - (b.display_order || 999); });
+        
+        var html = '';
+        mainCats.forEach(function(cat) {
+            var img = getImageUrl(cat.image_url, 150);
+            var subCount = allCategories.filter(function(sc) { return sc.parent_id === cat.id; }).length;
+            var displayOrder = (cat.display_order !== null && cat.display_order !== undefined && cat.display_order !== 0) ? cat.display_order : '';
+            
+            html += '<div class="card-item">';
+            html += '<div class="order-num-badge">' + (displayOrder ? '#' + displayOrder : '#?') + '</div>';
+            if (cat.is_on_hold) html += '<span class="hold-badge" style="top:30px;">Hold</span>';
+            html += '<div class="card-item-img">' + (img ? '<img src="' + img + '" loading="lazy" decoding="async">' : '<i class="fas fa-folder"></i>') + '</div>';
+            html += '<div class="card-item-body"><div class="card-item-title">' + esc(cat.name) + '</div>';
+            html += '<div class="card-item-subtitle">' + esc(cat.section || 'No Section') + ' | Sub: ' + subCount + '</div>';
+            html += '<div class="order-num-inline"><label>🔢</label>';
+            html += '<input type="number" min="1" value="' + displayOrder + '" placeholder="1" onchange="setCategoryOrder(\'' + cat.id + '\',this.value,\'cat\')" style="max-width:55px;">';
+            html += '<button class="move-btn" onclick="moveCategory(\'' + cat.id + '\',\'up\',\'cat\')" title="Move up">↑</button>';
+            html += '<button class="move-btn" onclick="moveCategory(\'' + cat.id + '\',\'down\',\'cat\')" title="Move down">↓</button>';
+            html += '</div>';
+            html += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">';
+            html += '<button class="btn btn-warning btn-sm" onclick="showCategoryModal(\'' + cat.id + '\')">✏️</button>';
+            html += '<button class="btn btn-outline btn-sm" onclick="toggleCategoryHold(\'' + cat.id + '\',' + cat.is_on_hold + ')">' + (cat.is_on_hold ? 'Unhold' : 'Hold') + '</button>';
+            html += '<button class="btn btn-danger btn-sm" onclick="deleteCategory(\'' + cat.id + '\')">🗑️</button></div></div></div>';
+        });
+        
+        c.innerHTML = '<div class="content-card"><div class="card-header"><h2>📁 Main Categories (' + mainCats.length + ')</h2>' +
+        '<div style="display:flex;gap:6px;"><button class="btn btn-warning btn-sm" onclick="renumberAllCategories(\'cat\')">🔧 Fix Orders</button>' +
+        '<button class="btn btn-primary btn-sm" onclick="showCategoryModal(null,\'main\')">+ Add Category</button></div></div>' +
+        '<div style="padding:0 12px;">' + renderSearchBar('searchCatInput', 'Search categories...', searchCategories, 'filterCategories') + '</div>' +
+        '<div class="card-grid">' + (html || '<div class="empty-state"><i class="fas fa-folder"></i><p>No categories</p></div>') + '</div></div>';
+    }
+    
+    window.setCategoryOrder = async function(id, value, type) {
+        var newOrder = parseInt(value);
+        if (isNaN(newOrder) || newOrder < 1) {
+            toast('⚠️ Enter valid number (1+)', 'error');
+            await loadData();
+            if (type === 'sub') renderSubCategories($('contentArea'));
+            else renderCategories($('contentArea'));
+            return;
+        }
+        try {
+            var targetCat = allCategories.find(function(c) { return c.id === id; });
+            if (!targetCat) { toast('❌ Not found', 'error'); return; }
+            
+            var sameGroupCats = type === 'sub'
+                ? allCategories.filter(function(c) { return c.parent_id && c.parent_id === targetCat.parent_id; })
+                : allCategories.filter(function(c) { return !c.parent_id; });
+            
+            sameGroupCats.sort(function(a, b) { return (a.display_order || 999) - (b.display_order || 999); });
+            
+            var remaining = sameGroupCats.filter(function(c) { return c.id !== id; });
+            var insertIdx = Math.min(newOrder - 1, remaining.length);
+            if (insertIdx < 0) insertIdx = 0;
+            remaining.splice(insertIdx, 0, targetCat);
+            
+            var updates = [];
+            for (var i = 0; i < remaining.length; i++) {
+                var newPos = i + 1;
+                if ((remaining[i].display_order || 0) !== newPos) {
+                    updates.push(sb.from('categories').update({display_order: newPos}).eq('id', remaining[i].id).select());
+                }
+            }
+            
+            if (updates.length === 0) { toast('✅ Already at #' + newOrder); return; }
+            
+            var results = await Promise.all(updates);
+            var failed = results.filter(function(r) { return r.error || !r.data || r.data.length === 0; }).length;
+            
+            if (failed > 0) toast('⚠️ ' + failed + '/' + updates.length + ' failed. Check RLS.', 'error');
+            else toast('✅ Order #' + newOrder + ' saved');
+            
+            bustGlobalCache();
+            await loadData();
+            if (type === 'sub') renderSubCategories($('contentArea'));
+            else renderCategories($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    window.moveCategory = async function(id, direction, type) {
+        var targetCat = allCategories.find(function(c) { return c.id === id; });
+        if (!targetCat) return;
+        
+        var group = type === 'sub'
+            ? allCategories.filter(function(c) { return c.parent_id && c.parent_id === targetCat.parent_id; })
+            : allCategories.filter(function(c) { return !c.parent_id; });
+        
+        group.sort(function(a, b) { return (a.display_order || 999) - (b.display_order || 999); });
+        
+        var curIdx = -1;
+        for (var i = 0; i < group.length; i++) { if (group[i].id === id) { curIdx = i; break; } }
+        if (curIdx === -1) return;
+        
+        var newIdx = curIdx + (direction === 'up' ? -1 : 1);
+        if (newIdx < 0 || newIdx >= group.length) return;
+        
+        var swapWith = group[newIdx];
+        
+        try {
+            var results = await Promise.all([
+                sb.from('categories').update({ display_order: newIdx + 1 }).eq('id', id).select(),
+                sb.from('categories').update({ display_order: curIdx + 1 }).eq('id', swapWith.id).select()
+            ]);
+            var failed = results.some(function(r) { return r.error || !r.data || r.data.length === 0; });
+            if (failed) throw new Error('Update failed — RLS');
+            
+            toast('✅ Moved ' + direction);
+            bustGlobalCache();
+            await loadData();
+            if (type === 'sub') renderSubCategories($('contentArea'));
+            else renderCategories($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    window.renumberAllCategories = async function(type) {
+        var cats = type === 'sub' 
+            ? allCategories.filter(function(c) { return c.parent_id; })
+            : allCategories.filter(function(c) { return !c.parent_id; });
+        cats.sort(function(a, b) { return (a.display_order || 999) - (b.display_order || 999); });
+        
+        if (!confirm('Renumber all ' + cats.length + ' ' + (type === 'sub' ? 'sub-categories' : 'categories') + ' 1,2,3...?')) return;
+        
+        try {
+            var updates = [];
+            for (var i = 0; i < cats.length; i++) {
+                updates.push(sb.from('categories').update({display_order: i + 1}).eq('id', cats[i].id));
+            }
+            await Promise.all(updates);
+            toast('✅ Renumbered ' + cats.length);
+            bustGlobalCache();
+            await loadData();
+            if (type === 'sub') renderSubCategories($('contentArea'));
+            else renderCategories($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    function renderSubCategories(c) {
+        var subCats = allCategories.filter(function(cat) { return cat.parent_id; });
+        if (searchSubCategories) {
+            subCats = subCats.filter(function(cat) { 
+                var name = (cat.name || '').toLowerCase();
+                var parent = (getCatName(cat.parent_id) || '').toLowerCase();
+                return name.indexOf(searchSubCategories) !== -1 || parent.indexOf(searchSubCategories) !== -1;
+            });
+        }
+        subCats.sort(function(a, b) { return (a.display_order || 999) - (b.display_order || 999); });
+        
+        var html = '';
+        subCats.forEach(function(cat) {
+            var img = getImageUrl(cat.image_url, 150);
+            var parentName = getCatName(cat.parent_id);
+            var displayOrder = (cat.display_order !== null && cat.display_order !== undefined && cat.display_order !== 0) ? cat.display_order : '';
+            
+            html += '<div class="card-item">';
+            html += '<div class="order-num-badge">' + (displayOrder ? '#' + displayOrder : '#?') + '</div>';
+            if (cat.is_on_hold) html += '<span class="hold-badge" style="top:30px;">Hold</span>';
+            html += '<div class="card-item-img">' + (img ? '<img src="' + img + '" loading="lazy" decoding="async">' : '<i class="fas fa-folder-open"></i>') + '</div>';
+            html += '<div class="card-item-body"><div class="card-item-title">' + esc(cat.name) + '</div>';
+            html += '<div class="card-item-subtitle">Parent: ' + esc(parentName) + '</div>';
+            html += '<div class="order-num-inline"><label>🔢</label>';
+            html += '<input type="number" min="1" value="' + displayOrder + '" placeholder="1" onchange="setCategoryOrder(\'' + cat.id + '\',this.value,\'sub\')" style="max-width:55px;">';
+            html += '<button class="move-btn" onclick="moveCategory(\'' + cat.id + '\',\'up\',\'sub\')" title="Move up">↑</button>';
+            html += '<button class="move-btn" onclick="moveCategory(\'' + cat.id + '\',\'down\',\'sub\')" title="Move down">↓</button>';
+            html += '</div>';
+            html += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">';
+            html += '<button class="btn btn-warning btn-sm" onclick="showCategoryModal(\'' + cat.id + '\')">✏️</button>';
+            html += '<button class="btn btn-outline btn-sm" onclick="toggleCategoryHold(\'' + cat.id + '\',' + cat.is_on_hold + ')">' + (cat.is_on_hold ? 'Unhold' : 'Hold') + '</button>';
+            html += '<button class="btn btn-danger btn-sm" onclick="deleteCategory(\'' + cat.id + '\')">🗑️</button></div></div></div>';
+        });
+        
+        c.innerHTML = '<div class="content-card"><div class="card-header"><h2>📂 Sub-Categories (' + subCats.length + ')</h2>' +
+        '<div style="display:flex;gap:6px;"><button class="btn btn-warning btn-sm" onclick="renumberAllCategories(\'sub\')">🔧 Fix Orders</button>' +
+        '<button class="btn btn-warning btn-sm" onclick="showCategoryModal(null,\'sub\')">+ Add Sub-Category</button></div></div>' +
+        '<div style="padding:0 12px;">' + renderSearchBar('searchSubCatInput', 'Search sub-categories...', searchSubCategories, 'filterSubCategories') + '</div>' +
+        '<div class="card-grid">' + (html || '<div class="empty-state"><i class="fas fa-folder-open"></i><p>No sub-categories</p></div>') + '</div></div>';
+    }
+    
+    window.showCategoryModal = function(id, forcedType) {
+        catEditId = id || null;
+        catImageFile = null;
+        catImageRemoved = false;
+        var cat = id ? allCategories.find(function(c) { return c.id === id; }) : null;
+        var existingImg = cat && cat.image_url ? getImageUrl(cat.image_url, 100) : '';
+        
+        var isSub = cat ? (cat.parent_id ? true : false) : (forcedType === 'sub');
+        if (forcedType) isSub = (forcedType === 'sub');
+        
+        var sectionOptions = '<option value="">Select Section</option>';
+        allSections.filter(function(s) { return s.is_active; }).forEach(function(s) {
+            sectionOptions += '<option value="' + esc(s.name) + '"' + (cat && cat.section === s.name ? ' selected' : '') + '>' + esc(s.name) + '</option>';
+        });
+        
+        var parentOptions = '<option value="">None (Top Level)</option>';
+        allCategories.filter(function(c2) { return !c2.parent_id; }).forEach(function(pc) {
+            if(cat && pc.id === cat.id) return;
+            parentOptions += '<option value="' + pc.id + '"' + (cat && cat.parent_id === pc.id ? ' selected' : '') + '>' + esc(pc.name) + '</option>';
+        });
+        
+        var html = '<div class="modal-header"><h3>' + (cat ? '✏️ Edit' : '➕ Add') + ' Category</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+        
+        // ✅ FIX: Explicit Category Type Selector for better UX
+        html += '<div class="form-group"><label class="form-label">Category Type</label><select id="catTypeSelect" class="form-control" onchange="toggleCatParentField()">' +
+            '<option value="main"' + (!isSub ? ' selected' : '') + '>📁 Main Category</option>' +
+            '<option value="sub"' + (isSub ? ' selected' : '') + '>📂 Sub-Category</option>' +
+            '</select></div>';
+
+        html += '<div class="form-group"><label class="form-label">Name *</label><input type="text" id="catName" class="form-control" value="' + esc(cat ? cat.name : '') + '"></div>';
+        html += '<div class="form-group"><label class="form-label">Section *</label><select id="catSection" class="form-control">' + sectionOptions + '</select></div>';
+        
+        html += '<div class="form-group" id="catParentGroup" style="display:' + (isSub ? 'block' : 'none') + ';">' +
+            '<label class="form-label">Parent Category *</label><select id="catParent" class="form-control">' + parentOptions + '</select></div>';
+            
+        html += '<div class="form-group"><label class="form-label">🔢 Display Order</label><input type="number" id="catOrder" class="form-control" value="' + (cat ? (cat.display_order || 0) : 0) + '"></div>';
+        
+        var removeBtnHtml = existingImg ? '<button type="button" onclick="event.stopPropagation(); removeCatImage()" style="position:absolute; top:5px; right:5px; background:#EF4444; color:white; border:2px solid white; border-radius:50%; width:28px; height:28px; font-weight:bold; cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.3);">✕</button>' : '';
+        
+        html += '<div class="form-group"><label class="form-label">📸 Photo</label>';
+        html += '<div class="image-upload-box' + (existingImg ? ' has-image' : '') + '" id="catImgBox" onclick="document.getElementById(\'catImgInput\').click()" style="position:relative; overflow:hidden;">';
+        html += '<input type="file" id="catImgInput" accept="image/*" style="display:none" onchange="handleCatImage(this)">';
+        html += '<div style="font-size:12px;color:#0B5A31;font-weight:600;margin-bottom:5px;">📁 Click to Upload</div>';
+        html += '<div id="catImgPreview">' + (existingImg ? '<img src="' + existingImg + '" class="image-preview show" loading="lazy">' + removeBtnHtml : '') + '</div>';
+        html += '</div></div>';
+        
+        html += '<button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveCategory()">💾 Save</button>';
+        showModal(html);
+    };
+    
+    window.toggleCatParentField = function() {
+        var type = $('catTypeSelect').value;
+        $('catParentGroup').style.display = (type === 'sub') ? 'block' : 'none';
+    };
+    
+    window.handleCatImage = function(input) {
+        var file = input.files[0];
+        if(!file) return;
+        if(file.size > 5 * 1024 * 1024) { toast('Max 5MB', 'error'); input.value = ''; return; }
+        
+        var p = $('catImgPreview');
+        var box = $('catImgBox');
+        if(p) p.innerHTML = '<div style="padding:10px;font-size:12px;color:#0B5A31;"><i class="fas fa-spinner fa-spin"></i> Compressing...</div>';
+        
+        compressImage(file).then(function(compressed) {
+            catImageFile = compressed;
+            catImageRemoved = false;
+            var reader = new FileReader();
+            reader.onload = function(e) { 
+                if(p) p.innerHTML = '<img src="' + e.target.result + '" class="image-preview show" style="border:2px solid #22C55E; position:relative; z-index:1;">' + 
+                '<button type="button" onclick="event.stopPropagation(); removeCatImage()" style="position:absolute; top:5px; right:5px; background:#EF4444; color:white; border:2px solid white; border-radius:50%; width:28px; height:28px; font-weight:bold; cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.3);">✕</button>';
+                if(box) box.classList.add('has-image');
+            };
+            reader.readAsDataURL(compressed);
+            toast('✅ New photo selected');
+        }).catch(function(err) {
+            if(p) p.innerHTML = '';
+            toast('❌ Image processing failed', 'error');
+        });
+        
+        input.value = ''; 
+    };
+    
+    window.removeCatImage = function() {
+        catImageFile = null;
+        catImageRemoved = true;
+        var p = $('catImgPreview');
+        if(p) p.innerHTML = '';
+        var box = $('catImgBox');
+        if(box) box.classList.remove('has-image');
+        toast('🗑️ Photo removed. Click Save to apply.');
+    };
+    
+    window.saveCategory = async function() {
+        var btn = document.querySelector('.modal-container button[onclick="saveCategory()"]');
+        if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+
+        var name = $('catName').value.trim();
+        var section = $('catSection').value;
+        var type = $('catTypeSelect').value;
+        var parentId = type === 'sub' ? ($('catParent')?.value || null) : null;
+        var orderInput = parseInt($('catOrder')?.value) || 0;
+        
+        if(!name || !section) { toast('Fill fields', 'error'); if(btn){btn.disabled=false;btn.innerHTML='💾 Save';} return; }
+        if(type === 'sub' && !parentId) { toast('Select parent', 'error'); if(btn){btn.disabled=false;btn.innerHTML='💾 Save';} return; }
+        
+        var data = { name: name, section: section, parent_id: parentId, is_active: true, display_order: orderInput };
+        
+        if(catImageFile) {
+            var imageUrl = await uploadCompressedImage(catImageFile, 'category-images', 'cat_' + (catEditId || 'new'));
+            if(!imageUrl) { if(btn){btn.disabled=false;btn.innerHTML='💾 Save';} return; }
+            data.image_url = imageUrl;
+        } else if (catImageRemoved) {
+            data.image_url = null; 
+        }
+        
+        var siblings = type === 'sub'
+            ? allCategories.filter(function(c) { return c.parent_id === parentId && c.id !== catEditId; })
+            : allCategories.filter(function(c) { return !c.parent_id && c.id !== catEditId; });
+        siblings.sort(function(a, b) { return (a.display_order || 999) - (b.display_order || 999); });
+        
+        if (orderInput < 1) orderInput = siblings.length + 1;
+        if (orderInput > siblings.length + 1) orderInput = siblings.length + 1;
+        data.display_order = orderInput;
+        
+        try {
+            var savedId = catEditId;
+            if(catEditId) { 
+                var r = await sb.from('categories').update(data).eq('id', catEditId).select();
+                if(r.error) throw new Error(r.error.message);
+            }
+            else { 
+                var r2 = await sb.from('categories').insert([data]).select();
+                if(r2.error) throw new Error(r2.error.message);
+                savedId = r2.data[0].id;
+            }
+            
+            var orderedList = [];
+            var inserted = false;
+            for (var i = 0; i < siblings.length; i++) {
+                if (!inserted && (i + 1) === orderInput) {
+                    orderedList.push({ id: savedId, display_order: orderInput });
+                    inserted = true;
+                }
+                orderedList.push(siblings[i]);
+            }
+            if (!inserted) orderedList.push({ id: savedId, display_order: orderInput });
+            
+            var batchUpdates = [];
+            for (var j = 0; j < orderedList.length; j++) {
+                var newPos = j + 1;
+                var item = orderedList[j];
+                if ((item.display_order || 0) !== newPos) {
+                    batchUpdates.push(sb.from('categories').update({display_order: newPos}).eq('id', item.id).select());
+                }
+            }
+            if (batchUpdates.length > 0) {
+                var results = await Promise.all(batchUpdates);
+                var failed = results.filter(function(r) { return r.error || !r.data || r.data.length === 0; }).length;
+                if (failed > 0) toast('⚠️ ' + failed + ' order updates failed', 'error');
+            }
+            
+            bustGlobalCache();
+            
+            // ✅ FIX: Clear Feedback for Type Change
+            var oldCat = catEditId ? allCategories.find(function(x){return x.id === catEditId}) : null;
+            if(catEditId) {
+                if(oldCat && oldCat.parent_id && !parentId) toast('✅ Moved to Main Category!');
+                else if(oldCat && !oldCat.parent_id && parentId) toast('✅ Moved to Sub-Category!');
+                else toast('✅ Category Updated!');
+            } else {
+                toast('✅ Category Added!');
+            }
+            
+            closeModal(); 
+            await loadData();
+            if(type === 'sub') renderSubCategories($('contentArea'));
+            else renderCategories($('contentArea'));
+        } catch(e) { 
+            toast('❌ ' + e.message, 'error'); 
+            if(btn){btn.disabled=false;btn.innerHTML='💾 Save';}
+        }
+    };
+    
+    window.toggleCategoryHold = async function(id, hold) { 
+        try {
+            var r = await sb.from('categories').update({is_on_hold: !hold}).eq('id', id).select();
+            if(r.error) throw new Error(r.error.message);
+            toast('Done!');
+            bustGlobalCache();
+            await loadData();
+            if(currentSection === 'subcategories') renderSubCategories($('contentArea'));
+            else renderCategories($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    // ✅ FIX: Force Delete Category with moving products to null
+    window.deleteCategory = async function(id) { 
+        var cat = allCategories.find(function(c) { return c.id === id; });
+        if(!cat) { toast('Category not found', 'error'); return; }
+        
+        var subCats = allCategories.filter(function(c) { return c.parent_id === id; });
+        var catIdsToDelete = [id];
+        subCats.forEach(function(sc) { catIdsToDelete.push(sc.id); });
+        
+        var prodsInCat = allProducts.filter(function(p) { return catIdsToDelete.indexOf(p.category_id) !== -1; });
+        var shopsInCat = allShops.filter(function(s) { return catIdsToDelete.indexOf(s.category_id) !== -1; });
+        
+        var msg = 'Delete category "' + cat.name + '"?';
+        if(subCats.length > 0) msg += '\n\n⚠️ It has ' + subCats.length + ' sub-categories.';
+        if(prodsInCat.length > 0) msg += '\n\n⚠️ It has ' + prodsInCat.length + ' products. They will be moved to Uncategorized.';
+        if(shopsInCat.length > 0) msg += '\n\n⚠️ It has ' + shopsInCat.length + ' shops. They will be moved to Uncategorized.';
+        
+        if(!confirm(msg)) return;
+        
+        try {
+            // 1. Move products to null
+            if(prodsInCat.length > 0) {
+                await sb.from('products').update({ category_id: null }).in('category_id', catIdsToDelete);
+            }
+            // 2. Move shops to null
+            if(shopsInCat.length > 0) {
+                await sb.from('shops').update({ category_id: null }).in('category_id', catIdsToDelete);
+            }
+            // 3. Delete sub-categories
+            if(subCats.length > 0) { 
+                for(var i = 0; i < subCats.length; i++) {
+                    await sb.from('categories').delete().eq('id', subCats[i].id); 
+                }
+            }
+            // 4. Delete main category
+            var delRes = await sb.from('categories').delete().eq('id', id).select();
+            if(delRes.error) throw new Error(delRes.error.message);
+            
+            toast('✅ Category Deleted & Products Uncategorized');
+            bustGlobalCache();
+            await loadData();
+            if(currentSection === 'subcategories') renderSubCategories($('contentArea'));
+            else renderCategories($('contentArea'));
+        } catch(e) { 
+            toast('❌ ' + e.message, 'error'); 
+        }
+    };
+    
+    function renderProducts(c) {
+        var filtered = fuzzyFilterProducts(searchProducts);
+        var deleteRequests = filtered.filter(function(p) { return p.delete_requested === true; });
+        var featuredProducts = filtered.filter(function(p) { return p.is_featured === true && !p.delete_requested; });
+        var normalProducts = filtered.filter(function(p) { return !p.delete_requested && !p.is_featured; });
+        
+        function productCard(p) {
+            var img = getImageUrl((p.images && p.images[0]) || p.image_url, 250);
+            var shopName = getShopName(p.shop_id);
+            var actualPrice = parseFloat(p.price) || 0;
+            var offerPrice = parseFloat(p.offer_price) || null;
+            var displayPrice = offerPrice && offerPrice < actualPrice ? offerPrice : actualPrice;
+            var h = '<div class="card-item"' + (p.delete_requested ? ' style="border:2px solid #F59E0B;"' : '') + '>';
+            h += '<div class="card-item-img">' + (img ? '<img src="' + img + '" loading="lazy">' : '<i class="fas fa-box"></i>') + '</div>';
+            h += '<div class="card-item-body"><div class="card-item-title">' + esc(p.name) + '</div>';
+            h += '<div class="card-item-subtitle">₹' + displayPrice.toLocaleString('en-IN');
+            if(offerPrice && offerPrice < actualPrice) h += ' <s>₹' + actualPrice.toLocaleString('en-IN') + '</s>';
+            h += ' | ' + esc(shopName) + '</div>';
+            if(p.delete_requested) h += '<div class="delete-req-badge">⏳ Delete Requested</div>';
+            if(p.is_featured) h += '<div class="featured-badge">⭐ Featured</div>';
+            if(p.is_offer) h += '<div class="featured-badge" style="background:#FFF8EB;color:#D97706;">🎁 ' + esc(p.offer_tag || 'Offer') + '</div>';
+            h += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+            h += '<button class="btn btn-warning btn-sm" onclick="showProductEditModal(\'' + p.id + '\')">✏️ Edit</button>';
+            if(p.is_featured) h += '<button class="btn btn-outline btn-sm" onclick="toggleFeatured(\'' + p.id + '\',false)">Unfeature</button>';
+            else h += '<button class="btn btn-warning btn-sm" onclick="toggleFeatured(\'' + p.id + '\',true)">⭐</button>';
+            if(p.delete_requested) {
+                h += '<button class="btn btn-success btn-sm" onclick="approveDeleteRequest(\'' + p.id + '\')">✅</button>';
+                h += '<button class="btn btn-outline btn-sm" onclick="rejectDeleteRequest(\'' + p.id + '\')">↩️</button>';
+            }
+            h += '<button class="btn btn-danger btn-sm" onclick="deleteProduct(\'' + p.id + '\')">🗑️</button>';
+            h += '</div></div></div>';
+            return h;
+        }
+        
+        var deleteHtml = deleteRequests.map(productCard).join('');
+        var featuredHtml = featuredProducts.map(productCard).join('');
+        var normalHtml = normalProducts.map(productCard).join('');
+        var bulkBtn = deleteRequests.length > 1 ? '<button class="btn btn-success btn-lg" onclick="bulkApproveDeleteRequests()">✅ Approve ALL (' + deleteRequests.length + ')</button>' : '';
+        
+        c.innerHTML = 
+        '<div style="padding:0 12px;">' + renderSearchBar('searchProductsInput', 'Search products by name, shop, category...', searchProducts, 'filterProducts') + '</div>' +
+        '<div class="search-count" style="padding:0 12px;">Showing ' + filtered.length + ' of ' + allProducts.length + ' products</div>' +
+        (deleteRequests.length > 0 ? 
+        '<div class="content-card" style="border:2px solid #F59E0B;"><div class="card-header" style="background:#FFF8EB;"><h2>⏳ Delete Requests (' + deleteRequests.length + ')</h2>' + bulkBtn + '</div>' +
+        '<div class="card-grid">' + deleteHtml + '</div></div>' : '') +
+        '<div class="content-card"><div class="card-header"><h2>⭐ Featured (' + featuredProducts.length + ')</h2></div>' +
+        '<div class="card-grid">' + (featuredHtml || '<div class="empty-state"><i class="fas fa-star"></i><p>No featured</p></div>') + '</div></div>' +
+        '<div class="content-card"><div class="card-header"><h2>📦 All Products (' + normalProducts.length + ')</h2></div>' +
+        '<div class="card-grid">' + (normalHtml || '<div class="empty-state"><i class="fas fa-box"></i><p>No products</p></div>') + '</div></div>';
+    }
+    
+    window.showProductEditModal = async function(id) {
+        var p = allProducts.find(function(x) { return x.id === id; });
+        if(!p) { toast('Product not found — refresh', 'error'); return; }
+        
+        editProductExistingImages = [];
+        editProductNewBlobs = [];
+        editProductRemovedImages = [];
+        
+        function extractImages(prod) {
+            var result = [];
+            var rawImages = prod.images;
+            if (Array.isArray(rawImages) && rawImages.length > 0) {
+                rawImages.forEach(function(img) {
+                    if (img && typeof img === 'string' && img.length > 5) result.push(img);
+                    else if (img && typeof img === 'object' && img.url) result.push(img.url);
+                });
+            } else if (typeof rawImages === 'string' && rawImages.length > 2) {
+                try {
+                    var parsed = JSON.parse(rawImages);
+                    if (Array.isArray(parsed)) {
+                        parsed.forEach(function(img) {
+                            if (img && typeof img === 'string' && img.length > 5) result.push(img);
+                            else if (img && typeof img === 'object' && img.url) result.push(img.url);
+                        });
+                    }
+                } catch(e) {
+                    if (rawImages.indexOf('http') === 0 || rawImages.indexOf('/') === 0 || rawImages.indexOf('product-images') !== -1) result.push(rawImages);
+                }
+            }
+            if (result.length === 0 && prod.image_url && typeof prod.image_url === 'string' && prod.image_url.length > 5) {
+                result.push(prod.image_url);
+            }
+            if (Array.isArray(prod.variants)) {
+                prod.variants.forEach(function(v) {
+                    if (v && v.image_url && typeof v.image_url === 'string' && result.indexOf(v.image_url) === -1) result.push(v.image_url);
+                });
+            }
+            if (Array.isArray(prod.colors)) {
+                prod.colors.forEach(function(c) {
+                    if (c && c.image_url && typeof c.image_url === 'string' && result.indexOf(c.image_url) === -1) result.push(c.image_url);
+                });
+            }
+            return result.filter(function(v, i, arr) { return arr.indexOf(v) === i; });
+        }
+        
+        editProductExistingImages = extractImages(p);
+        
+        if (editProductExistingImages.length === 0) {
+            try {
+                var fresh = await sb.from('products').select('images, image_url, variants, colors').eq('id', id).maybeSingle();
+                if (fresh && fresh.data) editProductExistingImages = extractImages(fresh.data);
+            } catch(e) {}
+        }
+        
+        var html = '<div class="modal-header"><h3>✏️ Edit Product</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+        html += '<div class="form-group"><label class="form-label">Name</label><input type="text" id="editProdName" class="form-control" value="' + esc(p.name) + '"></div>';
+        html += '<div class="form-row"><div class="form-half"><label class="form-label">Price ₹</label><input type="number" id="editProdPrice" class="form-control" value="' + (p.price || '') + '"></div>';
+        html += '<div class="form-half"><label class="form-label">Offer Price</label><input type="number" id="editProdOffer" class="form-control" value="' + (p.offer_price || '') + '"></div></div>';
+        html += '<div class="form-row"><div class="form-half"><label class="form-label">Stock</label><input type="number" id="editProdStock" class="form-control" value="' + (p.stock || 0) + '"></div>';
+        html += '<div class="form-half"><label class="form-label">Category</label><select id="editProdCat" class="form-control">';
+        allCategories.forEach(function(cat) { html += '<option value="' + cat.id + '"' + (p.category_id === cat.id ? ' selected' : '') + '>' + esc(cat.name) + '</option>'; });
+        html += '</select></div></div>';
+        
+        html += '<div class="form-group" style="margin-top:16px;background:#F0FDF4;border:2px solid #86EFAC;border-radius:12px;padding:14px;">';
+        html += '<label class="form-label" style="color:#065F46;font-size:13px;font-weight:700;">📸 Product Photos (<span id="editProdImgCount">' + editProductExistingImages.length + '</span>)</label>';
+        html += '<div class="prod-edit-img-grid" id="editProdImgGrid"></div>';
+        html += '<input type="file" id="editProdNewImages" accept="image/*" multiple style="display:none" onchange="handleEditProdImages(this)">';
+        html += '<button type="button" style="width:100%;padding:14px;margin-top:10px;background:var(--brand-green);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;" onclick="document.getElementById(\'editProdNewImages\').click()">📸 Upload New Photos</button>';
+        html += '<div style="font-size:10px;color:#059669;text-align:center;margin-top:6px;font-weight:600;">✅ Auto-compress: 80-90 KB</div>';
+        html += '<div id="editProdNewPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"></div>';
+        html += '</div>';
+        
+        html += '<div class="form-group" style="background:#FFF8EB;padding:12px;border-radius:12px;border:2px solid #FDE68A;">';
+        html += '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;font-weight:600;">';
+        html += '<input type="checkbox" id="editProdOfferCheck" onchange="toggleEditOfferFields()" style="width:18px;height:18px;"' + (p.is_offer ? ' checked' : '') + '>';
+        html += '🎁 Offer Product</label>';
+        html += '<div id="editOfferFields" style="' + (p.is_offer ? 'display:block;' : 'display:none;') + 'margin-top:10px;">';
+        html += '<input type="text" id="editProdOfferTag" class="form-control" value="' + esc(p.offer_tag || '') + '" placeholder="e.g. Free Bucket">';
+        html += '</div></div>';
+        
+        html += '<div class="form-group"><label class="form-label">Featured</label><label class="toggle-switch"><input type="checkbox" id="editProdFeatured" ' + (p.is_featured ? 'checked' : '') + '><span class="toggle-slider"></span></label></div>';
+        html += '<div class="form-group"><label class="form-label">On Hold</label><label class="toggle-switch"><input type="checkbox" id="editProdHold" ' + (p.is_on_hold ? 'checked' : '') + '><span class="toggle-slider"></span></label></div>';
+        html += '<button class="btn btn-primary" style="width:100%;padding:14px;font-size:14px;" onclick="saveProductEdit(\'' + p.id + '\')">💾 Save Changes</button>';
+        showModal(html);
+        
+        renderEditProdImgGrid();
+    };
+    
+    function renderEditProdImgGrid() {
+        var grid = $('editProdImgGrid');
+        if(!grid) return;
+        var h = '';
+        if(editProductExistingImages.length === 0) {
+            h = '<div class="prod-edit-img-empty">📷 No photos yet — upload below</div>';
+        } else {
+            for(var i = 0; i < editProductExistingImages.length; i++) {
+                var url = editProductExistingImages[i];
+                var displayUrl = getImageUrl(url, 200);
+                h += '<div class="prod-edit-img-item">';
+                h += '<img src="' + displayUrl + '" loading="lazy" decoding="async" style="cursor:zoom-in;" onclick="viewFullImage(\'' + displayUrl.replace(/'/g, "\\'") + '\')">';
+                h += '<button type="button" class="remove-btn" onclick="event.stopPropagation();removeEditProdImage(' + i + ')" title="Remove">✕</button>';
+                h += '</div>';
+            }
+        }
+        grid.innerHTML = h;
+        var countEl = document.getElementById('editProdImgCount');
+        if (countEl) countEl.textContent = editProductExistingImages.length;
+    }
+    
+    window.viewFullImage = function(url) {
+        if (!url) return;
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;';
+        overlay.onclick = function() { overlay.remove(); };
+        overlay.innerHTML = '<img src="' + url + '" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 8px 32px rgba(255,255,255,0.2);"><div style="position:absolute;top:20px;right:20px;color:white;font-size:32px;font-weight:900;cursor:pointer;">✕</div>';
+        document.body.appendChild(overlay);
+    };
+    
+    window.removeEditProdImage = function(index) {
+        if(index < 0 || index >= editProductExistingImages.length) return;
+        editProductRemovedImages.push(editProductExistingImages.splice(index, 1)[0]);
+        renderEditProdImgGrid();
+        toast('🗑️ Photo removed');
+    };
+    
+    window.handleEditProdImages = async function(input) {
+        var files = input.files;
+        if(!files || files.length === 0) return;
+        var limitedCount = Math.min(files.length, 4);
+        var promises = [];
+        for(var i = 0; i < limitedCount; i++) promises.push(compressImage(files[i]));
+        try {
+            var compressed = await Promise.all(promises);
+            for(var j = 0; j < compressed.length; j++) editProductNewBlobs.push(compressed[j]);
+            var preview = $('editProdNewPreview');
+            if(preview) {
+                preview.innerHTML = '';
+                for(var k = 0; k < editProductNewBlobs.length; k++) {
+                    var sizeKB = Math.round(editProductNewBlobs[k].size / 1024);
+                    var color = sizeKB >= 80 && sizeKB <= 90 ? '#059669' : '#D97706';
+                    preview.innerHTML += '<div style="text-align:center;"><img src="' + URL.createObjectURL(editProductNewBlobs[k]) + '" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:2px solid ' + color + ';"><div style="font-size:9px;color:' + color + ';font-weight:600;margin-top:2px;">' + sizeKB + ' KB</div></div>';
+                }
+            }
+            toast('📸 ' + compressed.length + ' new photo(s) ready');
+            input.value = '';
+        } catch(e) { toast('❌ Image processing failed', 'error'); }
+    };
+    
+    window.toggleEditOfferFields = function() {
+        var checkbox = $('editProdOfferCheck');
+        var fields = $('editOfferFields');
+        if(checkbox && fields) fields.style.display = checkbox.checked ? 'block' : 'none';
+    };
+    
+    window.saveProductEdit = async function(id) {
+        var btn = document.querySelector('.modal-container button[onclick^="saveProductEdit"]');
+        if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+
+        var name = $('editProdName').value.trim();
+        var price = parseFloat($('editProdPrice').value) || 0;
+        var offer = parseFloat($('editProdOffer').value) || null;
+        var stock = parseInt($('editProdStock').value) || 0;
+        var catId = $('editProdCat').value;
+        var isFeatured = $('editProdFeatured').checked;
+        var isOnHold = $('editProdHold').checked;
+        var isOffer = $('editProdOfferCheck') ? $('editProdOfferCheck').checked : false;
+        var offerTag = isOffer && $('editProdOfferTag') ? $('editProdOfferTag').value.trim() : null;
+        
+        try {
+            var newImageUrls = [];
+            if (editProductNewBlobs.length > 0) {
+                var uploadPromises = [];
+                for (var i = 0; i < editProductNewBlobs.length; i++) uploadPromises.push(uploadCompressedImage(editProductNewBlobs[i], 'product-images', 'prod_' + id + '_' + i + '_' + Date.now()));
+                var uploaded = await Promise.all(uploadPromises);
+                for (var j = 0; j < uploaded.length; j++) if (uploaded[j]) newImageUrls.push(uploaded[j]);
+            }
+            
+            var finalImages = editProductExistingImages.concat(newImageUrls);
+            
+            var updateData = {
+                name: name, price: price, offer_price: offer, stock: stock, category_id: catId,
+                is_featured: isFeatured, is_on_hold: isOnHold, is_offer: isOffer, offer_tag: offerTag,
+                images: finalImages,
+                image_url: finalImages[0] || null
+            };
+            
+            var updateRes = await sb.from('products').update(updateData).eq('id', id).select();
+            if (updateRes.error) throw new Error(updateRes.error.message);
+            if (!updateRes.data || updateRes.data.length === 0) throw new Error('Update failed — RLS');
+            
+            for (var k = 0; k < editProductRemovedImages.length; k++) {
+                try {
+                    var url = editProductRemovedImages[k];
+                    if (url && url.indexOf('product-images/') !== -1) {
+                        var path = url.split('product-images/')[1];
+                        await sb.storage.from('product-images').remove([path]);
+                    }
+                } catch(e) {}
+            }
+            
+            bustGlobalCache(); // ✅ FIX: Cache clear for product changes
+            
+            toast('✅ Product updated!');
+            closeModal();
+            editProductExistingImages = []; editProductNewBlobs = []; editProductRemovedImages = [];
+            await loadData();
+            renderProducts($('contentArea'));
+        } catch(e) { 
+            toast('❌ ' + e.message, 'error'); 
+            if(btn){btn.disabled=false;btn.innerHTML='💾 Save Changes';}
+        }
+    };
+    
+    window.bulkApproveDeleteRequests = async function() {
+        var ids = allProducts.filter(function(p) { return p.delete_requested === true; }).map(function(p) { return p.id; });
+        if(!ids.length) return;
+        if(!confirm('Approve ALL ' + ids.length + ' delete requests?')) return;
+        await sb.from('products').delete().in('id', ids);
+        bustGlobalCache();
+        toast('✅ Deleted!'); 
+        await loadData(); 
+        renderProducts($('contentArea'));
+    };
+    
+    window.approveDeleteRequest = async function(id) { 
+        if(!confirm('Delete this product?')) return; 
+        await sb.from('products').delete().eq('id', id); 
+        bustGlobalCache();
+        toast('Deleted'); 
+        await loadData(); 
+        renderProducts($('contentArea')); 
+    };
+    window.rejectDeleteRequest = async function(id) { 
+        await sb.from('products').update({delete_requested: false}).eq('id', id); 
+        bustGlobalCache();
+        toast('Rejected'); 
+        await loadData(); 
+        renderProducts($('contentArea')); 
+    };
+    window.toggleFeatured = async function(id, f) { 
+        await sb.from('products').update({is_featured: f}).eq('id', id); 
+        bustGlobalCache();
+        toast('Done!'); 
+        await loadData(); 
+        renderProducts($('contentArea')); 
+    };
+    window.deleteProduct = async function(id) { 
+        if(!confirm('Delete product?')) return; 
+        await sb.from('products').delete().eq('id', id); 
+        bustGlobalCache();
+        toast('Deleted'); 
+        await loadData(); 
+        renderProducts($('contentArea')); 
+    };
+    
+    function renderOffers(c) {
+        var filtered = allProducts.filter(function(p) { return p.is_offer === true; });
+        if (searchOffers) {
+            filtered = filtered.filter(function(p) {
+                return (p.name || '').toLowerCase().indexOf(searchOffers) !== -1;
+            });
+        }
+        
+        var html = '';
+        filtered.forEach(function(p) {
+            var img = getImageUrl((p.images && p.images[0]) || p.image_url, 250);
+            var price = parseFloat(p.offer_price) || parseFloat(p.price) || 0;
+            var shopName = getShopName(p.shop_id);
+            html += '<div class="card-item">';
+            html += '<div class="card-item-img">' + (img ? '<img src="' + img + '" loading="lazy">' : '<i class="fas fa-box"></i>') + '</div>';
+            html += '<div class="card-item-body">';
+            html += '<div class="card-item-title">' + esc(p.name) + '</div>';
+            html += '<div class="card-item-subtitle">₹' + price.toLocaleString('en-IN') + ' | ' + esc(shopName) + '</div>';
+            if (p.offer_tag) html += '<div class="featured-badge" style="background:#FFF8EB;color:#D97706;">🎁 ' + esc(p.offer_tag) + '</div>';
+            html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+            html += '<button class="btn btn-warning btn-sm" onclick="showProductEditModal(\'' + p.id + '\')">✏️ Edit</button>';
+            html += '<button class="btn btn-danger btn-sm" onclick="removeOffer(\'' + p.id + '\')">❌ Remove</button>';
+            html += '</div></div></div>';
+        });
+        
+        c.innerHTML = '<div class="content-card">' +
+            '<div class="card-header"><h2>🎁 Offer Products (' + filtered.length + ')</h2>' +
+            '<button class="btn btn-primary btn-sm" onclick="showAddOfferProductModal()">+ Mark Product as Offer</button></div>' +
+            '<div style="padding:0 12px;">' + renderSearchBar('searchOffersInput', 'Search offer products...', searchOffers, 'filterOffers') + '</div>' +
+            '<div class="card-grid">' + (html || '<div class="empty-state"><i class="fas fa-gift"></i><p>No products marked as offer</p><p style="font-size:11px;margin-top:6px;">Individual products pe "Offer" toggle karo</p></div>') + '</div></div>';
+    }
+    
+    window.removeOffer = async function(id) {
+        if (!confirm('Remove this product from offers?')) return;
+        try {
+            var r = await sb.from('products').update({ is_offer: false, offer_tag: null }).eq('id', id).select();
+            if (r.error) throw new Error(r.error.message);
+            bustGlobalCache();
+            toast('✅ Removed from offers');
+            await loadData();
+            renderOffers($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    window.showAddOfferProductModal = function() {
+        var html = '<div class="modal-header"><h3>🎁 Mark Product as Offer</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+        html += '<div class="form-group"><label class="form-label">Select Product</label>';
+        html += '<div class="search-bar" style="margin-bottom:6px;"><i class="fas fa-search"></i><input type="text" placeholder="Search products..." oninput="filterOfferPickList(this.value)"></div>';
+        html += '<div class="cat-checkbox-list" id="offerPickList" style="max-height:250px;">';
+        allProducts.filter(function(p) { return !p.is_offer; }).slice(0, 100).forEach(function(p) {
+            html += '<label class="cat-checkbox-label" data-prod-name="' + esc((p.name || '').toLowerCase()) + '"><input type="radio" name="offerPick" value="' + p.id + '"> ' + esc(p.name) + ' — ₹' + (p.price || 0) + '</label>';
+        });
+        html += '</div></div>';
+        html += '<div class="form-group"><label class="form-label">Offer Tag</label><input type="text" id="offerPickTag" class="form-control" placeholder="e.g. Free Bucket, 20% off, Buy 1 Get 1"></div>';
+        html += '<button class="btn btn-primary" style="width:100%;padding:12px;" onclick="markAsOffer()">💾 Mark as Offer</button>';
+        showModal(html);
+    };
+    
+    window.filterOfferPickList = function(q) {
+        q = (q || '').toLowerCase().trim();
+        document.querySelectorAll('#offerPickList .cat-checkbox-label').forEach(function(l) {
+            var name = l.getAttribute('data-prod-name') || '';
+            l.style.display = name.indexOf(q) !== -1 ? 'flex' : 'none';
+        });
+    };
+    
+    window.markAsOffer = async function() {
+        var picked = document.querySelector('input[name="offerPick"]:checked');
+        if (!picked) { toast('⚠️ Select a product', 'error'); return; }
+        var tag = ($('offerPickTag')?.value || '').trim();
+        try {
+            var r = await sb.from('products').update({ is_offer: true, offer_tag: tag || 'Offer' }).eq('id', picked.value).select();
+            if (r.error) throw new Error(r.error.message);
+            bustGlobalCache();
+            toast('✅ Marked as offer');
+            closeModal();
+            await loadData();
+            renderOffers($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    async function renderComboOffers(c) {
+        try {
+            var r = await sb.from('combo_offers').select('*').order('display_order');
+            allComboOffers = r.data || [];
+        } catch(e) { allComboOffers = []; }
+        
+        var html = '';
+        allComboOffers.forEach(function(co) {
+            var img = co.image_url ? getImageUrl(co.image_url, 250) : '';
+            var prodCount = (co.product_ids && co.product_ids.length) ? co.product_ids.length : 0;
+            html += '<div class="card-item">';
+            html += '<div class="card-item-img">' + (img ? '<img src="' + img + '" loading="lazy">' : '<i class="fas fa-box-open"></i>') + '</div>';
+            html += '<div class="card-item-body">';
+            html += '<div class="card-item-title">' + esc(co.title) + '</div>';
+            html += '<div class="card-item-subtitle">₹' + (co.offer_price || 0).toLocaleString('en-IN');
+            if (co.original_price) html += ' <s>₹' + co.original_price.toLocaleString('en-IN') + '</s>';
+            html += ' | ' + prodCount + ' products</div>';
+            html += '<div style="margin:6px 0;">' + (co.is_active ? '<span class="badge badge-success">🟢 Active</span>' : '<span class="badge badge-danger">🔴 Inactive</span>') + '</div>';
+            html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+            html += '<button class="btn btn-warning btn-sm" onclick="showComboOfferModal(\'' + co.id + '\')">✏️ Edit</button>';
+            html += '<button class="btn btn-outline btn-sm" onclick="toggleComboActive(\'' + co.id + '\',' + co.is_active + ')">' + (co.is_active ? 'Disable' : 'Enable') + '</button>';
+            html += '<button class="btn btn-danger btn-sm" onclick="deleteComboOffer(\'' + co.id + '\')">🗑️</button>';
+            html += '</div></div></div>';
+        });
+        
+        c.innerHTML = '<div class="content-card">' +
+            '<div class="card-header"><h2>📦 Combo Offers (' + allComboOffers.length + ')</h2>' +
+            '<button class="btn btn-primary btn-sm" onclick="showComboOfferModal(null)">+ Add Combo</button></div>' +
+            '<div style="padding:12px;background:#FFFBEB;border-bottom:1px solid #FDE68A;font-size:11px;color:#92400E;">' +
+            'ℹ️ Combo offers homepage pe dikhte hain (max 2 active). Ek baar me 2 se zyada active mat rakho.' +
+            '</div>' +
+            '<div class="card-grid">' + (html || '<div class="empty-state"><i class="fas fa-box-open"></i><p>No combo offers yet</p><p style="font-size:11px;margin-top:6px;">Create karo — homepage pe automatically dikhega</p></div>') + '</div></div>';
+    }
+    
+    window.showComboOfferModal = function(id) {
+        var co = id ? allComboOffers.find(function(x) { return x.id === id; }) : null;
+        var existingImg = co && co.image_url ? getImageUrl(co.image_url, 200) : '';
+        var selectedIds = (co && co.product_ids && Array.isArray(co.product_ids)) ? co.product_ids : [];
+        
+        var html = '<div class="modal-header"><h3>' + (co ? '✏️ Edit Combo Offer' : '➕ Add Combo Offer') + '</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+        html += '<div class="form-group"><label class="form-label">Title *</label><input type="text" id="comboTitle" class="form-control" value="' + esc(co ? co.title : '') + '" placeholder="e.g. ₹999 Combo — 1L Oil + 1kg Sugar"></div>';
+        html += '<div class="form-group"><label class="form-label">Description</label><textarea id="comboDesc" class="form-control" rows="2">' + esc(co ? (co.description || '') : '') + '</textarea></div>';
+        html += '<div class="form-row"><div class="form-half"><label class="form-label">Offer Price ₹ *</label><input type="number" id="comboPrice" class="form-control" value="' + (co ? co.offer_price : '') + '"></div>';
+        html += '<div class="form-half"><label class="form-label">Original Price ₹</label><input type="number" id="comboOriginalPrice" class="form-control" value="' + (co ? (co.original_price || '') : '') + '"></div></div>';
+        html += '<div class="form-group"><label class="form-label">📸 Cover Image</label><div class="image-upload-box' + (existingImg ? ' has-image' : '') + '" onclick="document.getElementById(\'comboImgInput\').click()"><input type="file" id="comboImgInput" accept="image/*" style="display:none" onchange="handleComboImage(this)">📁 Upload<div id="comboImgPreview">' + (existingImg ? '<img src="' + existingImg + '" class="image-preview show" loading="lazy">' : '') + '</div></div></div>';
+        html += '<div class="form-row"><div class="form-half"><label class="form-label">Order</label><input type="number" id="comboOrder" class="form-control" value="' + (co ? co.display_order : allComboOffers.length + 1) + '"></div>';
+        html += '<div class="form-half"><label class="form-label">Active</label><br><label class="toggle-switch"><input type="checkbox" id="comboActive" ' + (co ? (co.is_active ? 'checked' : '') : 'checked') + '><span class="toggle-slider"></span></label></div></div>';
+        
+        html += '<div class="form-group"><label class="form-label">📦 Products * <span style="font-size:10px;color:#6B7280;">(search karke select karo)</span></label>';
+        html += '<div class="search-bar" style="margin-bottom:6px;"><i class="fas fa-search"></i><input type="text" id="comboProdSearch" placeholder="Search products..." oninput="filterComboProducts(this.value)"></div>';
+        html += '<div class="cat-checkbox-list" id="comboProductList" style="max-height:250px;">';
+        allProducts.slice(0, 100).forEach(function(p) {
+            var checked = selectedIds.indexOf(p.id) !== -1 ? ' checked' : '';
+            html += '<label class="cat-checkbox-label" data-prod-name="' + esc((p.name || '').toLowerCase()) + '"><input type="checkbox" class="comboProdCheck" value="' + p.id + '"' + checked + '> ' + esc(p.name) + ' — ₹' + (p.price || 0) + '</label>';
+        });
+        html += '</div></div>';
+        html += '<button class="btn btn-primary" style="width:100%;padding:14px;font-size:14px;" onclick="saveComboOffer(\'' + (co ? co.id : '') + '\')">💾 Save Combo Offer</button>';
+        showModal(html);
+    };
+    
+    window.filterComboProducts = function(q) {
+        q = (q || '').toLowerCase().trim();
+        document.querySelectorAll('#comboProductList .cat-checkbox-label').forEach(function(l) {
+            var name = l.getAttribute('data-prod-name') || '';
+            l.style.display = name.indexOf(q) !== -1 ? 'flex' : 'none';
+        });
+    };
+    
+    window.handleComboImage = function(input) {
+        var file = input.files[0];
+        if (!file) return;
+        compressImage(file).then(function(compressed) {
+            window._comboImageFile = compressed;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var p = $('comboImgPreview');
+                if (p) p.innerHTML = '<img src="' + e.target.result + '" class="image-preview show">';
+            };
+            reader.readAsDataURL(compressed);
+        });
+        input.value = '';
+    };
+    
+    window.saveComboOffer = async function(id) {
+        var btn = document.querySelector('.modal-container button[onclick^="saveComboOffer"]');
+        if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+
+        var title = ($('comboTitle')?.value || '').trim();
+        var desc = ($('comboDesc')?.value || '').trim();
+        var price = parseFloat($('comboPrice')?.value) || 0;
+        var originalPrice = parseFloat($('comboOriginalPrice')?.value) || null;
+        var order = parseInt($('comboOrder')?.value) || 0;
+        var isActive = $('comboActive')?.checked || false;
+        
+        if (!title || price < 1) { toast('⚠️ Fill title and price', 'error'); if(btn){btn.disabled=false;btn.innerHTML='💾 Save Combo Offer';} return; }
+        
+        var selectedProducts = [];
+        document.querySelectorAll('.comboProdCheck:checked').forEach(function(cb) { selectedProducts.push(cb.value); });
+        if (selectedProducts.length === 0) { toast('⚠️ Select at least 1 product', 'error'); if(btn){btn.disabled=false;btn.innerHTML='💾 Save Combo Offer';} return; }
+        
+        var imageUrl = '';
+        if (window._comboImageFile) {
+            imageUrl = await uploadCompressedImage(window._comboImageFile, 'product-images', 'combo_' + (id || 'new'));
+            if (!imageUrl) { if(btn){btn.disabled=false;btn.innerHTML='💾 Save Combo Offer';} return; }
+        }
+        
+        var data = {
+            title: title,
+            description: desc || null,
+            offer_price: price,
+            original_price: originalPrice,
+            product_ids: selectedProducts,
+            display_order: order,
+            is_active: isActive
+        };
+        if (imageUrl) data.image_url = imageUrl;
+        
+        try {
+            if (id) {
+                var r = await sb.from('combo_offers').update(data).eq('id', id).select();
+                if (r.error) throw new Error(r.error.message);
+                toast('✅ Combo updated!');
+            } else {
+                var r2 = await sb.from('combo_offers').insert([data]).select();
+                if (r2.error) throw new Error(r2.error.message);
+                toast('✅ Combo created!');
+            }
+            bustGlobalCache();
+            closeModal();
+            window._comboImageFile = null;
+            await renderComboOffers($('contentArea'));
+        } catch(e) { 
+            toast('❌ ' + e.message, 'error'); 
+            if(btn){btn.disabled=false;btn.innerHTML='💾 Save Combo Offer';}
+        }
+    };
+    
+    window.toggleComboActive = async function(id, isActive) {
+        try {
+            var r = await sb.from('combo_offers').update({ is_active: !isActive }).eq('id', id).select();
+            if (r.error) throw new Error(r.error.message);
+            bustGlobalCache();
+            toast('Updated');
+            await renderComboOffers($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    window.deleteComboOffer = async function(id) {
+        if (!confirm('Delete this combo offer?')) return;
+        try {
+            var r = await sb.from('combo_offers').delete().eq('id', id).select();
+            if (r.error) throw new Error(r.error.message);
+            bustGlobalCache();
+            toast('Deleted');
+            await renderComboOffers($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+    
+    function renderSliders(c) {
+        var html = '';
+        for(var i = 0; i < allSliders.length; i++) {
+            var sl = allSliders[i];
+            var img = getImageUrl(sl.image_url, 400);
+            html += '<div class="card-item"><div class="card-item-img">' + (img ? '<img src="' + img + '" class="slider-preview" loading="lazy">' : '<i class="fas fa-image"></i>') + '</div>';
+            html += '<div class="card-item-body"><div class="card-item-title">' + esc(sl.title || 'Slider') + '</div>';
+            html += '<div class="card-item-subtitle">Order: ' + sl.display_order + ' | ' + (sl.is_active ? '🟢 Active' : '🔴 Inactive') + '</div>';
+            html += '<div style="display:flex;gap:4px;">';
+            html += '<button class="btn btn-warning btn-sm" onclick="showSliderModal(\'' + sl.id + '\')">✏️</button>';
+            html += '<button class="btn btn-outline btn-sm" onclick="toggleSliderActive(\'' + sl.id + '\',' + sl.is_active + ')">' + (sl.is_active ? 'Disable' : 'Enable') + '</button>';
+            html += '<button class="btn btn-danger btn-sm" onclick="deleteSlider(\'' + sl.id + '\')">🗑️</button>';
+            html += '</div></div></div>';
+        }
+        c.innerHTML = '<div class="content-card"><div class="card-header"><h2>🖼️ Homepage Sliders (' + allSliders.length + ')</h2><button class="btn btn-primary btn-sm" onclick="showSliderModal(null)">+ Add Slider</button></div>' +
+        '<div class="card-grid">' + (html || '<div class="empty-state"><i class="fas fa-image"></i><p>No sliders</p></div>') + '</div></div>';
+    }
+    
+    window.showSliderModal = function(id) {
+        var sl = id ? allSliders.find(function(s) { return s.id === id; }) : null;
+        var existingImg = sl && sl.image_url ? getImageUrl(sl.image_url, 200) : '';
+        var html = '<div class="modal-header"><h3>' + (sl ? '✏️ Edit Slider' : '➕ Add Slider') + '</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+        html += '<div class="form-group"><label class="form-label">Title</label><input type="text" id="sliderTitle" class="form-control" value="' + esc(sl ? sl.title || '' : '') + '"></div>';
+        html += '<div class="form-group"><label class="form-label">Link</label><input type="text" id="sliderLink" class="form-control" value="' + esc(sl ? sl.link || '' : '') + '"></div>';
+        html += '<div class="form-group"><label class="form-label">Order</label><input type="number" id="sliderOrder" class="form-control" value="' + (sl ? sl.display_order : allSliders.length + 1) + '"></div>';
+        html += '<div class="form-group"><label class="form-label">📸 Image</label><div class="image-upload-box' + (existingImg ? ' has-image' : '') + '" onclick="document.getElementById(\'sliderImgInput\').click()"><input type="file" id="sliderImgInput" accept="image/*" style="display:none" onchange="handleSliderImage(this)">📁 Upload<div id="sliderImgPreview">' + (existingImg ? '<img src="' + existingImg + '" class="image-preview show" loading="lazy">' : '') + '</div></div></div>';
+        html += '<button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveSlider(\'' + (sl ? sl.id : '') + '\')">💾 Save</button>';
+        showModal(html);
+    };
+    
+    window.handleSliderImage = function(input) {
+        var file = input.files[0];
+        if(!file) return;
+        compressImage(file).then(function(compressed) {
+            window._sliderImageFile = compressed;
+            var reader = new FileReader();
+            reader.onload = function(e) { var p = $('sliderImgPreview'); if(p) p.innerHTML = '<img src="' + e.target.result + '" class="image-preview show">'; };
+            reader.readAsDataURL(compressed);
+        });
+        input.value = '';
+    };
+    
+    window.saveSlider = async function(id) {
+        var btn = document.querySelector('.modal-container button[onclick^="saveSlider"]');
+        if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+
+        var title = $('sliderTitle').value.trim() || 'Slider';
+        var link = $('sliderLink').value.trim() || '#';
+        var order = parseInt($('sliderOrder').value) || 0;
+        var imageUrl = '';
+        if(window._sliderImageFile) { imageUrl = await uploadCompressedImage(window._sliderImageFile, 'slider-images', 'slider'); if(!imageUrl) { if(btn){btn.disabled=false;btn.innerHTML='💾 Save';} return; } }
+        var data = { title: title, link: link, display_order: order };
+        if(imageUrl) data.image_url = imageUrl;
+        try {
+            if(id) { var r = await sb.from('sliders').update(data).eq('id', id).select(); if(r.error) throw new Error(r.error.message); toast('Updated!'); }
+            else { var r2 = await sb.from('sliders').insert([data]).select(); if(r2.error) throw new Error(r2.error.message); toast('Added!'); }
+            bustGlobalCache();
+            closeModal(); window._sliderImageFile = null;
+            await loadData(); renderSliders($('contentArea'));
+        } catch(e) { 
+            toast('❌ ' + e.message, 'error'); 
+            if(btn){btn.disabled=false;btn.innerHTML='💾 Save';}
+        }
+    };
+    
+    window.toggleSliderActive = async function(id, st) { 
+        await sb.from('sliders').update({is_active: !st}).eq('id', id); 
+        bustGlobalCache();
+        toast('Done!'); 
+        await loadData(); 
+        renderSliders($('contentArea')); 
+    };
+    window.deleteSlider = async function(id) { 
+        if(!confirm('Delete slider?')) return; 
+        await sb.from('sliders').delete().eq('id', id); 
+        bustGlobalCache();
+        toast('Deleted'); 
+        await loadData(); 
+        renderSliders($('contentArea')); 
+    };
+    
+    function renderNotifications(c) {
+        var html = '<div class="content-card"><div class="card-header"><h2>🔔 Send Push Notification</h2></div><div style="padding:16px;">';
+        html += '<div class="form-group"><label class="form-label">📝 Title *</label><input type="text" id="notifTitle" class="form-control" placeholder="Notification title"></div>';
+        html += '<div class="form-group"><label class="form-label">💬 Message *</label><textarea id="notifMessage" class="form-control" rows="4" placeholder="Notification message..."></textarea></div>';
+        html += '<div class="form-group"><label class="form-label">🔗 Link (optional)</label><input type="text" id="notifLink" class="form-control" placeholder="e.g. products.html?offer=true"></div>';
+        html += '<button class="btn btn-primary" style="width:100%;padding:14px;font-size:14px;" onclick="sendNotification()">📨 Send to All Users</button>';
+        html += '</div></div>';
+        
+        html += '<div class="content-card"><div class="card-header"><h2>📋 Recent (' + allNotifications.length + ')</h2></div><div style="padding:12px;">';
+        if (allNotifications.length > 0) {
+            allNotifications.slice(0, 10).forEach(function(n) {
+                html += '<div style="padding:10px;border:1px solid var(--neutral-border);border-radius:10px;margin-bottom:6px;">';
+                html += '<div style="font-weight:700;font-size:12px;">' + esc(n.title || 'No Title') + '</div>';
+                html += '<div style="font-size:11px;color:#6B7280;margin-top:2px;">' + esc(n.message || '') + '</div>';
+                html += '</div>';
+            });
+        } else {
+            html += '<div class="empty-state"><i class="fas fa-bell-slash"></i><p>No notifications</p></div>';
+        }
+        html += '</div></div>';
+        c.innerHTML = html;
+    }
+    
+    window.sendNotification = async function() {
+        var title = ($('notifTitle')?.value || '').trim();
+        var message = ($('notifMessage')?.value || '').trim();
+        var linkUrl = ($('notifLink')?.value || '').trim();
+        if (!title || !message) { toast('⚠️ Fill title and message', 'error'); return; }
+        var btn = document.querySelector('.btn-primary[onclick="sendNotification()"]');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...'; }
+        try {
+            var notifData = { title: title, message: message, created_at: new Date().toISOString(), is_global: true };
+            if (linkUrl) notifData.link_url = linkUrl;
+            await sb.from('notifications').insert([notifData]);
+            var sessionRes = await sb.auth.getSession();
+            var token = (sessionRes && sessionRes.data && sessionRes.data.session && sessionRes.data.session.access_token) ? sessionRes.data.session.access_token : CONFIG.SUPABASE_KEY;
+            await fetch(CONFIG.SUPABASE_URL + '/functions/v1/send-notification', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'apikey': CONFIG.SUPABASE_KEY, 'Authorization': 'Bearer ' + token},
+                body: JSON.stringify({title: title, message: message, link_url: linkUrl || '', send_type: 'all', user_ids: []})
+            });
+            toast('✅ Sent!');
+            if ($('notifTitle')) $('notifTitle').value = '';
+            if ($('notifMessage')) $('notifMessage').value = '';
+            if ($('notifLink')) $('notifLink').value = '';
+            await loadData();
+            renderNotifications($('contentArea'));
+        } catch(e) { toast('❌ ' + (e.message || 'Failed'), 'error'); if (btn) { btn.disabled = false; btn.innerHTML = '📨 Send to All Users'; } }
+    };
+    
+    function renderDeliverySettings(c) {
+        var ds = deliverySettingsData || {};
+        var plan1m = getAppSetting('plan_1m_fee', '499');
+        var plan6m = getAppSetting('plan_6m_fee', '1999');
+        var plan12m = getAppSetting('plan_12m_fee', '3500');
+        
+        var html = '<div class="content-card"><div class="card-header"><h2>🕐 Delivery Settings</h2></div><div style="padding:16px;">';
+        html += '<div class="form-row"><div class="form-half"><label class="form-label">Start Time</label><input type="time" id="deliveryStart" class="form-control" value="' + (ds.opening_time || '08:00').substring(0,5) + '"></div>';
+        html += '<div class="form-half"><label class="form-label">End Time</label><input type="time" id="deliveryEnd" class="form-control" value="' + (ds.closing_time || '20:00').substring(0,5) + '"></div></div>';
+        html += '<div class="form-row"><div class="form-half"><label class="form-label">Delivery Minutes</label><input type="number" id="deliveryMinutes" class="form-control" value="' + (ds.delivery_time_minutes || 10) + '"></div>';
+        html += '<div class="form-half"><label class="form-label">Delivery Fee ₹</label><input type="number" id="deliveryFee" class="form-control" value="' + (ds.delivery_charge || 40) + '"></div></div>';
+        html += '<div class="form-row"><div class="form-half"><label class="form-label">Free Above ₹</label><input type="number" id="freeDeliveryAbove" class="form-control" value="' + (ds.free_delivery_above || 299) + '"></div>';
+        html += '<div class="form-half"><label class="form-label">Min Order ₹</label><input type="number" id="minOrderAmount" class="form-control" value="' + (ds.min_order_amount || 0) + '"></div></div>';
+        html += '<div class="form-group"><label class="form-label">🏖️ Holiday Mode</label><label class="toggle-switch"><input type="checkbox" id="isHoliday" ' + (ds.is_holiday ? 'checked' : '') + '><span class="toggle-slider"></span></label></div>';
+        html += '<div class="form-group" id="holidayReasonGroup" style="display:' + (ds.is_holiday ? 'block' : 'none') + ';"><label class="form-label">Reason</label><input type="text" id="holidayReason" class="form-control" value="' + esc(ds.holiday_reason || '') + '"></div>';
+        html += '<div class="form-group"><label class="form-label">🔓 Shop Open</label><label class="toggle-switch"><input type="checkbox" id="isShopOpen" ' + (ds.is_open !== false ? 'checked' : '') + '><span class="toggle-slider"></span></label></div>';
+        html += '<button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveDeliverySettings()">💾 Save Delivery Settings</button></div></div>';
+        
+        html += '<div class="content-card"><div class="card-header"><h2>💰 Shop Registration Plans</h2></div><div style="padding:16px;">';
+        html += '<p style="font-size:11px;color:#6B7280;margin-bottom:14px;">ℹ️ GST 18% upar se lagega.</p>';
+        html += '<div class="plan-fee-card"><div class="plan-fee-card-title"><i class="fas fa-calendar-day"></i> 📅 1 Month Plan</div>';
+        html += '<input type="number" id="plan1mFee" class="plan-fee-input" value="' + plan1m + '" oninput="updatePlanTotal(\'1m\',this.value)">';
+        html += '<div class="plan-fee-total">Total with GST: <span id="plan1mTotal">₹' + (parseFloat(plan1m)*1.18).toFixed(2) + '</span></div></div>';
+        html += '<div class="plan-fee-card"><div class="plan-fee-card-title"><i class="fas fa-calendar-alt"></i> 📆 6 Months Plan (Popular)</div>';
+        html += '<input type="number" id="plan6mFee" class="plan-fee-input" value="' + plan6m + '" oninput="updatePlanTotal(\'6m\',this.value)">';
+        html += '<div class="plan-fee-total">Total with GST: <span id="plan6mTotal">₹' + (parseFloat(plan6m)*1.18).toFixed(2) + '</span></div></div>';
+        html += '<div class="plan-fee-card"><div class="plan-fee-card-title"><i class="fas fa-calendar-check"></i> 🗓️ 12 Months Plan (Best Value)</div>';
+        html += '<input type="number" id="plan12mFee" class="plan-fee-input" value="' + plan12m + '" oninput="updatePlanTotal(\'12m\',this.value)">';
+        html += '<div class="plan-fee-total">Total with GST: <span id="plan12mTotal">₹' + (parseFloat(plan12m)*1.18).toFixed(2) + '</span></div></div>';
+        html += '<button class="btn btn-success" style="width:100%;padding:14px;font-size:14px;margin-top:12px;" onclick="savePlanFees()">💾 Save All Plan Fees</button></div></div>';
+        
+        c.innerHTML = html;
+        var hEl = $('isHoliday');
+        if (hEl) hEl.addEventListener('change', function() { var rg = $('holidayReasonGroup'); if(rg) rg.style.display = this.checked ? 'block' : 'none'; });
+    }
+    
+    window.updatePlanTotal = function(plan, val) {
+        var v = parseFloat(val) || 0;
+        var totalEl = $('plan' + plan + 'Total');
+        if (totalEl) totalEl.textContent = '₹' + (v * 1.18).toFixed(2);
+    };
+    
+    window.savePlanFees = async function() {
+        var btn = document.querySelector('button[onclick="savePlanFees()"]');
+        if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+
+        var fees = {
+            'plan_1m_fee': parseInt($('plan1mFee').value) || 499,
+            'plan_6m_fee': parseInt($('plan6mFee').value) || 1999,
+            'plan_12m_fee': parseInt($('plan12mFee').value) || 3500
+        };
+        try {
+            for (var key in fees) {
+                if (!fees.hasOwnProperty(key)) continue;
+                var existing = allAppSettings.find(function(s) { return s.key === key; });
+                if (existing) { await sb.from('app_settings').update({value: String(fees[key])}).eq('key', key); }
+                else { await sb.from('app_settings').insert([{key: key, value: String(fees[key])}]); }
+            }
+            bustGlobalCache(); // ✅ Bust settings cache
+            toast('✅ Plan fees updated!');
+            await loadData();
+            renderDeliverySettings($('contentArea'));
+        } catch(e) { 
+            toast('❌ ' + e.message, 'error'); 
+            if(btn){btn.disabled=false;btn.innerHTML='💾 Save All Plan Fees';}
+        }
+    };
+    
+    window.saveDeliverySettings = async function() {
+        var btn = document.querySelector('button[onclick="saveDeliverySettings()"]');
+        if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+
+        var startTime = ($('deliveryStart').value || '08:00').substring(0, 5);
+        var endTime = ($('deliveryEnd').value || '20:00').substring(0, 5);
+        var data = {
+            opening_time: startTime + ':00', closing_time: endTime + ':00',
+            delivery_time_minutes: parseInt($('deliveryMinutes').value) || 10,
+            delivery_charge: parseInt($('deliveryFee').value) || 0,
+            free_delivery_above: parseInt($('freeDeliveryAbove').value) || 0,
+            min_order_amount: parseInt($('minOrderAmount').value) || 0,
+            is_holiday: $('isHoliday').checked,
+            holiday_reason: $('isHoliday').checked ? ($('holidayReason')?.value || '').trim() : null,
+            holiday_date: $('isHoliday').checked ? new Date().toISOString().split('T')[0] : null,
+            is_open: $('isShopOpen').checked,
+            is_active: true, updated_at: new Date().toISOString()
+        };
+        try {
+            var insertRes = await sb.from('delivery_settings').insert([data]).select();
+            if (insertRes.error) throw new Error(insertRes.error.message);
+            if (insertRes.data && insertRes.data[0]) await sb.from('delivery_settings').delete().neq('id', insertRes.data[0].id);
+            
+            bustGlobalCache(); // ✅ Bust settings cache
+            
+            toast('✅ Saved! Home page updated.');
+            await loadData();
+            renderDeliverySettings($('contentArea'));
+        } catch(e) { 
+            toast('❌ ' + e.message, 'error'); 
+            if(btn){btn.disabled=false;btn.innerHTML='💾 Save Delivery Settings';}
+        }
+    };
+    
+    function renderLocations(c) {
+        var html = '<div class="content-card"><div class="card-header"><h2>📍 Add New Location</h2></div><div style="padding:16px;">';
+        html += '<div class="form-row"><div class="form-half"><label class="form-label">District Name</label><input type="text" id="newDistrictName" class="form-control" placeholder="e.g. Pune"></div>';
+        html += '<div class="form-half"><label class="form-label">Taluka Name</label><input type="text" id="newTalukaName" class="form-control" placeholder="e.g. Haveli"></div></div>';
+        html += '<button class="btn btn-primary" style="width:100%;padding:12px;margin-top:10px;" onclick="addNewLocation()">➕ Add Location</button>';
+        html += '</div></div>';
+
+        var grouped = {};
+        allLocations.forEach(function(loc) {
+            if (!grouped[loc.district]) grouped[loc.district] = [];
+            grouped[loc.district].push(loc);
+        });
+
+        html += '<div class="content-card"><div class="card-header"><h2>🗺️ Current Locations (' + allLocations.length + ')</h2></div><div style="padding:12px;">';
+        
+        if (Object.keys(grouped).length === 0) {
+            html += '<div class="empty-state"><i class="fas fa-map"></i><p>No locations added yet</p></div>';
+        } else {
+            Object.keys(grouped).sort().forEach(function(dist) {
+                html += '<div style="margin-bottom:12px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:10px;">';
+                html += '<h3 style="font-size:14px;color:var(--brand-green-dark);margin-bottom:8px;">' + esc(dist) + ' <span style="font-size:10px;color:#6B7280;font-weight:normal;">(' + grouped[dist].length + ' talukas)</span></h3>';
+                html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+                grouped[dist].forEach(function(loc) {
+                    html += '<div style="background:white;border:1px solid #E5E7EB;border-radius:20px;padding:4px 10px;font-size:11px;display:flex;align-items:center;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05);">' + esc(loc.taluka) + '<i class="fas fa-times" style="color:#EF4444;cursor:pointer;font-size:10px;" onclick="deleteLocation(\'' + loc.id + '\')"></i></div>';
+                });
+                html += '</div></div>';
+            });
+        }
+        html += '</div></div>';
+        c.innerHTML = html;
+    }
+
+    window.addNewLocation = async function() {
+        var dist = $('newDistrictName').value.trim();
+        var taluka = $('newTalukaName').value.trim();
+        if (!dist || !taluka) { toast('⚠️ Enter both District and Taluka', 'error'); return; }
+        
+        try {
+            var r = await sb.from('service_areas').insert([{ district: dist, taluka: taluka }]).select();
+            if (r.error) throw new Error(r.error.message);
+            toast('✅ Location added!');
+            $('newDistrictName').value = '';
+            $('newTalukaName').value = '';
+            await loadData();
+            renderLocations($('contentArea'));
+        } catch(e) {
+            if (e.message.indexOf('duplicate') !== -1 || e.message.indexOf('unique') !== -1) {
+                toast('⚠️ This District-Taluka already exists', 'error');
+            } else {
+                toast('❌ ' + e.message, 'error');
+            }
+        }
+    };
+
+    window.deleteLocation = async function(id) {
+        if (!confirm('Delete this location? Customers from this area will no longer be able to select it.')) return;
+        try {
+            var r = await sb.from('service_areas').delete().eq('id', id).select();
+            if (r.error) throw new Error(r.error.message);
+            toast('✅ Deleted');
+            await loadData();
+            renderLocations($('contentArea'));
+        } catch(e) { toast('❌ ' + e.message, 'error'); }
+    };
+
+    function showModal(html) {
+        closeModal();
+        var overlay = document.createElement('div');
+        overlay.className = 'modal-overlay show';
+        overlay.id = 'modalContainer';
+        overlay.innerHTML = '<div class="modal-container">' + html + '</div>';
+        overlay.addEventListener('click', function(e) { if(e.target === overlay) closeModal(); });
+        document.body.appendChild(overlay);
+    }
+    
+    window.closeModal = function() { 
+        var m = $('modalContainer'); 
+        if(m) m.remove(); 
+        catImageFile = null; 
+        catImageRemoved = false; 
+        window._sliderImageFile = null;
+        window._comboImageFile = null;
+        editProductExistingImages = [];
+        editProductNewBlobs = [];
+        editProductRemovedImages = [];
+    };
+    
+    window.handleLogout = async function() { 
+        if(sessionRefreshTimer) clearInterval(sessionRefreshTimer);
+        if(autoRefreshTimer) clearInterval(autoRefreshTimer);
+        try { await sb.auth.signOut(); } catch(e) {}
+        ['zymart_session','zymart_user_role','zymart_user_phone','zymart_token'].forEach(function(k) { localStorage.removeItem(k); });
+        try { var keys = Object.keys(localStorage); for (var i = 0; i < keys.length; i++) if (keys[i].indexOf('sb-') === 0) localStorage.removeItem(keys[i]); } catch(e) {}
+        try { sessionStorage.clear(); } catch(e) {}
+        window.location.replace('index.html'); 
+    };
+    
+    // ✅ FIX: FORCE SUPABASE AUTH
+    async function checkSession() {
+        try {
+            var res = await sb.auth.getSession();
+            if(!res || !res.data || !res.data.session) {
+                // Session expire ho gaya hai, local storage clear karo taaki RLS block na kare
+                ['zymart_session','zymart_user_role','zymart_user_phone','zymart_token'].forEach(function(k) { localStorage.removeItem(k); });
+                try { var keys = Object.keys(localStorage); for (var i = 0; i < keys.length; i++) if (keys[i].indexOf('sb-') === 0) localStorage.removeItem(keys[i]); } catch(e) {}
+                showLogin();
+                showApp();
+                return;
+            }
+            
+            if (res.data.session.user.email === 'sk12shaikh@gmail.com') {
+                currentAdmin = res.data.session.user;
+                await loadData();
+                renderApp();
+                showApp();
+                return;
+            }
+            
+            var prof = await safeFetch(function() { return sb.from('users').select('role').eq('email', res.data.session.user.email).maybeSingle(); });
+            var role = prof.data ? prof.data.role : null;
+            if(role === 1 || role === '1' || role === 'admin' || role === 'Admin') {
+                currentAdmin = res.data.session.user;
+                await loadData();
+                renderApp();
+                showApp();
+                return;
+            }
+            
+            window.location.href = 'index.html';
+        } catch(e) { showLogin(); showApp(); }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() { checkSession(); });
+    
+    // Window Exports
+    window.toggleSidebar = toggleSidebar;
+    window.loadSection = loadSection;
+    window.showShopDetails = showShopDetails;
+    window.showShopEditModal = showShopEditModal;
+    window.saveShopEdit = saveShopEdit;
+    window.approveShop = approveShop;
+    window.rejectShop = rejectShop;
+    window.deleteShop = deleteShop;
+    window.showSectionModal = showSectionModal;
+    window.saveSectionWithCategories = saveSectionWithCategories;
+    window.toggleSectionActive = toggleSectionActive;
+    window.deleteSection = deleteSection;
+    window.showCategoryModal = showCategoryModal;
+    window.handleCatImage = handleCatImage;
+    window.removeCatImage = removeCatImage; 
+    window.saveCategory = saveCategory;
+    window.toggleCategoryHold = toggleCategoryHold;
+    window.deleteCategory = deleteCategory;
+    window.setCategoryOrder = setCategoryOrder;
+    window.moveCategory = moveCategory;
+    window.renumberAllCategories = renumberAllCategories;
+    window.showProductEditModal = showProductEditModal;
+    window.removeEditProdImage = removeEditProdImage;
+    window.handleEditProdImages = handleEditProdImages;
+    window.saveProductEdit = saveProductEdit;
+    window.toggleEditOfferFields = toggleEditOfferFields;
+    window.viewFullImage = viewFullImage;
+    window.bulkApproveDeleteRequests = bulkApproveDeleteRequests;
+    window.approveDeleteRequest = approveDeleteRequest;
+    window.rejectDeleteRequest = rejectDeleteRequest;
+    window.toggleFeatured = toggleFeatured;
+    window.deleteProduct = deleteProduct;
+    window.filterOffers = filterOffers;
+    window.removeOffer = removeOffer;
+    window.showAddOfferProductModal = showAddOfferProductModal;
+    window.filterOfferPickList = filterOfferPickList;
+    window.markAsOffer = markAsOffer;
+    window.showComboOfferModal = showComboOfferModal;
+    window.filterComboProducts = filterComboProducts;
+    window.handleComboImage = handleComboImage;
+    window.saveComboOffer = saveComboOffer;
+    window.toggleComboActive = toggleComboActive;
+    window.deleteComboOffer = deleteComboOffer;
+    window.showSliderModal = showSliderModal;
+    window.handleSliderImage = handleSliderImage;
+    window.saveSlider = saveSlider;
+    window.toggleSliderActive = toggleSliderActive;
+    window.deleteSlider = deleteSlider;
+    window.sendNotification = sendNotification;
+    window.saveDeliverySettings = saveDeliverySettings;
+    window.savePlanFees = savePlanFees;
+    window.updatePlanTotal = updatePlanTotal;
+    window.closeModal = closeModal;
+    window.handleLogout = handleLogout;
+    window.fastNavigate = fastNavigate;
+    window.switchToDashboard = switchToDashboard;
+    window.sendAdminOTP = sendAdminOTP;
+    window.verifyAdminOTP = verifyAdminOTP;
+    window.resendAdminOTP = resendAdminOTP;
+    window.backToAdminEmail = backToAdminEmail;
+    window.manualRefresh = manualRefresh;
+    window.filterShops = filterShops;
+    window.filterProducts = filterProducts;
+    window.filterCategories = filterCategories;
+    window.filterSubCategories = filterSubCategories;
+    window.addNewLocation = addNewLocation; 
+    window.deleteLocation = deleteLocation; 
+    
+})();
+</script>
+</body>
+</html>

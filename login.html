@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Login - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(function(OneSignal) {
+            OneSignal.init({ appId: "3beb3078-e0f1-4629-af17-fde833b9f716" });
+        });
+    </script>
+    
+    <style>
+        :root { 
+            --brand-green: #0B5A31; 
+            --brand-green-dark: #083D21; 
+            --brand-orange: #F59E0B; 
+            --danger: #EF4444; 
+            --success: #10B981; 
+            --warning: #F59E0B; 
+            --status-bar-height: env(safe-area-inset-top, 0px);
+            --bg-input: #F3F4F6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* PREMIUM BACKGROUND */
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(135deg, #0A3D26 0%, #0B5A31 50%, #083D21 100%); 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+            padding-top: calc(20px + var(--status-bar-height)); 
+            padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); 
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Background decorative elements */
+        body::before { content: ''; position: absolute; top: -10%; left: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(163,230,53,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
+        body::after { content: ''; position: absolute; bottom: -10%; right: -10%; width: 60%; height: 60%; background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
+
+        .login-container { 
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 28px; 
+            padding: 32px 24px; 
+            width: 100%; 
+            max-width: 420px; 
+            box-shadow: 0 24px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,0,0,0.05); 
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
+            position: relative;
+            z-index: 10;
+        }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); } 20%, 40%, 60%, 80% { transform: translateX(4px); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .logo { text-align: center; margin-bottom: 8px; }
+        .logo span { font-family: 'Poppins', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: -1.5px; display: inline-block; }
+        .logo .zy { color: #0B5A31; } .logo .mart { color: #D4A017; }
+        
+        .title { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 6px; color: #1A1A1A; letter-spacing: -0.5px; }
+        .subtitle { font-size: 13px; color: #6B7280; text-align: center; margin-bottom: 24px; font-weight: 500; }
+        
+        /* TOP BAR */
+        .top-bar { position: fixed; top: 0; left: 0; width: 100%; padding: 12px 16px; padding-top: calc(12px + var(--status-bar-height)); display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+        .back-home-btn, .cart-icon-btn { width: 42px; height: 42px; background: rgba(255,255,255,0.1); backdrop-filter: blur(4px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 16px; text-decoration: none; transition: all 0.2s; }
+        .back-home-btn:active, .cart-icon-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.92); }
+        
+        .cart-badge { position: absolute; top: -2px; right: -2px; background: var(--brand-orange); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 9px; display: none; align-items: center; justify-content: center; border: 2px solid #0A3D26; font-weight: 800; }
+        .cart-badge.show { display: flex; }
+        
+        /* MODERN TABS */
+        .tabs { display: flex; background: var(--bg-input); border-radius: 14px; padding: 5px; margin-bottom: 24px; position: relative; }
+        .tab { flex: 1; padding: 12px; text-align: center; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: #6B7280; font-family: 'Inter', sans-serif; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .tab.active { background: white; color: #0B5A31; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .tab i { font-size: 14px; }
+        
+        .tab-content { display: none; animation: slideUp 0.3s ease; }
+        .tab-content.active { display: block; }
+        
+        /* MESSAGES */
+        .error-msg, .success-msg, .warning-msg { padding: 12px 16px; border-radius: 12px; font-size: 12.5px; margin-bottom: 16px; display: none; text-align: left; font-weight: 500; line-height: 1.5; align-items: center; gap: 8px;}
+        .error-msg { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+        .success-msg { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+        .warning-msg { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+        .error-msg i, .success-msg i, .warning-msg i { font-size: 16px; }
+        
+        /* INPUT FIELDS */
+        .input-group { margin-bottom: 18px; position: relative; }
+        .input-group label { display: block; font-size: 12px; font-weight: 600; color: #4B5563; margin-bottom: 6px; margin-left: 4px;}
+        
+        .input-wrapper { position: relative; display: flex; align-items: center; background: var(--bg-input); border-radius: 14px; border: 1.5px solid transparent; transition: all 0.2s ease; }
+        .input-wrapper:focus-within { background: white; border-color: var(--brand-orange); box-shadow: 0 0 0 4px rgba(245,158,11,0.1); }
+        .input-wrapper.error { border-color: var(--danger); background: #FEF2F2; animation: shake 0.4s ease; }
+        
+        .input-icon { position: absolute; left: 16px; color: #9CA3AF; font-size: 16px; transition: color 0.2s; }
+        .input-wrapper:focus-within .input-icon { color: var(--brand-orange); }
+        
+        .input-wrapper input { width: 100%; padding: 16px 16px 16px 44px; border: none; background: transparent; font-size: 15px; font-family: 'Inter', sans-serif; color: #1A1A1A; outline: none; font-weight: 500; border-radius: 14px; }
+        .input-wrapper input::placeholder { color: #9CA3AF; font-weight: 400; }
+        
+        .country-code { position: absolute; left: 44px; font-weight: 600; font-size: 15px; color: #374151; pointer-events: none; }
+        .input-wrapper input.phone-input { padding-left: 80px; }
+        
+        /* BUTTONS */
+        .btn { width: 100%; padding: 16px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; font-family: 'Inter', sans-serif; margin-bottom: 12px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.3px; }
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        
+        .btn-green { background: linear-gradient(135deg, #0B5A31, #15803D); color: white; box-shadow: 0 6px 20px rgba(11,90,49,0.25); }
+        .btn-orange { background: linear-gradient(135deg, #F59E0B, #EA580C); color: white; box-shadow: 0 6px 20px rgba(245,158,11,0.25); }
+        .btn-gray { background: #F3F4F6; color: #4B5563; border: 1px solid #E5E7EB; }
+        .btn-back { background: transparent; color: #6B7280; font-size: 13px; box-shadow: none; margin-top: -4px; }
+        
+        .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
+        
+        /* OTP SECTION */
+        .otp-section { display: none; text-align: center; padding-top: 8px; animation: slideUp 0.3s ease; }
+        .otp-input-wrapper { margin-bottom: 16px; }
+        .otp-input-wrapper input { width: 100%; padding: 16px; border: 1.5px solid #E5E7EB; border-radius: 14px; font-size: 24px; text-align: center; letter-spacing: 12px; font-family: 'Inter', sans-serif; font-weight: 700; background: #F9FAFB; outline: none; transition: all 0.2s; }
+        .otp-input-wrapper input:focus { background: white; border-color: var(--brand-orange); box-shadow: 0 0 0 4px rgba(245,158,11,0.1); }
+        .otp-input-wrapper input.error { border-color: var(--danger); background: #FEF2F2; animation: shake 0.4s ease;}
+        
+        .otp-info { font-size: 13px; color: #6B7280; margin-bottom: 16px; }
+        .otp-info strong { color: #1A1A1A; font-weight: 700; }
+        
+        /* SECURITY NOTE */
+        .security-note { background: #F0FDF4; border: 1px dashed #BBF7D0; border-radius: 12px; padding: 12px; font-size: 11px; color: #166534; margin-top: 20px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; }
+        .security-note i { font-size: 14px; color: #10B981; }
+        
+        /* SHOP CTA */
+        .shop-cta-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 16px; }
+        .shop-cta-divider::before, .shop-cta-divider::after { content: ''; flex: 1; height: 1px; background: #E5E7EB; }
+        .shop-cta-divider span { font-size: 10px; color: #9CA3AF; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .shop-cta-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 16px; background: linear-gradient(135deg, #EDF7F1, #DCFCE7); border: 1.5px solid #86EFAC; border-radius: 16px; color: #0B5A31; text-decoration: none; font-family: 'Inter', sans-serif; transition: all 0.2s; position: relative; overflow: hidden; }
+        .shop-cta-btn:active { transform: scale(0.98); background: linear-gradient(135deg, #DCFCE7, #C8E6D4); }
+        .shop-cta-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); transform: skewX(-20deg); animation: shine 3s infinite; }
+        @keyframes shine { 100% { left: 200%; } }
+        
+        .shop-cta-icon { width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #0B5A31; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .shop-cta-text { text-align: left; }
+        .shop-cta-title { font-size: 14px; font-weight: 800; display: block; margin-bottom: 2px; }
+        .shop-cta-sub { font-size: 10.5px; font-weight: 500; color: #4B5563; display: block; }
+        
+        /* ACTION PROMPT (NO SHOP FOUND) */
+        #actionPrompt { display: none; margin-bottom: 16px; background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 14px; padding: 16px; }
+        #actionPrompt p { font-size: 13px; color: #92400E; margin-bottom: 12px; text-align: center; font-weight: 500; line-height: 1.4; }
+        #actionPrompt .btn { margin-bottom: 8px; padding: 12px; font-size: 14px; }
+        #actionPrompt .btn:last-child { margin-bottom: 0; }
+
+        @media (max-width: 380px) {
+            .login-container { padding: 24px 18px; }
+            .logo span { font-size: 30px; }
+            .title { font-size: 20px; }
+            .tab { font-size: 12px; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="netBanner" style="display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);background:#DC2626;color:white;text-align:center;padding:8px 20px;border-radius:30px;font-size:12px;font-weight:700;z-index:99999;box-shadow:0 4px 12px rgba(220,38,38,0.5);white-space:nowrap;pointer-events:none;">📴 No Internet Connection</div>
+
+<div class="top-bar">
+    <a href="index.html" class="back-home-btn"><i class="fas fa-arrow-left"></i></a>
+    <a href="cart.html" class="cart-icon-btn">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+    </a>
+</div>
+
+<div class="login-container">
+    <div class="logo"><span class="zy">Zy</span><span class="mart">Mart</span></div>
+    <h1 class="title">Welcome Back</h1>
+    <p class="subtitle">Login to access your account & track orders</p>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('mobile')"><i class="fas fa-mobile-alt"></i> Mobile</button>
+        <button class="tab" onclick="switchTab('email')"><i class="fas fa-envelope"></i> Email</button>
+    </div>
+    
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="success-msg" id="successMsg"></div>
+    <div class="warning-msg" id="warningMsg"></div>
+    
+    <!-- ACTION PROMPT FOR SHOP NOT FOUND -->
+    <div id="actionPrompt">
+        <p>Aapka koi shop nahi mila. Pehle apni dukan register karein ya customer ke roop me aage badhein.</p>
+        <a href="shop-register.html" class="btn btn-orange">
+            <i class="fas fa-store"></i> Register Your Business
+        </a>
+        <a href="index.html" class="btn btn-gray">
+            <i class="fas fa-home"></i> Continue as Customer
+        </a>
+    </div>
+
+    <!-- MOBILE LOGIN -->
+    <div class="tab-content active" id="mobileTab">
+        <div id="mobileForm">
+            <div class="input-group">
+                <label>Mobile Number</label>
+                <div class="input-wrapper" id="mobileWrapper">
+                    <i class="fas fa-mobile-alt input-icon"></i>
+                    <span class="country-code">+91</span>
+                    <input type="tel" id="mobileInput" class="phone-input" placeholder="Enter 10-digit number" maxlength="10" inputmode="numeric" autocomplete="tel-national" oninput="this.classList.remove('error')">
+                </div>
+            </div>
+            <button class="btn btn-green" id="mobileSendBtn" onclick="sendMobileOTP()"><i class="fas fa-paper-plane"></i> Send OTP</button>
+        </div>
+        
+        <div id="mobileOtpSection" class="otp-section">
+            <p class="otp-info">📩 OTP sent to <strong id="mobileOtpDisplay"></strong></p>
+            <div class="otp-input-wrapper">
+                <input type="text" id="mobileOtpInput" placeholder="••••••" maxlength="6" inputmode="numeric" autocomplete="one-time-code" oninput="this.classList.remove('error')">
+            </div>
+            <button class="btn btn-orange" onclick="verifyMobileOTP()" id="mobileVerifyBtn"><i class="fas fa-check-circle"></i> Verify & Login</button>
+            <button class="btn btn-gray" onclick="resendMobileOTP()" id="mobileResendBtn" style="display:none;"><i class="fas fa-redo"></i> Resend OTP</button>
+            <button class="btn btn-back" onclick="goBackMobile()"><i class="fas fa-chevron-left"></i> Change Number</button>
+        </div>
+    </div>
+
+    <!-- EMAIL LOGIN -->
+    <div class="tab-content" id="emailTab">
+        <div id="emailForm">
+            <div class="input-group">
+                <label>Email Address</label>
+                <div class="input-wrapper" id="emailWrapper">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="emailInput" placeholder="example@email.com" inputmode="email" autocomplete="email" oninput="this.classList.remove('error')">
+                </div>
+            </div>
+            <button class="btn btn-green" id="emailSendBtn" onclick="sendEmailOTP()"><i class="fas fa-paper-plane"></i> Send OTP</button>
+        </div>
+        
+        <div id="emailOtpSection" class="otp-section">
+            <p class="otp-info">📩 OTP sent to <strong id="emailOtpDisplay"></strong></p>
+            <div class="otp-input-wrapper">
+                <input type="text" id="emailOtpInput" placeholder="••••••" maxlength="6" inputmode="numeric" autocomplete="one-time-code" oninput="this.classList.remove('error')">
+            </div>
+            <button class="btn btn-orange" onclick="verifyEmailOTP()" id="emailVerifyBtn"><i class="fas fa-check-circle"></i> Verify & Login</button>
+            <button class="btn btn-gray" onclick="resendEmailOTP()" id="emailResendBtn" style="display:none;"><i class="fas fa-redo"></i> Resend OTP</button>
+            <button class="btn btn-back" onclick="goBackEmail()"><i class="fas fa-chevron-left"></i> Change Email</button>
+        </div>
+    </div>
+
+    <div class="security-note"><i class="fas fa-shield-alt"></i> Your data is 100% secure. OTP expires in 5 mins.</div>
+    
+    <div class="shop-cta-divider"><span>New Business?</span></div>
+    <a href="shop-register.html" class="shop-cta-btn">
+        <div class="shop-cta-icon"><i class="fas fa-store"></i></div>
+        <div class="shop-cta-text">
+            <span class="shop-cta-title">Register Your Business</span>
+            <span class="shop-cta-sub">Starting at just ₹499 + GST</span>
+        </div>
+    </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function() {
+    'use strict';
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'
+    };
+    var zymartDB = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    var RL_KEY_MOBILE = 'zymart_rl_mobile';
+    var RL_KEY_EMAIL = 'zymart_rl_email';
+    var currentMobile = null, currentEmail = null;
+    var mobileTimer = null, emailTimer = null;
+    var mobileSeconds = 0, emailSeconds = 0;
+    
+    var ADMIN_EMAIL = 'sk12shaikh@gmail.com';
+    
+    function $(id) { return document.getElementById(id); }
+    function showError(msg) { var el = $('errorMsg'); if(el){ el.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg; el.style.display='flex'; } $('successMsg').style.display='none'; $('warningMsg').style.display='none'; }
+    function showSuccess(msg) { var el = $('successMsg'); if(el){ el.innerHTML = '<i class="fas fa-check-circle"></i> ' + msg; el.style.display='flex'; } $('errorMsg').style.display='none'; $('warningMsg').style.display='none'; }
+    function showWarning(msg) { var el = $('warningMsg'); if(el){ el.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + msg; el.style.display='flex'; } $('errorMsg').style.display='none'; $('successMsg').style.display='none'; }
+    function hideAll() { $('errorMsg').style.display='none'; $('successMsg').style.display='none'; $('warningMsg').style.display='none'; $('actionPrompt').style.display='none'; }
+    
+    window.addEventListener('offline', function() { var b = $('netBanner'); if (b) b.style.display = 'block'; });
+    window.addEventListener('online', function() { var b = $('netBanner'); if (b) b.style.display = 'none'; });
+    
+    // ═══════════════════════════════════════════════════
+    // NOTIFICATION SETUP
+    // ═══════════════════════════════════════════════════
+    async function setupNotifications(userId) {
+        if (!userId) return;
+        console.log('[Login] Setting up notifications for user:', userId);
+        
+        try {
+            if (window.OneSignalDeferred) {
+                OneSignalDeferred.push(async function(OneSignal) {
+                    try {
+                        await OneSignal.login(String(userId));
+                        var permission = OneSignal.Notifications.permission;
+                        if (permission !== true) { await OneSignal.Notifications.requestPermission(); }
+                        await OneSignal.User.PushSubscription.optIn();
+                        console.log('[Login] OneSignal linked');
+                    } catch(e) { console.warn('[Login] OneSignal error:', e.message); }
+                });
+            }
+        } catch(e) { console.warn('[Login] OneSignal exception:', e.message); }
+        
+        try {
+            if (window.Android && typeof window.Android.requestNotificationPermission === 'function') {
+                window.Android.requestNotificationPermission();
+            }
+        } catch(e) {}
+        
+        var attempts = 0;
+        var maxAttempts = 6;
+        var saved = false;
+        var saveInterval = setInterval(async function() {
+            attempts++;
+            if (saved) { clearInterval(saveInterval); return; }
+            
+            var token = null;
+            try { token = localStorage.getItem('zymart_fcm_token'); } catch(e) {}
+            
+            if (token && token.length > 20) {
+                try {
+                    var existing = await zymartDB.from('device_tokens').select('id').eq('token', token).maybeSingle();
+                    if (existing && existing.data) {
+                        await zymartDB.from('device_tokens').update({ user_id: userId, updated_at: new Date().toISOString() }).eq('token', token);
+                    } else {
+                        await zymartDB.from('device_tokens').insert({ token: token, platform: 'android', user_id: userId, updated_at: new Date().toISOString() });
+                    }
+                    console.log('[Login] ✅ FCM token saved for user');
+                    saved = true;
+                    clearInterval(saveInterval);
+                } catch(e) { console.warn('[Login] FCM save attempt failed:', e.message); }
+            }
+            
+            if (attempts >= maxAttempts) { clearInterval(saveInterval); }
+        }, 2000);
+    }
+    
+    function normalizeRole(role, email) {
+        if(email && String(email).toLowerCase().trim() === ADMIN_EMAIL) return 'admin';
+        if(!role) return 'customer';
+        var r = String(role).toLowerCase().trim();
+        if(r === 'admin' || r === '1') return 'admin';
+        if(r === '2' || r === '3' || r === 'shop_owner' || r === 'shopowner' || r === 'shop owner') return 'shop_owner';
+        return 'customer';
+    }
+    
+    function updateCartBadge() {
+        try {
+            var cart = JSON.parse(localStorage.getItem('zymart_cart') || '[]');
+            var totalItems = cart.reduce(function(sum, item) { return sum + (item.quantity || 1); }, 0);
+            var badge = $('cartBadge');
+            if (badge) { badge.textContent = totalItems; if(totalItems > 0) badge.classList.add('show'); else badge.classList.remove('show'); }
+        } catch(e) {}
+    }
+    
+    function getRL(key) { try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { return {}; } }
+    function saveRL(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {} }
+    
+    function canSendOTP(rlKey) {
+        var rl = getRL(rlKey);
+        var now = Date.now();
+        if(!rl.windowStart || (now - rl.windowStart) > 300000) { rl = { windowStart: now, sendCount: 0, lockedUntil: 0, attemptCount: 0 }; saveRL(rlKey, rl); }
+        if(rl.lockedUntil && now < rl.lockedUntil) { var mins = Math.ceil((rl.lockedUntil - now) / 60000); return { allowed: false, reason: '🔒 Locked. Try in ' + mins + ' min.', rl: rl }; }
+        if(rl.sendCount >= 3) { return { allowed: false, reason: '⚠️ Too many OTP requests.', rl: rl }; }
+        if(rl.lastSend && (now - rl.lastSend) < 30000) { return { allowed: false, reason: '⏳ Wait 30 seconds.', rl: rl }; }
+        return { allowed: true, rl: rl };
+    }
+    
+    function recordOTPSend(rlKey, rl) { rl.sendCount = (rl.sendCount || 0) + 1; rl.lastSend = Date.now(); saveRL(rlKey, rl); }
+    
+    window.switchTab = function(tab) {
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+        if(tab === 'mobile') { document.querySelector('.tab:nth-child(1)').classList.add('active'); $('mobileTab').classList.add('active'); }
+        else { document.querySelector('.tab:nth-child(2)').classList.add('active'); $('emailTab').classList.add('active'); }
+        hideAll();
+    };
+    
+    function callEdge(name, body, timeoutMs) {
+        timeoutMs = timeoutMs || 20000;
+        var controller = new AbortController();
+        var timerId = setTimeout(function() { controller.abort(); }, timeoutMs);
+        return fetch(CONFIG.SUPABASE_URL + '/functions/v1/' + name, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': CONFIG.SUPABASE_KEY, 'Authorization': 'Bearer ' + CONFIG.SUPABASE_KEY },
+            body: JSON.stringify(body),
+            signal: controller.signal
+        }).finally(function() { clearTimeout(timerId); });
+    }
+    
+    function isSafeRedirect(url) {
+        if (!url || typeof url !== 'string') return false;
+        if (url.indexOf('//') === 0) return false;
+        if (url.charAt(0) === '/') return true;
+        try {
+            var u = new URL(url, window.location.origin);
+            return u.origin === window.location.origin;
+        } catch(e) { return false; }
+    }
+    
+    async function redirectByRole(role, email, phone) {
+        var redirect = sessionStorage.getItem('zymart_redirect_after_login');
+        if(redirect) {
+            sessionStorage.removeItem('zymart_redirect_after_login');
+            if (isSafeRedirect(redirect)) { window.location.href = redirect; return; }
+        }
+        
+        var roleStr = String(role || 'customer').toLowerCase().trim();
+        
+        if (roleStr === 'admin') { window.location.href = 'admin-panel.html'; return; }
+        
+        if (roleStr === 'shop_owner') {
+            try {
+                var shopQuery = zymartDB.from('shops').select('id, status').limit(1);
+                if (email) shopQuery = shopQuery.ilike('owner_email', email);
+                else if (phone) shopQuery = shopQuery.eq('owner_phone', phone);
+                else shopQuery = null;
+                
+                if (shopQuery) {
+                    var shopRes = await shopQuery.maybeSingle();
+                    if (shopRes && shopRes.data) {
+                        if (shopRes.data.status === 'approved') {
+                            window.location.href = 'shop-dashboard.html';
+                            return;
+                        } else if (shopRes.data.status === 'pending') {
+                            showWarning('⏳ Aapka shop pending approval me hai. Admin 24 ghante me review karega. WhatsApp: 8600252238');
+                            return;
+                        } else if (shopRes.data.status === 'rejected') {
+                            showError('❌ Aapka shop reject ho gaya hai. Support: WhatsApp 8600252238');
+                            return;
+                        }
+                    }
+                }
+            } catch(e) { console.warn('[Login] Shop status check failed:', e.message); }
+            
+            showWarning('🏪 Aapka koi shop nahi mila. Pehle apni dukan register karein ya customer ke roop me continue karein.');
+            $('actionPrompt').style.display = 'block';
+            return;
+        }
+        
+        window.location.href = 'index.html';
+    }
+    
+    function saveSession(phone, userId, role, email) {
+        try {
+            var session = { userId: userId, phone: phone, role: role, email: email || '', loginTime: new Date().toISOString() };
+            localStorage.setItem('zymart_session', JSON.stringify(session));
+            if(phone) localStorage.setItem('zymart_user_phone', phone);
+            if(email) localStorage.setItem('zymart_user_email', email);
+            localStorage.setItem('zymart_user_role', role);
+        } catch(e) {}
+    }
+    
+    function clearSession() {
+        try {
+            ['zymart_session','zymart_user_phone','zymart_user_email','zymart_user_role','zymart_token'].forEach(function(k) { localStorage.removeItem(k); });
+        } catch(e) {}
+    }
+    
+    async function checkApprovedShop(email, phone) {
+        try {
+            if(email) {
+                var emailRes = await zymartDB.from('shops').select('id, status').ilike('owner_email', email.trim()).eq('status', 'approved').limit(1).maybeSingle();
+                if(emailRes && emailRes.data) return emailRes.data;
+            }
+            if(phone) {
+                var phoneRes = await zymartDB.from('shops').select('id, status').eq('owner_phone', phone.trim()).eq('status', 'approved').limit(1).maybeSingle();
+                if(phoneRes && phoneRes.data) return phoneRes.data;
+            }
+            return null;
+        } catch(e) { return null; }
+    }
+    
+    async function getOrCreateUser(phone, email, authId) {
+        try {
+            if (!authId) { console.error('[Login] No authId'); return null; }
+            
+            var userId = authId;
+            var dbRole = null;
+            
+            var byId = await zymartDB.from('users').select('id, role').eq('id', authId).maybeSingle();
+            if (byId && byId.data) { dbRole = byId.data.role; }
+            
+            if (dbRole === null) {
+                var checkQuery = zymartDB.from('users').select('id, role');
+                if(phone) checkQuery = checkQuery.eq('phone', phone);
+                else if(email) checkQuery = checkQuery.eq('email', email);
+                
+                var check = await checkQuery.limit(1).maybeSingle();
+                if (check && check.data && check.data.id) {
+                    if (check.data.id === authId) { dbRole = check.data.role; }
+                    else { console.warn('[Login] ⚠️ Legacy user id mismatch, using authId'); dbRole = check.data.role; }
+                }
+            }
+            
+            if (dbRole === null) {
+                var userRole = normalizeRole(null, email);
+                var newUser = {
+                    id: authId, phone: phone || null, email: email || null,
+                    name: phone ? 'User' + phone.slice(-4) : (email ? email.split('@')[0] : 'User'),
+                    role: userRole, is_active: true, created_at: new Date().toISOString()
+                };
+                var insert = await zymartDB.from('users').insert([newUser]).select('id, role').maybeSingle();
+                
+                if (insert && insert.data) { dbRole = insert.data.role; }
+                else if (insert && insert.error) {
+                    console.error('[Login] Insert error:', insert.error.message);
+                    var retry = await zymartDB.from('users').select('id, role').eq('id', authId).maybeSingle();
+                    if (retry && retry.data) { dbRole = retry.data.role; }
+                    else return null;
+                }
+            }
+            
+            var finalRole = normalizeRole(dbRole, email);
+            
+            if (finalRole !== 'admin' && finalRole !== 'shop_owner') {
+                var approvedShop = await checkApprovedShop(email, phone);
+                if (approvedShop) {
+                    finalRole = 'shop_owner';
+                    if (dbRole !== 'shop_owner' && dbRole !== '2' && dbRole !== '3') {
+                        try { await zymartDB.from('users').update({ role: 'shop_owner' }).eq('id', authId); } catch(e) {}
+                    }
+                }
+            }
+            
+            return { userId: authId, role: finalRole };
+        } catch(e) {
+            console.error('[Login] getOrCreateUser error:', e);
+            return null;
+        }
+    }
+    
+    // ═══════════════════════════════════════════════════
+    // MOBILE LOGIN
+    // ═══════════════════════════════════════════════════
+    window.sendMobileOTP = async function() {
+        hideAll();
+        if(!navigator.onLine) { showError('No internet connection'); return; }
+        
+        var phone = ($('mobileInput').value || '').trim();
+        if(!phone || !/^[6-9]\d{9}$/.test(phone)) { $('mobileWrapper').classList.add('error'); showError('Please enter a valid 10-digit mobile number'); return; }
+        $('mobileWrapper').classList.remove('error');
+        var check = canSendOTP(RL_KEY_MOBILE);
+        if(!check.allowed) { showError(check.reason); return; }
+        var btn = $('mobileSendBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Sending...';
+        try {
+            var res = await callEdge('send-otp', { phone: phone });
+            if(!res.ok) { showError('❌ Failed to send OTP'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; return; }
+            var data = await res.json();
+            if(data.Status === 'Success' || data.status === 'success' || data.success === true) {
+                recordOTPSend(RL_KEY_MOBILE, check.rl);
+                currentMobile = phone;
+                $('mobileOtpDisplay').textContent = '+91 ' + phone;
+                $('mobileForm').style.display = 'none';
+                $('mobileOtpSection').style.display = 'block';
+                $('mobileOtpInput').value = '';
+                showSuccess('OTP sent to +91 ' + phone);
+                startMobileTimer();
+            } else { showError('Failed to send OTP'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; }
+        } catch(e) { showError('⚠️ Network error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; }
+    };
+    
+    window.verifyMobileOTP = async function() {
+        hideAll();
+        if(!navigator.onLine) { showError('No internet connection'); return; }
+        if(!currentMobile) { showError('Session expired'); return; }
+        var otp = ($('mobileOtpInput').value || '').trim();
+        if(!otp || otp.length !== 6) { showError('Enter 6-digit OTP'); return; }
+        var btn = $('mobileVerifyBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
+        try {
+            var res = await callEdge('verify-otp', { phone: currentMobile, otp: otp });
+            var data = {};
+            try { data = await res.json(); } catch(e) {}
+            
+            if(!res.ok || (data.Status !== 'Success' && data.status !== 'success' && data.success !== true)) {
+                showError('❌ ' + (data.message || data.error || 'Incorrect OTP'));
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+                return;
+            }
+            
+            var authEmail = data.email;
+            var authPassword = data.password;
+            
+            if(authEmail && authPassword) {
+                btn.innerHTML = '<span class="loading-spinner"></span> Logging in...';
+                var signInRes = await zymartDB.auth.signInWithPassword({ email: authEmail, password: authPassword });
+                
+                if(signInRes.error) {
+                    showError('⚠️ Session failed: ' + signInRes.error.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+                    return;
+                }
+                
+                if(!signInRes.data || !signInRes.data.session) {
+                    showError('⚠️ Session not created');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+                    return;
+                }
+                
+                var authUid = signInRes.data.session.user.id;
+                var userData = await getOrCreateUser(currentMobile, null, authUid);
+                
+                if(!userData || !userData.userId) {
+                    showError('⚠️ Unable to create account');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+                    return;
+                }
+                
+                var role = userData.role || 'customer';
+                clearSession();
+                saveSession(currentMobile, userData.userId, role, '');
+                await setupNotifications(userData.userId);
+                
+                showSuccess('✅ Login successful!');
+                setTimeout(function() { redirectByRole(role, '', currentMobile); }, 800);
+            } else {
+                showError('⚠️ Auth credentials missing');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+            }
+        } catch(e) {
+            console.error('[Login] Error:', e);
+            showError('⚠️ Verification failed: ' + e.message);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+        }
+    };
+    
+    window.resendMobileOTP = async function() {
+        if(mobileSeconds > 0 || !currentMobile) return;
+        if(!navigator.onLine) { showError('No internet connection'); return; }
+        var check = canSendOTP(RL_KEY_MOBILE);
+        if(!check.allowed) { showError(check.reason); return; }
+        try {
+            var res = await callEdge('send-otp', { phone: currentMobile });
+            if(res.ok) { recordOTPSend(RL_KEY_MOBILE, check.rl); showSuccess('✅ OTP resent!'); startMobileTimer(); $('mobileOtpInput').value = ''; }
+        } catch(e) { showError('Network error'); }
+    };
+    
+    function startMobileTimer() {
+        mobileSeconds = 30;
+        var btn = $('mobileResendBtn');
+        btn.disabled = true;
+        btn.style.display = 'flex';
+        if(mobileTimer) clearInterval(mobileTimer);
+        mobileTimer = setInterval(function() {
+            mobileSeconds--;
+            if(mobileSeconds <= 0) { clearInterval(mobileTimer); btn.disabled = false; btn.innerHTML = '<i class="fas fa-redo"></i> Resend OTP'; }
+            else { btn.innerHTML = '<i class="fas fa-redo"></i> Resend OTP (' + mobileSeconds + 's)'; }
+        }, 1000);
+    }
+    
+    window.goBackMobile = function() {
+        $('mobileForm').style.display = 'block';
+        $('mobileOtpSection').style.display = 'none';
+        currentMobile = null;
+        hideAll();
+        if(mobileTimer) clearInterval(mobileTimer);
+        $('mobileResendBtn').style.display = 'none';
+        var btn = $('mobileSendBtn'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+    };
+    
+    // ═══════════════════════════════════════════════════
+    // EMAIL LOGIN
+    // ═══════════════════════════════════════════════════
+    window.sendEmailOTP = async function() {
+        hideAll();
+        if(!navigator.onLine) { showError('No internet connection'); return; }
+        
+        var email = ($('emailInput').value || '').trim().toLowerCase();
+        if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { $('emailWrapper').classList.add('error'); showError('Please enter a valid email'); return; }
+        $('emailWrapper').classList.remove('error');
+        var check = canSendOTP(RL_KEY_EMAIL);
+        if(!check.allowed) { showError(check.reason); return; }
+        var btn = $('emailSendBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Sending...';
+        try {
+            var res = await zymartDB.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } });
+            if(res.error) { showError('❌ ' + res.error.message); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; return; }
+            recordOTPSend(RL_KEY_EMAIL, check.rl);
+            currentEmail = email;
+            $('emailOtpDisplay').textContent = email;
+            $('emailForm').style.display = 'none';
+            $('emailOtpSection').style.display = 'block';
+            $('emailOtpInput').value = '';
+            showSuccess('✅ OTP sent to ' + email);
+            startEmailTimer();
+        } catch(e) { showError('⚠️ Network error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP'; }
+    };
+    
+    window.verifyEmailOTP = async function() {
+        hideAll();
+        if(!navigator.onLine) { showError('No internet connection'); return; }
+        if(!currentEmail) { showError('Session expired'); return; }
+        var otp = ($('emailOtpInput').value || '').trim();
+        if(!otp || otp.length !== 6) { showError('Enter 6-digit OTP'); return; }
+        var btn = $('emailVerifyBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Verifying...';
+        try {
+            var res = await zymartDB.auth.verifyOtp({ email: currentEmail, token: otp, type: 'email' });
+            if(res.error) { showError('❌ Invalid OTP'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login'; return; }
+            if(res.data && res.data.session) {
+                var user = res.data.session.user;
+                var authUid = user.id;
+                
+                var userData = await getOrCreateUser(null, currentEmail, authUid);
+                
+                if (!userData || !userData.userId) {
+                    showError('⚠️ Unable to create account');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+                    return;
+                }
+                
+                var role = userData.role || normalizeRole(null, currentEmail);
+                clearSession();
+                saveSession(user.phone || '', userData.userId, role, currentEmail);
+                await setupNotifications(userData.userId);
+                
+                showSuccess('✅ Login successful!');
+                setTimeout(function() { redirectByRole(role, currentEmail, ''); }, 800);
+            } else {
+                showError('⚠️ Verification failed');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+            }
+        } catch(e) {
+            showError('⚠️ Verification failed');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+        }
+    };
+    
+    window.resendEmailOTP = async function() {
+        if(emailSeconds > 0 || !currentEmail) return;
+        if(!navigator.onLine) { showError('No internet connection'); return; }
+        var check = canSendOTP(RL_KEY_EMAIL);
+        if(!check.allowed) { showError(check.reason); return; }
+        try {
+            var res = await zymartDB.auth.signInWithOtp({ email: currentEmail, options: { shouldCreateUser: true } });
+            if(!res.error) { recordOTPSend(RL_KEY_EMAIL, check.rl); showSuccess('✅ OTP resent!'); startEmailTimer(); $('emailOtpInput').value = ''; }
+        } catch(e) { showError('Network error'); }
+    };
+    
+    function startEmailTimer() {
+        emailSeconds = 30;
+        var btn = $('emailResendBtn');
+        btn.disabled = true;
+        btn.style.display = 'flex';
+        if(emailTimer) clearInterval(emailTimer);
+        emailTimer = setInterval(function() {
+            emailSeconds--;
+            if(emailSeconds <= 0) { clearInterval(emailTimer); btn.disabled = false; btn.innerHTML = '<i class="fas fa-redo"></i> Resend OTP'; }
+            else { btn.innerHTML = '<i class="fas fa-redo"></i> Resend OTP (' + emailSeconds + 's)'; }
+        }, 1000);
+    }
+    
+    window.goBackEmail = function() {
+        $('emailForm').style.display = 'block';
+        $('emailOtpSection').style.display = 'none';
+        currentEmail = null;
+        hideAll();
+        if(emailTimer) clearInterval(emailTimer);
+        $('emailResendBtn').style.display = 'none';
+        var btn = $('emailSendBtn'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!navigator.onLine) { var nb = $('netBanner'); if (nb) nb.style.display = 'block'; }
+        updateCartBadge();
+    });
+    window.addEventListener('storage', function(e) { if(e.key === 'zymart_cart') { updateCartBadge(); } });
+    
+})();
+</script>
+</body>
+</html>

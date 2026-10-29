@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Business Register - ZyMart+</title>
+    <meta name="theme-color" content="#0B5A31">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://zwajyovemwdqtkecipeb.supabase.co">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --brand-green: #0B5A31; --brand-green-dark: #083D21; --brand-orange: #F59E0B;
+            --brand-gold: #D4A017; --brand-gold-light: #FDE047;
+            --neutral-white: #FFFFFF; --neutral-bg: #F9FAFB; --neutral-border: #E5E7EB;
+            --neutral-gray: #6B7280; --neutral-dark: #1A1A1A; --danger: #EF4444;
+            --success: #22C55E;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06); --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --radius-md: 14px; --radius-lg: 18px; --radius-xl: 22px; --radius-2xl: 28px; --radius-full: 9999px;
+            --status-bar-height: env(safe-area-inset-top, 0px);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* FONT MISMATCH FIX */
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--neutral-bg); color: var(--neutral-dark); -webkit-tap-highlight-color: transparent; min-height: 100vh; padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes heroGlow { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
+        @keyframes heroShimmer { 0% { left: -100%; } 100% { left: 100%; } }
+        @keyframes twinkle { 0%, 100% { transform: scale(1) rotate(0); opacity: 1; } 50% { transform: scale(1.2) rotate(15deg); opacity: 0.8; } }
+        @keyframes lineShimmer { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes ctaPulse { 0%, 100% { box-shadow: 0 8px 24px rgba(245,158,11,0.4), 0 0 0 0 rgba(245,158,11,0.5); } 50% { box-shadow: 0 12px 32px rgba(245,158,11,0.55), 0 0 0 12px rgba(245,158,11,0); } }
+        
+        #simpleLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 10002; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; transition: opacity 0.3s ease; }
+        #simpleLoader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .simple-spinner { width: 34px; height: 34px; border: 2.5px solid var(--neutral-border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .loader-logo { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; }
+        .loader-zy { color: #A3E635; } .loader-mart { color: #FDE047; }
+        
+        .top-bar { background: linear-gradient(135deg, #0A3D26 0%, #0F5132 50%, #0A3D26 100%); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 10px 14px; padding-top: calc(10px + var(--status-bar-height)); display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(11,90,49,0.35); }
+        .back-btn { width: 40px; height: 40px; min-width: 40px; background: rgba(255,255,255,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 15px; text-decoration: none; transition: all 0.2s; }
+        .back-btn:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+        
+        .brand-logo { display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; padding-bottom: 2px; }
+        .logo-main { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 800; line-height: 1; letter-spacing: -0.5px; }
+        .logo-z { color: #FFFFFF; } .logo-y { color: #FDE047; } .logo-mart { color: #FFFFFF; }
+        .logo-india { font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 800; color: #FDE047; letter-spacing: 1.5px; margin-top: 2px; padding-left: 18px; display: flex; align-items: center; gap: 3px; }
+        .logo-india::before { content: ''; display: inline-block; width: 14px; height: 5px; flex-shrink: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6' viewBox='0 0 16 6'%3E%3Cpath d='M1 1 Q 8 5 15 1' fill='none' stroke='%23A3E635' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center; background-size: 100% 100%; }
+        
+        .page-title { flex: 1; text-align: center; font-weight: 600; font-size: 13px; color: white; }
+        .cart-icon-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: white; font-size: 14px; position: relative; text-decoration: none; }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--brand-orange); color: white; border-radius: 50%; width: 17px; height: 17px; font-size: 8px; display: none; align-items: center; justify-content: center; border: 2px solid var(--brand-green); font-weight: 700; }
+        .cart-badge.show { display: flex; }
+        
+        .main-content { padding-top: calc(60px + var(--status-bar-height)); padding-bottom: 40px; max-width: 600px; margin: 0 auto; }
+        
+        .hero-section { 
+            background: linear-gradient(135deg, #0A3D26 0%, #0B5A31 40%, #0F6E3B 70%, #083D21 100%);
+            margin: 12px 14px 20px;
+            padding: 26px 20px 24px;
+            border-radius: var(--radius-2xl);
+            animation: fadeInUp 0.4s ease;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(11,90,49,0.4), 0 8px 16px -8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.12);
+            border: 1px solid rgba(163,230,53,0.18);
+        }
+        .hero-section::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 20% 20%, rgba(253,224,71,0.14) 0%, transparent 40%), radial-gradient(circle at 80% 80%, rgba(163,230,53,0.1) 0%, transparent 45%); pointer-events: none; animation: heroGlow 8s ease-in-out infinite; z-index: 0; }
+        .hero-section::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); animation: heroShimmer 4.5s infinite; pointer-events: none; z-index: 1; }
+        .hero-content { position: relative; z-index: 2; }
+        
+        .hero-premium-badge { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #FDE047 0%, #D4A017 100%); color: #0A3D26; padding: 6px 14px; border-radius: 9999px; font-size: 9.5px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 14px; box-shadow: 0 4px 14px rgba(253,224,71,0.35), inset 0 1px 0 rgba(255,255,255,0.5); animation: float 3s ease-in-out infinite; }
+        .hero-premium-badge i { font-size: 11px; animation: twinkle 2s infinite; }
+        
+        .hero-section h1 { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 800; line-height: 1.25; margin-bottom: 8px; background: linear-gradient(135deg, #FFFFFF 0%, #E0F2E9 60%, #FDE047 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.3px; }
+        .hero-content > p { font-size: 11.5px; opacity: 0.82; margin-bottom: 18px; line-height: 1.55; }
+        
+        .fee-premium-card { background: linear-gradient(135deg, rgba(255,255,255,0.13) 0%, rgba(253,224,71,0.09) 100%); border: 1.5px solid rgba(253,224,71,0.4); border-radius: 18px; padding: 16px 20px 14px; margin-top: 10px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: relative; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.15); }
+        .fee-premium-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #FDE047, transparent); animation: lineShimmer 3s infinite; }
+        .fee-label { font-size: 9.5px; font-weight: 700; color: #FDE047; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+        .fee-amount { font-family: 'Poppins', sans-serif; font-size: 42px; font-weight: 800; line-height: 1; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.2); letter-spacing: -1.5px; display: flex; align-items: baseline; justify-content: center; gap: 2px; }
+        .fee-amount .rupee { font-size: 24px; opacity: 0.9; font-weight: 700; margin-right: 1px; }
+        .fee-period { font-size: 11px; color: rgba(255,255,255,0.72); font-weight: 500; margin-top: 4px; }
+        .fee-gst-note { display: inline-flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.22); padding: 4px 10px; border-radius: 9999px; font-size: 9.5px; font-weight: 600; color: #FDE047; margin-top: 10px; }
+        
+        .hero-stats { display: flex; justify-content: space-between; gap: 6px; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.12); position: relative; z-index: 2; }
+        .hero-stat { flex: 1; text-align: center; }
+        .hero-stat i { font-size: 15px; margin-bottom: 4px; display: block; }
+        .hero-stat strong { display: block; font-family: 'Poppins', sans-serif; font-size: 12.5px; font-weight: 800; color: white; margin-bottom: 1px; }
+        .hero-stat span { font-size: 8.5px; opacity: 0.65; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 600; }
+        
+        .benefits-section { background: white; margin: 0 14px 20px; border-radius: var(--radius-2xl); padding: 18px; box-shadow: var(--shadow-sm); border: 1px solid var(--neutral-border); animation: fadeInUp 0.4s ease; }
+        .benefits-title { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; color: var(--brand-green-dark); text-align: center; margin-bottom: 4px; }
+        .benefits-sub { text-align: center; font-size: 11px; color: var(--neutral-gray); margin-bottom: 14px; }
+        .benefits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .benefit-card { background: linear-gradient(135deg, #F0FDF4, #F7FEF9); border: 1px solid #BBF7D0; border-radius: 12px; padding: 12px 10px; text-align: center; }
+        .benefit-card .b-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--brand-green), #0F6E3B); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 14px; box-shadow: 0 2px 8px rgba(11,90,49,0.25); }
+        .benefit-card .b-title { font-size: 11px; font-weight: 700; color: var(--brand-green-dark); margin-bottom: 2px; }
+        .benefit-card .b-desc { font-size: 9px; color: #6B7280; line-height: 1.35; }
+        
+        .plans-landing-section { margin: 0 14px 20px; animation: fadeInUp 0.5s ease; }
+        .plans-landing-title { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 800; color: var(--brand-green-dark); text-align: center; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .plans-landing-title i { color: var(--brand-orange); }
+        .plans-landing-sub { text-align: center; font-size: 11px; color: var(--neutral-gray); margin-bottom: 16px; }
+        .plans-landing-grid { display: flex; flex-direction: column; gap: 16px; }
+        
+        .plan-card-landing { background: white; border: 2px solid var(--neutral-border); border-radius: var(--radius-xl); padding: 22px 18px 18px; position: relative; cursor: pointer; transition: all 0.25s; box-shadow: var(--shadow-sm); }
+        .plan-card-landing:active { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .plan-card-landing.plan-popular { border-color: #F59E0B; background: linear-gradient(180deg, #FFFBEB, white); }
+        .plan-card-landing.plan-best { border-color: #D4A017; background: linear-gradient(180deg, #FEFCE8, white); }
+        
+        .pcl-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); padding: 4px 14px; border-radius: 9999px; font-size: 9px; font-weight: 800; letter-spacing: 1px; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); white-space: nowrap; }
+        .pcl-badge.limited { background: linear-gradient(135deg, #6B7280, #4B5563); }
+        .pcl-badge.popular { background: linear-gradient(135deg, #F59E0B, #EA580C); }
+        .pcl-badge.best { background: linear-gradient(135deg, #D4A017, #B8860B); }
+        
+        .pcl-header { margin-bottom: 12px; }
+        .pcl-name { font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 800; color: var(--neutral-dark); margin-bottom: 2px; }
+        .pcl-validity { font-size: 11px; color: var(--neutral-gray); font-weight: 500; }
+        
+        .pcl-price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+        .pcl-price { font-family: 'Poppins', sans-serif; font-size: 34px; font-weight: 800; color: var(--brand-green); line-height: 1; letter-spacing: -1px; }
+        .pcl-price .pcl-cur { font-size: 20px; opacity: 0.85; font-weight: 700; }
+        .pcl-price-save { font-size: 10px; font-weight: 700; color: #059669; background: #ECFDF5; padding: 3px 8px; border-radius: 9999px; border: 1px solid #A7F3D0; }
+        .pcl-gst { font-size: 10px; color: #D97706; font-weight: 600; margin-bottom: 14px; }
+        
+        .pcl-features { display: flex; flex-direction: column; gap: 8px; padding: 14px 0; border-top: 1px dashed var(--neutral-border); border-bottom: 1px dashed var(--neutral-border); margin-bottom: 14px; }
+        .pcl-feature { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #374151; font-weight: 500; }
+        .pcl-feature i { width: 18px; height: 18px; background: #DCFCE7; color: #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; }
+        .pcl-feature strong { color: var(--brand-green-dark); font-weight: 700; }
+        
+        .pcl-btn { width: 100%; padding: 14px; border-radius: 9999px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; font-family: 'Inter', sans-serif; background: var(--brand-green); color: white; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; }
+        .pcl-btn:active { transform: scale(0.97); }
+        .plan-popular .pcl-btn { background: linear-gradient(135deg, #F59E0B, #EA580C); box-shadow: 0 4px 14px rgba(245,158,11,0.3); }
+        .plan-best .pcl-btn { background: linear-gradient(135deg, #D4A017, #B8860B); box-shadow: 0 4px 14px rgba(212,160,23,0.3); }
+        
+        .main-cta-section { margin: 0 14px 20px; text-align: center; }
+        .main-cta-btn { width: 100%; padding: 18px 20px; border-radius: 9999px; font-size: 15px; font-weight: 800; cursor: pointer; border: none; font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #F59E0B 0%, #EA580C 100%); color: white; display: flex; align-items: center; justify-content: center; gap: 8px; animation: ctaPulse 2.5s ease-in-out infinite; text-transform: uppercase; letter-spacing: 0.5px; position: relative; overflow: hidden; }
+        .main-cta-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: heroShimmer 3s infinite; }
+        .main-cta-btn:active { transform: scale(0.97); }
+        .main-cta-note { font-size: 10px; color: var(--neutral-gray); margin-top: 8px; }
+        
+        .trust-badges-row { display: flex; justify-content: center; gap: 6px; margin: 14px 14px 16px; flex-wrap: wrap; }
+        .trust-badge-mini { display: inline-flex; align-items: center; gap: 4px; background: white; border: 1px solid var(--neutral-border); border-radius: 20px; padding: 6px 12px; font-size: 9px; font-weight: 600; color: #4B5563; }
+        .trust-badge-mini i { color: var(--brand-green); font-size: 10px; }
+        
+        .faq-mini { background: white; margin: 0 14px 20px; border-radius: var(--radius-2xl); padding: 18px; box-shadow: var(--shadow-sm); border: 1px solid var(--neutral-border); }
+        .faq-mini-title { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; color: var(--brand-green-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .faq-item { padding: 10px 0; border-bottom: 1px dashed var(--neutral-border); }
+        .faq-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .faq-q { font-size: 12px; font-weight: 700; color: var(--neutral-dark); margin-bottom: 4px; padding-left: 20px; position: relative; }
+        .faq-q::before { content: 'Q'; position: absolute; left: 0; top: 0; background: var(--brand-green); color: white; width: 15px; height: 15px; border-radius: 50%; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+        .faq-a { font-size: 11px; color: #6B7280; line-height: 1.5; padding-left: 20px; }
+        
+        @media (max-width: 380px) { 
+            .hero-section h1 { font-size: 19px; }
+            .fee-amount { font-size: 36px; }
+            .fee-amount .rupee { font-size: 20px; }
+            .pcl-price { font-size: 30px; }
+            .logo-main { font-size: 18px; }
+            .page-title { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="simpleLoader">
+    <div class="simple-spinner"></div>
+    <div class="loader-logo"><span class="loader-zy">Zy</span><span class="loader-mart">Mart</span></div>
+</div>
+
+<div id="mainApp" style="display:none;">
+    <div class="top-bar">
+        <a href="index.html" class="back-btn" aria-label="Back"><i class="fas fa-arrow-left"></i></a>
+        <div class="brand-logo" onclick="window.location.href='index.html'">
+            <div class="logo-main"><span class="logo-z">Z</span><span class="logo-y">y</span><span class="logo-mart">Mart</span></div>
+            <div class="logo-india">INDIA</div>
+        </div>
+        <div class="page-title">Business Register</div>
+        <a href="cart.html" class="cart-icon-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+    </div>
+    
+    <div class="main-content">
+        
+        <!-- PREMIUM HERO (dynamic price) -->
+        <div class="hero-section">
+            <div class="hero-content">
+                <div class="hero-premium-badge"><i class="fas fa-crown"></i> Premium Membership</div>
+                <h1>Grow Your Business<br>with ZyMart+</h1>
+                <p>Join local businesses reaching thousands of customers<br>across 4 districts of Maharashtra</p>
+                
+                <div class="fee-premium-card">
+                    <div class="fee-label">Starting at just</div>
+                    <div class="fee-amount"><span class="rupee">₹</span><span id="heroFeeAmount">...</span></div>
+                    <div class="fee-period">for 1 month</div>
+                    <div class="fee-gst-note"><i class="fas fa-info-circle"></i> +18% GST added at payment</div>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="hero-stat"><i class="fas fa-bolt" style="color:#FDE047;"></i><strong>24hr</strong><span>Setup</span></div>
+                    <div class="hero-stat"><i class="fas fa-shield-alt" style="color:#A3E635;"></i><strong>Secure</strong><span>Payments</span></div>
+                    <div class="hero-stat"><i class="fas fa-headset" style="color:#FDE047;"></i><strong>24/7</strong><span>Support</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- BENEFITS -->
+        <div class="benefits-section">
+            <div class="benefits-title">🎯 Why Business Owners Choose ZyMart+</div>
+            <div class="benefits-sub">Everything you need to grow your business online</div>
+            <div class="benefits-grid">
+                <div class="benefit-card"><div class="b-icon"><i class="fas fa-users"></i></div><div class="b-title">More Customers</div><div class="b-desc">Access thousands of local buyers</div></div>
+                <div class="benefit-card"><div class="b-icon"><i class="fas fa-bolt"></i></div><div class="b-title">Quick Setup</div><div class="b-desc">Go live within 24 hours</div></div>
+                <div class="benefit-card"><div class="b-icon"><i class="fas fa-shield-alt"></i></div><div class="b-title">Secure Payments</div><div class="b-desc">Razorpay protected</div></div>
+                <div class="benefit-card"><div class="b-icon"><i class="fas fa-headset"></i></div><div class="b-title">Dedicated Support</div><div class="b-desc">WhatsApp + call support</div></div>
+                <div class="benefit-card"><div class="b-icon"><i class="fas fa-chart-line"></i></div><div class="b-title">Growth Analytics</div><div class="b-desc">Track orders &amp; revenue</div></div>
+                <div class="benefit-card"><div class="b-icon"><i class="fas fa-truck"></i></div><div class="b-title">Local Delivery</div><div class="b-desc">10-minute delivery network</div></div>
+            </div>
+        </div>
+        
+        <!-- PLANS (dynamic prices) -->
+        <div class="plans-landing-section">
+            <div class="plans-landing-title"><i class="fas fa-crown"></i> Choose Your Plan</div>
+            <div class="plans-landing-sub">Select a plan that fits your business size</div>
+            
+            <div class="plans-landing-grid">
+                
+                <!-- PLAN 1 -->
+                <div class="plan-card-landing" onclick="goToForm('1m')">
+                    <div class="pcl-badge limited">🔴 LIMITED</div>
+                    <div class="pcl-header">
+                        <div class="pcl-name">Monthly</div>
+                        <div class="pcl-validity">1 month validity</div>
+                    </div>
+                    <div class="pcl-price-row">
+                        <div class="pcl-price"><span class="pcl-cur">₹</span><span id="planPrice1m">...</span></div>
+                    </div>
+                    <div class="pcl-gst">+18% GST at payment</div>
+                    <div class="pcl-features">
+                        <div class="pcl-feature"><i class="fas fa-check"></i> Up to <strong>10 products</strong> upload</div>
+                        <div class="pcl-feature"><i class="fas fa-check"></i> <strong>3 photos</strong> per product</div>
+                        <div class="pcl-feature"><i class="fas fa-check"></i> Full dashboard access</div>
+                        <div class="pcl-feature"><i class="fas fa-check"></i> WhatsApp + email alerts</div>
+                    </div>
+                    <button class="pcl-btn">Select Plan →</button>
+                </div>
+                
+                <!-- PLAN 2 -->
+                <div class="plan-card-landing plan-popular" onclick="goToForm('6m')">
+                    <div class="pcl-badge popular">🔥 POPULAR</div>
+                    <div class="pcl-header">
+                        <div class="pcl-name">Half-Yearly</div>
+                        <div class="pcl-validity">6 months validity</div>
+                    </div>
+                    <div class="pcl-price-row">
+                        <div class="pcl-price"><span class="pcl-cur">₹</span><span id="planPrice6m">...</span></div>
+                        <div class="pcl-price-save" id="planSave6m" style="display:none;"></div>
+                    </div>
+                    <div class="pcl-gst">+18% GST at payment</div>
+                    <div class="pcl-features">
+                        <div class="pcl-feature"><i class="fas fa-check"></i> Up to <strong>100 products</strong> upload</div>
+                        <div class="pcl-feature"><i class="fas fa-check"></i> <strong>3 photos</strong> per product</div>
+                        <div class="pcl-feature"><i class="fas fa-check"></i> Full dashboard + analytics</div>
+                        <div class="pcl-feature"><i class="fas fa-check"></i> Priority support</div>
+                    </div>
+                    <button class="pcl-btn">Select Plan →</button>
+                </div>
+                
+                <!-- PLAN 3 -->
+                <div class="plan-card-landing plan-best" onclick="goToForm('12m')">
+                    <div class="pcl-badge best">👑 BEST VALUE</div>
+                    <div class="pcl-header">
+                        <div class="pcl-name">Yearly</div>
+                        <div class="pcl-validity">12 months validity</div>
+                    </div>
+                    <div class="pcl-price-row">
+                        <div class="pcl-price"><span class="pcl-cur">₹</span><span id="planPrice12m">...</span></div>
+                        <div class="pcl-price-save" id="planSave12m" style="display:none;"></div>
+                    </div>
+                    <div class="pcl-gst">+18% GST at payment</div>
+                    <div class="pcl-features">
+                        <div class="pcl-feature"><i class="fas fa-check"></i> Up to <strong>1,000 products</strong> upload</div>
+                        <div class="pcl-feature"><i class="fas fa-check"></i> <strong>3 photos</strong> per product</div>
+                        <div class="pcl-feature"><i class="fas fa-check"></i> Full dashboard + analytics</div>
+                        <div class="pcl-feature"><i class="fas fa-check"></i> Priority support + badge</div>
+                    </div>
+                    <button class="pcl-btn">Select Plan →</button>
+                </div>
+                
+            </div>
+        </div>
+        
+        <!-- MAIN CTA -->
+        <div class="main-cta-section">
+            <button class="main-cta-btn" onclick="goToForm('1m')">
+                <i class="fas fa-rocket"></i> Register Your Business Now
+            </button>
+            <div class="main-cta-note">Starts at <span id="ctaPrice">...</span> + GST · No hidden charges</div>
+        </div>
+        
+        <!-- TRUST -->
+        <div class="trust-badges-row">
+            <div class="trust-badge-mini"><i class="fas fa-lock"></i> Razorpay Secured</div>
+            <div class="trust-badge-mini"><i class="fas fa-check-circle"></i> Verified Platform</div>
+            <div class="trust-badge-mini"><i class="fas fa-headset"></i> 24/7 Support</div>
+        </div>
+        
+        <!-- FAQ -->
+        <div class="faq-mini">
+            <div class="faq-mini-title"><i class="fas fa-question-circle" style="color:var(--brand-orange);"></i> Frequently Asked Questions</div>
+            <div class="faq-item"><div class="faq-q">How long does approval take?</div><div class="faq-a">Usually within 24 hours after payment. You will receive a WhatsApp confirmation.</div></div>
+            <div class="faq-item"><div class="faq-q">Can I upgrade my plan later?</div><div class="faq-a">Yes, contact support to upgrade. You only pay the difference amount.</div></div>
+            <div class="faq-item"><div class="faq-q">What happens if I exceed product limit?</div><div class="faq-a">You will need to upgrade your plan to add more products. Dashboard will show plan limit warnings.</div></div>
+            <div class="faq-item"><div class="faq-q">Is the registration fee refundable?</div><div class="faq-a">No. All registration fees are strictly non-refundable. Please read full terms before paying.</div></div>
+            <div class="faq-item"><div class="faq-q">What if my business is rejected?</div><div class="faq-a">Our team reviews all businesses. Please ensure all details are correct. Fees are non-refundable as per terms.</div></div>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    
+    var CONFIG = {
+        SUPABASE_URL: 'https://zwajyovemwdqtkecipeb.supabase.co',
+        SUPABASE_KEY: 'sb_publishable_D7j1zU2VHCIl2Y56RFOmHg_HERx4Rz1'
+    };
+    
+    var sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+    
+    var planFees = { '1m': 499, '6m': 1999, '12m': 3499 };
+    
+    function formatRupees(n) { 
+        return '₹' + Number(n).toLocaleString('en-IN'); 
+    }
+    
+    function formatNumber(n) {
+        return Number(n).toLocaleString('en-IN');
+    }
+    
+    async function fetchPlanFees() {
+        try {
+            var r = await sb.from('app_settings').select('key, value').in('key', ['plan_1m_fee', 'plan_6m_fee', 'plan_12m_fee']);
+            if (r && r.data && r.data.length > 0) {
+                r.data.forEach(function(row) {
+                    var numVal = parseInt(row.value, 10);
+                    if (isNaN(numVal) || numVal <= 0) return;
+                    if (row.key === 'plan_1m_fee') planFees['1m'] = numVal;
+                    else if (row.key === 'plan_6m_fee') planFees['6m'] = numVal;
+                    else if (row.key === 'plan_12m_fee') planFees['12m'] = numVal;
+                });
+            }
+        } catch(e) { console.error('[Landing] Fetch failed:', e); }
+    }
+    
+    function updateAllPrices() {
+        var heroFee = document.getElementById('heroFeeAmount');
+        if (heroFee) heroFee.textContent = formatNumber(planFees['1m']);
+        
+        var p1 = document.getElementById('planPrice1m');
+        if (p1) p1.textContent = formatNumber(planFees['1m']);
+        
+        var p6 = document.getElementById('planPrice6m');
+        if (p6) p6.textContent = formatNumber(planFees['6m']);
+        var save6 = document.getElementById('planSave6m');
+        if (save6) {
+            var savings6 = (planFees['1m'] * 6) - planFees['6m'];
+            if (savings6 > 0) { save6.textContent = 'Save ₹' + formatNumber(savings6); save6.style.display = 'inline-block'; }
+            else { save6.style.display = 'none'; }
+        }
+        
+        var p12 = document.getElementById('planPrice12m');
+        if (p12) p12.textContent = formatNumber(planFees['12m']);
+        var save12 = document.getElementById('planSave12m');
+        if (save12) {
+            var savings12 = (planFees['1m'] * 12) - planFees['12m'];
+            if (savings12 > 0) { save12.textContent = 'Save ₹' + formatNumber(savings12); save12.style.display = 'inline-block'; }
+            else { save12.style.display = 'none'; }
+        }
+        
+        var cta = document.getElementById('ctaPrice');
+        if (cta) cta.textContent = formatRupees(planFees['1m']);
+    }
+    
+    function goToForm(plan) {
+        window.location.href = 'shop-register-form.html?plan=' + encodeURIComponent(plan);
+    }
+    window.goToForm = goToForm;
+    
+    async function init() {
+        // Fetch prices first, so user doesn't see placeholder '...'
+        await fetchPlanFees();
+        updateAllPrices();
+        
+        try {
+            var cart = JSON.parse(localStorage.getItem('zymart_cart') || '[]');
+            var count = cart.reduce(function(s, i) { return s + (i.quantity || 1); }, 0);
+            var badge = document.getElementById('cartBadge');
+            if (badge && count > 0) { badge.textContent = count; badge.classList.add('show'); }
+        } catch(e) {}
+        
+        // Hide loader after data is ready
+        var l = document.getElementById('simpleLoader');
+        var a = document.getElementById('mainApp');
+        if (a) a.style.display = '';
+        if (l) { 
+            l.classList.add('fade-out'); 
+            setTimeout(function() { if (l.parentNode) l.parentNode.removeChild(l); }, 300); 
+        }
+    }
+    
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+    
+})();
+</script>
+</body>
+</html>
